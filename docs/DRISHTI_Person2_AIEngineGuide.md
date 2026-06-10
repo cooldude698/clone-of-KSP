@@ -1,7 +1,7 @@
 # DRISHTI — ದೃಷ್ಟಿ
 ## Person 2: AI Engine Commander — Complete Step-by-Step Guide
 **KSP × Hack2Skill Datathon 2026**
-
+**Swapnil Gosh**
 ---
 
 > **Your role in one sentence:**  
@@ -16,7 +16,7 @@ Before you write a single line of code, understand who gives you what and when.
 ### What You Need From Others (in order)
 
 ```
-FROM PERSON 1 (Vedesh) — needed on Day 1 of your work:
+FROM PERSON 1 (Vritika) — needed on Day 1 of your work:
   ✅ The .env file with all credentials (Anthropic API key, Catalyst DB, Zia API key)
   ✅ GitHub repo access (your branch is: ai-engine)
   ✅ Catalyst project access (login credentials)
@@ -24,7 +24,7 @@ FROM PERSON 1 (Vedesh) — needed on Day 1 of your work:
   ✅ Confirmation that database tables exist and data is loaded
   ✅ The QuickML knowledge base URL (containing NCRB documents)
 
-FROM PERSON 3 (Data Boy) — needed in Week 3:
+FROM PERSON 3 (Aman) — needed in Week 3:
   ✅ The URL/endpoint for: /api/analytics/hotspots
   ✅ The URL/endpoint for: /api/analytics/underreporting
   ✅ The URL/endpoint for: /api/analytics/victim-vulnerability
@@ -33,7 +33,7 @@ FROM PERSON 3 (Data Boy) — needed in Week 3:
   ✅ The exact JSON response format each endpoint returns
   → Ask Person 3 to share a Postman collection or just the JSON examples
 
-FROM PERSON 4 (Camera Boy) — needed in Week 4:
+FROM PERSON 4 (Vedesh) — needed in Week 4:
   ✅ The URL/endpoint for: /api/cameras/nearby
   ✅ The URL/endpoint for: /api/trail
   ✅ The URL/endpoint for: /api/anpr/check
@@ -44,7 +44,7 @@ FROM PERSON 4 (Camera Boy) — needed in Week 4:
 ### What You Give to Others (in order)
 
 ```
-TO PERSON 5 (Girl) — needed when she starts chat UI (Week 2):
+TO PERSON 5 (Aryan) — needed when she starts chat UI (Week 2):
   📤 Your chat API endpoint URL (she calls this from the frontend)
   📤 The exact JSON request format she should send
   📤 The exact JSON response format she will receive
@@ -52,7 +52,7 @@ TO PERSON 5 (Girl) — needed when she starts chat UI (Week 2):
   📤 The PDF export button handler (she adds this to the Download button)
   → Share these as a simple text document in WhatsApp or a file in GitHub
 
-TO PERSON 1 (Vedesh) — for integration in Week 5:
+TO PERSON 1 (Vritika) — for integration in Week 5:
   📤 Final deployed URL of your chat Catalyst Serverless Function
   📤 Any environment variables that were added after initial setup
 ```
