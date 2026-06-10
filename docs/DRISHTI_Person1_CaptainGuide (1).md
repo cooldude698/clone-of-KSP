@@ -1,6 +1,6 @@
 # DRISHTI — ದೃಷ್ಟಿ
 ## Person 1: Captain's Complete Step-by-Step Guide
-**Vedesh | KSP × Hack2Skill Datathon 2026**
+**VRITIKA | KSP × Hack2Skill Datathon 2026**
 
 ---
 
@@ -68,7 +68,7 @@ If NCRB says Koramangala has more vehicle thefts than Yeshwantpur — our databa
 
 ```
 Day 1    → Catalyst account + project setup
-Day 1    → GitHub repository + folder structure
+Day 1    → GitHub repository(repo done + folder structure
 Day 2    → Download all real datasets (5 sources)
 Day 3    → Set up database schema in Catalyst Data Store
 Day 3    → Write Python script to transform real data into DB
