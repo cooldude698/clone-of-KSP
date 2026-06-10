@@ -1,7 +1,7 @@
 # DRISHTI — ದೃಷ್ಟಿ
 ## Person 3: Data & Analytics Commander — Complete Step-by-Step Guide
 **KSP × Hack2Skill Datathon 2026**
-
+**| Aman Jain**
 ---
 
 > **Your role in one sentence:**  
@@ -14,7 +14,7 @@
 ### What You Need From Others (in order)
 
 ```
-FROM PERSON 1 (Vedesh) — needed on YOUR Day 1:
+FROM PERSON 1 (Vritika) — needed on YOUR Day 1:
   ✅ The .env file with Catalyst DB credentials
        (CATALYST_DB_HOST, CATALYST_DB_PORT, CATALYST_DB_NAME,
         CATALYST_DB_USER, CATALYST_DB_PASSWORD)
@@ -23,7 +23,7 @@ FROM PERSON 1 (Vedesh) — needed on YOUR Day 1:
        (Tables: Districts, PoliceStations, CrimeTypes, FIRs, Accused,
         Victims, FIR_Accused, FIR_Victims, Cameras, ANPR_Watchlist, Alerts)
   ✅ Catalyst project access (dashboard login)
-  → Message Vedesh: "Tables created? .env ready? Share when done."
+  → Message Vritika: "Tables created? .env ready? Share when done."
 
 FROM NOBODY ELSE:
   You do NOT need Person 2, 4, or 5 to start your work.
@@ -33,23 +33,23 @@ FROM NOBODY ELSE:
 ### What You Give to Others (in order)
 
 ```
-TO PERSON 2 (AI Boy) — share by end of Week 2:
+TO PERSON 2 (Swapnil) — share by end of Week 2:
   📤 Your API contract document (exact JSON format for all 6 APIs)
   📤 Local URL of your running analytics server
   → Paste the API contract in WhatsApp + save in crime-database/API_CONTRACT.md
 
-TO PERSON 4 (Camera Boy) — share by end of Week 2:
+TO PERSON 4 (Vedesh) — share by end of Week 2:
   📤 Access to run ZCQL queries against the database
        (they need FIR data to build the ANPR watchlist)
   📤 Database credentials (they already have .env from Vedesh)
   → Tell Person 4: "DB is ready, tables are loaded. Your .env already has access."
 
-TO PERSON 5 (Girl) — share by end of Week 3:
+TO PERSON 5 (Aryan) — share by end of Week 3:
   📤 Sample JSON output of trends API (she needs this for dashboard charts)
   📤 Sample JSON for hotspot API (for the analyst dashboard heatmap)
   → Send sample JSONs in WhatsApp
 
-TO PERSON 1 (Vedesh) — for integration in Week 5:
+TO PERSON 1 (Vritka) — for integration in Week 5:
   📤 All 6 final deployed API endpoint URLs
   📤 Any environment variables added beyond initial .env
 ```
@@ -293,7 +293,7 @@ npm install zcatalyst-sdk-node dotenv express
 
 Copy the .env from Vedesh. Add these extra variables for your module:
 ```
-# Catalyst DB (from Vedesh)
+# Catalyst DB (from Vritka)
 CATALYST_DB_HOST=xxxx
 CATALYST_DB_PORT=3306
 CATALYST_DB_NAME=DRISHTI_KSP
