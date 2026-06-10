@@ -98,11 +98,9 @@ Week 7   → Submit on Hack2Skill
 
 1. After logging in, open a new tab
 2. Go to: **https://catalyst.zoho.com/promotions.html?cn=KSPH26**
-3. You will see a "Claim Credits" page
-4. Click **"Claim Credits"** — enter promo code **KSPH26** if prompted
-5. You should see a confirmation that credits have been added to your account
-6. Go back to your Catalyst dashboard. You should see credits in your account.
-7. **Screenshot this page and save it** — you may need it if there's any dispute
+3. **https://docs.google.com/document/d/e/2PACX-1vRCvJUkaiQma8eabDnP_BgXfG0zvkQzBjnjTpOshLhbKjc1BWSaorBYoa5yml9WnwvKQYv1gcwV7VtM/pub** - follow this to claim
+4. Go back to your Catalyst dashboard. You should see credits in your account.
+5. **Screenshot this page and save it** — you may need it if there's any dispute
 
 ### Step 3: Create Your Project
 
