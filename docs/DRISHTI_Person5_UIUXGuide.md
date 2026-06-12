@@ -1,7 +1,7 @@
 # DRISHTI — ದೃಷ್ಟಿ
 ## Person 5: UI/UX & Experience Commander — Complete Step-by-Step Guide
 **KSP × Hack2Skill Datathon 2026**
-
+**| Aryan **
 ---
 
 > **Your role in one sentence:**  
@@ -14,7 +14,7 @@
 ### What You Need From Others (in order)
 
 ```
-FROM PERSON 1 (Vedesh) — needed on YOUR Day 1:
+FROM PERSON 1 (Vritika) — needed on YOUR Day 1:
   ✅ GitHub repo access — your branch is: frontend
   ✅ The .env file (you only need these keys):
        NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
@@ -27,7 +27,7 @@ FROM PERSON 1 (Vedesh) — needed on YOUR Day 1:
        policymaker@drishti.ksp / [password]
   → Message Vedesh Day 1: "Need .env, Slate access, and test user credentials"
 
-FROM PERSON 2 (AI Boy) — needed in Week 2:
+FROM PERSON 2 (Swapnil) — needed in Week 2:
   ✅ camera-intel/API_CONTRACT.md (already on GitHub — describes chat request/response format)
   ✅ VoiceInput.tsx — React component for microphone input
   ✅ textToSpeech.ts — utility for reading responses aloud
@@ -35,7 +35,7 @@ FROM PERSON 2 (AI Boy) — needed in Week 2:
   → Message Person 2 at start of Week 2: "Ready to integrate voice. Push components 
     to your branch. What's your chat API URL right now?"
 
-FROM PERSON 4 (Camera Boy) — needed in Week 4:
+FROM PERSON 4 (Vedesh) — needed in Week 4:
   ✅ ChronoCriminalGraph.tsx — the animated network graph component
   ✅ InvestigatorWall.tsx — the case board component
   ✅ GeoTrailCard.tsx — the animated suspect trail map
@@ -46,7 +46,7 @@ FROM PERSON 4 (Camera Boy) — needed in Week 4:
 ### What You Give to Others (in order)
 
 ```
-TO PERSON 1 (Vedesh) — end of Week 6:
+TO PERSON 1 (Vritika) — end of Week 6:
   📤 Complete built frontend app (production build in /frontend/out or /.next)
   📤 List of all NEXT_PUBLIC_ environment variables that need to be set in Slate
 
