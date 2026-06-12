@@ -1,6 +1,7 @@
 # DRISHTI — ದೃಷ್ಟಿ
 ## Person 4: Camera Intelligence & Network Commander — Complete Step-by-Step Guide
 **KSP × Hack2Skill Datathon 2026**
+**| Vedesh S Khatri**
 
 ---
 
@@ -14,39 +15,39 @@
 ### What You Need From Others (in order)
 
 ```
-FROM PERSON 1 (Vedesh) — needed on YOUR Day 1:
+FROM PERSON 1 (Vritika) — needed on YOUR Day 1:
   ✅ The .env file with Catalyst DB credentials
   ✅ GitHub repo access — your branch is: camera-intel
   ✅ Catalyst project access (Signals enabled, NoSQL enabled)
   ✅ Confirmation that DB tables are created, especially:
        Cameras, ANPR_Watchlist, Alerts, FIRs, FIR_Accused, Accused
-  → Message Vedesh Day 1: "Need .env and confirm Cameras table exists"
+  → Message Vritka Day 1: "Need .env and confirm Cameras table exists"
 
-FROM PERSON 3 (Data Boy) — needed by end of Week 2:
+FROM PERSON 3 (Aman) — needed by end of Week 2:
   ✅ Confirmation that FIR data is loaded (you query it for ANPR watchlist)
   ✅ Their FIRs API URL (you call it to get repeat offender data for graph)
   ✅ Their Repeat Offenders API URL + exact JSON response format
        (the Chrono-graph needs accused_id, name, fir dates, crime types)
-  → Message Person 3 Week 2: "Is FIR data loaded? Share repeat-offenders 
+  → Message Aman Week 2: "Is FIR data loaded? Share repeat-offenders 
     API URL and sample response. I need accused + FIR dates for the graph."
 ```
 
 ### What You Give to Others (in order)
 
 ```
-TO PERSON 2 (AI Boy) — share by end of Week 3:
+TO PERSON 2 (Swapnil) — share by end of Week 3:
   📤 /api/cameras/nearby — URL + exact JSON response format
   📤 /api/trail — URL + exact JSON response format
   📤 /api/anpr/check — URL + exact JSON response format
   → Save in camera-intel/API_CONTRACT.md and share on WhatsApp
 
-TO PERSON 5 (Girl) — share by end of Week 4:
+TO PERSON 5 (Aryan) — share by end of Week 4:
   📤 ChronoCriminalGraph.tsx React component
   📤 InvestigatorWall.tsx React component
   📤 GeoTrailCard.tsx React component (renders the animated trail map)
   → Push these to your branch, tell Person 5 which folder to copy from
 
-TO PERSON 1 (Vedesh) — for integration in Week 5:
+TO PERSON 1 (Vritika) — for integration in Week 5:
   📤 All deployed Catalyst function URLs
   📤 Any new .env variables added
 ```
