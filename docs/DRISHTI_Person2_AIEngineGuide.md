@@ -17,7 +17,7 @@ Before you write a single line of code, understand who gives you what and when.
 
 ```
 FROM PERSON 1 (Vritika) — needed on Day 1 of your work:
-  ✅ The .env file with all credentials (Anthropic API key, Catalyst DB, Zia API key)
+  ✅ The .env file with all credentials (Gemini API key, Catalyst DB, Zia API key)
   ✅ GitHub repo access (your branch is: ai-engine)
   ✅ Catalyst project access (login credentials)
   ✅ Confirmation that Catalyst QuickML, Zia Services, NoSQL, SmartBrowz are enabled
@@ -138,8 +138,8 @@ These values must NEVER appear literally inside any `.js` file:
 
 | What it is | Wrong (hardcoded) | Correct (from .env) |
 |-----------|-------------------|---------------------|
-| Anthropic key | `"sk-ant-api03-xxx"` | `process.env.ANTHROPIC_API_KEY` |
-| AI model name | `"claude-sonnet-4-5"` | `process.env.ANTHROPIC_MODEL` |
+| Gemini API key | `"AIza..."` | `process.env.GEMINI_API_KEY` |
+| AI model name | `"gemini-2.5-flash"` | `process.env.GEMINI_MODEL` |
 | Max tokens | `1024` | `parseInt(process.env.MAX_TOKENS)` |
 | Temperature | `0.3` | `parseFloat(process.env.AI_TEMPERATURE)` |
 | Person 3's API URL | `"http://localhost:3001/hotspots"` | `process.env.ANALYTICS_API_URL` |
@@ -147,8 +147,8 @@ These values must NEVER appear literally inside any `.js` file:
 
 Add these to your `.env` file (and to .env.example without values):
 ```
-ANTHROPIC_API_KEY=sk-ant-xxx
-ANTHROPIC_MODEL=claude-sonnet-4-5
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-2.5-flash
 MAX_TOKENS=2000
 AI_TEMPERATURE=0.3
 ANALYTICS_API_URL=http://localhost:3000/api/analytics
@@ -211,7 +211,7 @@ git branch
 ```bash
 cd ai-engine
 npm init -y
-npm install @anthropic-ai/sdk axios zcatalyst-sdk-node dotenv
+npm install @google/generative-ai axios zcatalyst-sdk-node dotenv
 ```
 
 Create your `.env` file (paste the content below, fill in values from Vedesh):
@@ -221,8 +221,8 @@ touch .env
 
 Open `.env` in any text editor and paste:
 ```
-ANTHROPIC_API_KEY=PASTE_FROM_VEDESH
-ANTHROPIC_MODEL=claude-sonnet-4-5
+GEMINI_API_KEY=PASTE_FROM_VEDESH
+GEMINI_MODEL=gemini-2.5-flash
 MAX_TOKENS=2000
 AI_TEMPERATURE=0.3
 CATALYST_PROJECT_ID=PASTE_FROM_VEDESH
@@ -252,15 +252,15 @@ Prompt:
 ```
 Write a Node.js script called test-connection.js that:
 1. Loads environment variables from .env using dotenv
-2. Tests Anthropic API connection: sends a simple "Say hello in one word" message 
-   to claude-sonnet-4-5, prints the response
+2. Tests Gemini API connection: sends a simple "Say hello in one word" message 
+  to gemini-2.5-flash, prints the response
 3. Tests Catalyst NoSQL: initializes zcatalyst-sdk-node, reads from the 
    'conversations' collection (expects empty, that is fine), prints success or error
 4. Tests Catalyst Data Store: queries SELECT COUNT(*) FROM FIRs, prints the count
 5. For each test: prints ✅ PASS or ❌ FAIL with the error message
 
 Use async/await. Import dotenv at the top. 
-Show clear console output like: "Testing Anthropic API... ✅ PASS — Response: Hi"
+Show clear console output like: "Testing Gemini API... ✅ PASS — Response: Hi"
 ```
 
 Run it:
@@ -361,7 +361,7 @@ It handles POST requests to /api/chat.
 
 IMPORTS NEEDED:
 - require('dotenv').config()
-- Anthropic SDK: const Anthropic = require('@anthropic-ai/sdk')
+- Gemini SDK: const { GoogleGenerativeAI } = require('@google/generative-ai')
 - Catalyst SDK: const catalyst = require('zcatalyst-sdk-node')
 - axios for calling other APIs
 - The system prompt config: const { getSystemPrompt } = require('../../config/system-prompt')
@@ -375,7 +375,7 @@ REQUEST BODY:
 }
 
 STEP 1 — Initialize:
-- Initialize Anthropic client using process.env.ANTHROPIC_API_KEY
+- Initialize Gemini client using process.env.GEMINI_API_KEY
 - Initialize Catalyst app using catalyst.initialize(req)
 - Get Catalyst NoSQL using app.nosql()
 
@@ -395,7 +395,7 @@ STEP 3 — Query the crime database for relevant context:
 - Format these FIRs as a compact JSON summary (just key fields: case_number, crime_type_code, district_name, date_filed, status, location_name)
 - This becomes the contextData for the system prompt
 
-STEP 4 — Prepare messages for Claude:
+STEP 4 — Prepare messages for Gemini:
 - Build messages array:
   [
     ...conversation_history (last 10 messages),
@@ -403,18 +403,23 @@ STEP 4 — Prepare messages for Claude:
   ]
 - System prompt = getSystemPrompt(contextData from Step 3)
 
-STEP 5 — Call Anthropic API:
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const message = await client.messages.create({
-  model: process.env.ANTHROPIC_MODEL,
-  max_tokens: parseInt(process.env.MAX_TOKENS),
-  temperature: parseFloat(process.env.AI_TEMPERATURE),
-  system: systemPrompt,
-  messages: messages
+STEP 5 — Call Gemini API:
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({
+  model: process.env.GEMINI_MODEL,
+  systemInstruction: systemPrompt
+});
+const result = await model.generateContent({
+  contents: messages,
+  generationConfig: {
+    maxOutputTokens: parseInt(process.env.MAX_TOKENS),
+    temperature: parseFloat(process.env.AI_TEMPERATURE)
+  }
 });
 
 STEP 6 — Parse the response:
-- Extract text from message.content[0].text
+- Extract text from result.response.text()
 - Try to parse as JSON (the AI should return valid JSON)
 - If JSON parse fails: wrap the text in a default response object with type "none"
 
@@ -440,7 +445,7 @@ STEP 9 — Return response:
 Return HTTP 200 with the parsed JSON object plus conversation_id added to it.
 
 ERROR HANDLING:
-- If Anthropic API fails: return 500 with { error: true, message: "AI service unavailable" }
+- If Gemini API fails: return 500 with { error: true, message: "AI service unavailable" }
 - If DB query fails: still proceed — just use empty contextData
 - If NoSQL save fails: still return the response — don't fail the request
 
@@ -553,7 +558,7 @@ Paste this into Claude:
 ```
 Write a Node.js utility function called validateAndFillVizData(vizObject, dbData).
 
-vizObject is what Claude returned: { type, title, data }
+vizObject is what Gemini returned: { type, title, data }
 dbData is real data from the database (can be null)
 
 The function should:
@@ -1119,7 +1124,7 @@ Expected: A PDF file downloads. It contains the conversation. It looks professio
 - [ ] PASS
 
 ### Test 10 — Error Resilience
-Temporarily change ANTHROPIC_API_KEY to an invalid value. Run a query.
+Temporarily change GEMINI_API_KEY to an invalid value. Run a query.
 Expected: API returns `{ error: true, message: "AI service unavailable" }` — it does NOT crash the server.
 Restore the key after testing.
 - [ ] PASS
@@ -1149,10 +1154,10 @@ Person 5 needs these from you to build the chat UI. When each item is ready, sha
 
 | Resource | URL |
 |---------|-----|
-| Anthropic API Console (get API key) | https://console.anthropic.com |
-| Anthropic API docs | https://docs.anthropic.com/en/api/getting-started |
-| Anthropic Node.js SDK | https://www.npmjs.com/package/@anthropic-ai/sdk |
-| Anthropic messages API reference | https://docs.anthropic.com/en/api/messages |
+| Google AI Studio (get API key) | https://aistudio.google.com/app/apikey |
+| Gemini API docs | https://ai.google.dev/gemini-api/docs |
+| Gemini Node.js SDK | https://www.npmjs.com/package/@google/generative-ai |
+| Gemini generateContent reference | https://ai.google.dev/api/generate-content |
 | Catalyst Node.js SDK docs | https://docs.catalyst.zoho.com/en/sdk/nodejs/v2/overview/ |
 | Catalyst Serverless Functions docs | https://docs.catalyst.zoho.com/en/serverless-functions/ |
 | Catalyst NoSQL docs | https://docs.catalyst.zoho.com/en/nosql/ |
@@ -1170,12 +1175,12 @@ Person 5 needs these from you to build the chat UI. When each item is ready, sha
 
 1. **Copy the FULL error** (the entire stack trace, not just the last line)
 2. **Copy the relevant code section** (the function where the error happens)
-3. **Open a new Claude conversation** and paste:
+3. **Open a new Gemini chat** and paste:
 
 ```
 I am building the AI Engine module for DRISHTI — a crime intelligence platform 
 for Karnataka Police. I am using Node.js, Catalyst Serverless Functions, and 
-the Anthropic SDK.
+the Gemini SDK.
 
 I am getting this error:
 [PASTE FULL ERROR]
@@ -1184,7 +1189,7 @@ The relevant code is:
 [PASTE CODE]
 
 The .env variables involved are:
-ANTHROPIC_MODEL, ANTHROPIC_API_KEY, MAX_TOKENS (do NOT paste actual values)
+GEMINI_MODEL, GEMINI_API_KEY, MAX_TOKENS (do NOT paste actual values)
 
 Fix this step by step. Explain what was wrong.
 ```

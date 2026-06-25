@@ -23,7 +23,7 @@ const DB_URL = "jdbc:mysql://abc123.catalyst.zoho.com/DRISHTI";
 **Environment variables = correct.** Values live in a `.env` file, code reads from process:
 ```js
 // CORRECT — environment variable
-const API_KEY = process.env.ANTHROPIC_API_KEY;
+const API_KEY = process.env.GEMINI_API_KEY;
 const DB_URL = process.env.CATALYST_DB_URL;
 ```
 
@@ -232,8 +232,9 @@ Create a file called `.env.example` (this IS committed to GitHub — it shows th
 ```bash
 # Paste this into .env.example:
 cat > .env.example << 'EOF'
-# Anthropic API
-ANTHROPIC_API_KEY=your_anthropic_api_key_here
+# Gemini API
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-2.5-flash
 
 # Catalyst Project
 CATALYST_PROJECT_ID=your_project_id
@@ -823,16 +824,16 @@ If Check 6 shows all months roughly equal (no seasonal pattern), the seasonal we
 
 ## DAY 4 — API Keys and Environment Variable Setup
 
-### Step 1: Get Anthropic API Key
+### Step 1: Get Gemini API Key
 
-1. Go to: **https://console.anthropic.com**
+1. Go to: **https://aistudio.google.com/app/apikey**
 2. Create an account or sign in
-3. Go to: **API Keys** → **Create Key**
+3. Go to: **Get API key** → **Create API key**
 4. Name it: `DRISHTI-KSP`
-5. Copy the key (starts with `sk-ant-...`)
+5. Copy the key
 6. **Store it ONLY in your .env file — never paste it in code or send it in chat**
 
-**Important:** Anthropic gives you free credits on signup. The claude-sonnet-4-5 model is what we use. Monitor usage at the console to make sure you don't exceed the free tier during development.
+**Important:** Use Gemini 2.5 Flash for the AI engine. Monitor usage in Google AI Studio to stay within your free tier during development.
 
 ### Step 2: Get Catalyst Zia API Key
 
@@ -855,8 +856,9 @@ Create the final `.env` with ALL real values filled in:
 ```bash
 # Create the final .env file
 cat > .env << 'EOF'
-# Anthropic
-ANTHROPIC_API_KEY=sk-ant-XXXX
+# Gemini
+GEMINI_API_KEY=XXXX
+GEMINI_MODEL=gemini-2.5-flash
 
 # Catalyst Project
 CATALYST_PROJECT_ID=XXXX
@@ -905,8 +907,8 @@ Even though Member 2 builds the AI features, you need to set up the QuickML foun
 
 1. Catalyst Dashboard → QuickML → Your project `drishti-ai`
 2. Under **LLM Configuration**:
-   - Select model: **Claude (Anthropic)**
-   - Paste your `ANTHROPIC_API_KEY`
+  - Select model: **Gemini 2.5 Flash**
+  - Paste your `GEMINI_API_KEY`
    - Set max tokens: 2000
    - Temperature: 0.3 (for factual crime queries)
 3. Save the configuration
@@ -1331,7 +1333,7 @@ Click Submit. Screenshot the confirmation page.
 | Slate Docs | Frontend hosting | https://docs.catalyst.zoho.com/en/slate/ |
 | Signals Docs | Real-time events | https://docs.catalyst.zoho.com/en/signals/ |
 | CLI Install | Deploy from terminal | https://docs.catalyst.zoho.com/en/cli/ |
-| Anthropic Console | Get API key | https://console.anthropic.com |
+| Google AI Studio | Get API key | https://aistudio.google.com/app/apikey |
 
 ---
 

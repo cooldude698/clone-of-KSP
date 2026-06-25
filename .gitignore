@@ -1,0 +1,13 @@
+.env
+.env.local
+.env.*
+credentials_PRIVATE.txt
+node_modules/
+dist/
+build/
+coverage/
+raw-data/
+*.csv
+*.xlsx
+*.log
+.DS_Store
