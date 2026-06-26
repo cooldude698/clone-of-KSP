@@ -114,8 +114,8 @@ kspdatathon2026/
 
 ---
 
-## 👥 Team VRITIKA
-* **Vritika** — *Captain & Infrastructure Coordinator* (Person 1)
+## 👥 Team DHRISHTI
+* **Vritika** — *Coordinator* (Person 1)
 * **Swapnil Gosh** — *AI Engine Commander* (Person 2)
 * **Aman Jain** — *Data & Analytics Commander* (Person 3)
 * **Vedesh S Khatri** — *Camera Network Commander* (Person 4)
