@@ -118,7 +118,7 @@ kspdatathon2026/
 * **Vritika** — *Coordinator* (Person 1)
 * **Swapnil Gosh** — *AI Engine Commander* (Person 2)
 * **Aman Jain** — *Data & Analytics Commander* (Person 3)
-* **Vedesh S Khatri** — *Camera Network Commander* (Person 4)
+* **Vedesh S Khatri** — *Lead and Camera Network Commander* (Person 4)
 * **Aryan** — *UI/UX & Experience Commander* (Person 5)
 
 ---
