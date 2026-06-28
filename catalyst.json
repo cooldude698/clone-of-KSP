@@ -1,0 +1,15 @@
+{
+  "functions": {
+    "targets": [
+      "drishti_ksp_function"
+    ],
+    "ignore": [],
+    "source": "functions"
+  },
+  "slate": [
+    {
+      "name": "nextjs",
+      "source": "C:\\Users\\Vedesh\\Documents\\Hackathons\\KSP-DATATHON\\kspdatathon2026-1\\nextjs"
+    }
+  ]
+}

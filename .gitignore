@@ -1,0 +1,20 @@
+# Env / Credentials
+.env
+
+# Logs
+*.log
+catalyst-debug.log
+
+# Build / Output
+.build/
+.next/
+dist/
+build/
+out/
+
+# Dependencies
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
