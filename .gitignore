@@ -1,13 +1,24 @@
+# Env / Credentials
 .env
 .env.local
 .env.*
 credentials_PRIVATE.txt
-node_modules/
+
+# Logs
+*.log
+catalyst-debug.log
+
+# Build / Output
+.build/
+.next/
 dist/
 build/
+out/
 coverage/
-raw-data/
-*.csv
-*.xlsx
-*.log
+
+# Dependencies
+node_modules/
+
+# OS files
 .DS_Store
+Thumbs.db

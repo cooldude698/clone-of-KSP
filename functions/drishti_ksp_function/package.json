@@ -1,0 +1,9 @@
+{
+	"name": "drishti_ksp_function",
+	"version": "1.0.0",
+	"main": "index.js",
+	"author": "vritika110@gmail.com",
+	"dependencies": {
+		"zcatalyst-sdk-node": "latest"
+	}
+}
