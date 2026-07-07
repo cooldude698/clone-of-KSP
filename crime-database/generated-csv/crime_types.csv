@@ -1,0 +1,16 @@
+code,name,category,ipc_section,severity
+vehicle_theft,Vehicle Theft,Property,IPC 379,2
+chain_snatching,Chain Snatching,Violent,IPC 392,3
+burglary,Burglary,Property,IPC 454,3
+robbery,Robbery,Violent,IPC 392,4
+assault,Assault,Violent,IPC 323,3
+fraud,Fraud,Economic,IPC 420,2
+cybercrime,Cybercrime,Economic,IT Act 66,2
+drug_offence,Drug Offence,Other,NDPS 20,3
+murder,Murder,Violent,IPC 302,5
+eve_teasing,Eve Teasing,Violent,IPC 354,2
+kidnapping,Kidnapping,Violent,IPC 363,5
+hit_and_run,Hit and Run,Other,IPC 304A,3
+property_crime,Property Crime,Property,IPC 427,1
+domestic_violence,Domestic Violence,Violent,IPC 498A,3
+senior_citizen_crime,Senior Citizen Crime,Violent,IPC various,3
