@@ -1,0 +1,61 @@
+{
+  "BENGALURU_BOUNDS": {
+    "lat_min": 12.85,
+    "lat_max": 13.05,
+    "lng_min": 77.50,
+    "lng_max": 77.70
+  },
+  "CAMERA_TYPE_PRIORITY": [
+    "Safe_City",
+    "BATCS",
+    "MCCTNS_Commercial",
+    "MCCTNS_RWA",
+    "MCCTNS_Private"
+  ],
+  "CAMERA_DISTRIBUTION": {
+    "safe_city_count": 800,
+    "batcs_count": 300,
+    "mcctns_count": 3900
+  },
+  "SAFE_CITY_PROPERTIES": {
+    "has_anpr": true,
+    "has_face_recog": true,
+    "coverage_radius_m": 50
+  },
+  "BATCS_PROPERTIES": {
+    "has_anpr": true,
+    "has_face_recog": false,
+    "coverage_radius_m": 80
+  },
+  "MCCTNS_PROPERTIES": {
+    "has_anpr": false,
+    "has_face_recog": false,
+    "coverage_radius_m": 20
+  },
+  "TRAIL": {
+    "max_hop_distance_m": 900,
+    "min_hop_distance_m": 300,
+    "time_between_hops_min_sec": 180,
+    "time_between_hops_max_sec": 480,
+    "max_hops": 6,
+    "confidence_range": {
+      "first_2_hops": [85, 95],
+      "later_hops": [55, 80]
+    },
+    "direction_drift_degrees": 25
+  },
+  "RELEVANCE_SCORING": {
+    "base_score": 100,
+    "distance_penalty_per_100m": 10,
+    "anpr_bonus": 20,
+    "face_recog_bonus": 15,
+    "safe_city_type_bonus": 10
+  },
+  "ANPR_PLATE_PATTERN": "KA-\\d{2}-[A-Z]{1,2}-\\d{4}",
+  "BLIND_SPOT": {
+    "grid_cell_degrees": 0.005,
+    "min_crime_count": 5,
+    "max_camera_count_for_blind_spot": 2,
+    "critical_ratio_threshold": 10
+  }
+}

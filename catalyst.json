@@ -1,7 +1,11 @@
 {
   "functions": {
     "targets": [
-      "drishti_ksp_function"
+      "drishti_ksp_function",
+      "cameras-nearby",
+      "trail",
+      "anpr-check",
+      "network-graph-data"
     ],
     "ignore": [],
     "source": "functions"

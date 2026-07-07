@@ -1,0 +1,11 @@
+{
+	"name": "anpr-check",
+	"version": "1.0.0",
+	"main": "index.js",
+	"author": "vedeshskhatri",
+	"dependencies": {
+		"zcatalyst-sdk-node": "latest",
+		"dotenv": "latest",
+		"axios": "latest"
+	}
+}
