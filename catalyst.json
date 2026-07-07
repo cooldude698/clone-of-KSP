@@ -5,7 +5,13 @@
       "cameras-nearby",
       "trail",
       "anpr-check",
-      "network-graph-data"
+      "network-graph-data",
+      "firs",
+      "hotspots",
+      "trends",
+      "repeat-offenders",
+      "victim-vulnerability",
+      "underreporting"
     ],
     "ignore": [],
     "source": "functions"

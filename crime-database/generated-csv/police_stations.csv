@@ -1,0 +1,121 @@
+name,district_name,division,address,lat,lng
+Bengaluru Urban Central PS,Bengaluru Urban,Bengaluru,"Central Road, Bengaluru Urban, Karnataka",12.9906,77.6339
+Bengaluru Urban North PS,Bengaluru Urban,Bengaluru,"North Road, Bengaluru Urban, Karnataka",13.0078,77.5837
+Bengaluru Urban South PS,Bengaluru Urban,Bengaluru,"South Road, Bengaluru Urban, Karnataka",13.007,77.5701
+Bengaluru Urban East PS,Bengaluru Urban,Bengaluru,"East Road, Bengaluru Urban, Karnataka",13.0093,77.5458
+Bengaluru Urban West PS,Bengaluru Urban,Bengaluru,"West Road, Bengaluru Urban, Karnataka",12.8952,77.5695
+Bengaluru Urban Traffic PS,Bengaluru Urban,Bengaluru,"Traffic Road, Bengaluru Urban, Karnataka",12.9882,77.5718
+Bengaluru Rural Central PS,Bengaluru Rural,Bengaluru,"Central Road, Bengaluru Rural, Karnataka",13.2255,77.5079
+Bengaluru Rural North PS,Bengaluru Rural,Bengaluru,"North Road, Bengaluru Rural, Karnataka",13.2698,77.5593
+Bengaluru Rural South PS,Bengaluru Rural,Bengaluru,"South Road, Bengaluru Rural, Karnataka",13.1844,77.6003
+Bengaluru Rural East PS,Bengaluru Rural,Bengaluru,"East Road, Bengaluru Rural, Karnataka",13.2739,77.5517
+Bengaluru Rural West PS,Bengaluru Rural,Bengaluru,"West Road, Bengaluru Rural, Karnataka",13.2849,77.6523
+Bengaluru Rural Traffic PS,Bengaluru Rural,Bengaluru,"Traffic Road, Bengaluru Rural, Karnataka",13.1764,77.5859
+Mysuru Central PS,Mysuru,Southern,"Central Road, Mysuru, Karnataka",12.2856,76.6094
+Mysuru North PS,Mysuru,Southern,"North Road, Mysuru, Karnataka",12.3644,76.6871
+Mysuru South PS,Mysuru,Southern,"South Road, Mysuru, Karnataka",12.3446,76.6026
+Mysuru East PS,Mysuru,Southern,"East Road, Mysuru, Karnataka",12.2556,76.7184
+Mysuru West PS,Mysuru,Southern,"West Road, Mysuru, Karnataka",12.3397,76.5701
+Mysuru Traffic PS,Mysuru,Southern,"Traffic Road, Mysuru, Karnataka",12.3462,76.5743
+Mangaluru (Dakshina Kannada) Town PS,Mangaluru (Dakshina Kannada),Western,"Town Road, Mangaluru (Dakshina Kannada), Karnataka",12.8408,74.8459
+Mangaluru (Dakshina Kannada) Rural PS,Mangaluru (Dakshina Kannada),Western,"Rural Road, Mangaluru (Dakshina Kannada), Karnataka",12.8485,74.8772
+Mangaluru (Dakshina Kannada) Suburban PS,Mangaluru (Dakshina Kannada),Western,"Suburban Road, Mangaluru (Dakshina Kannada), Karnataka",12.9859,74.8659
+Mangaluru (Dakshina Kannada) Traffic PS,Mangaluru (Dakshina Kannada),Western,"Traffic Road, Mangaluru (Dakshina Kannada), Karnataka",12.852,74.8833
+Mangaluru (Dakshina Kannada) Market PS,Mangaluru (Dakshina Kannada),Western,"Market Road, Mangaluru (Dakshina Kannada), Karnataka",12.889,74.8404
+Mangaluru (Dakshina Kannada) Industrial PS,Mangaluru (Dakshina Kannada),Western,"Industrial Road, Mangaluru (Dakshina Kannada), Karnataka",12.9493,74.8596
+Hubballi-Dharwad Town PS,Hubballi-Dharwad,Northern,"Town Road, Hubballi-Dharwad, Karnataka",15.2979,75.2022
+Hubballi-Dharwad Rural PS,Hubballi-Dharwad,Northern,"Rural Road, Hubballi-Dharwad, Karnataka",15.3586,75.1279
+Hubballi-Dharwad Suburban PS,Hubballi-Dharwad,Northern,"Suburban Road, Hubballi-Dharwad, Karnataka",15.3054,75.1055
+Hubballi-Dharwad Traffic PS,Hubballi-Dharwad,Northern,"Traffic Road, Hubballi-Dharwad, Karnataka",15.3057,75.1757
+Hubballi-Dharwad Market PS,Hubballi-Dharwad,Northern,"Market Road, Hubballi-Dharwad, Karnataka",15.3278,75.1005
+Hubballi-Dharwad Industrial PS,Hubballi-Dharwad,Northern,"Industrial Road, Hubballi-Dharwad, Karnataka",15.3306,75.086
+Belagavi Town PS,Belagavi,Northern,"Town Road, Belagavi, Karnataka",15.826,74.5315
+Belagavi Rural PS,Belagavi,Northern,"Rural Road, Belagavi, Karnataka",15.8278,74.5118
+Belagavi Suburban PS,Belagavi,Northern,"Suburban Road, Belagavi, Karnataka",15.876,74.4604
+Belagavi Traffic PS,Belagavi,Northern,"Traffic Road, Belagavi, Karnataka",15.7754,74.443
+Belagavi Market PS,Belagavi,Northern,"Market Road, Belagavi, Karnataka",15.8832,74.4386
+Belagavi Industrial PS,Belagavi,Northern,"Industrial Road, Belagavi, Karnataka",15.7716,74.5561
+Kalaburagi Town PS,Kalaburagi,North-Eastern,"Town Road, Kalaburagi, Karnataka",17.3747,76.7808
+Kalaburagi Rural PS,Kalaburagi,North-Eastern,"Rural Road, Kalaburagi, Karnataka",17.2636,76.8305
+Kalaburagi Suburban PS,Kalaburagi,North-Eastern,"Suburban Road, Kalaburagi, Karnataka",17.2529,76.9107
+Kalaburagi Traffic PS,Kalaburagi,North-Eastern,"Traffic Road, Kalaburagi, Karnataka",17.3988,76.86
+Kalaburagi Market PS,Kalaburagi,North-Eastern,"Market Road, Kalaburagi, Karnataka",17.3375,76.7695
+Kalaburagi Industrial PS,Kalaburagi,North-Eastern,"Industrial Road, Kalaburagi, Karnataka",17.3626,76.8943
+Ballari Town PS,Ballari,Central,"Town Road, Ballari, Karnataka",15.0979,76.9821
+Ballari Rural PS,Ballari,Central,"Rural Road, Ballari, Karnataka",15.0725,76.8909
+Ballari Suburban PS,Ballari,Central,"Suburban Road, Ballari, Karnataka",15.1993,76.8549
+Ballari Traffic PS,Ballari,Central,"Traffic Road, Ballari, Karnataka",15.1009,76.946
+Ballari Market PS,Ballari,Central,"Market Road, Ballari, Karnataka",15.1891,76.8623
+Ballari Industrial PS,Ballari,Central,"Industrial Road, Ballari, Karnataka",15.0783,76.9259
+Shivamogga Town PS,Shivamogga,Central,"Town Road, Shivamogga, Karnataka",13.9376,75.5391
+Shivamogga Rural PS,Shivamogga,Central,"Rural Road, Shivamogga, Karnataka",13.9799,75.5175
+Shivamogga Suburban PS,Shivamogga,Central,"Suburban Road, Shivamogga, Karnataka",13.9317,75.6392
+Shivamogga Traffic PS,Shivamogga,Central,"Traffic Road, Shivamogga, Karnataka",13.9949,75.6066
+Shivamogga Market PS,Shivamogga,Central,"Market Road, Shivamogga, Karnataka",13.9683,75.6253
+Shivamogga Industrial PS,Shivamogga,Central,"Industrial Road, Shivamogga, Karnataka",13.8784,75.5196
+Tumakuru Town PS,Tumakuru,Bengaluru,"Town Road, Tumakuru, Karnataka",13.395,77.0624
+Tumakuru Rural PS,Tumakuru,Bengaluru,"Rural Road, Tumakuru, Karnataka",13.2784,77.1501
+Tumakuru Suburban PS,Tumakuru,Bengaluru,"Suburban Road, Tumakuru, Karnataka",13.3508,77.1128
+Tumakuru Traffic PS,Tumakuru,Bengaluru,"Traffic Road, Tumakuru, Karnataka",13.2899,77.0873
+Tumakuru Market PS,Tumakuru,Bengaluru,"Market Road, Tumakuru, Karnataka",13.3232,77.0691
+Tumakuru Industrial PS,Tumakuru,Bengaluru,"Industrial Road, Tumakuru, Karnataka",13.3888,77.0458
+Davangere Town PS,Davangere,Central,"Town Road, Davangere, Karnataka",14.4903,75.9567
+Davangere Rural PS,Davangere,Central,"Rural Road, Davangere, Karnataka",14.5345,75.9342
+Davangere Suburban PS,Davangere,Central,"Suburban Road, Davangere, Karnataka",14.5443,75.9637
+Davangere Traffic PS,Davangere,Central,"Traffic Road, Davangere, Karnataka",14.5167,75.9094
+Davangere Market PS,Davangere,Central,"Market Road, Davangere, Karnataka",14.5054,75.8952
+Davangere Industrial PS,Davangere,Central,"Industrial Road, Davangere, Karnataka",14.4758,75.8556
+Hassan Town PS,Hassan,Southern,"Town Road, Hassan, Karnataka",13.0535,76.0285
+Hassan Rural PS,Hassan,Southern,"Rural Road, Hassan, Karnataka",13.0588,76.0387
+Hassan Suburban PS,Hassan,Southern,"Suburban Road, Hassan, Karnataka",12.973,76.1774
+Hassan Traffic PS,Hassan,Southern,"Traffic Road, Hassan, Karnataka",12.9281,76.0581
+Hassan Market PS,Hassan,Southern,"Market Road, Hassan, Karnataka",13.0787,76.1737
+Hassan Industrial PS,Hassan,Southern,"Industrial Road, Hassan, Karnataka",13.0242,76.1232
+Vijayapura Town PS,Vijayapura,Northern,"Town Road, Vijayapura, Karnataka",16.7695,75.7628
+Vijayapura Rural PS,Vijayapura,Northern,"Rural Road, Vijayapura, Karnataka",16.7833,75.6604
+Vijayapura Suburban PS,Vijayapura,Northern,"Suburban Road, Vijayapura, Karnataka",16.7999,75.6839
+Vijayapura Traffic PS,Vijayapura,Northern,"Traffic Road, Vijayapura, Karnataka",16.8062,75.6898
+Vijayapura Market PS,Vijayapura,Northern,"Market Road, Vijayapura, Karnataka",16.8552,75.6584
+Vijayapura Industrial PS,Vijayapura,Northern,"Industrial Road, Vijayapura, Karnataka",16.8202,75.6372
+Raichur Town PS,Raichur,North-Eastern,"Town Road, Raichur, Karnataka",16.1856,77.3546
+Raichur Rural PS,Raichur,North-Eastern,"Rural Road, Raichur, Karnataka",16.2367,77.3422
+Raichur Suburban PS,Raichur,North-Eastern,"Suburban Road, Raichur, Karnataka",16.2064,77.4002
+Raichur Traffic PS,Raichur,North-Eastern,"Traffic Road, Raichur, Karnataka",16.2307,77.3439
+Raichur Market PS,Raichur,North-Eastern,"Market Road, Raichur, Karnataka",16.2195,77.2916
+Raichur Industrial PS,Raichur,North-Eastern,"Industrial Road, Raichur, Karnataka",16.1549,77.4118
+Udupi Town PS,Udupi,Western,"Town Road, Udupi, Karnataka",13.3231,74.7811
+Udupi Rural PS,Udupi,Western,"Rural Road, Udupi, Karnataka",13.3717,74.6717
+Udupi Suburban PS,Udupi,Western,"Suburban Road, Udupi, Karnataka",13.2864,74.7748
+Udupi Traffic PS,Udupi,Western,"Traffic Road, Udupi, Karnataka",13.2914,74.7293
+Udupi Market PS,Udupi,Western,"Market Road, Udupi, Karnataka",13.3544,74.6786
+Udupi Industrial PS,Udupi,Western,"Industrial Road, Udupi, Karnataka",13.3378,74.7223
+Kolar Town PS,Kolar,Bengaluru,"Town Road, Kolar, Karnataka",13.1061,78.1739
+Kolar Rural PS,Kolar,Bengaluru,"Rural Road, Kolar, Karnataka",13.1861,78.187
+Kolar Suburban PS,Kolar,Bengaluru,"Suburban Road, Kolar, Karnataka",13.0923,78.129
+Kolar Traffic PS,Kolar,Bengaluru,"Traffic Road, Kolar, Karnataka",13.2039,78.112
+Kolar Market PS,Kolar,Bengaluru,"Market Road, Kolar, Karnataka",13.0663,78.0789
+Kolar Industrial PS,Kolar,Bengaluru,"Industrial Road, Kolar, Karnataka",13.2062,78.0547
+Mandya Town PS,Mandya,Southern,"Town Road, Mandya, Karnataka",12.524,76.9484
+Mandya Rural PS,Mandya,Southern,"Rural Road, Mandya, Karnataka",12.4952,76.9083
+Mandya Suburban PS,Mandya,Southern,"Suburban Road, Mandya, Karnataka",12.581,76.8938
+Mandya Traffic PS,Mandya,Southern,"Traffic Road, Mandya, Karnataka",12.5545,76.9038
+Mandya Market PS,Mandya,Southern,"Market Road, Mandya, Karnataka",12.5984,76.8344
+Mandya Industrial PS,Mandya,Southern,"Industrial Road, Mandya, Karnataka",12.5062,76.9624
+Chikkamagaluru Town PS,Chikkamagaluru,Western,"Town Road, Chikkamagaluru, Karnataka",13.2701,75.7502
+Chikkamagaluru Rural PS,Chikkamagaluru,Western,"Rural Road, Chikkamagaluru, Karnataka",13.2716,75.798
+Chikkamagaluru Suburban PS,Chikkamagaluru,Western,"Suburban Road, Chikkamagaluru, Karnataka",13.3084,75.7832
+Chikkamagaluru Traffic PS,Chikkamagaluru,Western,"Traffic Road, Chikkamagaluru, Karnataka",13.2986,75.7199
+Chikkamagaluru Market PS,Chikkamagaluru,Western,"Market Road, Chikkamagaluru, Karnataka",13.3073,75.7121
+Chikkamagaluru Industrial PS,Chikkamagaluru,Western,"Industrial Road, Chikkamagaluru, Karnataka",13.3686,75.7622
+Bidar Town PS,Bidar,North-Eastern,"Town Road, Bidar, Karnataka",17.8498,77.5979
+Bidar Rural PS,Bidar,North-Eastern,"Rural Road, Bidar, Karnataka",17.9569,77.4953
+Bidar Suburban PS,Bidar,North-Eastern,"Suburban Road, Bidar, Karnataka",17.9166,77.4528
+Bidar Traffic PS,Bidar,North-Eastern,"Traffic Road, Bidar, Karnataka",17.9803,77.4616
+Bidar Market PS,Bidar,North-Eastern,"Market Road, Bidar, Karnataka",17.9086,77.5046
+Bidar Industrial PS,Bidar,North-Eastern,"Industrial Road, Bidar, Karnataka",17.9147,77.5357
+Koppal Town PS,Koppal,North-Eastern,"Town Road, Koppal, Karnataka",15.3218,76.2093
+Koppal Rural PS,Koppal,North-Eastern,"Rural Road, Koppal, Karnataka",15.385,76.1027
+Koppal Suburban PS,Koppal,North-Eastern,"Suburban Road, Koppal, Karnataka",15.3104,76.0913
+Koppal Traffic PS,Koppal,North-Eastern,"Traffic Road, Koppal, Karnataka",15.3727,76.18
+Koppal Market PS,Koppal,North-Eastern,"Market Road, Koppal, Karnataka",15.3577,76.2062
+Koppal Industrial PS,Koppal,North-Eastern,"Industrial Road, Koppal, Karnataka",15.2808,76.1271

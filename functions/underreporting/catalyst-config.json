@@ -1,0 +1,11 @@
+{
+    "deployment": {
+        "stack": "node24",
+        "type": "advancedio",
+        "env_variables": {},
+        "name": "underreporting"
+    },
+    "execution": {
+        "main": "index.js"
+    }
+}

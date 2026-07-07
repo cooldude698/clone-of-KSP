@@ -1,0 +1,9 @@
+{
+    "version": "1.0.0",
+    "main": "index.js",
+    "dependencies": {
+        "zcatalyst-sdk-node": "latest",
+        "dotenv": "latest"
+    },
+    "name": "hotspots"
+}
