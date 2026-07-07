@@ -1,0 +1,12 @@
+{
+	"name": "cameras-nearby",
+	"version": "1.0.0",
+	"main": "index.js",
+	"author": "vedeshskhatri",
+	"dependencies": {
+		"axios": "latest",
+		"csv-parser": "^3.2.1",
+		"dotenv": "latest",
+		"zcatalyst-sdk-node": "latest"
+	}
+}

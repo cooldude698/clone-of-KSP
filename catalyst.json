@@ -1,7 +1,17 @@
 {
   "functions": {
     "targets": [
-      "drishti_ksp_function"
+      "drishti_ksp_function",
+      "cameras-nearby",
+      "trail",
+      "anpr-check",
+      "network-graph-data",
+      "firs",
+      "hotspots",
+      "trends",
+      "repeat-offenders",
+      "victim-vulnerability",
+      "underreporting"
     ],
     "ignore": [],
     "source": "functions"

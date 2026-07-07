@@ -22,3 +22,7 @@ node_modules/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Misc
+*.zip
+crime-database/raw-data/

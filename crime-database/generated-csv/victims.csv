@@ -1,0 +1,2501 @@
+full_name,age,gender,occupation,district_name,vulnerability_score
+Bhavika Bora,26,Female,Student,Mandya,45
+Eta Shroff,21,Female,Student,Vijayapura,25
+Guneet Bir,71,Male,Teacher,Kolar,84
+Eta Bhakta,65,Female,Homemaker,Belagavi,55
+Gauri Sarin,71,Female,Retired Officer,Vijayapura,25
+Wyatt Ganesan,20,Male,Bank Employee,Kolar,26
+Girish Mammen,36,Male,Software Engineer,Udupi,63
+Geetika Dugal,57,Female,Student,Mysuru,66
+Qushi Devi,44,Female,Bank Employee,Hassan,25
+Champak More,23,Male,Retired Officer,Koppal,72
+Rayaan Sood,60,Male,Bank Employee,Bengaluru Rural,87
+Wyatt Mukherjee,52,Male,Software Engineer,Koppal,64
+William Wable,52,Male,Retired Officer,Hubballi-Dharwad,62
+Kai Verma,24,Male,Homemaker,Shivamogga,61
+Aditya Chokshi,18,Male,Student,Vijayapura,67
+Jeremiah Bail,57,Male,Bank Employee,Kalaburagi,51
+Arin Bandi,20,Male,Bank Employee,Kalaburagi,42
+Dalbir Gill,29,Male,Student,Mangaluru (Dakshina Kannada),46
+Parth Patla,68,Male,Bank Employee,Ballari,52
+Madhav Garde,40,Male,Retired Officer,Davangere,67
+Vidhi Chandran,59,Female,Homemaker,Ballari,33
+Samar Barad,33,Male,Student,Bengaluru Rural,58
+Sarthak Iyengar,70,Male,Teacher,Kolar,36
+Anvi Bobal,55,Female,Retired Officer,Chikkamagaluru,22
+Vedant Saxena,25,Male,Homemaker,Mandya,26
+Sara Mallick,66,Female,Student,Shivamogga,62
+Chaman Bumb,69,Female,Homemaker,Davangere,83
+Quincy Dutta,62,Male,Retired Officer,Koppal,87
+Samuel Shan,27,Male,Retired Officer,Hassan,49
+Rishi Hayer,32,Male,Bank Employee,Kalaburagi,59
+Falak Patla,39,Female,Shopkeeper,Shivamogga,62
+Manya Bassi,68,Female,Retired Officer,Bengaluru Rural,55
+Zaitra Bhatnagar,51,Female,Shopkeeper,Hassan,79
+Balveer Vora,39,Male,Teacher,Mandya,34
+Kevin Hayer,69,Male,Shopkeeper,Bengaluru Rural,83
+Nidhi Iyer,69,Female,Software Engineer,Mysuru,36
+Ranbir Badami,42,Male,Teacher,Raichur,42
+Abhiram Bains,61,Male,Bank Employee,Koppal,51
+Dipta Narain,38,Female,Retired Officer,Belagavi,80
+Ikshita Gaba,43,Female,Retired Officer,Belagavi,41
+Abdul Warrior,35,Male,Retired Officer,Shivamogga,37
+Pranit Basak,17,Male,Software Engineer,Davangere,72
+Baljiwan Chaudhry,38,Male,Homemaker,Bidar,76
+Bachittar Nadkarni,61,Male,Homemaker,Hassan,38
+Saksham Cherian,32,Male,Homemaker,Davangere,43
+Garima Raja,28,Female,Student,Mandya,49
+Vihaan Garde,34,Male,Teacher,Kalaburagi,46
+Jatin Garde,44,Male,Bank Employee,Mandya,51
+Samesh Mahajan,61,Male,Homemaker,Vijayapura,46
+Qadim Tella,52,Male,Shopkeeper,Koppal,46
+Yatin Badal,19,Male,Bank Employee,Koppal,65
+Abhimanyu Sethi,66,Male,Software Engineer,Kolar,67
+Theodore Chhabra,51,Male,Software Engineer,Tumakuru,52
+Lekha Raj,62,Female,Homemaker,Belagavi,68
+Yutika Ramakrishnan,26,Female,Student,Kalaburagi,68
+Baghyawati Narula,47,Female,Homemaker,Udupi,51
+Yatin Varughese,24,Male,Software Engineer,Udupi,72
+Mohammed Mohan,62,Male,Bank Employee,Bidar,90
+Manthan Char,72,Male,Software Engineer,Udupi,78
+Lila Pandey,42,Female,Teacher,Vijayapura,51
+Qasim Muni,64,Male,Teacher,Chikkamagaluru,28
+Ranbir Doshi,39,Male,Retired Officer,Koppal,64
+Dayamai Chadha,69,Female,Bank Employee,Bengaluru Rural,38
+Chaaya Pai,63,Female,Bank Employee,Mandya,90
+Dhriti Amble,23,Female,Homemaker,Hubballi-Dharwad,75
+Bahadurjit Hayer,30,Male,Homemaker,Raichur,59
+Manya Kara,67,Female,Retired Officer,Koppal,42
+Rudra Mahal,52,Male,Retired Officer,Davangere,48
+Kashish Balasubramanian,65,Female,Student,Ballari,48
+Jonathan Baral,48,Male,Teacher,Mangaluru (Dakshina Kannada),66
+Zashil Sachar,48,Male,Teacher,Davangere,31
+Krish Seth,32,Male,Shopkeeper,Ballari,37
+Januja Lal,31,Female,Homemaker,Tumakuru,23
+Sathvik Shenoy,49,Male,Student,Bengaluru Rural,39
+Darsh Balan,40,Male,Student,Bidar,71
+Vaishnavi Nagi,37,Female,Homemaker,Hubballi-Dharwad,87
+Nidra Apte,23,Female,Bank Employee,Kalaburagi,77
+Samuel Barad,48,Male,Teacher,Shivamogga,22
+Osha Menon,31,Female,Student,Bengaluru Rural,34
+Tripti Palla,37,Female,Bank Employee,Tumakuru,61
+Andrew Sharma,27,Male,Software Engineer,Mandya,46
+Pooja Narasimhan,43,Female,Homemaker,Koppal,28
+Bhavani Shanker,18,Female,Retired Officer,Kalaburagi,54
+Bachittar Mall,46,Male,Retired Officer,Hassan,22
+Abhimanyu Lad,63,Male,Teacher,Hassan,63
+Imaran Sangha,51,Male,Student,Vijayapura,64
+Balvan Buch,70,Male,Homemaker,Tumakuru,23
+Banjeet Bhavsar,25,Male,Shopkeeper,Belagavi,65
+Gavin Venkataraman,45,Male,Shopkeeper,Bidar,66
+Faraj Yadav,18,Male,Student,Raichur,65
+Mohammed Baral,42,Male,Shopkeeper,Mandya,27
+Jason Tiwari,71,Male,Bank Employee,Koppal,77
+Ikbal Khurana,69,Male,Homemaker,Hassan,58
+Arjun Walla,62,Male,Bank Employee,Raichur,88
+Chandran Devan,40,Male,Bank Employee,Kalaburagi,24
+Yoshita Master,33,Female,Retired Officer,Hubballi-Dharwad,76
+Yashasvi Wali,40,Female,Shopkeeper,Kalaburagi,45
+Jai Gupta,31,Male,Shopkeeper,Udupi,82
+Anay Arya,21,Male,Shopkeeper,Kolar,43
+Qadim Brar,56,Male,Shopkeeper,Hassan,67
+Jairaj Grover,47,Male,Student,Davangere,51
+Azaan Kothari,19,Male,Homemaker,Hubballi-Dharwad,45
+Xalak Sha,53,Female,Retired Officer,Hassan,68
+Amol Bail,69,Male,Software Engineer,Hubballi-Dharwad,75
+Owen Kadakia,19,Male,Retired Officer,Bengaluru Urban,47
+Xiti Dhingra,25,Female,Software Engineer,Hassan,41
+Benjamin Kuruvilla,61,Male,Shopkeeper,Davangere,49
+Patrick Karnik,17,Male,Bank Employee,Raichur,57
+Yashodhara Pingle,46,Female,Homemaker,Shivamogga,28
+Benjamin Chada,28,Male,Teacher,Davangere,88
+Jeet Samra,56,Male,Student,Chikkamagaluru,55
+Nidhi Banerjee,47,Female,Shopkeeper,Kalaburagi,43
+Gunbir Arora,49,Male,Bank Employee,Shivamogga,24
+Tanvi Parmer,19,Female,Student,Hassan,73
+Indrajit Gandhi,61,Male,Software Engineer,Udupi,79
+Widisha Yadav,58,Female,Bank Employee,Koppal,48
+Yashodhara Sachdeva,41,Female,Bank Employee,Bengaluru Rural,40
+Ansh Das,62,Male,Student,Kolar,64
+Agastya Tailor,39,Male,Shopkeeper,Koppal,55
+Jagdish Mahajan,54,Male,Bank Employee,Bengaluru Urban,60
+Zansi Bahl,69,Female,Student,Hubballi-Dharwad,87
+Tanmayi Gandhi,37,Female,Retired Officer,Mangaluru (Dakshina Kannada),26
+Ekansh Loyal,60,Male,Homemaker,Raichur,74
+Tristan Handa,54,Male,Bank Employee,Kolar,29
+Jai Kara,44,Male,Teacher,Bidar,89
+Thomas Banerjee,54,Male,Shopkeeper,Kolar,86
+Balhaar Randhawa,38,Male,Bank Employee,Vijayapura,25
+Ayaan Patel,42,Male,Software Engineer,Vijayapura,79
+Netra Soni,34,Female,Retired Officer,Udupi,44
+Imaran Hayre,34,Male,Shopkeeper,Vijayapura,58
+Jackson Saxena,20,Male,Student,Vijayapura,59
+Oeshi Peri,16,Female,Bank Employee,Udupi,53
+Hemani Shah,17,Female,Homemaker,Belagavi,59
+Jai De,57,Male,Bank Employee,Belagavi,84
+Nihal Halder,20,Male,Retired Officer,Tumakuru,82
+Udarsh Gour,32,Male,Homemaker,Davangere,48
+Oscar Bali,43,Male,Teacher,Mangaluru (Dakshina Kannada),31
+Saanvi Gala,50,Female,Retired Officer,Bidar,21
+Upma Gera,45,Female,Software Engineer,Udupi,87
+Charita Chaudhari,72,Female,Teacher,Mangaluru (Dakshina Kannada),32
+Baghyawati Karpe,39,Female,Homemaker,Hassan,36
+Hredhaan Sodhi,25,Male,Software Engineer,Kalaburagi,26
+Sanaya Khalsa,64,Female,Shopkeeper,Davangere,75
+Logan Magar,43,Male,Bank Employee,Udupi,32
+Dalbir Patel,30,Male,Retired Officer,Chikkamagaluru,57
+Gaurika Mukherjee,64,Female,Bank Employee,Tumakuru,43
+Yashawini Batra,47,Female,Software Engineer,Mandya,23
+Harrison Oak,20,Male,Retired Officer,Hubballi-Dharwad,40
+Mohammed Padmanabhan,60,Male,Bank Employee,Davangere,54
+Xavier Balasubramanian,49,Male,Homemaker,Bengaluru Rural,29
+Oscar Chaudhari,48,Male,Student,Chikkamagaluru,76
+Jackson Chand,65,Male,Bank Employee,Kolar,44
+Lakshit Dhawan,39,Male,Homemaker,Tumakuru,42
+Urishilla Badal,32,Female,Homemaker,Kolar,43
+Falak Mittal,28,Female,Shopkeeper,Mysuru,47
+Dominic Rajan,71,Male,Retired Officer,Bengaluru Rural,44
+Wridesh Nagar,25,Male,Homemaker,Hubballi-Dharwad,68
+Matthew Anne,69,Male,Shopkeeper,Chikkamagaluru,88
+Gunbir Sibal,48,Male,Software Engineer,Hassan,37
+Vihaan Banik,21,Male,Retired Officer,Koppal,87
+Oni Morar,43,Female,Retired Officer,Hassan,82
+Mohammed Iyengar,50,Male,Software Engineer,Hubballi-Dharwad,55
+Priya Ahluwalia,25,Female,Retired Officer,Koppal,47
+Rayaan Lanka,19,Male,Teacher,Raichur,33
+Bimala Sandhu,69,Female,Retired Officer,Udupi,28
+Mitesh Tandon,35,Male,Bank Employee,Kalaburagi,68
+Vedant Yohannan,27,Male,Shopkeeper,Hubballi-Dharwad,62
+Chaitaly Dhingra,26,Female,Software Engineer,Shivamogga,89
+Manan Chada,37,Male,Shopkeeper,Tumakuru,61
+Tanmayi Baral,29,Female,Shopkeeper,Hubballi-Dharwad,28
+Qasim Varty,57,Male,Homemaker,Davangere,24
+Bimala Bhatnagar,56,Female,Student,Bengaluru Rural,60
+Harshil Vohra,41,Male,Student,Chikkamagaluru,46
+Amrita Khurana,61,Female,Shopkeeper,Mysuru,88
+Atharv Kari,35,Male,Software Engineer,Shivamogga,67
+Ganga Buch,47,Female,Teacher,Bengaluru Rural,27
+Mitesh Dua,44,Male,Software Engineer,Bengaluru Rural,88
+Maya Sule,28,Female,Shopkeeper,Chikkamagaluru,30
+Arunima Oza,47,Female,Teacher,Vijayapura,70
+Aryan Khurana,53,Male,Software Engineer,Shivamogga,52
+Veda Thaman,61,Female,Bank Employee,Chikkamagaluru,34
+Lakshmi Bahri,26,Female,Bank Employee,Bidar,60
+Bhavika Menon,65,Female,Retired Officer,Udupi,26
+Kashvi Manne,19,Female,Shopkeeper,Davangere,24
+Darpan Din,49,Male,Teacher,Hassan,44
+Aradhana Rao,35,Female,Homemaker,Hubballi-Dharwad,29
+Yug Dutt,36,Male,Software Engineer,Tumakuru,39
+Yashodhara Madan,27,Female,Teacher,Kalaburagi,63
+Yadavi Bumb,24,Female,Student,Bengaluru Rural,89
+Lucky Natarajan,59,Male,Homemaker,Ballari,20
+Ishita Om,45,Female,Software Engineer,Hubballi-Dharwad,50
+Dayita Issac,35,Female,Retired Officer,Bidar,79
+Hiral Mangat,18,Female,Retired Officer,Shivamogga,83
+Aashi Atwal,71,Female,Student,Koppal,58
+Xavier Gopal,55,Male,Retired Officer,Mysuru,89
+Daksh Sachdeva,30,Male,Software Engineer,Bengaluru Rural,47
+Michael Dhingra,72,Male,Teacher,Davangere,63
+Kai Bal,65,Male,Student,Tumakuru,62
+Abdul Dasgupta,47,Male,Teacher,Udupi,29
+Dayamai Toor,71,Female,Student,Mangaluru (Dakshina Kannada),49
+Reyansh Mandal,19,Male,Homemaker,Kalaburagi,85
+Keya Comar,26,Female,Software Engineer,Kalaburagi,75
+Liam Ratta,59,Male,Teacher,Davangere,74
+Diya Dhar,18,Female,Shopkeeper,Hassan,83
+Tristan Jha,69,Male,Shopkeeper,Kalaburagi,68
+Dhruv Dube,72,Male,Retired Officer,Davangere,40
+Ekiya Lalla,46,Female,Retired Officer,Bengaluru Urban,64
+Unni Dora,60,Female,Software Engineer,Tumakuru,69
+Aayush Raja,33,Male,Shopkeeper,Bidar,50
+Nitara Johal,66,Female,Software Engineer,Bengaluru Urban,53
+Janaki Soni,48,Female,Bank Employee,Raichur,75
+Rajeshri Khalsa,23,Female,Bank Employee,Kolar,44
+Krish Thaker,70,Male,Software Engineer,Davangere,80
+Dipta Hayre,58,Female,Bank Employee,Bidar,28
+Avi Bedi,53,Male,Teacher,Tumakuru,30
+Fariq Prakash,53,Male,Student,Hubballi-Dharwad,42
+Chaman Vaidya,66,Female,Teacher,Hassan,30
+Saksham Bali,16,Male,Retired Officer,Mysuru,64
+Mohammed Nadkarni,28,Male,Software Engineer,Kalaburagi,53
+Darika Reddy,27,Female,Homemaker,Belagavi,57
+Sai Barad,72,Male,Software Engineer,Kolar,66
+Ikshita Bail,44,Female,Student,Bidar,58
+Sudiksha Balasubramanian,35,Female,Student,Mysuru,67
+Rachit Khosla,37,Male,Shopkeeper,Mangaluru (Dakshina Kannada),51
+Christopher Prasad,60,Male,Retired Officer,Davangere,58
+Hredhaan Krishnan,48,Male,Teacher,Shivamogga,63
+Anita Dugar,68,Female,Bank Employee,Chikkamagaluru,32
+Keya Subramanian,25,Female,Retired Officer,Davangere,50
+Tanmayi Singh,19,Female,Shopkeeper,Hubballi-Dharwad,58
+Dayita Brar,19,Female,Shopkeeper,Mangaluru (Dakshina Kannada),56
+Arjun Rattan,35,Male,Bank Employee,Koppal,32
+Krisha Deep,19,Female,Retired Officer,Mysuru,40
+Zehaan Prabhu,36,Male,Retired Officer,Shivamogga,43
+Teerth Khatri,40,Male,Shopkeeper,Mangaluru (Dakshina Kannada),47
+Aadi Nagar,37,Male,Shopkeeper,Belagavi,62
+Jeet Dani,53,Male,Shopkeeper,Belagavi,90
+Sarthak Karnik,68,Male,Software Engineer,Tumakuru,61
+Jagdish Dani,38,Male,Student,Tumakuru,82
+Nilima Agrawal,21,Female,Software Engineer,Hassan,51
+Adya Hayer,33,Female,Retired Officer,Koppal,88
+Yoshita Mani,59,Female,Bank Employee,Mysuru,89
+Om Mander,66,Male,Homemaker,Shivamogga,50
+Chatresh Shenoy,44,Male,Shopkeeper,Bengaluru Rural,48
+Jyoti Madan,66,Female,Homemaker,Mandya,43
+Meera Jani,42,Female,Software Engineer,Mandya,72
+Yatin Raja,37,Male,Teacher,Mandya,57
+Radhika Sheth,63,Female,Software Engineer,Koppal,64
+Nirja Upadhyay,36,Female,Shopkeeper,Belagavi,66
+Reyansh Gera,24,Male,Software Engineer,Tumakuru,41
+Naksh Bhakta,70,Male,Homemaker,Belagavi,29
+Amol Kumar,35,Male,Teacher,Bengaluru Urban,68
+Indrajit Agate,64,Male,Bank Employee,Vijayapura,47
+Chakrika Khatri,42,Female,Homemaker,Chikkamagaluru,60
+Omkaar Agate,51,Male,Software Engineer,Bidar,73
+Azaan Arya,25,Male,Shopkeeper,Chikkamagaluru,77
+Rachit Banerjee,33,Male,Bank Employee,Bengaluru Rural,75
+Vasatika Srinivasan,42,Female,Student,Kolar,36
+Jagvi Atwal,28,Female,Homemaker,Mysuru,41
+Luke Bhardwaj,17,Male,Student,Tumakuru,79
+Jackson Madan,47,Male,Software Engineer,Ballari,54
+Jeremiah Patla,46,Male,Retired Officer,Kolar,59
+Rohan Khanna,45,Male,Teacher,Mysuru,61
+Ayaan Khurana,59,Male,Homemaker,Mandya,50
+Oeshi Biswas,37,Female,Student,Shivamogga,71
+Anthony Bail,35,Male,Retired Officer,Bidar,72
+Anya Morar,64,Female,Retired Officer,Mandya,71
+Ijaya Lall,53,Female,Bank Employee,Kolar,47
+Widisha Kapoor,28,Female,Software Engineer,Davangere,45
+Ikshita Sha,20,Female,Homemaker,Kolar,38
+Henry Rajagopal,65,Male,Student,Hassan,45
+Shaurya Sama,66,Male,Software Engineer,Ballari,52
+Vedant Johal,34,Male,Shopkeeper,Chikkamagaluru,58
+Qarin Keer,42,Male,Retired Officer,Hassan,60
+Gaurangi Oza,54,Female,Homemaker,Hassan,75
+Omkaar Anne,25,Male,Software Engineer,Mysuru,32
+Zilmil Sant,20,Female,Bank Employee,Mysuru,64
+Chasmum Ramakrishnan,33,Female,Retired Officer,Tumakuru,59
+Anika Sandhu,18,Female,Retired Officer,Bengaluru Rural,75
+Guneet Tella,57,Male,Shopkeeper,Udupi,56
+Anjali Bhandari,28,Female,Teacher,Belagavi,35
+Jackson Gera,24,Male,Student,Bengaluru Urban,35
+Ayush Venkatesh,34,Male,Software Engineer,Udupi,87
+Sudiksha Bhakta,35,Female,Student,Bengaluru Rural,74
+Hemal Bail,22,Female,Student,Bidar,90
+Odika Wadhwa,51,Female,Shopkeeper,Udupi,74
+Zinal Pandey,50,Female,Bank Employee,Kolar,63
+Sathvik Hayer,55,Male,Bank Employee,Mandya,57
+Praneel Thakur,54,Male,Student,Bengaluru Rural,30
+Liam Dutt,41,Male,Shopkeeper,Davangere,21
+Ronith Dada,31,Male,Student,Shivamogga,40
+Jason Nath,43,Male,Shopkeeper,Kolar,43
+Jagrati Borra,40,Female,Teacher,Koppal,59
+Gaurang Bassi,22,Male,Software Engineer,Davangere,52
+Reyansh Kara,65,Male,Student,Udupi,77
+Yashodhara Borde,51,Female,Retired Officer,Udupi,30
+Anmol Bala,57,Male,Bank Employee,Bengaluru Urban,37
+Aayush Karan,52,Male,Teacher,Bidar,55
+Balhaar Raval,25,Male,Homemaker,Vijayapura,55
+Ria Sunder,18,Female,Shopkeeper,Hassan,72
+Ekalinga Sodhi,30,Male,Software Engineer,Mangaluru (Dakshina Kannada),88
+Riya Kurian,51,Female,Shopkeeper,Kolar,74
+Simon Dash,41,Male,Bank Employee,Shivamogga,75
+Warhi Bedi,25,Female,Teacher,Hubballi-Dharwad,83
+Urmi Wadhwa,57,Female,Retired Officer,Mangaluru (Dakshina Kannada),51
+Gautami Hayer,17,Female,Student,Kalaburagi,23
+Chakradev Chad,47,Male,Teacher,Mandya,20
+Harinakshi Nayak,47,Female,Shopkeeper,Kalaburagi,66
+Chakradev Singh,42,Male,Teacher,Shivamogga,81
+Chatresh Ram,21,Male,Bank Employee,Hubballi-Dharwad,48
+Gaurav Parmer,24,Male,Homemaker,Chikkamagaluru,51
+Xalak Viswanathan,18,Female,Shopkeeper,Hassan,83
+Mitesh Radhakrishnan,23,Male,Software Engineer,Belagavi,90
+Ekalinga Das,69,Male,Retired Officer,Mysuru,52
+Qabil Mital,58,Male,Retired Officer,Raichur,59
+Yamini Jha,59,Female,Homemaker,Hassan,60
+Banjeet Sidhu,59,Male,Homemaker,Hubballi-Dharwad,40
+Nitara Merchant,39,Female,Shopkeeper,Koppal,52
+Siddharth Kalita,44,Male,Retired Officer,Mysuru,36
+Zarna Dugar,23,Female,Bank Employee,Bengaluru Urban,89
+Rohan Gill,28,Male,Bank Employee,Hassan,54
+Rushil Bedi,40,Male,Homemaker,Shivamogga,29
+George Bhandari,16,Male,Shopkeeper,Mandya,22
+Chatura Cheema,46,Male,Retired Officer,Mandya,70
+Inaya Manne,30,Female,Retired Officer,Belagavi,41
+Omisha Deshmukh,53,Female,Retired Officer,Bengaluru Urban,26
+Girish Kapadia,17,Male,Retired Officer,Hubballi-Dharwad,35
+Chandresh Bhatt,16,Male,Bank Employee,Bidar,87
+Devansh Dass,21,Male,Software Engineer,Raichur,37
+Ekaraj Kanda,47,Male,Shopkeeper,Mysuru,34
+Samesh Bir,18,Male,Retired Officer,Chikkamagaluru,35
+Chanakya Dalal,30,Male,Homemaker,Tumakuru,21
+Vinaya Solanki,18,Female,Student,Koppal,76
+Aayush Gopal,26,Male,Bank Employee,Ballari,26
+Mason Mittal,40,Male,Retired Officer,Bengaluru Urban,87
+Hemang Pillai,20,Male,Shopkeeper,Koppal,44
+Anusha Kakar,28,Female,Student,Vijayapura,41
+Pallavi Gokhale,43,Female,Homemaker,Tumakuru,46
+Gavin Wali,56,Male,Homemaker,Udupi,30
+Balhaar Misra,35,Male,Homemaker,Kolar,90
+Henry Banerjee,17,Male,Software Engineer,Shivamogga,81
+Aditya Toor,66,Male,Software Engineer,Hubballi-Dharwad,56
+Waida Dhaliwal,33,Female,Homemaker,Shivamogga,31
+Lajita Kala,31,Female,Shopkeeper,Raichur,81
+Saksham Kulkarni,41,Male,Retired Officer,Chikkamagaluru,64
+Zilmil Deep,45,Female,Software Engineer,Hubballi-Dharwad,37
+Ekavir Choudhry,35,Male,Teacher,Shivamogga,49
+Raghav Mallick,70,Male,Student,Koppal,26
+Vamakshi Shukla,21,Female,Homemaker,Mandya,73
+Ubika Bail,17,Female,Teacher,Raichur,65
+Wridesh Wable,21,Male,Shopkeeper,Bengaluru Urban,53
+Balveer Purohit,65,Male,Retired Officer,Shivamogga,86
+Turvi Kadakia,58,Female,Homemaker,Vijayapura,87
+Gaurika Walia,34,Female,Bank Employee,Ballari,24
+Caleb Raja,31,Male,Teacher,Chikkamagaluru,75
+Kashish Butala,33,Female,Retired Officer,Mangaluru (Dakshina Kannada),56
+Mason Patel,27,Male,Software Engineer,Bidar,77
+Bishakha Lad,62,Female,Shopkeeper,Raichur,81
+Divya Vaidya,17,Female,Student,Mysuru,32
+Kavya Chowdhury,40,Female,Software Engineer,Ballari,85
+Arya Kashyap,38,Female,Software Engineer,Hassan,51
+Ikshita Bath,49,Female,Software Engineer,Bengaluru Rural,65
+Kavya Chopra,32,Female,Student,Vijayapura,42
+Theodore Ganesan,59,Male,Shopkeeper,Udupi,42
+Jonathan Chander,23,Male,Teacher,Shivamogga,26
+Saanvi Sampath,24,Female,Teacher,Hassan,25
+Hemang Chadha,40,Male,Homemaker,Hubballi-Dharwad,54
+Abha Kulkarni,41,Female,Teacher,Bidar,41
+Harrison Borah,19,Male,Student,Ballari,41
+Alka Mohanty,49,Female,Software Engineer,Kolar,70
+Falak Sharaf,42,Female,Retired Officer,Shivamogga,38
+Chandani Brahmbhatt,24,Female,Student,Davangere,26
+Aryan Dalal,35,Male,Retired Officer,Tumakuru,60
+Guneet Kakar,34,Male,Software Engineer,Bidar,43
+Lila Mangal,27,Female,Teacher,Mangaluru (Dakshina Kannada),84
+Naveen Varghese,30,Male,Software Engineer,Koppal,55
+Ekiya Virk,18,Female,Homemaker,Mysuru,51
+Amaira Keer,24,Female,Teacher,Bidar,75
+Amrita Lal,34,Female,Bank Employee,Bengaluru Urban,66
+Devika Bhandari,17,Female,Homemaker,Koppal,78
+Aarush Sridhar,53,Male,Bank Employee,Belagavi,38
+Forum Ravel,32,Female,Retired Officer,Bengaluru Rural,68
+Charles Shah,44,Male,Student,Mandya,69
+Dalbir Mahajan,41,Male,Homemaker,Mangaluru (Dakshina Kannada),70
+Zarna Biswas,35,Female,Teacher,Chikkamagaluru,63
+Yug Natarajan,65,Male,Bank Employee,Belagavi,31
+Matthew Gole,22,Male,Retired Officer,Bengaluru Urban,61
+Kala Chhabra,52,Female,Teacher,Hubballi-Dharwad,45
+Urishilla Mallick,19,Female,Teacher,Tumakuru,41
+Vasudha Nadig,58,Female,Retired Officer,Ballari,53
+Caleb Ram,35,Male,Shopkeeper,Belagavi,38
+Chavvi Kalla,51,Female,Teacher,Ballari,61
+Wishi Walia,20,Female,Student,Chikkamagaluru,30
+Yug Thaman,40,Male,Retired Officer,Chikkamagaluru,32
+Warjas Das,25,Male,Software Engineer,Udupi,90
+Lucky Kumer,59,Male,Student,Bengaluru Urban,48
+Gaurangi Bose,65,Female,Bank Employee,Mysuru,46
+Ladli Bahri,25,Female,Software Engineer,Hassan,69
+Januja Gera,35,Female,Retired Officer,Kalaburagi,35
+Qabil Bal,17,Male,Bank Employee,Mysuru,27
+Azaan Grover,66,Male,Student,Mysuru,42
+Chakradev Devi,42,Male,Student,Kalaburagi,89
+Yashoda Pathak,40,Female,Homemaker,Bengaluru Rural,76
+Ojas Amble,23,Male,Teacher,Bidar,66
+Ojasvi Sinha,71,Female,Retired Officer,Hubballi-Dharwad,36
+Tejas Bajaj,53,Male,Bank Employee,Hubballi-Dharwad,52
+Yashvi Ben,61,Female,Shopkeeper,Bidar,79
+Chandresh Merchant,36,Male,Teacher,Koppal,78
+Jeremiah Uppal,51,Male,Software Engineer,Belagavi,55
+Arunima Narula,72,Female,Teacher,Bengaluru Rural,29
+Bakhshi Hora,63,Male,Retired Officer,Raichur,22
+Vyanjana Varty,42,Female,Bank Employee,Bidar,31
+Urvi Hegde,16,Female,Homemaker,Vijayapura,27
+Oscar Srinivasan,17,Male,Homemaker,Mysuru,85
+Ikbal Nigam,61,Male,Shopkeeper,Mysuru,67
+Nimrat Bansal,66,Female,Homemaker,Shivamogga,68
+Aadi Sane,32,Male,Bank Employee,Tumakuru,89
+Zansi Sachdeva,62,Female,Shopkeeper,Belagavi,53
+Ekbal Chokshi,34,Male,Retired Officer,Mandya,72
+Mohini Banik,38,Female,Teacher,Mandya,69
+Omya Sarraf,70,Female,Shopkeeper,Hassan,90
+Manbir Dhillon,32,Male,Student,Ballari,84
+Michael Lad,19,Male,Software Engineer,Tumakuru,57
+Omkaar Kashyap,69,Male,Software Engineer,Mangaluru (Dakshina Kannada),41
+Yauvani Mohanty,71,Female,Student,Raichur,43
+Bahadurjit Pradhan,71,Male,Retired Officer,Hubballi-Dharwad,83
+Adweta Arora,45,Female,Homemaker,Davangere,25
+Urmi Bobal,38,Female,Homemaker,Mysuru,83
+Ranbir Dasgupta,17,Male,Software Engineer,Hubballi-Dharwad,71
+Umang Grewal,64,Male,Shopkeeper,Shivamogga,46
+Aadi Bobal,28,Male,Teacher,Shivamogga,65
+Zaitra Rana,58,Female,Teacher,Mysuru,34
+Upadhriti Sem,37,Female,Homemaker,Mysuru,89
+Manya Peri,69,Female,Teacher,Raichur,28
+Charles Korpal,18,Male,Student,Bengaluru Urban,75
+Maanas Bains,25,Male,Homemaker,Hubballi-Dharwad,66
+Chatresh Munshi,70,Male,Teacher,Bidar,88
+Manya Shetty,23,Female,Software Engineer,Chikkamagaluru,77
+Priya Ahuja,66,Female,Student,Ballari,52
+Kashvi Trivedi,23,Female,Retired Officer,Koppal,30
+Frederick Thaker,30,Male,Teacher,Mandya,37
+Veer Dara,54,Male,Bank Employee,Udupi,29
+Maya Lal,56,Female,Bank Employee,Kalaburagi,54
+Rajeshri Joshi,72,Female,Student,Tumakuru,76
+Aarna Naik,31,Female,Bank Employee,Bengaluru Urban,24
+Tripti Mishra,49,Female,Retired Officer,Hubballi-Dharwad,71
+Triveni Kalita,59,Female,Shopkeeper,Mysuru,32
+Viraj Kunda,41,Male,Homemaker,Shivamogga,67
+Yashasvi Barman,36,Female,Shopkeeper,Shivamogga,49
+Dayita Tank,33,Female,Student,Mysuru,23
+Isha Misra,70,Female,Software Engineer,Bidar,77
+Ikshita Mallick,55,Female,Student,Bengaluru Rural,58
+Maanas Subramanian,29,Male,Software Engineer,Ballari,37
+Charles Kala,40,Male,Homemaker,Hubballi-Dharwad,36
+Adweta Kunda,35,Female,Teacher,Koppal,74
+Wishi Narayanan,29,Female,Shopkeeper,Kolar,21
+Chaitaly Pillai,46,Female,Bank Employee,Chikkamagaluru,41
+Kamya Butala,39,Female,Shopkeeper,Udupi,70
+Darsh Agate,26,Male,Student,Chikkamagaluru,41
+Nidra Dass,67,Female,Teacher,Davangere,39
+Urvi Joshi,36,Female,Teacher,Tumakuru,51
+Azad Shan,60,Male,Retired Officer,Shivamogga,21
+Yashoda Dua,23,Female,Retired Officer,Bengaluru Urban,28
+Indira Chand,64,Female,Retired Officer,Kolar,24
+Oviya Jani,37,Female,Teacher,Kalaburagi,50
+Daniel Rattan,68,Male,Retired Officer,Raichur,89
+Gabriel Soman,57,Male,Shopkeeper,Ballari,56
+Tanay Muni,62,Male,Shopkeeper,Mangaluru (Dakshina Kannada),30
+Jeet Sankaran,23,Male,Bank Employee,Shivamogga,28
+Shivani Sahota,43,Female,Homemaker,Ballari,64
+Mugdha Chowdhury,21,Female,Bank Employee,Ballari,21
+Ikbal Zacharia,48,Male,Bank Employee,Koppal,31
+Chakradhar Sundaram,20,Male,Student,Tumakuru,90
+Hredhaan Rau,44,Male,Software Engineer,Ballari,26
+Neel Gola,59,Male,Teacher,Mysuru,74
+Jeet Gara,72,Male,Bank Employee,Koppal,82
+Darika Cherian,60,Female,Software Engineer,Kalaburagi,66
+Panini Andra,51,Female,Student,Shivamogga,73
+Unnati Wagle,72,Female,Student,Bengaluru Urban,52
+Wridesh Bahl,64,Male,Teacher,Bengaluru Urban,84
+Vasudha Gulati,65,Female,Homemaker,Ballari,27
+Kamya Bava,42,Female,Teacher,Kolar,61
+Pranav Din,20,Male,Retired Officer,Hassan,66
+Balhaar Agarwal,18,Male,Student,Kolar,38
+Chandani Bhardwaj,33,Female,Student,Davangere,67
+Omya Lall,24,Female,Bank Employee,Ballari,24
+Amara Patla,53,Female,Student,Chikkamagaluru,28
+Oviya Sarin,51,Female,Software Engineer,Chikkamagaluru,44
+Unni Chana,41,Female,Shopkeeper,Kalaburagi,46
+Chavvi Kari,28,Female,Software Engineer,Mysuru,72
+Atharv Nadkarni,37,Male,Bank Employee,Bengaluru Urban,67
+Jonathan Prabhu,61,Male,Software Engineer,Kolar,72
+Praneel Ramanathan,45,Male,Teacher,Bengaluru Rural,71
+Darsh Parmar,38,Male,Homemaker,Vijayapura,26
+Chatura Bhardwaj,33,Male,Shopkeeper,Koppal,70
+Manan Mangat,36,Male,Shopkeeper,Bidar,62
+Jairaj Joshi,39,Male,Teacher,Mysuru,31
+Ubika Gaba,63,Female,Retired Officer,Vijayapura,54
+Sanaya Tank,39,Female,Retired Officer,Mysuru,56
+Upma Mannan,35,Female,Homemaker,Mangaluru (Dakshina Kannada),33
+Wriddhish Sanghvi,58,Male,Retired Officer,Tumakuru,26
+Bhavna Chana,19,Female,Homemaker,Belagavi,88
+Charles Dey,31,Male,Homemaker,Udupi,83
+Arin Kaul,25,Male,Teacher,Bidar,68
+Hema Bhardwaj,61,Female,Shopkeeper,Chikkamagaluru,44
+Benjamin Nadkarni,19,Male,Shopkeeper,Bengaluru Rural,25
+Turvi Badal,48,Female,Student,Vijayapura,45
+Kashvi Bava,67,Female,Bank Employee,Koppal,32
+Abdul Mutti,29,Male,Retired Officer,Shivamogga,29
+Yash Sundaram,56,Male,Homemaker,Ballari,28
+Xiti Buch,57,Female,Teacher,Hassan,53
+Lavanya Mall,70,Female,Student,Ballari,44
+Ishanvi Sama,16,Female,Homemaker,Davangere,72
+Veda Oommen,45,Female,Shopkeeper,Mysuru,23
+Aditya Sarin,18,Male,Software Engineer,Ballari,47
+Mohini Choudhury,29,Female,Software Engineer,Chikkamagaluru,60
+Advik Luthra,53,Male,Shopkeeper,Koppal,39
+Vinaya Shetty,45,Female,Homemaker,Raichur,50
+Logan Nair,71,Male,Homemaker,Mandya,62
+Lucky Sen,40,Male,Student,Bidar,36
+Mitesh Dugar,25,Male,Teacher,Mysuru,37
+Kai Barman,46,Male,Software Engineer,Ballari,37
+Ekantika Edwin,33,Female,Shopkeeper,Ballari,65
+Bhavani Dhingra,55,Female,Retired Officer,Raichur,47
+Yachana Pandya,29,Female,Retired Officer,Mandya,53
+Michael Peri,21,Male,Retired Officer,Hassan,54
+Mugdha Rastogi,47,Female,Homemaker,Belagavi,27
+Manbir Dixit,17,Male,Teacher,Davangere,57
+Umang Chauhan,21,Male,Student,Mandya,42
+Jagdish Bandi,58,Male,Software Engineer,Udupi,85
+Waida Gopal,59,Female,Shopkeeper,Ballari,45
+Aahana Sundaram,58,Female,Software Engineer,Tumakuru,82
+Kamya Uppal,71,Female,Software Engineer,Kalaburagi,28
+Aadhya Ray,53,Female,Shopkeeper,Tumakuru,53
+Januja Varughese,66,Female,Shopkeeper,Raichur,35
+Adweta Borah,56,Female,Retired Officer,Tumakuru,54
+Farhan Prabhakar,66,Male,Teacher,Kolar,86
+Yash Dutt,47,Male,Shopkeeper,Bidar,43
+Logan Pingle,27,Male,Homemaker,Chikkamagaluru,52
+Wahab Tank,31,Male,Bank Employee,Ballari,30
+Saumya Kala,67,Female,Teacher,Tumakuru,53
+Gopal Munshi,72,Male,Bank Employee,Ballari,83
+Pavani Batra,33,Female,Retired Officer,Bidar,86
+Adya Sharaf,16,Female,Software Engineer,Mysuru,89
+Peter Kamdar,50,Male,Teacher,Mysuru,58
+Patrick Choudhury,30,Male,Shopkeeper,Tumakuru,44
+Yashica Pal,41,Female,Shopkeeper,Koppal,90
+Chaitaly Chaudhry,68,Female,Student,Tumakuru,37
+Daksh Kuruvilla,66,Male,Software Engineer,Koppal,67
+Widisha Dua,22,Female,Bank Employee,Chikkamagaluru,70
+Fitan Ghose,62,Male,Retired Officer,Kolar,43
+Bahadurjit Chaudhari,71,Male,Bank Employee,Raichur,81
+Omkaar Karan,59,Male,Software Engineer,Belagavi,29
+Zashil Sankaran,70,Male,Bank Employee,Koppal,77
+Urishilla Roy,51,Female,Bank Employee,Raichur,72
+Siddharth Mangal,50,Male,Student,Mandya,87
+Abhimanyu Krish,61,Male,Homemaker,Hassan,59
+Aahana Subramaniam,28,Female,Bank Employee,Belagavi,35
+Radha Konda,52,Female,Teacher,Hassan,80
+Aarnav Garg,55,Male,Homemaker,Davangere,43
+Rohan Guha,39,Male,Homemaker,Mandya,83
+Sai Tara,24,Female,Software Engineer,Tumakuru,87
+Chaaya Bora,35,Female,Bank Employee,Hassan,44
+Tanay Kalita,38,Male,Teacher,Chikkamagaluru,58
+Warinder Sanghvi,17,Male,Software Engineer,Mandya,37
+Aarna Shenoy,45,Female,Homemaker,Vijayapura,79
+Leela Seshadri,25,Female,Shopkeeper,Davangere,70
+Nathan Bhakta,31,Male,Bank Employee,Hubballi-Dharwad,37
+Rohan Deep,40,Male,Retired Officer,Mangaluru (Dakshina Kannada),45
+Ekiya Bir,52,Female,Student,Tumakuru,27
+Yatan Som,48,Male,Teacher,Koppal,21
+Joshua Peri,46,Male,Software Engineer,Belagavi,75
+Nisha Mital,16,Female,Student,Mysuru,23
+Divya Dash,21,Female,Retired Officer,Mandya,50
+Yahvi Sandhu,33,Female,Homemaker,Mysuru,27
+Sanya Borde,58,Female,Student,Udupi,71
+Peter Ramachandran,36,Male,Student,Vijayapura,87
+Daksh Palla,44,Male,Software Engineer,Mysuru,26
+Tripti Char,62,Female,Retired Officer,Bengaluru Urban,46
+Isaiah Comar,53,Male,Shopkeeper,Ballari,62
+Kritika Dutta,27,Female,Software Engineer,Mangaluru (Dakshina Kannada),90
+Vivaan Goel,40,Male,Bank Employee,Vijayapura,82
+Avi Raghavan,39,Male,Homemaker,Belagavi,43
+Xalak Seth,36,Female,Retired Officer,Udupi,64
+Triveni Rege,37,Female,Bank Employee,Ballari,58
+Vedika Dixit,22,Female,Software Engineer,Mysuru,50
+Kavya Hora,52,Female,Student,Mysuru,73
+Ethan Pillai,60,Male,Bank Employee,Koppal,21
+Avni Gour,59,Female,Retired Officer,Belagavi,39
+Udarsh Sarin,34,Male,Software Engineer,Hubballi-Dharwad,21
+Teerth Hans,56,Male,Shopkeeper,Mandya,58
+Chasmum Soman,35,Female,Shopkeeper,Vijayapura,45
+Dayamai Zachariah,40,Female,Retired Officer,Chikkamagaluru,67
+Harini Suresh,27,Female,Shopkeeper,Ballari,64
+Yashasvi Handa,23,Female,Teacher,Koppal,90
+Finn Nath,43,Male,Homemaker,Shivamogga,62
+Banjeet Guha,41,Male,Retired Officer,Tumakuru,58
+Yashica Nori,61,Female,Student,Kalaburagi,57
+Yagnesh Ratti,42,Male,Shopkeeper,Tumakuru,80
+Rachit Thakkar,60,Male,Student,Bengaluru Rural,60
+Vanya Shukla,36,Female,Software Engineer,Tumakuru,54
+Amrita Varghese,69,Female,Shopkeeper,Bengaluru Urban,56
+Naveen Hegde,60,Male,Software Engineer,Udupi,45
+Qushi Parikh,31,Female,Software Engineer,Tumakuru,27
+Utkarsh Rastogi,54,Male,Shopkeeper,Tumakuru,60
+Banjeet Thaman,61,Male,Retired Officer,Hassan,69
+Sathvik Krishna,59,Male,Retired Officer,Mandya,85
+Peter Grewal,32,Male,Student,Chikkamagaluru,66
+Falguni Dhar,59,Female,Shopkeeper,Belagavi,55
+Ekalinga Rattan,19,Male,Student,Hassan,47
+Hemal Baria,21,Female,Homemaker,Koppal,27
+Damini Comar,63,Female,Retired Officer,Bidar,36
+Dev Jayaraman,23,Male,Student,Tumakuru,40
+Viraj Aurora,33,Male,Homemaker,Bengaluru Urban,82
+Ranveer Agate,48,Male,Software Engineer,Ballari,38
+Anjali Wali,55,Female,Shopkeeper,Ballari,39
+Gavin Sodhi,56,Male,Retired Officer,Bidar,83
+Sachi Ahluwalia,22,Female,Retired Officer,Koppal,45
+William Mand,67,Male,Retired Officer,Hubballi-Dharwad,52
+Yug Buch,64,Male,Student,Hassan,58
+Ojasvi Bhagat,34,Female,Bank Employee,Belagavi,23
+Pratyush Mall,39,Male,Retired Officer,Kalaburagi,24
+Vaishnavi Ratta,64,Female,Teacher,Mysuru,22
+Rachana Viswanathan,59,Female,Software Engineer,Bengaluru Rural,62
+Vedant Lal,72,Male,Shopkeeper,Hubballi-Dharwad,86
+Orinder Tripathi,21,Male,Student,Tumakuru,59
+Neelima Sundaram,33,Female,Homemaker,Ballari,90
+Ishwar Bhakta,28,Male,Software Engineer,Mysuru,39
+Charan Bose,71,Male,Software Engineer,Raichur,25
+Hemang Suri,59,Male,Homemaker,Bidar,71
+Vinaya Singh,31,Female,Software Engineer,Vijayapura,81
+Madhavi Khanna,30,Female,Teacher,Vijayapura,20
+Kala Biswas,52,Female,Student,Davangere,66
+Vihaan Bala,53,Male,Homemaker,Shivamogga,56
+Matthew Mammen,68,Male,Shopkeeper,Bidar,76
+Elijah Deo,29,Male,Bank Employee,Davangere,65
+Jagrati Nayak,16,Female,Bank Employee,Belagavi,20
+Rajata Mohanty,63,Female,Retired Officer,Kolar,34
+Anirudh Kumer,18,Male,Student,Belagavi,61
+Girik Ganesan,60,Male,Homemaker,Ballari,84
+Balvan Divan,37,Male,Teacher,Raichur,55
+Maanav Tandon,20,Male,Student,Shivamogga,31
+Vrishti Pillai,55,Female,Retired Officer,Udupi,61
+Aditya Kothari,18,Male,Homemaker,Ballari,46
+Fitan Nagy,56,Male,Retired Officer,Hassan,64
+Yachana Thakur,37,Female,Teacher,Hassan,25
+Devansh Bains,55,Male,Student,Chikkamagaluru,25
+Mahika Kakar,47,Female,Shopkeeper,Tumakuru,38
+Krish Ranganathan,19,Male,Homemaker,Ballari,82
+Jalsa Khanna,36,Female,Homemaker,Kalaburagi,78
+Priya Patla,68,Female,Teacher,Raichur,47
+Yoshita Sarma,70,Female,Teacher,Mysuru,49
+Samarth Shah,64,Male,Shopkeeper,Bengaluru Urban,51
+Michael Gola,32,Male,Software Engineer,Raichur,25
+Abhimanyu Chaudhuri,72,Male,Shopkeeper,Bengaluru Urban,71
+Ira Chhabra,56,Female,Bank Employee,Tumakuru,80
+Kamala Mukhopadhyay,44,Female,Software Engineer,Mangaluru (Dakshina Kannada),43
+Aashi Bava,62,Female,Teacher,Belagavi,55
+William Barad,33,Male,Teacher,Mandya,23
+Maya Kumar,47,Female,Software Engineer,Chikkamagaluru,79
+Tarak Kanda,59,Male,Student,Kalaburagi,61
+Hemang Sankar,59,Male,Student,Mysuru,60
+Yash Dugar,51,Male,Bank Employee,Kalaburagi,71
+Nidra Goel,32,Female,Software Engineer,Shivamogga,47
+Geetika Dhingra,45,Female,Bank Employee,Mandya,75
+Ikbal Swamy,19,Male,Student,Koppal,75
+Barkha Tara,70,Female,Homemaker,Ballari,66
+Lakshmi Agarwal,62,Female,Shopkeeper,Udupi,60
+Oviya Kar,41,Female,Homemaker,Kolar,90
+Om Krishnamurthy,23,Male,Retired Officer,Bengaluru Rural,21
+Avi Gola,42,Male,Teacher,Belagavi,60
+Onveer Sankar,37,Male,Bank Employee,Tumakuru,37
+Ladli Chandran,49,Female,Teacher,Belagavi,78
+Watika Sur,19,Female,Homemaker,Hubballi-Dharwad,31
+Owen Walia,41,Male,Bank Employee,Ballari,49
+Zayan Vig,69,Male,Teacher,Mangaluru (Dakshina Kannada),58
+Tamanna Roy,16,Female,Student,Bidar,50
+Chavvi Bhandari,20,Female,Software Engineer,Hassan,57
+Bahadurjit Narain,66,Male,Software Engineer,Koppal,80
+Akshay Thaker,44,Male,Teacher,Mandya,84
+Vamakshi Rai,18,Female,Shopkeeper,Chikkamagaluru,84
+Upkaar Garg,57,Male,Bank Employee,Chikkamagaluru,28
+Jeevika Brahmbhatt,56,Female,Software Engineer,Mysuru,27
+Bahadurjit Sawhney,30,Male,Homemaker,Kalaburagi,46
+Utkarsh Ahuja,41,Male,Teacher,Udupi,42
+Bhavika Chahal,18,Female,Homemaker,Tumakuru,26
+Neel Pau,37,Male,Shopkeeper,Udupi,20
+Darika Garde,68,Female,Bank Employee,Vijayapura,63
+Triya Doctor,28,Female,Teacher,Bidar,50
+Chasmum Saini,46,Female,Software Engineer,Mandya,55
+Christopher Mander,60,Male,Homemaker,Bidar,61
+Widisha Narang,35,Female,Teacher,Kalaburagi,89
+Nandini Brahmbhatt,71,Female,Retired Officer,Bengaluru Rural,59
+Saanvi Bath,48,Female,Homemaker,Belagavi,32
+Balveer Raval,44,Male,Shopkeeper,Hassan,38
+Bhavani Mittal,20,Female,Software Engineer,Chikkamagaluru,78
+Qadim Bala,27,Male,Student,Belagavi,52
+Triveni Sawhney,58,Female,Student,Shivamogga,38
+Faris Chaudhary,40,Male,Student,Mangaluru (Dakshina Kannada),57
+Dayita Natt,33,Female,Teacher,Bengaluru Urban,79
+Libni Bhatti,34,Female,Teacher,Chikkamagaluru,75
+Aryan Dua,40,Male,Retired Officer,Kalaburagi,82
+Sathvik Saraf,49,Male,Retired Officer,Vijayapura,63
+Faris Tata,47,Male,Software Engineer,Mandya,42
+Gaurang Sanghvi,46,Male,Retired Officer,Udupi,38
+Ijaya Thakkar,20,Female,Bank Employee,Mysuru,45
+Tanveer Gulati,51,Male,Student,Vijayapura,43
+Omkaar Borra,48,Male,Shopkeeper,Davangere,88
+Yasti Kaur,58,Female,Bank Employee,Hubballi-Dharwad,56
+Pranit Sule,72,Male,Retired Officer,Bidar,43
+Farhan Khatri,23,Male,Software Engineer,Koppal,64
+Diya Ray,23,Female,Student,Vijayapura,77
+Chandani Chaudhary,51,Female,Teacher,Mysuru,29
+Nilima Datta,50,Female,Student,Tumakuru,35
+Girindra Dhar,63,Male,Student,Raichur,40
+Lakshit Chowdhury,72,Male,Homemaker,Udupi,75
+Laksh Garg,30,Male,Teacher,Koppal,51
+Yashasvi Nayak,71,Female,Teacher,Shivamogga,65
+Shivani Sarma,21,Female,Shopkeeper,Mysuru,49
+Timothy Handa,43,Male,Retired Officer,Ballari,21
+Lucky Chawla,67,Male,Shopkeeper,Bengaluru Rural,89
+Andrew Shukla,36,Male,Homemaker,Bengaluru Rural,75
+Advay Taneja,34,Male,Student,Bengaluru Rural,36
+Ria Pathak,60,Female,Homemaker,Shivamogga,80
+Qushi Som,42,Female,Retired Officer,Ballari,37
+Hamsini Jha,45,Female,Homemaker,Raichur,21
+Rohan Seshadri,22,Male,Teacher,Bengaluru Urban,71
+Aarini Gour,63,Female,Homemaker,Raichur,75
+Owen Vohra,40,Male,Retired Officer,Mysuru,26
+Veda Golla,57,Female,Bank Employee,Shivamogga,40
+Vincent Oommen,67,Male,Homemaker,Davangere,33
+Widisha Dhaliwal,54,Female,Software Engineer,Koppal,42
+Azaan Gulati,23,Male,Teacher,Belagavi,80
+Tara Deshmukh,29,Female,Shopkeeper,Ballari,45
+Anjali Mall,71,Female,Bank Employee,Tumakuru,89
+Vasatika Loke,54,Female,Shopkeeper,Bengaluru Rural,57
+Girindra Ramanathan,64,Male,Homemaker,Hassan,82
+Wishi Naidu,20,Female,Bank Employee,Raichur,89
+Samesh Mital,65,Male,Teacher,Kolar,56
+Christopher Bajaj,26,Male,Retired Officer,Mangaluru (Dakshina Kannada),68
+Mahika Gara,50,Female,Teacher,Shivamogga,88
+Abhimanyu Ahluwalia,67,Male,Retired Officer,Hubballi-Dharwad,39
+Kashish Mody,69,Female,Retired Officer,Ballari,35
+Omkaar Deo,57,Male,Teacher,Davangere,34
+Odika Upadhyay,65,Female,Software Engineer,Hassan,46
+Daksha Madan,25,Female,Software Engineer,Hassan,26
+Anusha Loke,33,Female,Homemaker,Mangaluru (Dakshina Kannada),30
+Zayan Kothari,41,Male,Student,Davangere,65
+Wahab Kakar,61,Male,Shopkeeper,Koppal,59
+Yashvi Kala,61,Female,Bank Employee,Kolar,29
+Patrick Oak,41,Male,Teacher,Koppal,39
+Turvi Kara,64,Female,Bank Employee,Belagavi,85
+Dakshesh Dhillon,53,Male,Shopkeeper,Koppal,24
+Qadim Manne,18,Male,Software Engineer,Kalaburagi,59
+Ayaan Tripathi,56,Male,Software Engineer,Ballari,63
+Ishani Shankar,58,Female,Shopkeeper,Kalaburagi,25
+Joshua Sandal,72,Male,Student,Mysuru,44
+Yutika Choudhry,41,Female,Homemaker,Kalaburagi,26
+Libni Sura,45,Female,Shopkeeper,Bengaluru Rural,66
+Chameli Natt,69,Female,Retired Officer,Bidar,24
+Manan Tak,65,Male,Software Engineer,Kalaburagi,23
+Hemangini Nayak,58,Female,Shopkeeper,Belagavi,73
+Omya Korpal,44,Female,Student,Koppal,81
+Udarsh Srinivas,67,Male,Student,Davangere,63
+Omkaar Varghese,26,Male,Student,Kalaburagi,69
+Yasti Yohannan,25,Female,Teacher,Belagavi,57
+Ayaan Khare,61,Male,Teacher,Ballari,45
+Vidhi Parekh,60,Female,Software Engineer,Kolar,20
+Farhan Ravel,31,Male,Teacher,Bidar,84
+Jatin Lanka,38,Male,Student,Chikkamagaluru,56
+Vrishti Iyengar,66,Female,Teacher,Raichur,52
+Praneel Kashyap,26,Male,Shopkeeper,Koppal,29
+Vedhika Gour,37,Female,Retired Officer,Hassan,47
+George Rastogi,54,Male,Homemaker,Mangaluru (Dakshina Kannada),43
+Janya Kurian,70,Female,Student,Bengaluru Rural,70
+Ladli D’Alia,33,Female,Student,Bengaluru Urban,48
+Laban Patil,64,Male,Teacher,Raichur,68
+Pushti Shetty,45,Female,Bank Employee,Belagavi,28
+Yagnesh Sabharwal,38,Male,Student,Bengaluru Rural,31
+Zayyan Kurian,27,Male,Bank Employee,Kalaburagi,69
+Jackson Dube,43,Male,Teacher,Bengaluru Urban,45
+Udyati Pandya,20,Female,Student,Belagavi,87
+Triya Tak,57,Female,Student,Chikkamagaluru,44
+Noah Sethi,46,Male,Software Engineer,Mangaluru (Dakshina Kannada),81
+Jagdish Aurora,53,Male,Shopkeeper,Raichur,55
+Hitesh Lad,25,Male,Software Engineer,Bengaluru Urban,58
+Tristan Pai,36,Male,Software Engineer,Ballari,39
+Gaurika Kapoor,44,Female,Student,Raichur,45
+Agastya Chaudry,64,Male,Student,Mysuru,41
+Chaaya Dalal,62,Female,Student,Kalaburagi,83
+Lucky Mohanty,69,Male,Homemaker,Koppal,66
+Hamsini Bhatnagar,42,Female,Bank Employee,Hubballi-Dharwad,79
+Forum Gera,56,Female,Retired Officer,Belagavi,47
+Warhi Jayaraman,70,Female,Student,Bidar,51
+Simon Singhal,61,Male,Homemaker,Bengaluru Rural,43
+Nidhi Anand,54,Female,Bank Employee,Shivamogga,73
+Hritik Prasad,54,Male,Shopkeeper,Chikkamagaluru,45
+Saanvi Behl,38,Female,Student,Bengaluru Rural,64
+Brinda Sen,63,Female,Shopkeeper,Hubballi-Dharwad,22
+Guneet Purohit,43,Male,Student,Raichur,77
+Advay Sekhon,19,Male,Teacher,Udupi,56
+Girindra Sachdev,23,Male,Software Engineer,Mysuru,38
+Widisha Murthy,30,Female,Bank Employee,Raichur,48
+Bimala Dugar,25,Female,Software Engineer,Mandya,68
+Hiral Kar,27,Female,Software Engineer,Shivamogga,35
+Logan Seth,57,Male,Teacher,Udupi,39
+Rohan Pandey,56,Male,Teacher,Mysuru,25
+Vrishti Sura,16,Female,Shopkeeper,Hassan,81
+William Nayak,23,Male,Teacher,Tumakuru,27
+Manthan Seshadri,38,Male,Homemaker,Kolar,88
+Matthew Srivastava,42,Male,Bank Employee,Davangere,23
+Arjun Majumdar,31,Male,Bank Employee,Shivamogga,88
+Aarna Grover,67,Female,Homemaker,Mandya,52
+Urmi Sheth,72,Female,Student,Tumakuru,41
+Charles Walla,56,Male,Bank Employee,Tumakuru,80
+Adya Bobal,17,Female,Software Engineer,Tumakuru,23
+Mohini Sani,31,Female,Retired Officer,Koppal,38
+Chatresh Kamdar,52,Male,Teacher,Bengaluru Rural,66
+Eesha Rau,62,Female,Homemaker,Raichur,60
+Girik Anand,20,Male,Bank Employee,Belagavi,32
+Xavier Vohra,32,Male,Teacher,Chikkamagaluru,23
+Kashvi Ramaswamy,31,Female,Software Engineer,Udupi,27
+Triveni Karnik,58,Female,Teacher,Koppal,37
+Faraj Sahota,60,Male,Student,Davangere,31
+George Parmar,20,Male,Bank Employee,Udupi,37
+Abhimanyu Banik,44,Male,Bank Employee,Davangere,63
+Lucky Krishna,57,Male,Teacher,Kolar,37
+Shivansh Kala,55,Male,Teacher,Bidar,32
+Mohini Prashad,37,Female,Shopkeeper,Shivamogga,37
+Radhika Cherian,30,Female,Student,Kolar,48
+Vasudha Bahl,19,Female,Student,Mysuru,43
+Triveni Bhakta,61,Female,Shopkeeper,Tumakuru,77
+Samaksh Cherian,46,Male,Retired Officer,Bengaluru Urban,86
+Kabir Sarma,57,Male,Student,Hassan,26
+Baljiwan Sekhon,16,Male,Homemaker,Mysuru,28
+Leena Puri,35,Female,Homemaker,Mangaluru (Dakshina Kannada),52
+Rajata Tata,32,Female,Student,Raichur,27
+Banjeet Muni,64,Male,Shopkeeper,Bengaluru Rural,58
+Mugdha Varghese,51,Female,Retired Officer,Belagavi,71
+Advay Karan,72,Male,Shopkeeper,Hassan,86
+Gopal Gandhi,20,Male,Shopkeeper,Udupi,83
+Pranit Mukhopadhyay,69,Male,Teacher,Tumakuru,70
+Dakshesh Barad,24,Male,Software Engineer,Bidar,44
+Ekantika Rai,39,Female,Retired Officer,Bengaluru Urban,40
+Banjeet Dash,19,Male,Shopkeeper,Vijayapura,41
+Bahadurjit Suri,48,Male,Shopkeeper,Mangaluru (Dakshina Kannada),70
+Omisha Patla,68,Female,Bank Employee,Belagavi,88
+Garima Pandya,69,Female,Software Engineer,Bengaluru Rural,67
+Pallavi Narain,20,Female,Homemaker,Mangaluru (Dakshina Kannada),29
+Theodore Raghavan,72,Male,Student,Hassan,41
+Nachiket Sarraf,49,Male,Retired Officer,Koppal,79
+Finn Kanda,71,Male,Retired Officer,Belagavi,55
+Arunima Sangha,19,Female,Shopkeeper,Kalaburagi,85
+Indali Khatri,66,Female,Shopkeeper,Bengaluru Rural,76
+Tanish Ray,57,Male,Student,Hassan,78
+Manbir Kade,64,Male,Teacher,Vijayapura,66
+Hemani Om,59,Female,Homemaker,Raichur,83
+Jyoti Rajan,29,Female,Teacher,Shivamogga,79
+Raghav Boase,68,Male,Shopkeeper,Mysuru,28
+Ishaan Rout,23,Male,Student,Mangaluru (Dakshina Kannada),51
+Kritika Borah,70,Female,Student,Mysuru,73
+Megha Singhal,20,Female,Homemaker,Mangaluru (Dakshina Kannada),89
+Anthony Sabharwal,36,Male,Bank Employee,Udupi,64
+Peter Magar,22,Male,Software Engineer,Vijayapura,47
+Jeevika Palan,29,Female,Software Engineer,Davangere,50
+Niharika Sabharwal,39,Female,Homemaker,Bengaluru Rural,26
+Sarthak Shenoy,72,Male,Student,Udupi,23
+Watika Kara,52,Female,Student,Chikkamagaluru,85
+Arin Radhakrishnan,41,Male,Software Engineer,Bengaluru Urban,85
+Dayamai Babu,20,Female,Retired Officer,Kalaburagi,70
+Rachana Magar,28,Female,Teacher,Bidar,38
+Nihal Banerjee,23,Male,Software Engineer,Hubballi-Dharwad,48
+Chavvi Pandit,50,Female,Student,Belagavi,52
+Noah Mittal,67,Male,Homemaker,Bengaluru Urban,76
+Pranav Bhandari,67,Male,Teacher,Udupi,82
+Gaurangi Sridhar,50,Female,Software Engineer,Tumakuru,30
+Pavani Luthra,34,Female,Shopkeeper,Chikkamagaluru,87
+Kabir Magar,52,Male,Retired Officer,Hubballi-Dharwad,85
+Quincy Kapadia,55,Male,Homemaker,Bengaluru Rural,22
+Nathaniel Comar,36,Male,Homemaker,Raichur,77
+Kamala Mall,70,Female,Shopkeeper,Ballari,28
+Ayush Johal,25,Male,Bank Employee,Bengaluru Urban,34
+Amrita Choudhary,34,Female,Shopkeeper,Davangere,64
+Amol Shah,47,Male,Retired Officer,Kolar,64
+Raksha Gulati,31,Female,Software Engineer,Kolar,74
+Frederick Swamy,16,Male,Bank Employee,Kolar,62
+Arya Chandran,61,Female,Bank Employee,Tumakuru,23
+Yagnesh Ray,26,Male,Bank Employee,Shivamogga,57
+Amara Krishna,26,Female,Student,Koppal,33
+Indira Dara,51,Female,Shopkeeper,Kolar,40
+Watika Bassi,68,Female,Software Engineer,Vijayapura,47
+Tanay Ganguly,51,Male,Shopkeeper,Raichur,84
+Harinakshi Chaudhari,20,Female,Software Engineer,Kalaburagi,86
+Advaith Rajan,65,Male,Student,Kalaburagi,46
+Samuel Lal,19,Male,Bank Employee,Raichur,71
+Daniel Chopra,55,Male,Bank Employee,Bengaluru Rural,71
+Bhavini Konda,49,Female,Student,Bengaluru Rural,46
+Onveer Ranganathan,54,Male,Teacher,Shivamogga,31
+Maya Manda,36,Female,Shopkeeper,Tumakuru,51
+Ekaraj Deol,35,Male,Student,Bidar,25
+Girindra Sur,25,Male,Homemaker,Bengaluru Urban,62
+Vansha Krish,29,Female,Retired Officer,Ballari,77
+Ubika Gala,37,Female,Teacher,Tumakuru,40
+Pranit Deep,63,Male,Student,Mangaluru (Dakshina Kannada),31
+Harsh Memon,45,Male,Retired Officer,Kolar,70
+Ucchal Kota,18,Female,Teacher,Hassan,86
+Zaid Oommen,32,Male,Software Engineer,Mandya,52
+Ansh Barman,29,Male,Student,Ballari,30
+Leena Oza,63,Female,Shopkeeper,Ballari,72
+Libni Datta,38,Female,Bank Employee,Bengaluru Rural,69
+Neha Agarwal,65,Female,Software Engineer,Kalaburagi,76
+Advik Bhagat,53,Male,Retired Officer,Kolar,35
+Abhiram Munshi,49,Male,Retired Officer,Ballari,25
+Mason Bahri,65,Male,Retired Officer,Bengaluru Rural,76
+Hamsini Trivedi,29,Female,Retired Officer,Vijayapura,22
+Charita Bhattacharyya,21,Female,Bank Employee,Bengaluru Rural,90
+Gaurang Gara,34,Male,Homemaker,Bengaluru Rural,24
+Chandresh Parmer,72,Male,Shopkeeper,Mangaluru (Dakshina Kannada),31
+Ekalinga Dhar,43,Male,Shopkeeper,Mysuru,60
+Yashasvi Kannan,41,Female,Homemaker,Bengaluru Urban,26
+Amrita Kakar,23,Female,Student,Vijayapura,60
+Manan Sama,65,Male,Software Engineer,Koppal,69
+Tara Sridhar,48,Female,Shopkeeper,Raichur,73
+Qarin Dash,67,Male,Shopkeeper,Bengaluru Urban,22
+Ishwar Kara,40,Male,Software Engineer,Tumakuru,60
+Brijesh Banik,17,Male,Bank Employee,Bidar,81
+Aradhana Varma,17,Female,Teacher,Udupi,26
+Reyansh Oommen,46,Male,Homemaker,Mangaluru (Dakshina Kannada),36
+Ganga Yadav,24,Female,Teacher,Shivamogga,34
+Ria Mohanty,57,Female,Software Engineer,Tumakuru,48
+Onveer Korpal,48,Male,Software Engineer,Koppal,68
+Nihal Lall,30,Male,Software Engineer,Tumakuru,36
+Niharika Chakraborty,17,Female,Bank Employee,Bengaluru Urban,30
+Owen Kumer,59,Male,Student,Bengaluru Rural,83
+Liam Jaggi,20,Male,Retired Officer,Mysuru,30
+Vivaan Dyal,54,Male,Bank Employee,Bidar,82
+Raagini Bobal,69,Female,Shopkeeper,Hassan,87
+Vedant Mitter,16,Male,Shopkeeper,Bengaluru Rural,28
+Geetika Chopra,53,Female,Retired Officer,Bidar,81
+Harrison Chowdhury,48,Male,Student,Belagavi,66
+Vinaya Ahluwalia,66,Female,Teacher,Davangere,87
+Reva Narain,54,Female,Teacher,Bidar,83
+Kamala Nair,60,Female,Software Engineer,Belagavi,70
+Ekalinga Shukla,69,Male,Retired Officer,Belagavi,51
+Harsh Tailor,58,Male,Bank Employee,Mangaluru (Dakshina Kannada),69
+Eiravati Banerjee,30,Female,Teacher,Hubballi-Dharwad,23
+Ekavir Kumer,64,Male,Student,Kolar,35
+Sachi Biswas,57,Female,Homemaker,Udupi,59
+Harsh Krishnan,19,Male,Shopkeeper,Mysuru,87
+Megha Nagarajan,36,Female,Student,Tumakuru,32
+Vedhika Raju,19,Female,Student,Hubballi-Dharwad,82
+Gagan Sengupta,23,Male,Shopkeeper,Mandya,70
+Watika Chad,19,Female,Retired Officer,Vijayapura,59
+Nathan Gala,32,Male,Teacher,Hassan,36
+Fiyaz Bajaj,27,Male,Homemaker,Vijayapura,39
+Jatin Manne,70,Male,Homemaker,Vijayapura,49
+Tanmayi Gokhale,27,Female,Software Engineer,Hassan,60
+Balveer Vyas,27,Male,Software Engineer,Vijayapura,31
+Benjamin Bahl,55,Male,Software Engineer,Kolar,38
+Ucchal Kunda,25,Female,Teacher,Hubballi-Dharwad,51
+Guneet Om,25,Male,Student,Mandya,29
+Bhanumati Bhatia,67,Female,Shopkeeper,Tumakuru,56
+Rajeshri Mistry,63,Female,Bank Employee,Hassan,56
+Jonathan Kalita,35,Male,Bank Employee,Davangere,33
+Anita Raju,53,Female,Retired Officer,Chikkamagaluru,73
+Aadi Kapur,39,Male,Software Engineer,Shivamogga,44
+Eiravati Vohra,68,Female,Shopkeeper,Davangere,73
+Anay Kulkarni,70,Male,Retired Officer,Vijayapura,49
+Henry Gour,41,Male,Homemaker,Udupi,87
+Eesha Kakar,68,Female,Bank Employee,Mandya,42
+Gayathri Sinha,62,Female,Software Engineer,Davangere,37
+Farhan Rege,25,Male,Shopkeeper,Shivamogga,21
+Rajeshri Samra,22,Female,Retired Officer,Vijayapura,37
+Meghana Dada,72,Female,Bank Employee,Hubballi-Dharwad,84
+Matthew Walia,34,Male,Shopkeeper,Mandya,59
+Nandini Khurana,17,Female,Retired Officer,Bengaluru Rural,33
+Aarini Seth,59,Female,Software Engineer,Chikkamagaluru,59
+Jyoti Karnik,56,Female,Software Engineer,Hassan,90
+Ishani Pau,54,Female,Teacher,Chikkamagaluru,86
+Lohit Grover,20,Male,Teacher,Raichur,29
+Vaishnavi Sabharwal,56,Female,Shopkeeper,Bengaluru Urban,59
+Janya Bala,55,Female,Homemaker,Bengaluru Urban,44
+Dalbir Modi,16,Male,Homemaker,Tumakuru,50
+Hardik Kulkarni,16,Male,Retired Officer,Chikkamagaluru,67
+Daksh Agrawal,48,Male,Retired Officer,Chikkamagaluru,41
+Yatin Setty,16,Male,Student,Belagavi,58
+Arjun Warrior,61,Male,Teacher,Chikkamagaluru,73
+Indrajit Hayer,53,Male,Teacher,Mangaluru (Dakshina Kannada),23
+Udant Keer,63,Male,Homemaker,Bengaluru Rural,78
+Tanay Mohan,42,Male,Student,Chikkamagaluru,75
+Omisha Mandal,29,Female,Teacher,Mysuru,34
+Udant Pathak,51,Male,Shopkeeper,Koppal,83
+Arya Chhabra,25,Female,Bank Employee,Mandya,55
+Avi Rao,46,Male,Teacher,Bengaluru Rural,64
+Urvi Rege,70,Female,Homemaker,Kolar,22
+Girik Bath,61,Male,Bank Employee,Tumakuru,50
+Harini Pal,57,Female,Student,Mandya,79
+Nicholas Lad,46,Male,Homemaker,Davangere,89
+Inaya Khosla,50,Female,Teacher,Kolar,37
+Jatin Raju,61,Male,Homemaker,Raichur,59
+Siddharth Raman,47,Male,Bank Employee,Tumakuru,53
+Sneha Pingle,59,Female,Retired Officer,Bengaluru Urban,32
+Jagdish Dar,63,Male,Retired Officer,Koppal,65
+Ekansh Singhal,16,Male,Retired Officer,Koppal,44
+Chaitanya Mander,44,Male,Student,Kolar,54
+Ijaya Gour,21,Female,Retired Officer,Bengaluru Rural,33
+Yatan Patla,39,Male,Student,Kolar,25
+Lakshit Gaba,20,Male,Retired Officer,Bengaluru Rural,26
+Mohammed Arora,71,Male,Bank Employee,Mysuru,31
+Gaurang Dass,21,Male,Teacher,Shivamogga,40
+Nisha Prashad,67,Female,Software Engineer,Ballari,47
+Devansh Pandey,29,Male,Teacher,Koppal,46
+Ira Bhatti,49,Female,Teacher,Shivamogga,53
+Lohit Gara,72,Male,Homemaker,Kolar,62
+Darsh Narang,71,Male,Retired Officer,Kolar,88
+Pranav Vala,49,Male,Shopkeeper,Kolar,77
+Logan Dani,62,Male,Retired Officer,Ballari,28
+Yatin Savant,36,Male,Homemaker,Koppal,88
+Aarav Talwar,32,Male,Shopkeeper,Koppal,76
+Udant Garde,53,Male,Bank Employee,Kolar,83
+Devika Trivedi,59,Female,Retired Officer,Koppal,64
+Yoshita Sangha,39,Female,Software Engineer,Chikkamagaluru,81
+Eshana Chatterjee,33,Female,Homemaker,Raichur,67
+Vincent Balasubramanian,42,Male,Teacher,Tumakuru,66
+Devika Dey,53,Female,Teacher,Belagavi,71
+Azad Narula,33,Male,Retired Officer,Mysuru,78
+Upadhriti Kari,30,Female,Shopkeeper,Vijayapura,84
+Nihal Krish,45,Male,Bank Employee,Koppal,90
+Rachita Dugar,40,Female,Homemaker,Tumakuru,56
+Yashawini Mitter,26,Female,Homemaker,Bengaluru Rural,57
+Chandani Handa,44,Female,Bank Employee,Kolar,55
+Advika Andra,51,Female,Retired Officer,Bidar,47
+Tripti Bhatti,70,Female,Retired Officer,Hubballi-Dharwad,43
+Harrison Dixit,67,Male,Homemaker,Mandya,82
+Parth Bhatti,33,Male,Retired Officer,Bengaluru Rural,20
+Hema Reddy,58,Female,Teacher,Ballari,64
+Kabir Oza,27,Male,Software Engineer,Hassan,40
+Akshay Bhatnagar,42,Male,Bank Employee,Chikkamagaluru,28
+Devika Nazareth,67,Female,Student,Bidar,39
+Ucchal Lalla,46,Female,Bank Employee,Vijayapura,90
+Ojas Sachdev,67,Male,Bank Employee,Kalaburagi,32
+Rachana Mani,47,Female,Retired Officer,Davangere,58
+Jairaj Gaba,27,Male,Bank Employee,Hubballi-Dharwad,28
+Qarin Varghese,28,Male,Student,Raichur,22
+Gaurang Malhotra,19,Male,Student,Belagavi,80
+Gayathri Sankar,30,Female,Software Engineer,Bidar,63
+Gauri Parmar,31,Female,Software Engineer,Kalaburagi,72
+Thomas Mallick,64,Male,Shopkeeper,Koppal,36
+Amol Bahl,20,Male,Teacher,Raichur,29
+Zinal Guha,61,Female,Retired Officer,Mangaluru (Dakshina Kannada),25
+Chakradev Yohannan,59,Male,Student,Kalaburagi,67
+Wyatt Seth,31,Male,Software Engineer,Udupi,55
+Leela Uppal,43,Female,Teacher,Belagavi,42
+Timothy Pal,26,Male,Software Engineer,Udupi,27
+Faqid Manda,38,Male,Student,Davangere,63
+Frado Varghese,41,Male,Retired Officer,Vijayapura,36
+Jagrati Vig,51,Female,Retired Officer,Shivamogga,49
+Finn Bandi,72,Male,Homemaker,Kolar,87
+Jacob Bhandari,30,Male,Student,Shivamogga,42
+Harrison Sibal,58,Male,Retired Officer,Vijayapura,72
+Manan Hora,59,Male,Teacher,Davangere,60
+Gaurav Rout,44,Male,Student,Hubballi-Dharwad,81
+Logan Nagar,45,Male,Homemaker,Davangere,50
+Harini Lal,56,Female,Teacher,Mysuru,45
+Jagat Sani,21,Male,Homemaker,Bengaluru Urban,72
+Faqid Sahni,34,Male,Shopkeeper,Chikkamagaluru,88
+Naveen Chanda,19,Male,Homemaker,Tumakuru,34
+Divya Sant,64,Female,Retired Officer,Udupi,72
+Bimala Yohannan,29,Female,Software Engineer,Udupi,26
+Arunima Bose,46,Female,Teacher,Chikkamagaluru,88
+Gaurangi Mishra,40,Female,Retired Officer,Bengaluru Rural,28
+Mugdha Goel,47,Female,Shopkeeper,Vijayapura,32
+Chanakya Radhakrishnan,48,Male,Retired Officer,Koppal,28
+Manya Trivedi,40,Female,Retired Officer,Mandya,62
+Ikbal Bajwa,21,Male,Student,Kalaburagi,57
+Yatin Jani,68,Male,Homemaker,Koppal,41
+Ayaan Raghavan,49,Male,Software Engineer,Koppal,56
+Sudiksha Contractor,58,Female,Teacher,Mandya,70
+Reyansh Bahri,39,Male,Software Engineer,Shivamogga,49
+Owen Keer,53,Male,Shopkeeper,Mandya,55
+Benjamin Bose,65,Male,Homemaker,Mysuru,52
+Harrison Mody,43,Male,Retired Officer,Chikkamagaluru,64
+Damyanti Chatterjee,45,Female,Bank Employee,Mangaluru (Dakshina Kannada),27
+Hitesh Lad,43,Male,Teacher,Tumakuru,25
+Bakhshi Ben,65,Male,Software Engineer,Bengaluru Urban,62
+Bimala Swaminathan,69,Female,Student,Tumakuru,76
+Widisha Trivedi,16,Female,Shopkeeper,Bidar,60
+Urishilla Modi,51,Female,Shopkeeper,Hassan,28
+Balveer Rastogi,38,Male,Software Engineer,Vijayapura,64
+Alexander Samra,61,Male,Shopkeeper,Kalaburagi,43
+Pallavi Goswami,69,Female,Software Engineer,Belagavi,58
+Naksh Bath,64,Male,Student,Udupi,85
+Dalaja Nadkarni,39,Female,Teacher,Ballari,61
+Saksham Prasad,33,Male,Homemaker,Mysuru,29
+Advik Keer,68,Male,Homemaker,Kolar,78
+Zilmil Kalla,59,Female,Student,Mysuru,89
+Robert Bhandari,64,Male,Shopkeeper,Hubballi-Dharwad,53
+Gautam Varughese,60,Male,Retired Officer,Mandya,86
+Benjamin Batra,48,Male,Software Engineer,Bidar,30
+Kritika Pingle,70,Female,Software Engineer,Koppal,30
+Ekiya Dugar,17,Female,Homemaker,Shivamogga,50
+Ekantika Chakrabarti,39,Female,Retired Officer,Tumakuru,54
+Gaurika Hegde,42,Female,Software Engineer,Bengaluru Urban,53
+Reyansh Yadav,68,Male,Software Engineer,Bengaluru Rural,53
+Amara Sen,50,Female,Student,Kolar,39
+Bhavani Halder,31,Female,Homemaker,Kalaburagi,42
+Udant Ranganathan,18,Male,Student,Shivamogga,62
+Chatura Nair,61,Male,Teacher,Bengaluru Urban,48
+Henry Gole,63,Male,Teacher,Hubballi-Dharwad,45
+Samaksh Baria,68,Male,Shopkeeper,Shivamogga,83
+Raksha Kurian,72,Female,Homemaker,Hassan,35
+Christopher Naik,47,Male,Shopkeeper,Hassan,23
+Ridhi Kadakia,41,Female,Teacher,Bengaluru Urban,25
+Patrick Sastry,60,Male,Shopkeeper,Kolar,70
+Rohan Dave,46,Male,Homemaker,Bengaluru Urban,45
+Chaitaly Comar,36,Female,Bank Employee,Mangaluru (Dakshina Kannada),57
+Unnati Kaur,66,Female,Teacher,Hubballi-Dharwad,38
+Zayyan Dada,47,Male,Retired Officer,Bidar,90
+Upkaar Deo,46,Male,Homemaker,Vijayapura,54
+Januja Minhas,48,Female,Homemaker,Belagavi,89
+Matthew Saini,32,Male,Teacher,Bengaluru Rural,90
+Ria Devi,21,Female,Software Engineer,Kolar,33
+Manan Dani,19,Male,Teacher,Mandya,36
+Tanish Dhawan,47,Male,Retired Officer,Shivamogga,66
+Hardik Rajagopalan,33,Male,Software Engineer,Kolar,21
+Dev Grover,40,Male,Bank Employee,Kalaburagi,73
+Qarin Naidu,50,Male,Bank Employee,Tumakuru,55
+Ayushman Bose,28,Male,Shopkeeper,Mysuru,63
+Ishita Misra,52,Female,Teacher,Vijayapura,77
+Om Ramaswamy,59,Male,Bank Employee,Hubballi-Dharwad,69
+Andrew Ranganathan,21,Male,Student,Kolar,49
+Mason Dixit,57,Male,Homemaker,Chikkamagaluru,63
+Jalsa Nayak,62,Female,Bank Employee,Bengaluru Rural,43
+Laksh Hari,23,Male,Shopkeeper,Bengaluru Urban,90
+Bahadurjit Hans,47,Male,Shopkeeper,Raichur,44
+Ekiya Apte,71,Female,Shopkeeper,Udupi,60
+Aarini Deshmukh,65,Female,Shopkeeper,Hubballi-Dharwad,44
+Amara Sharaf,17,Female,Shopkeeper,Belagavi,88
+Udarsh Chandra,63,Male,Homemaker,Ballari,26
+Harish Bhakta,23,Male,Retired Officer,Shivamogga,40
+Gauri Rege,64,Female,Shopkeeper,Bengaluru Urban,44
+Falguni Sachdev,27,Female,Software Engineer,Koppal,56
+Hemang Parsa,57,Male,Retired Officer,Bidar,36
+Kiaan Soman,45,Male,Software Engineer,Ballari,57
+Faris Bajaj,28,Male,Software Engineer,Chikkamagaluru,27
+Chatresh Krishnamurthy,68,Male,Teacher,Shivamogga,71
+Noah Jani,63,Male,Retired Officer,Vijayapura,68
+Faraj Khalsa,18,Male,Software Engineer,Kolar,71
+Abdul Kara,63,Male,Bank Employee,Chikkamagaluru,53
+Wridesh Varughese,52,Male,Retired Officer,Hubballi-Dharwad,22
+Aarav Vig,46,Male,Teacher,Mangaluru (Dakshina Kannada),57
+Jacob Dhaliwal,46,Male,Shopkeeper,Mangaluru (Dakshina Kannada),79
+Tanvi Kumer,59,Female,Bank Employee,Tumakuru,31
+Karan Dyal,33,Male,Software Engineer,Bengaluru Urban,89
+Chatresh Kumer,50,Male,Homemaker,Shivamogga,80
+Balhaar Kar,61,Male,Bank Employee,Mandya,53
+Ikbal Dave,63,Male,Software Engineer,Mandya,20
+Turvi Dey,53,Female,Retired Officer,Mandya,38
+Darsh Bandi,28,Male,Software Engineer,Mangaluru (Dakshina Kannada),45
+Jyoti Sankar,41,Female,Software Engineer,Shivamogga,53
+Banjeet Din,30,Male,Software Engineer,Hassan,25
+Urishilla Dyal,37,Female,Retired Officer,Mysuru,90
+Azaan Sha,68,Male,Retired Officer,Kolar,25
+Kalpit Narula,37,Male,Retired Officer,Ballari,74
+Rushil Modi,39,Male,Homemaker,Kolar,27
+Ekta Dhaliwal,50,Female,Shopkeeper,Mangaluru (Dakshina Kannada),40
+Jatin Chopra,26,Male,Student,Kalaburagi,86
+Ikshita Sundaram,23,Female,Student,Davangere,27
+Ishanvi Warrior,68,Female,Teacher,Hassan,87
+Diya Bora,28,Female,Student,Vijayapura,87
+Rayaan Naik,72,Male,Software Engineer,Mysuru,48
+Dominic Karan,33,Male,Retired Officer,Raichur,21
+Maanas Ratti,17,Male,Shopkeeper,Ballari,45
+Utkarsh Shankar,47,Male,Shopkeeper,Bengaluru Urban,85
+Advay Menon,22,Male,Student,Hubballi-Dharwad,57
+Gopal Mallick,48,Male,Student,Vijayapura,46
+Xavier Savant,21,Male,Student,Mysuru,52
+Nirja Bobal,53,Female,Student,Davangere,54
+Agastya Lalla,21,Male,Teacher,Koppal,58
+Garima Rana,32,Female,Homemaker,Mysuru,49
+Omaja Babu,39,Female,Homemaker,Mysuru,76
+Triveni Apte,49,Female,Software Engineer,Kolar,40
+Rohan Johal,40,Male,Software Engineer,Bengaluru Urban,69
+Rohan Krishnan,63,Male,Retired Officer,Davangere,76
+Priya Guha,24,Female,Homemaker,Hubballi-Dharwad,67
+Urishilla Joshi,36,Female,Retired Officer,Belagavi,23
+Hredhaan Chowdhury,57,Male,Student,Shivamogga,58
+Harshil Bhattacharyya,22,Male,Shopkeeper,Hassan,87
+Champak Chacko,65,Male,Retired Officer,Hassan,52
+Vasudha Vig,27,Female,Teacher,Kolar,49
+Aryan Jha,64,Male,Teacher,Hubballi-Dharwad,85
+Jairaj Sawhney,68,Male,Teacher,Ballari,32
+Gaurang Dass,45,Male,Retired Officer,Koppal,79
+Upasna Mand,62,Female,Bank Employee,Mysuru,41
+George Virk,23,Male,Retired Officer,Mangaluru (Dakshina Kannada),62
+Jackson Padmanabhan,50,Male,Bank Employee,Davangere,27
+Chakradev Pall,36,Male,Student,Bengaluru Urban,67
+Eta Soman,59,Female,Homemaker,Mandya,26
+Banjeet Ahluwalia,43,Male,Homemaker,Belagavi,68
+Chatresh Dhawan,34,Male,Shopkeeper,Bidar,84
+Aarini Deep,40,Female,Student,Mysuru,65
+Harish Palla,46,Male,Teacher,Mysuru,79
+Eshana Yadav,18,Female,Bank Employee,Raichur,43
+Chaitaly Iyer,34,Female,Shopkeeper,Bengaluru Urban,61
+Bhavya Pillai,71,Female,Shopkeeper,Bengaluru Rural,49
+Kala Khurana,57,Female,Student,Belagavi,30
+Jairaj Chawla,28,Male,Bank Employee,Bidar,73
+Chanakya Sachar,19,Male,Retired Officer,Kolar,55
+Anvi Malhotra,64,Female,Retired Officer,Kolar,43
+Hiral Sani,52,Female,Software Engineer,Mangaluru (Dakshina Kannada),90
+Niharika Bhakta,25,Female,Software Engineer,Davangere,31
+Nakul Kota,19,Male,Bank Employee,Tumakuru,49
+Oscar Anne,68,Male,Shopkeeper,Udupi,40
+Rachana Rajagopalan,61,Female,Student,Ballari,84
+Chandresh Bose,16,Male,Software Engineer,Vijayapura,70
+Aadi Chandra,26,Male,Teacher,Bengaluru Rural,32
+Chakradhar Nigam,38,Male,Software Engineer,Kalaburagi,71
+Benjamin Ratti,23,Male,Teacher,Koppal,34
+Ekalinga Sule,20,Male,Shopkeeper,Koppal,85
+Reyansh Talwar,56,Male,Shopkeeper,Raichur,22
+Tanmayi Raval,43,Female,Retired Officer,Vijayapura,87
+Isaac Nagy,30,Male,Retired Officer,Vijayapura,37
+Champak Golla,65,Male,Software Engineer,Mangaluru (Dakshina Kannada),84
+Pavani Kurian,70,Female,Retired Officer,Koppal,69
+Turvi Kumar,58,Female,Shopkeeper,Mangaluru (Dakshina Kannada),81
+Edhitha Bhasin,52,Female,Software Engineer,Udupi,29
+Damini Shroff,47,Female,Homemaker,Tumakuru,71
+Krishna Borde,35,Female,Homemaker,Koppal,26
+Gaurav Kara,61,Male,Bank Employee,Mysuru,90
+Hardik Khalsa,29,Male,Shopkeeper,Mangaluru (Dakshina Kannada),64
+Theodore Singhal,60,Male,Bank Employee,Bengaluru Urban,40
+Advika Bansal,32,Female,Homemaker,Tumakuru,82
+Pahal Singhal,26,Female,Student,Kalaburagi,39
+Oeshi Loyal,48,Female,Student,Vijayapura,35
+Kavya Oommen,58,Female,Homemaker,Bengaluru Rural,58
+Ayaan Balay,43,Male,Student,Davangere,56
+Chakradev Morar,58,Male,Student,Hubballi-Dharwad,21
+Tara Bala,66,Female,Student,Raichur,60
+Daniel Seshadri,55,Male,Software Engineer,Davangere,21
+Udyati Kannan,71,Female,Shopkeeper,Bengaluru Urban,28
+Bhavika Mammen,26,Female,Teacher,Davangere,38
+Aditya Muni,61,Male,Student,Kalaburagi,23
+Harsh Sridhar,49,Male,Software Engineer,Koppal,59
+Pallavi Gara,41,Female,Shopkeeper,Davangere,77
+Samarth Dasgupta,48,Male,Retired Officer,Chikkamagaluru,68
+Ekiya Dhingra,24,Female,Bank Employee,Kolar,73
+Lopa Shanker,53,Female,Retired Officer,Hassan,62
+Onveer Srinivas,63,Male,Shopkeeper,Hassan,26
+Ranbir Dhar,16,Male,Bank Employee,Kalaburagi,36
+Januja Khurana,61,Female,Shopkeeper,Chikkamagaluru,54
+Dominic Karan,71,Male,Homemaker,Bengaluru Rural,32
+Omkaar Saran,45,Male,Bank Employee,Bengaluru Urban,52
+Girik Srinivasan,40,Male,Homemaker,Mangaluru (Dakshina Kannada),56
+Avi Sura,37,Male,Teacher,Koppal,42
+Praneel Ben,66,Male,Teacher,Kolar,23
+Chatresh Majumdar,66,Male,Retired Officer,Koppal,56
+Henry Wadhwa,53,Male,Shopkeeper,Chikkamagaluru,28
+Harsh Aggarwal,71,Male,Retired Officer,Mysuru,61
+Tarak Nayar,24,Male,Shopkeeper,Chikkamagaluru,25
+Mahika Majumdar,24,Female,Student,Kalaburagi,42
+Chameli Kuruvilla,34,Female,Teacher,Tumakuru,77
+Ekaraj Thaker,66,Male,Teacher,Chikkamagaluru,82
+Nathaniel Desai,70,Male,Bank Employee,Koppal,43
+Tanveer Walla,69,Male,Bank Employee,Koppal,85
+Guneet Sridhar,58,Male,Homemaker,Mandya,79
+Eiravati Johal,23,Female,Teacher,Vijayapura,40
+Pratyush Gandhi,24,Male,Teacher,Shivamogga,75
+Alexander Ganesh,64,Male,Retired Officer,Belagavi,59
+Frado Brar,32,Male,Student,Davangere,21
+Oscar Nayak,53,Male,Student,Mysuru,39
+Tripti Murthy,29,Female,Software Engineer,Ballari,66
+Jeet Bhagat,64,Male,Bank Employee,Davangere,63
+Jeremiah Pingle,45,Male,Bank Employee,Hubballi-Dharwad,66
+Lucky Malhotra,43,Male,Student,Mysuru,44
+Ekta Nori,23,Female,Shopkeeper,Shivamogga,66
+Lopa Basu,25,Female,Software Engineer,Chikkamagaluru,62
+Gautami Bajaj,20,Female,Student,Koppal,68
+Nathaniel Tata,24,Male,Student,Vijayapura,69
+Devansh Pall,31,Male,Student,Mandya,21
+Upma Pingle,63,Female,Shopkeeper,Bengaluru Rural,77
+Jagdish Choudhry,33,Male,Bank Employee,Bengaluru Rural,72
+Adya Grover,41,Female,Homemaker,Kolar,72
+Tejas Chaudhuri,26,Male,Retired Officer,Bengaluru Urban,61
+Ekapad Agarwal,30,Male,Retired Officer,Tumakuru,38
+Geetika Bajaj,72,Female,Bank Employee,Chikkamagaluru,26
+Daksha Ganguly,42,Female,Retired Officer,Kalaburagi,25
+Leela Nadkarni,47,Female,Homemaker,Kalaburagi,45
+Odika Madan,59,Female,Teacher,Shivamogga,74
+Pallavi Venkataraman,72,Female,Shopkeeper,Udupi,69
+Ati Sharma,67,Female,Bank Employee,Udupi,74
+Joshua Vora,28,Male,Shopkeeper,Kalaburagi,87
+Aarush Savant,53,Male,Teacher,Vijayapura,54
+Meghana Narayanan,34,Female,Teacher,Tumakuru,22
+Chasmum Nagarajan,24,Female,Shopkeeper,Belagavi,60
+Hamsini Patla,70,Female,Shopkeeper,Shivamogga,42
+Suhani Agate,62,Female,Homemaker,Davangere,20
+Ekansh Verma,53,Male,Bank Employee,Mangaluru (Dakshina Kannada),64
+Farhan Raghavan,71,Male,Student,Bengaluru Rural,59
+Anvi Singhal,65,Female,Bank Employee,Raichur,37
+Anirudh Seshadri,33,Male,Bank Employee,Hubballi-Dharwad,71
+Siddharth Vala,27,Male,Shopkeeper,Bengaluru Urban,88
+Andrew Sahota,18,Male,Software Engineer,Vijayapura,44
+Sachi Sharaf,39,Female,Bank Employee,Mandya,37
+Yashoda Majumdar,56,Female,Shopkeeper,Koppal,83
+Madhavi Sanghvi,63,Female,Software Engineer,Mandya,84
+Ishwar Date,41,Male,Bank Employee,Ballari,38
+Osha Soman,66,Female,Homemaker,Bengaluru Rural,33
+Mitali Sethi,30,Female,Software Engineer,Raichur,81
+Kamya Sankar,44,Female,Retired Officer,Kalaburagi,59
+Anusha Chand,71,Female,Student,Bengaluru Urban,75
+Christopher Atwal,45,Male,Homemaker,Kalaburagi,52
+Omisha Prasad,64,Female,Homemaker,Davangere,37
+Praneel Agate,33,Male,Shopkeeper,Bidar,26
+Zaid Pau,46,Male,Retired Officer,Bengaluru Urban,79
+Gavin Rau,36,Male,Software Engineer,Kalaburagi,77
+Lila Manne,50,Female,Retired Officer,Mangaluru (Dakshina Kannada),24
+Isaac Bala,26,Male,Shopkeeper,Koppal,77
+Tristan Shukla,64,Male,Retired Officer,Bidar,72
+Naveen Sampath,66,Male,Student,Kolar,79
+Eta Kumer,56,Female,Student,Ballari,28
+Zaid Varty,18,Male,Student,Ballari,29
+Abeer Khare,35,Male,Software Engineer,Bengaluru Rural,89
+Aashi Balasubramanian,24,Female,Software Engineer,Davangere,35
+Zilmil Chaudhry,28,Female,Retired Officer,Kolar,56
+Ganga Dhar,52,Female,Shopkeeper,Hassan,30
+Guneet Shroff,25,Male,Shopkeeper,Chikkamagaluru,32
+Aradhana Patil,17,Female,Homemaker,Belagavi,83
+Azaan Deshpande,20,Male,Bank Employee,Bengaluru Rural,23
+Nidhi Saxena,36,Female,Retired Officer,Bengaluru Urban,25
+Qushi Palla,42,Female,Teacher,Mysuru,37
+Avi Sibal,45,Male,Student,Kolar,86
+Triya Datta,19,Female,Retired Officer,Belagavi,65
+Neha Magar,72,Female,Shopkeeper,Vijayapura,35
+Advika Chaudhuri,71,Female,Retired Officer,Koppal,85
+Eesha Chokshi,38,Female,Software Engineer,Raichur,33
+Parth Sharaf,18,Male,Bank Employee,Koppal,77
+Amol Samra,60,Male,Homemaker,Udupi,52
+Falan Memon,44,Male,Shopkeeper,Kolar,26
+Jason Joshi,61,Male,Shopkeeper,Bidar,20
+Vincent Andra,20,Male,Student,Bengaluru Rural,57
+Ojasvi Char,65,Female,Retired Officer,Udupi,40
+Mason Sachdeva,42,Male,Shopkeeper,Bengaluru Urban,80
+Gautami Dani,64,Female,Software Engineer,Hubballi-Dharwad,72
+Radhika Ratta,50,Female,Retired Officer,Mandya,46
+Vrinda Modi,69,Female,Shopkeeper,Hassan,60
+Ekaraj Gola,66,Male,Teacher,Mangaluru (Dakshina Kannada),35
+Vasudha Baral,59,Female,Retired Officer,Shivamogga,25
+Kiaan Randhawa,65,Male,Teacher,Mangaluru (Dakshina Kannada),49
+Netra Aggarwal,56,Female,Software Engineer,Mandya,26
+Naksh Kala,43,Male,Homemaker,Vijayapura,73
+Damyanti Nadig,39,Female,Software Engineer,Koppal,80
+Benjamin Andra,34,Male,Teacher,Bengaluru Rural,35
+Benjamin Chad,37,Male,Retired Officer,Ballari,41
+Bhavika Buch,62,Female,Student,Shivamogga,41
+Urmi Parmer,48,Female,Shopkeeper,Bengaluru Rural,86
+Qadim Magar,67,Male,Software Engineer,Shivamogga,48
+Falguni Taneja,18,Female,Student,Koppal,68
+Gunbir Das,62,Male,Software Engineer,Mandya,74
+Vivaan Barad,64,Male,Student,Ballari,48
+Vedant Dixit,52,Male,Teacher,Udupi,88
+Yutika Gill,44,Female,Bank Employee,Davangere,39
+Triveni Borde,61,Female,Homemaker,Mangaluru (Dakshina Kannada),50
+Oliver Bahri,39,Male,Shopkeeper,Chikkamagaluru,58
+Divya Saini,24,Female,Shopkeeper,Ballari,45
+Aarini Bhatti,36,Female,Teacher,Hubballi-Dharwad,50
+Vedant Sandhu,33,Male,Homemaker,Davangere,80
+Pavani Barad,71,Female,Shopkeeper,Kalaburagi,74
+Forum Dhaliwal,57,Female,Homemaker,Tumakuru,58
+Teerth Kamdar,40,Male,Retired Officer,Belagavi,38
+Veer Dugar,59,Male,Homemaker,Mandya,76
+Shivansh Arora,32,Male,Software Engineer,Kalaburagi,30
+Sudiksha Char,30,Female,Bank Employee,Koppal,73
+William Bhasin,34,Male,Shopkeeper,Bidar,61
+Vedant Bose,72,Male,Student,Chikkamagaluru,26
+Anika Merchant,41,Female,Retired Officer,Vijayapura,20
+Mekhala Ghose,52,Female,Bank Employee,Koppal,43
+Ishani Mistry,17,Female,Homemaker,Ballari,31
+Akshay Viswanathan,70,Male,Homemaker,Chikkamagaluru,31
+Meera Vyas,54,Female,Software Engineer,Chikkamagaluru,80
+Ekansh Cheema,61,Male,Software Engineer,Vijayapura,75
+Ojas Varty,72,Male,Software Engineer,Udupi,46
+Ekbal Pathak,45,Male,Retired Officer,Bengaluru Rural,82
+Pooja Apte,50,Female,Retired Officer,Vijayapura,35
+Noah Sachar,72,Male,Homemaker,Kalaburagi,62
+Ucchal Shankar,59,Female,Retired Officer,Bengaluru Urban,48
+Tristan Nair,34,Male,Student,Vijayapura,31
+Jagat Chada,44,Male,Bank Employee,Ballari,32
+Ekavir Hegde,63,Male,Bank Employee,Bengaluru Urban,70
+Yutika Prakash,21,Female,Retired Officer,Chikkamagaluru,84
+Ranveer Din,70,Male,Shopkeeper,Bengaluru Rural,43
+Arjun Lad,37,Male,Student,Hubballi-Dharwad,62
+Chakradev Deo,72,Male,Software Engineer,Chikkamagaluru,57
+Lipika Borra,52,Female,Retired Officer,Ballari,21
+Gopal Pillay,28,Male,Student,Mysuru,22
+Chaitanya Upadhyay,55,Male,Teacher,Bengaluru Urban,24
+Ladli Nori,35,Female,Teacher,Belagavi,83
+Advika Bhalla,21,Female,Shopkeeper,Bengaluru Urban,38
+Ekansh Kamdar,31,Male,Bank Employee,Mysuru,87
+Faras Toor,66,Male,Student,Chikkamagaluru,70
+Victor Khurana,27,Male,Homemaker,Ballari,56
+Alka Minhas,63,Female,Teacher,Kolar,40
+Abhimanyu Oza,52,Male,Teacher,Bengaluru Rural,51
+Samarth Kala,28,Male,Homemaker,Hassan,63
+Charan Manne,37,Male,Teacher,Mandya,46
+Manbir Bera,45,Male,Shopkeeper,Bidar,47
+Farhan Varty,64,Male,Teacher,Kalaburagi,29
+Arunima Varty,23,Female,Homemaker,Hassan,34
+Turvi Sabharwal,52,Female,Bank Employee,Davangere,76
+Frado Dar,34,Male,Retired Officer,Ballari,33
+Abdul Chopra,43,Male,Student,Hassan,31
+Ekaja Singhal,22,Female,Homemaker,Bengaluru Rural,69
+Ati Mahal,68,Female,Student,Shivamogga,50
+Dalbir Lad,54,Male,Student,Tumakuru,25
+Lekha Khalsa,61,Female,Homemaker,Belagavi,81
+Hamsini Sibal,41,Female,Bank Employee,Davangere,21
+Samar Puri,61,Male,Homemaker,Vijayapura,43
+Thomas Chaudhari,56,Male,Teacher,Mandya,31
+Shivansh Sachdev,49,Male,Bank Employee,Raichur,22
+Lakshit Din,59,Male,Software Engineer,Raichur,61
+Yash Sen,42,Male,Student,Kalaburagi,40
+Waida Karan,44,Female,Retired Officer,Chikkamagaluru,68
+Nandini Ramaswamy,31,Female,Software Engineer,Belagavi,64
+Tarak Natarajan,52,Male,Shopkeeper,Mysuru,66
+Yatin Ramakrishnan,49,Male,Teacher,Ballari,67
+Banjeet Choudhury,29,Male,Bank Employee,Hassan,75
+Omya Bandi,43,Female,Bank Employee,Bengaluru Rural,84
+Vanya Goyal,65,Female,Software Engineer,Chikkamagaluru,57
+Harsh Kothari,44,Male,Software Engineer,Mysuru,55
+Vrishti Mallick,51,Female,Bank Employee,Raichur,64
+Ekani Keer,31,Female,Retired Officer,Vijayapura,21
+Waida Bahl,16,Female,Homemaker,Bengaluru Urban,59
+Shivansh Gole,53,Male,Teacher,Kalaburagi,80
+Ekanta Ratta,41,Female,Student,Bengaluru Urban,25
+Kritika Sarna,56,Female,Student,Ballari,68
+Nisha Dalal,51,Female,Student,Vijayapura,49
+Idika Dhingra,17,Female,Homemaker,Mangaluru (Dakshina Kannada),60
+Sachi Chandra,40,Female,Homemaker,Davangere,67
+Rayaan Kala,53,Male,Teacher,Mangaluru (Dakshina Kannada),23
+Lopa Chander,66,Female,Teacher,Koppal,90
+Parth Gade,18,Male,Shopkeeper,Hassan,45
+Aarav Majumdar,37,Male,Student,Davangere,80
+Umang Shah,67,Male,Software Engineer,Bidar,42
+Neel Dubey,43,Male,Teacher,Kalaburagi,27
+Nisha Kade,57,Female,Teacher,Davangere,81
+Noah Sawhney,49,Male,Shopkeeper,Koppal,56
+Leela Devan,53,Female,Software Engineer,Mysuru,38
+Jeet Butala,54,Male,Shopkeeper,Hassan,32
+Harsh Dewan,24,Male,Shopkeeper,Tumakuru,88
+Tanveer Bala,34,Male,Bank Employee,Shivamogga,52
+Atharv Saran,60,Male,Student,Koppal,51
+Kiaan Maharaj,37,Male,Student,Hassan,23
+Pranit Johal,72,Male,Software Engineer,Bengaluru Urban,29
+Lohit Kunda,43,Male,Software Engineer,Koppal,50
+Urmi Tank,48,Female,Homemaker,Bengaluru Rural,21
+Sathvik Vora,58,Male,Teacher,Chikkamagaluru,33
+Om Dewan,34,Male,Homemaker,Bidar,58
+Jeevika Mall,45,Female,Student,Davangere,64
+Madhavi Sundaram,22,Female,Software Engineer,Kalaburagi,70
+Qasim Sen,67,Male,Software Engineer,Hubballi-Dharwad,54
+Onveer Sankaran,36,Male,Bank Employee,Mysuru,38
+Siddharth Sen,38,Male,Retired Officer,Shivamogga,72
+Omkaar Sampath,64,Male,Homemaker,Mangaluru (Dakshina Kannada),25
+Raksha Pai,24,Female,Teacher,Kalaburagi,23
+Jairaj Murthy,16,Male,Bank Employee,Ballari,39
+Victor Datta,54,Male,Student,Mandya,46
+Wishi Dalal,20,Female,Teacher,Belagavi,23
+Robert Bumb,22,Male,Student,Davangere,53
+Frado Talwar,46,Male,Software Engineer,Mandya,45
+Bachittar Konda,34,Male,Retired Officer,Tumakuru,32
+Naksh Tripathi,45,Male,Retired Officer,Mandya,55
+Abeer Loyal,23,Male,Homemaker,Mangaluru (Dakshina Kannada),26
+Kevin Toor,70,Male,Bank Employee,Kalaburagi,20
+Gaurangi Murty,62,Female,Homemaker,Shivamogga,64
+Sudiksha Chad,63,Female,Bank Employee,Kolar,59
+Adya Baria,21,Female,Student,Hassan,62
+Chaitanya Master,30,Male,Shopkeeper,Kalaburagi,23
+Osha Gokhale,42,Female,Teacher,Vijayapura,38
+Sai Upadhyay,61,Male,Bank Employee,Bengaluru Rural,43
+Raagini Prasad,33,Female,Bank Employee,Bengaluru Urban,81
+Bhavika Kaul,41,Female,Retired Officer,Koppal,27
+Patrick Bhatnagar,69,Male,Bank Employee,Hubballi-Dharwad,43
+Unnati Mukherjee,35,Female,Bank Employee,Shivamogga,84
+Pranav Choudhry,53,Male,Teacher,Belagavi,79
+Amrita Badal,55,Female,Bank Employee,Davangere,65
+Charles Vora,68,Male,Software Engineer,Mysuru,28
+Ekaja Lalla,49,Female,Teacher,Mandya,56
+Qadim Dani,30,Male,Shopkeeper,Mandya,33
+Rachana Sura,32,Female,Shopkeeper,Kalaburagi,69
+Amol Varkey,61,Male,Shopkeeper,Belagavi,56
+Yahvi Raval,23,Female,Teacher,Bengaluru Rural,30
+Ekapad Grover,22,Male,Student,Hubballi-Dharwad,23
+Vasatika Singhal,53,Female,Software Engineer,Bidar,72
+Sai Prakash,50,Female,Teacher,Davangere,35
+Tanvi Nagi,19,Female,Student,Tumakuru,32
+Faqid Shere,68,Male,Homemaker,Kolar,24
+Vihaan Dyal,30,Male,Shopkeeper,Bidar,57
+Zashil Yadav,58,Male,Shopkeeper,Vijayapura,76
+Liam Bath,52,Male,Bank Employee,Mysuru,34
+Samarth Anand,34,Male,Teacher,Chikkamagaluru,28
+Jackson Acharya,41,Male,Student,Bidar,37
+Aishani Chakraborty,71,Female,Homemaker,Kolar,27
+Ridhi Nagi,41,Female,Retired Officer,Vijayapura,46
+Gaurika Prasad,47,Female,Teacher,Belagavi,25
+Kashvi Sidhu,20,Female,Homemaker,Belagavi,23
+Warjas Murthy,22,Male,Student,Raichur,60
+Pranav Anne,24,Male,Teacher,Kolar,50
+Baghyawati Handa,58,Female,Student,Bidar,47
+Wyatt Karan,49,Male,Teacher,Davangere,74
+Suhani Dani,48,Female,Homemaker,Bengaluru Urban,67
+Ekaja Varkey,44,Female,Bank Employee,Raichur,53
+Ojas Sodhi,66,Male,Shopkeeper,Chikkamagaluru,82
+Watika Rattan,44,Female,Homemaker,Shivamogga,32
+Lopa Tiwari,54,Female,Student,Koppal,45
+Ishaan Kurian,49,Male,Software Engineer,Bidar,55
+Yauvani Arya,23,Female,Student,Raichur,69
+Faqid Dara,57,Male,Software Engineer,Hassan,33
+Gaurika Venkatesh,39,Female,Bank Employee,Mangaluru (Dakshina Kannada),81
+Reva Sura,45,Female,Software Engineer,Kolar,85
+Laban Naidu,71,Male,Software Engineer,Vijayapura,57
+Tanay Kalita,44,Male,Student,Bengaluru Rural,70
+Watika Swaminathan,40,Female,Student,Raichur,72
+Kai Garde,18,Male,Retired Officer,Hassan,80
+Leela Borde,29,Female,Retired Officer,Belagavi,26
+Victor Sarraf,31,Male,Shopkeeper,Belagavi,52
+Udarsh Nadkarni,66,Male,Bank Employee,Vijayapura,34
+Barkha Rajagopalan,27,Female,Bank Employee,Tumakuru,38
+Adya Ganesh,28,Female,Bank Employee,Udupi,23
+Gautami Ramanathan,39,Female,Bank Employee,Chikkamagaluru,46
+Shaurya Bahl,44,Male,Teacher,Vijayapura,63
+Upma Krishnamurthy,26,Female,Retired Officer,Tumakuru,60
+Matthew Karan,38,Male,Software Engineer,Mandya,34
+Tanay Bahl,17,Male,Software Engineer,Udupi,83
+Adya Kala,64,Female,Retired Officer,Mandya,29
+Madhavi Sabharwal,21,Female,Software Engineer,Ballari,89
+Yashasvi Bora,56,Female,Shopkeeper,Udupi,20
+Tristan Jaggi,45,Male,Student,Hubballi-Dharwad,79
+Simon Tripathi,72,Male,Student,Udupi,35
+Lavanya Gara,62,Female,Software Engineer,Mangaluru (Dakshina Kannada),85
+Upasna Sarraf,40,Female,Retired Officer,Udupi,60
+Yoshita Dora,43,Female,Software Engineer,Vijayapura,55
+Finn Mane,46,Male,Bank Employee,Kolar,71
+Champak Atwal,69,Male,Shopkeeper,Mandya,33
+Pahal Bansal,22,Female,Shopkeeper,Shivamogga,58
+Omkaar Shah,21,Male,Retired Officer,Tumakuru,75
+Simon Bhandari,30,Male,Bank Employee,Bidar,59
+Brijesh Ramakrishnan,43,Male,Homemaker,Mangaluru (Dakshina Kannada),34
+Pranit Gandhi,53,Male,Teacher,Mangaluru (Dakshina Kannada),43
+Baljiwan Natarajan,42,Male,Student,Hubballi-Dharwad,42
+Alexander Savant,23,Male,Software Engineer,Hubballi-Dharwad,77
+Yashodhara Kara,54,Female,Student,Kolar,65
+Anvi Sangha,36,Female,Bank Employee,Mysuru,72
+Samarth Basu,41,Male,Shopkeeper,Koppal,63
+Abhiram Balasubramanian,47,Male,Teacher,Shivamogga,83
+Nicholas Samra,59,Male,Teacher,Tumakuru,44
+Dev Sahni,41,Male,Software Engineer,Ballari,61
+Azad Mani,22,Male,Homemaker,Kalaburagi,35
+Harita Rai,38,Female,Homemaker,Chikkamagaluru,49
+Arjun Bhavsar,36,Male,Teacher,Hassan,80
+Saanvi Trivedi,27,Female,Homemaker,Mysuru,76
+Netra Chopra,31,Female,Bank Employee,Koppal,29
+Jagvi Bir,18,Female,Student,Davangere,74
+Ansh Lanka,62,Male,Teacher,Kolar,75
+Adweta Murty,45,Female,Shopkeeper,Hubballi-Dharwad,29
+Gopal Mahajan,52,Male,Retired Officer,Shivamogga,58
+Rajata Sarna,40,Female,Shopkeeper,Mangaluru (Dakshina Kannada),35
+Yashoda Badal,50,Female,Student,Hassan,36
+Pushti Goyal,51,Female,Retired Officer,Bengaluru Rural,40
+Ekaraj Nanda,19,Male,Shopkeeper,Raichur,43
+Triya Yogi,25,Female,Teacher,Chikkamagaluru,35
+Radha Malhotra,40,Female,Software Engineer,Koppal,68
+Vihaan Ahuja,20,Male,Retired Officer,Vijayapura,34
+Ekani Kade,64,Female,Software Engineer,Vijayapura,74
+Zayan Chakrabarti,37,Male,Student,Belagavi,74
+Rachit Mane,21,Male,Shopkeeper,Shivamogga,84
+Guneet Mukherjee,29,Male,Shopkeeper,Vijayapura,26
+Garima Nayar,40,Female,Software Engineer,Bengaluru Rural,26
+Nihal Morar,67,Male,Retired Officer,Bengaluru Rural,52
+Elijah Anne,30,Male,Homemaker,Tumakuru,56
+Yash Kar,52,Male,Teacher,Vijayapura,30
+Irya Bora,30,Female,Teacher,Hubballi-Dharwad,51
+Pahal Loyal,43,Female,Bank Employee,Vijayapura,22
+Champak Khare,53,Male,Software Engineer,Bidar,39
+Nilima Andra,47,Female,Student,Bengaluru Rural,29
+Aradhana Dhingra,40,Female,Bank Employee,Udupi,40
+Nidra Comar,40,Female,Student,Raichur,60
+Udant Yohannan,28,Male,Shopkeeper,Tumakuru,50
+Charvi Ranganathan,39,Female,Shopkeeper,Vijayapura,71
+Chanchal Dubey,40,Female,Homemaker,Shivamogga,87
+Nathaniel Doshi,38,Male,Homemaker,Hubballi-Dharwad,76
+Omaja Mutti,62,Female,Teacher,Bengaluru Rural,25
+Ranbir Devi,57,Male,Student,Hassan,32
+Keya Venkataraman,42,Female,Teacher,Davangere,57
+Andrew Sekhon,65,Male,Homemaker,Hassan,51
+Agastya Mistry,20,Male,Retired Officer,Bidar,78
+Tejas Kari,33,Male,Bank Employee,Davangere,87
+Owen Saran,70,Male,Retired Officer,Bengaluru Rural,50
+Ekani Randhawa,16,Female,Homemaker,Davangere,65
+Aahana Lala,62,Female,Bank Employee,Hassan,37
+Champak Wable,59,Male,Bank Employee,Bidar,53
+Jagrati Shankar,57,Female,Retired Officer,Bengaluru Urban,71
+Ekiya Misra,56,Female,Bank Employee,Mandya,20
+Tanish Srinivas,68,Male,Homemaker,Mysuru,61
+Ayush Jani,31,Male,Homemaker,Bengaluru Rural,75
+Abhimanyu Mangat,28,Male,Shopkeeper,Bengaluru Urban,88
+Sudiksha Kapadia,64,Female,Shopkeeper,Belagavi,34
+Rohan Bali,45,Male,Homemaker,Mandya,36
+Sara Loyal,46,Female,Homemaker,Hassan,40
+Radhika Karnik,64,Female,Software Engineer,Mysuru,62
+Hardik Krishna,56,Male,Student,Bengaluru Urban,86
+Logan Dora,25,Male,Homemaker,Bengaluru Rural,43
+Faqid Bobal,62,Male,Bank Employee,Ballari,80
+Reva Sinha,35,Female,Teacher,Bengaluru Rural,38
+Theodore Sane,59,Male,Homemaker,Mangaluru (Dakshina Kannada),71
+Rehaan Contractor,60,Male,Software Engineer,Mandya,30
+Ishwar Nadig,47,Male,Retired Officer,Hassan,49
+Zayyan Dhawan,50,Male,Homemaker,Raichur,80
+Avni Varma,51,Female,Software Engineer,Mandya,67
+Laksh Jani,44,Male,Shopkeeper,Davangere,65
+Aryan Varty,51,Male,Student,Koppal,39
+Divya Khanna,60,Female,Shopkeeper,Belagavi,51
+Qarin Cheema,52,Male,Homemaker,Raichur,29
+Hamsini Mukherjee,52,Female,Student,Hassan,47
+Yashawini Madan,72,Female,Bank Employee,Bengaluru Rural,61
+Kamya Bobal,31,Female,Homemaker,Davangere,65
+Arjun Mane,35,Male,Retired Officer,Hubballi-Dharwad,88
+Irya Mani,62,Female,Homemaker,Hassan,33
+Ishanvi Kannan,72,Female,Student,Shivamogga,38
+Oviya Bava,27,Female,Teacher,Kolar,68
+Anya Bhargava,22,Female,Homemaker,Udupi,21
+Benjamin Loke,26,Male,Teacher,Tumakuru,31
+Chakradhar Sunder,27,Male,Student,Bidar,20
+Rayaan Bains,47,Male,Shopkeeper,Vijayapura,65
+Bishakha Peri,25,Female,Shopkeeper,Udupi,37
+Garima Shetty,52,Female,Shopkeeper,Koppal,44
+Kalpit Kannan,44,Male,Software Engineer,Raichur,36
+Abhimanyu Verma,16,Male,Homemaker,Ballari,74
+Sneha Natt,62,Female,Retired Officer,Chikkamagaluru,46
+Yashvi Garg,63,Female,Software Engineer,Davangere,87
+Ekani Jain,20,Female,Student,Bengaluru Rural,35
+Bakhshi Mohanty,20,Male,Shopkeeper,Kolar,69
+Gauri Baral,59,Female,Bank Employee,Bidar,41
+Omisha Upadhyay,69,Female,Retired Officer,Davangere,87
+Vinaya Dua,39,Female,Shopkeeper,Kolar,40
+Jairaj Gade,30,Male,Teacher,Mandya,75
+Vedika Chander,32,Female,Software Engineer,Hassan,57
+Brinda Dave,23,Female,Shopkeeper,Kolar,71
+Arya Kapadia,55,Female,Teacher,Kolar,55
+Darsh Minhas,35,Male,Retired Officer,Hassan,77
+Owen Varty,16,Male,Student,Shivamogga,88
+Orinder Comar,68,Male,Bank Employee,Bengaluru Urban,52
+Pranav Parmar,58,Male,Teacher,Raichur,42
+Jyoti Parikh,58,Female,Software Engineer,Mysuru,25
+Eta Setty,18,Female,Student,Hubballi-Dharwad,46
+Adweta Mall,39,Female,Student,Tumakuru,86
+Oviya Sathe,49,Female,Software Engineer,Hubballi-Dharwad,90
+Harish Rajagopalan,44,Male,Retired Officer,Bengaluru Rural,26
+Balveer Ramanathan,49,Male,Shopkeeper,Ballari,68
+Dalaja Iyer,42,Female,Teacher,Raichur,24
+Utkarsh Andra,44,Male,Homemaker,Belagavi,56
+Gabriel Apte,45,Male,Homemaker,Bidar,63
+Thomas Mann,66,Male,Homemaker,Udupi,78
+Jairaj Sane,62,Male,Homemaker,Mandya,71
+Ishaan Kalita,17,Male,Software Engineer,Shivamogga,29
+Rohan Borah,37,Male,Teacher,Bengaluru Urban,60
+Sara Kannan,60,Female,Retired Officer,Mangaluru (Dakshina Kannada),64
+Nisha Kari,46,Female,Retired Officer,Shivamogga,63
+Rajata Khosla,22,Female,Student,Koppal,48
+Anya Ramakrishnan,33,Female,Shopkeeper,Koppal,68
+Naksh Devi,29,Male,Retired Officer,Shivamogga,75
+Tanmayi Narayanan,59,Female,Bank Employee,Kalaburagi,42
+Advay Desai,71,Male,Teacher,Hubballi-Dharwad,45
+Faris Uppal,22,Male,Retired Officer,Kolar,55
+Fiyaz Saran,43,Male,Retired Officer,Vijayapura,54
+Anamika Sibal,36,Female,Teacher,Mysuru,43
+Saumya Saha,28,Female,Bank Employee,Hubballi-Dharwad,66
+Tristan Bhargava,53,Male,Bank Employee,Raichur,78
+Lakshit Saini,27,Male,Shopkeeper,Mandya,50
+Kashvi Bumb,64,Female,Teacher,Udupi,56
+Faras Sen,36,Male,Teacher,Mangaluru (Dakshina Kannada),87
+Oeshi Sarma,27,Female,Retired Officer,Mangaluru (Dakshina Kannada),42
+Akshay Virk,43,Male,Homemaker,Chikkamagaluru,64
+Girish Choudhry,71,Male,Homemaker,Davangere,57
+Rachita Bumb,25,Female,Teacher,Kolar,44
+Balhaar Krishnamurthy,36,Male,Shopkeeper,Bengaluru Rural,79
+Daksha Som,16,Female,Software Engineer,Vijayapura,72
+Garima Rana,65,Female,Software Engineer,Bengaluru Urban,52
+Gavin Varughese,30,Male,Bank Employee,Mysuru,52
+Chakrika Raju,42,Female,Retired Officer,Kolar,51
+Tejas Chanda,43,Male,Teacher,Mangaluru (Dakshina Kannada),32
+Isaiah Dugal,62,Male,Student,Chikkamagaluru,73
+Lakshit Misra,42,Male,Student,Mysuru,60
+Vasudha Raj,66,Female,Teacher,Vijayapura,47
+Ethan Seshadri,31,Male,Shopkeeper,Mangaluru (Dakshina Kannada),22
+Omya Patla,56,Female,Homemaker,Mandya,70
+David Bansal,19,Male,Homemaker,Kolar,45
+Samar Nori,67,Male,Retired Officer,Koppal,33
+Nilima Jayaraman,34,Female,Shopkeeper,Bengaluru Urban,80
+Zaitra Kunda,37,Female,Teacher,Koppal,60
+Amruta Goyal,64,Female,Teacher,Udupi,55
+Lavanya Chand,45,Female,Shopkeeper,Raichur,62
+Advay Yogi,26,Male,Retired Officer,Bengaluru Urban,43
+Tanay Bora,26,Male,Bank Employee,Raichur,77
+Deepa Varughese,39,Female,Homemaker,Mysuru,40
+Dhruv Prashad,62,Male,Retired Officer,Mysuru,39
+Maanav Prabhakar,69,Male,Teacher,Ballari,24
+Vritti Thakur,25,Female,Software Engineer,Kolar,77
+Devika Merchant,32,Female,Homemaker,Chikkamagaluru,38
+Advika Malhotra,22,Female,Homemaker,Raichur,51
+Forum Ahuja,39,Female,Retired Officer,Kalaburagi,80
+Wakeeta Dyal,29,Female,Teacher,Shivamogga,90
+Mahika Dasgupta,61,Female,Retired Officer,Hassan,29
+Girindra Dhawan,62,Male,Homemaker,Kolar,69
+Chaman Patil,48,Female,Retired Officer,Mandya,68
+Bhavani Ganesh,35,Female,Student,Shivamogga,45
+Rachita Chanda,72,Female,Shopkeeper,Kalaburagi,88
+Chanchal Samra,47,Female,Teacher,Kolar,86
+Madhav Mutti,44,Male,Student,Kalaburagi,67
+Sachi Sachdeva,61,Female,Student,Bengaluru Urban,87
+Pratyush Gandhi,27,Male,Shopkeeper,Udupi,64
+Yahvi Kata,28,Female,Bank Employee,Kalaburagi,61
+Owen Sachar,42,Male,Student,Mandya,58
+Wishi Khatri,19,Female,Teacher,Bengaluru Urban,67
+Charles Chand,36,Male,Homemaker,Vijayapura,24
+Rayaan Andra,34,Male,Retired Officer,Bengaluru Urban,20
+Quincy Barad,71,Male,Software Engineer,Kalaburagi,67
+Matthew Acharya,23,Male,Retired Officer,Bengaluru Rural,63
+Ryan Raman,23,Male,Shopkeeper,Belagavi,65
+Orinder Chanda,26,Male,Teacher,Mandya,54
+Fitan Mann,18,Male,Student,Chikkamagaluru,29
+Onkar Dhingra,27,Male,Retired Officer,Tumakuru,85
+Champak Mitra,35,Male,Student,Mysuru,24
+Qabil Narain,23,Male,Shopkeeper,Kolar,48
+Vedant Aurora,69,Male,Teacher,Bengaluru Urban,57
+Rajata Shankar,32,Female,Student,Mangaluru (Dakshina Kannada),77
+Harini Dora,32,Female,Student,Mandya,45
+Peter Patla,45,Male,Student,Kalaburagi,52
+Yagnesh Bahl,21,Male,Bank Employee,Udupi,68
+Ucchal Bhagat,28,Female,Homemaker,Koppal,60
+Gautam Shukla,18,Male,Retired Officer,Kalaburagi,36
+George Bumb,42,Male,Bank Employee,Bengaluru Rural,39
+Aditya Lalla,58,Male,Retired Officer,Koppal,55
+Warjas Hora,50,Male,Teacher,Kalaburagi,37
+Yuvraj Dey,36,Male,Homemaker,Hassan,72
+Chavvi Borah,64,Female,Bank Employee,Koppal,77
+Rachit Nori,21,Male,Shopkeeper,Davangere,49
+Janani Ganguly,37,Female,Shopkeeper,Raichur,83
+Anthony Gulati,32,Male,Software Engineer,Bidar,84
+Pavani Dey,54,Female,Homemaker,Ballari,77
+Hitesh Karnik,69,Male,Teacher,Raichur,36
+Vivaan Dash,18,Male,Bank Employee,Davangere,38
+Fariq Chanda,64,Male,Student,Raichur,24
+Abhimanyu Chand,49,Male,Retired Officer,Chikkamagaluru,25
+Zaid Master,46,Male,Software Engineer,Kolar,34
+Baghyawati Dhingra,22,Female,Bank Employee,Vijayapura,55
+Amara Madan,34,Female,Homemaker,Mysuru,89
+Amol Menon,21,Male,Teacher,Mysuru,84
+Devika Edwin,23,Female,Student,Kalaburagi,46
+Utkarsh Sarin,51,Male,Homemaker,Mysuru,63
+Harish Manne,26,Male,Teacher,Kalaburagi,67
+Arin Sengupta,57,Male,Shopkeeper,Hubballi-Dharwad,72
+Yashica Golla,69,Female,Teacher,Mangaluru (Dakshina Kannada),34
+Nachiket Dhaliwal,32,Male,Teacher,Udupi,25
+Sathvik Rege,37,Male,Bank Employee,Mangaluru (Dakshina Kannada),65
+Eiravati Kurian,28,Female,Homemaker,Mysuru,78
+Rayaan Chatterjee,58,Male,Retired Officer,Belagavi,66
+Omya Lalla,33,Female,Retired Officer,Bidar,57
+Pratyush Kumar,24,Male,Retired Officer,Hubballi-Dharwad,63
+Rachana Nagar,28,Female,Student,Mandya,77
+Ethan Nagar,23,Male,Homemaker,Vijayapura,44
+Gopal Andra,47,Male,Shopkeeper,Raichur,58
+Triveni Batta,41,Female,Bank Employee,Raichur,62
+Zinal Handa,56,Female,Bank Employee,Mysuru,39
+Baljiwan Bains,18,Male,Teacher,Hassan,66
+Shivani Singhal,30,Female,Homemaker,Udupi,50
+Yasti Walia,31,Female,Bank Employee,Vijayapura,72
+Nitara Kapur,71,Female,Student,Raichur,50
+Dhruv Aggarwal,64,Male,Bank Employee,Kalaburagi,70
+Madhavi Bhagat,42,Female,Shopkeeper,Bengaluru Rural,24
+Jai Sachdeva,21,Male,Bank Employee,Hassan,76
+Rayaan Misra,32,Male,Homemaker,Shivamogga,34
+Nidhi Mishra,19,Female,Teacher,Kolar,39
+Jairaj Contractor,50,Male,Bank Employee,Mandya,71
+Pahal Narain,59,Female,Teacher,Bengaluru Rural,59
+Jackson Hora,33,Male,Software Engineer,Belagavi,62
+Karan Edwin,21,Male,Retired Officer,Bengaluru Urban,23
+Jairaj Bhardwaj,32,Male,Teacher,Davangere,66
+Robert Prabhakar,16,Male,Retired Officer,Raichur,39
+Hemani Barad,51,Female,Homemaker,Mandya,65
+Ishaan Kale,70,Male,Homemaker,Bidar,89
+Jonathan Nair,18,Male,Student,Belagavi,70
+Vincent Singhal,49,Male,Software Engineer,Kolar,48
+Ekalinga Vig,51,Male,Student,Davangere,70
+Jacob Kamdar,26,Male,Software Engineer,Vijayapura,39
+Sai Kala,42,Female,Bank Employee,Chikkamagaluru,49
+Daksh Uppal,45,Male,Bank Employee,Davangere,35
+Charan Vala,66,Male,Software Engineer,Hassan,81
+Girindra Suri,24,Male,Software Engineer,Bidar,61
+Gaurika Saran,66,Female,Retired Officer,Hassan,31
+Yahvi Bhavsar,28,Female,Retired Officer,Belagavi,67
+Rachita Dada,63,Female,Bank Employee,Raichur,68
+Neel Oza,34,Male,Homemaker,Davangere,36
+Laksh Madan,66,Male,Retired Officer,Kalaburagi,42
+Manbir Mohan,37,Male,Software Engineer,Belagavi,37
+Meera Mallick,47,Female,Student,Bengaluru Urban,54
+Vyanjana Mandal,53,Female,Teacher,Hassan,83
+Nitara Patil,31,Female,Shopkeeper,Ballari,73
+Laksh Menon,54,Male,Homemaker,Kolar,87
+Ishanvi Tank,68,Female,Retired Officer,Bengaluru Rural,50
+Vanya Oommen,50,Female,Shopkeeper,Hubballi-Dharwad,48
+Adweta D’Alia,61,Female,Teacher,Hassan,72
+Max Bandi,60,Male,Homemaker,Kolar,66
+Lakshmi Srivastava,27,Female,Retired Officer,Belagavi,41
+Unni Bir,25,Female,Teacher,Udupi,81
+Neelima Barman,57,Female,Shopkeeper,Udupi,30
+Avi Krishna,21,Male,Bank Employee,Kalaburagi,67
+Damini Hora,36,Female,Software Engineer,Bengaluru Urban,64
+Warda Dugal,18,Female,Teacher,Koppal,86
+Gaurang Dhingra,20,Male,Student,Mandya,50
+Hiral Mall,49,Female,Homemaker,Hubballi-Dharwad,82
+Luke Rajagopalan,33,Male,Software Engineer,Bidar,38
+Nihal Sengupta,31,Male,Student,Mandya,32
+Chatresh Dayal,45,Male,Shopkeeper,Mandya,49
+Jonathan Tank,61,Male,Student,Vijayapura,62
+Avi Bhatt,28,Male,Homemaker,Hassan,83
+Parth Divan,66,Male,Teacher,Kolar,66
+Laksh Chaudhary,67,Male,Homemaker,Ballari,75
+Maanav Srivastava,44,Male,Homemaker,Kalaburagi,57
+Darpan Sheth,69,Male,Student,Mysuru,90
+Urvi Sarkar,17,Female,Homemaker,Shivamogga,85
+Tejas Sawhney,24,Male,Software Engineer,Mangaluru (Dakshina Kannada),20
+Pranit Virk,26,Male,Homemaker,Vijayapura,22
+Gavin Setty,62,Male,Student,Shivamogga,32
+Prisha Gara,54,Female,Bank Employee,Hassan,49
+William Varghese,63,Male,Homemaker,Hassan,60
+Neelima Barad,63,Female,Bank Employee,Bidar,45
+David Agrawal,27,Male,Shopkeeper,Koppal,41
+Bhanumati Doctor,64,Female,Student,Mangaluru (Dakshina Kannada),41
+Nitara Krishnamurthy,60,Female,Retired Officer,Raichur,71
+Teerth Patla,46,Male,Homemaker,Udupi,43
+Baljiwan Hayer,55,Male,Homemaker,Udupi,64
+Qushi Dhingra,57,Female,Software Engineer,Bengaluru Rural,76
+Henry Rajan,58,Male,Shopkeeper,Davangere,75
+Vihaan Narayanan,64,Male,Retired Officer,Mysuru,87
+Avi Bal,62,Male,Retired Officer,Kalaburagi,67
+Ekanta Kibe,64,Female,Retired Officer,Kolar,68
+Aryan Dave,67,Male,Shopkeeper,Hubballi-Dharwad,50
+Bhavya Bakshi,31,Female,Homemaker,Udupi,89
+Rajeshri Bali,47,Female,Software Engineer,Koppal,56
+Wakeeta Nagar,46,Female,Bank Employee,Bengaluru Rural,28
+Chaitaly Naidu,61,Female,Software Engineer,Bengaluru Rural,29
+Falak Devan,32,Female,Bank Employee,Kalaburagi,64
+Arjun Mistry,18,Male,Shopkeeper,Bengaluru Urban,34
+Udyati Lalla,19,Female,Retired Officer,Mandya,64
+Udyati Malhotra,23,Female,Student,Tumakuru,29
+Jai Balay,35,Male,Student,Mandya,70
+Amol Dey,48,Male,Shopkeeper,Davangere,58
+Thomas Mukhopadhyay,21,Male,Retired Officer,Bengaluru Rural,27
+Bishakha Vaidya,40,Female,Student,Shivamogga,50
+Charita Sha,27,Female,Teacher,Kalaburagi,38
+Advaith Dewan,26,Male,Shopkeeper,Belagavi,74
+Ishanvi Shroff,28,Female,Retired Officer,Mandya,51
+Anika Bhavsar,71,Female,Student,Raichur,21
+Champak Srivastava,71,Male,Student,Vijayapura,49
+Shivani Baral,17,Female,Shopkeeper,Vijayapura,87
+Dakshesh Vala,41,Male,Teacher,Bidar,61
+Arjun Wadhwa,45,Male,Software Engineer,Tumakuru,43
+Zinal Lall,65,Female,Retired Officer,Chikkamagaluru,51
+Jalsa Goswami,16,Female,Bank Employee,Hassan,40
+Tarak Ramanathan,34,Male,Teacher,Belagavi,25
+Logan Swaminathan,34,Male,Software Engineer,Udupi,77
+Liam Brar,49,Male,Retired Officer,Hubballi-Dharwad,78
+Chakradhar Kata,69,Male,Bank Employee,Vijayapura,78
+Ekavir Memon,41,Male,Student,Kolar,46
+Aarna Varma,24,Female,Bank Employee,Shivamogga,86
+Baljiwan Narasimhan,71,Male,Homemaker,Bengaluru Urban,89
+Aarini Rajagopal,45,Female,Teacher,Bengaluru Urban,54
+Naveen Bava,65,Male,Retired Officer,Bidar,49
+Vedika Mane,56,Female,Shopkeeper,Koppal,53
+Aayush Bassi,57,Male,Homemaker,Mysuru,30
+Jack Chandra,33,Male,Software Engineer,Udupi,67
+Varsha Mannan,34,Female,Homemaker,Davangere,59
+Charles Venkataraman,48,Male,Retired Officer,Bengaluru Urban,57
+Girindra Deshmukh,68,Male,Retired Officer,Bidar,61
+Fariq Agarwal,58,Male,Shopkeeper,Vijayapura,55
+Sneha Rao,30,Female,Bank Employee,Udupi,83
+Mason Mody,47,Male,Student,Bengaluru Urban,66
+Elijah Pall,19,Male,Student,Raichur,32
+Bachittar Sarkar,70,Male,Software Engineer,Kolar,79
+Kamya Munshi,46,Female,Student,Chikkamagaluru,82
+Bishakha Varghese,67,Female,Shopkeeper,Kolar,63
+Pushti Chaudhuri,72,Female,Software Engineer,Shivamogga,87
+Rudra Brahmbhatt,66,Male,Homemaker,Kolar,46
+Nandini Srinivas,33,Female,Software Engineer,Udupi,56
+Vasudha Wagle,71,Female,Retired Officer,Ballari,21
+Sanaya Barman,19,Female,Teacher,Udupi,66
+Shivani Sule,40,Female,Shopkeeper,Vijayapura,62
+Edhitha Dugar,71,Female,Shopkeeper,Ballari,21
+Ubika Desai,30,Female,Student,Davangere,58
+Jalsa Baral,26,Female,Software Engineer,Mysuru,74
+Avi Agarwal,38,Male,Shopkeeper,Bengaluru Urban,63
+Abha Rai,52,Female,Homemaker,Belagavi,30
+Vincent Bail,49,Male,Homemaker,Bengaluru Rural,65
+Bishakha Shanker,52,Female,Teacher,Vijayapura,56
+Jyoti Raman,68,Female,Bank Employee,Davangere,43
+Ansh Nair,26,Male,Homemaker,Koppal,83
+Onkar Saraf,41,Male,Shopkeeper,Hassan,53
+Arya Dayal,54,Female,Teacher,Mysuru,33
+Maanav Suri,20,Male,Retired Officer,Hassan,37
+Ekbal Gour,21,Male,Homemaker,Bengaluru Rural,87
+Saumya Nagi,17,Female,Bank Employee,Mangaluru (Dakshina Kannada),69
+Joshua Malhotra,32,Male,Retired Officer,Chikkamagaluru,56
+Balhaar Sankaran,36,Male,Homemaker,Bengaluru Urban,86
+Chaitaly Raghavan,27,Female,Bank Employee,Davangere,83
+Ranveer Mand,65,Male,Student,Chikkamagaluru,28
+Ekapad Yohannan,27,Male,Student,Mandya,43
+Kiaan Borra,60,Male,Homemaker,Bengaluru Rural,87
+Advay Sankaran,48,Male,Software Engineer,Ballari,90
+Leela Doctor,60,Female,Bank Employee,Bidar,51
+William D’Alia,33,Male,Student,Hassan,47
+Ishanvi Jaggi,18,Female,Student,Bidar,47
+Ekaraj Sant,63,Male,Student,Tumakuru,72
+Hredhaan Ganesan,60,Male,Student,Tumakuru,48
+Abdul Doctor,55,Male,Retired Officer,Kolar,24
+Chandresh Date,42,Male,Student,Belagavi,74
+Harinakshi Om,38,Female,Teacher,Mangaluru (Dakshina Kannada),24
+Sarthak Munshi,17,Male,Software Engineer,Davangere,60
+Ria Mohan,17,Female,Homemaker,Ballari,71
+Hemal Anand,30,Female,Student,Bengaluru Urban,87
+Ojas Krishnan,64,Male,Shopkeeper,Belagavi,24
+Anvi Nori,28,Female,Retired Officer,Mangaluru (Dakshina Kannada),75
+Simon Bala,60,Male,Retired Officer,Bidar,39
+Agastya Goda,21,Male,Homemaker,Kolar,25
+Arunima Sethi,30,Female,Software Engineer,Mandya,39
+Onveer Pau,22,Male,Retired Officer,Tumakuru,77
+Champak Vora,20,Male,Software Engineer,Mandya,76
+Rachita Balasubramanian,48,Female,Retired Officer,Raichur,75
+Jyoti Deo,43,Female,Shopkeeper,Hassan,82
+Geetika Vig,44,Female,Homemaker,Chikkamagaluru,60
+Vansha Mand,59,Female,Teacher,Kolar,22
+Amol Yogi,45,Male,Shopkeeper,Hubballi-Dharwad,47
+Ikshita Barman,29,Female,Student,Bidar,44
+Balhaar Narula,58,Male,Software Engineer,Belagavi,43
+Ikshita Sastry,72,Female,Homemaker,Chikkamagaluru,77
+Arya Bali,68,Female,Shopkeeper,Davangere,55
+Neel Palan,28,Male,Bank Employee,Hubballi-Dharwad,90
+Ekapad Taneja,24,Male,Student,Ballari,31
+Anthony Konda,69,Male,Software Engineer,Mysuru,28
+Nilima Warrior,33,Female,Shopkeeper,Kalaburagi,76
+Anita Batta,61,Female,Homemaker,Kolar,69
+Nisha Bandi,59,Female,Software Engineer,Bengaluru Urban,46
+Pranit Golla,69,Male,Teacher,Ballari,59
+Bhavika Upadhyay,37,Female,Bank Employee,Mandya,59
+Xiti Mangal,63,Female,Teacher,Davangere,43
+Anvi Samra,46,Female,Bank Employee,Udupi,27
+Gaurav Deol,42,Male,Bank Employee,Shivamogga,57
+Devansh Jha,17,Male,Retired Officer,Davangere,86
+Ridhi Bhatt,49,Female,Homemaker,Bengaluru Rural,83
+Priya Raman,16,Female,Homemaker,Hassan,72
+Urvi Desai,25,Female,Student,Kolar,31
+Maanas Tank,64,Male,Bank Employee,Udupi,50
+Pratyush Chahal,27,Male,Homemaker,Hassan,71
+Ekta Saxena,56,Female,Retired Officer,Mandya,81
+Triveni Kade,50,Female,Bank Employee,Chikkamagaluru,47
+Jai Mander,48,Male,Retired Officer,Belagavi,52
+Harinakshi Kibe,53,Female,Shopkeeper,Belagavi,45
+Rachana Kunda,68,Female,Bank Employee,Udupi,58
+Baghyawati Halder,17,Female,Software Engineer,Raichur,67
+Zaid Aurora,43,Male,Shopkeeper,Mandya,89
+Pratyush Chanda,43,Male,Homemaker,Tumakuru,87
+Ronith Dyal,28,Male,Homemaker,Bidar,31
+Tanmayi Sibal,37,Female,Software Engineer,Chikkamagaluru,71
+Balendra Choudhury,19,Male,Software Engineer,Mandya,50
+Chandresh Pillai,38,Male,Teacher,Bengaluru Urban,47
+Fariq Swaminathan,21,Male,Software Engineer,Koppal,53
+Brijesh Tripathi,46,Male,Student,Bidar,80
+Tejas Sheth,17,Male,Bank Employee,Hubballi-Dharwad,66
+Nathaniel Natt,60,Male,Teacher,Davangere,63
+Aachal Chawla,52,Female,Software Engineer,Udupi,78
+Kamya Rastogi,34,Female,Student,Ballari,63
+Mohammed Dutt,65,Male,Homemaker,Ballari,88
+Omya Venkataraman,35,Female,Shopkeeper,Bengaluru Rural,35
+Sarthak Luthra,50,Male,Teacher,Udupi,83
+Gaurangi Bakshi,62,Female,Teacher,Hubballi-Dharwad,79
+Aashi Shankar,72,Female,Software Engineer,Mysuru,26
+Chandani Chakraborty,46,Female,Homemaker,Hassan,60
+Balveer Dar,68,Male,Homemaker,Hubballi-Dharwad,70
+Imaran Luthra,64,Male,Software Engineer,Ballari,44
+Dev Parmar,71,Male,Homemaker,Bengaluru Rural,35
+Yutika Kohli,17,Female,Student,Bidar,40
+Vasana Oza,44,Female,Student,Shivamogga,34
+Xavier Sawhney,64,Male,Teacher,Vijayapura,62
+Nisha Varughese,46,Female,Teacher,Shivamogga,89
+Vasatika Balay,43,Female,Teacher,Vijayapura,25
+Xavier Lanka,24,Male,Bank Employee,Belagavi,28
+Triya Raja,33,Female,Bank Employee,Chikkamagaluru,88
+Barkha Merchant,56,Female,Shopkeeper,Bengaluru Urban,62
+Isaac Gour,55,Male,Bank Employee,Vijayapura,79
+Wridesh Sastry,61,Male,Bank Employee,Mangaluru (Dakshina Kannada),63
+Udarsh Joshi,45,Male,Homemaker,Kalaburagi,55
+Anmol Kohli,17,Male,Shopkeeper,Mandya,21
+Geetika Walla,24,Female,Shopkeeper,Mysuru,90
+Bakhshi Subramanian,35,Male,Retired Officer,Hassan,30
+Rehaan Pau,72,Male,Bank Employee,Davangere,38
+Mason D’Alia,32,Male,Teacher,Bengaluru Urban,60
+Jagat Mani,26,Male,Teacher,Mandya,83
+Neelima Rau,52,Female,Homemaker,Mandya,28
+Nandini Oak,26,Female,Student,Udupi,21
+Shivani Edwin,18,Female,Teacher,Davangere,52
+Chanakya Dugar,43,Male,Shopkeeper,Shivamogga,22
+Laksh Nath,27,Male,Retired Officer,Hubballi-Dharwad,88
+Charan Chaudhry,22,Male,Bank Employee,Vijayapura,85
+Adweta Hayre,53,Female,Homemaker,Raichur,38
+Advay Sur,50,Male,Shopkeeper,Bidar,51
+Jasmit Mistry,55,Female,Software Engineer,Ballari,86
+Shivani Nayar,35,Female,Shopkeeper,Bidar,37
+Kritika Munshi,22,Female,Teacher,Chikkamagaluru,22
+Timothy Shan,54,Male,Software Engineer,Hassan,63
+Ekantika Taneja,47,Female,Software Engineer,Mysuru,48
+Advay Khatri,35,Male,Software Engineer,Mysuru,36
+Ikbal Raman,56,Male,Shopkeeper,Bengaluru Rural,53
+Yug Hora,46,Male,Student,Kalaburagi,78
+Nathaniel Chaudhari,72,Male,Homemaker,Hassan,85
+Mekhala Anne,69,Female,Software Engineer,Belagavi,81
+Samaksh Dash,27,Male,Homemaker,Mysuru,82
+Vidhi Gola,38,Female,Teacher,Mandya,50
+Veer Mannan,31,Male,Student,Bidar,90
+Wakeeta Oak,49,Female,Teacher,Udupi,37
+Advik Prabhakar,21,Male,Shopkeeper,Shivamogga,66
+Jack Bhatt,72,Male,Student,Udupi,85
+Bakhshi Chaudry,71,Male,Teacher,Belagavi,69
+Gavin Sharaf,33,Male,Software Engineer,Koppal,30
+Kabir Walia,57,Male,Shopkeeper,Shivamogga,20
+Zilmil Issac,40,Female,Retired Officer,Mangaluru (Dakshina Kannada),43
+Yuvraj Mann,66,Male,Homemaker,Hubballi-Dharwad,62
+Tanish Chawla,58,Male,Homemaker,Raichur,71
+Ekalinga Choudhary,59,Male,Shopkeeper,Koppal,83
+Isaac Sani,67,Male,Software Engineer,Bengaluru Urban,29
+Rayaan Kata,42,Male,Homemaker,Udupi,67
+Ubika Sridhar,54,Female,Student,Udupi,79
+Logan Luthra,23,Male,Homemaker,Koppal,74
+Umang Nagi,39,Male,Bank Employee,Hubballi-Dharwad,48
+Kalpit Bhasin,26,Male,Software Engineer,Ballari,68
+Ranbir Das,34,Male,Student,Ballari,44
+Yachana Shere,33,Female,Bank Employee,Bengaluru Urban,22
+Oviya Bera,24,Female,Software Engineer,Mandya,25
+Raghav Zacharia,69,Male,Teacher,Ballari,47
+Vihaan Shankar,27,Male,Retired Officer,Davangere,82
+Sara Raval,35,Female,Teacher,Hubballi-Dharwad,53
+Simon Dara,71,Male,Teacher,Bidar,62
+Chaman Mital,49,Female,Homemaker,Bengaluru Urban,49
+Ishaan Guha,55,Male,Student,Mandya,32
+Hritik Bajwa,29,Male,Bank Employee,Hubballi-Dharwad,44
+Farhan Banik,24,Male,Homemaker,Kalaburagi,44
+Agastya Goswami,19,Male,Homemaker,Tumakuru,39
+Chanakya Deol,65,Male,Bank Employee,Vijayapura,38
+Nandini Gola,41,Female,Software Engineer,Raichur,71
+Ati Behl,50,Female,Bank Employee,Mysuru,87
+Tristan Nagarajan,67,Male,Shopkeeper,Koppal,76
+Jack Batta,56,Male,Teacher,Koppal,88
+Keya Choudhury,29,Female,Student,Kalaburagi,90
+Chanchal Borde,45,Female,Software Engineer,Hassan,51
+Gautam Nagarajan,21,Male,Shopkeeper,Shivamogga,70
+Ikshita Dara,41,Female,Student,Tumakuru,25
+Jagdish Wason,37,Male,Shopkeeper,Ballari,26
+Dominic Yohannan,42,Male,Teacher,Raichur,27
+Saksham Kaul,33,Male,Homemaker,Bengaluru Urban,69
+David Krishnamurthy,59,Male,Homemaker,Hubballi-Dharwad,86
+Alka Nayak,39,Female,Retired Officer,Mangaluru (Dakshina Kannada),82
+Vinaya Anand,53,Female,Student,Mysuru,90
+Quincy Magar,22,Male,Student,Raichur,73
+Tanay Master,23,Male,Software Engineer,Hubballi-Dharwad,87
+Kashvi Ranganathan,69,Female,Retired Officer,Hassan,26
+Kalpit Sawhney,65,Male,Retired Officer,Belagavi,70
+Omisha Kohli,52,Female,Bank Employee,Hassan,90
+Luke Menon,63,Male,Software Engineer,Bengaluru Urban,34
+Rudra Suresh,40,Male,Teacher,Tumakuru,36
+Damyanti Rana,45,Female,Bank Employee,Hubballi-Dharwad,51
+Indira Dhillon,30,Female,Student,Vijayapura,58
+Alka Dugar,36,Female,Retired Officer,Kolar,75
+Ekavir Shan,62,Male,Student,Bengaluru Urban,81
+Lila Devan,62,Female,Bank Employee,Tumakuru,31
+Omya Barad,48,Female,Bank Employee,Kalaburagi,29
+Ekta Tella,56,Female,Shopkeeper,Hubballi-Dharwad,35
+Vidhi Gokhale,46,Female,Bank Employee,Mangaluru (Dakshina Kannada),35
+Zayyan Toor,53,Male,Software Engineer,Udupi,48
+Yashawini Gera,67,Female,Bank Employee,Kolar,22
+Noah Grewal,39,Male,Retired Officer,Shivamogga,90
+Mason Samra,65,Male,Software Engineer,Shivamogga,24
+Oviya Badal,45,Female,Homemaker,Chikkamagaluru,73
+Brijesh Virk,44,Male,Homemaker,Mysuru,33
+Sarthak Dayal,16,Male,Retired Officer,Kolar,41
+Lila Parmer,27,Female,Homemaker,Shivamogga,21
+Wakeeta Kalla,64,Female,Homemaker,Raichur,71
+Rajeshri Halder,24,Female,Teacher,Bengaluru Urban,39
+Lekha Cherian,18,Female,Retired Officer,Udupi,48
+Samarth Deol,50,Male,Software Engineer,Hassan,46
+Oni Garg,31,Female,Teacher,Vijayapura,59
+Nisha Salvi,18,Female,Homemaker,Ballari,75
+Rachita Bora,56,Female,Shopkeeper,Davangere,71
+Jackson Soman,21,Male,Homemaker,Raichur,69
+Gaurangi Kibe,31,Female,Shopkeeper,Mandya,73
+Tanish Thaker,58,Male,Homemaker,Hassan,37
+Tamanna Bala,44,Female,Software Engineer,Bengaluru Rural,75
+Yatan Naik,41,Male,Teacher,Hassan,36
+Ikshita Varkey,23,Female,Retired Officer,Tumakuru,36
+Guneet Borah,54,Male,Software Engineer,Bidar,34
+Qushi Acharya,28,Female,Teacher,Raichur,37
+Isaac Keer,60,Male,Shopkeeper,Belagavi,90
+Aadi Gaba,62,Male,Student,Kolar,47
+Arya Sunder,26,Female,Software Engineer,Hassan,32
+Fitan Aurora,35,Male,Student,Mysuru,34
+Charles Narain,71,Male,Software Engineer,Hassan,88
+Abhiram Karan,42,Male,Student,Bengaluru Urban,80
+Devansh Dalal,17,Male,Software Engineer,Davangere,88
+Darpan Sachar,35,Male,Shopkeeper,Chikkamagaluru,43
+Advik Aggarwal,54,Male,Retired Officer,Shivamogga,62
+Qarin Sanghvi,69,Male,Homemaker,Mangaluru (Dakshina Kannada),79
+Elijah Ahluwalia,55,Male,Bank Employee,Bengaluru Rural,33
+Matthew Tella,27,Male,Teacher,Kolar,79
+Radhika Chad,42,Female,Bank Employee,Davangere,40
+Girish Gaba,70,Male,Shopkeeper,Vijayapura,88
+Vivaan Agrawal,39,Male,Retired Officer,Belagavi,28
+Balveer Zachariah,30,Male,Homemaker,Raichur,38
+Jack Swaminathan,35,Male,Shopkeeper,Vijayapura,50
+Azaan Sarna,50,Male,Software Engineer,Belagavi,38
+Nihal Madan,38,Male,Shopkeeper,Mangaluru (Dakshina Kannada),31
+Alka Dutt,21,Female,Retired Officer,Ballari,33
+Ethan Virk,30,Male,Bank Employee,Bengaluru Urban,52
+Vrinda Nagy,33,Female,Teacher,Mandya,23
+Amaira Vohra,48,Female,Student,Tumakuru,86
+Upkaar Bhakta,65,Male,Bank Employee,Koppal,85
+Vanya Swaminathan,34,Female,Shopkeeper,Shivamogga,32
+Harinakshi Chauhan,18,Female,Teacher,Mangaluru (Dakshina Kannada),46
+Harshil Kaul,67,Male,Shopkeeper,Kolar,83
+Akshay Sur,39,Male,Bank Employee,Hassan,53
+Raksha Borde,67,Female,Shopkeeper,Mandya,34
+Ijaya Som,57,Female,Software Engineer,Hubballi-Dharwad,78
+Indrajit Mane,57,Male,Software Engineer,Kalaburagi,34
+Dayita Vala,41,Female,Bank Employee,Udupi,38
+Tanay Dhar,54,Male,Shopkeeper,Ballari,65
+Finn Chandran,36,Male,Shopkeeper,Davangere,51
+Tanvi Varghese,25,Female,Student,Kolar,52
+Balvan Dani,28,Male,Retired Officer,Mysuru,62
+Gopal Sengupta,71,Male,Homemaker,Davangere,36
+Urvi Ghose,20,Female,Software Engineer,Belagavi,65
+Eiravati Mani,37,Female,Shopkeeper,Vijayapura,88
+Ranbir Pillai,58,Male,Retired Officer,Hassan,62
+Amara Kaul,27,Female,Retired Officer,Mangaluru (Dakshina Kannada),63
+Champak Rama,51,Male,Software Engineer,Kolar,23
+Liam Borde,71,Male,Software Engineer,Udupi,32
+Max Prasad,24,Male,Homemaker,Vijayapura,81
+Tarak Saini,34,Male,Software Engineer,Raichur,53
+Kavya Dewan,27,Female,Shopkeeper,Koppal,43
+Diya Kade,52,Female,Bank Employee,Vijayapura,77
+Krisha Mutti,48,Female,Retired Officer,Kolar,27
+Qasim Hayre,24,Male,Teacher,Raichur,28
+Jagdish Narayanan,64,Male,Software Engineer,Hassan,38
+Xiti Lad,28,Female,Bank Employee,Belagavi,74
+Victor Bir,35,Male,Retired Officer,Mangaluru (Dakshina Kannada),20
+Owen Savant,56,Male,Teacher,Bengaluru Urban,83
+Oscar Ray,68,Male,Homemaker,Bidar,63
+Devika Doctor,39,Female,Bank Employee,Davangere,83
+Azad Bahri,47,Male,Bank Employee,Bengaluru Rural,38
+Tanay Bath,17,Male,Teacher,Shivamogga,49
+Hema Bhakta,53,Female,Teacher,Bengaluru Rural,21
+Megha Mander,24,Female,Retired Officer,Udupi,87
+Jagrati Dutt,64,Female,Teacher,Mandya,25
+Hemangini Deo,36,Female,Homemaker,Vijayapura,84
+Frado Agarwal,58,Male,Retired Officer,Tumakuru,77
+Aadhya Prasad,21,Female,Bank Employee,Bengaluru Rural,55
+Warjas Lad,21,Male,Homemaker,Koppal,56
+Yashasvi Amble,30,Female,Student,Udupi,60
+Urmi Gupta,34,Female,Student,Ballari,47
+Gautami Choudhary,42,Female,Shopkeeper,Raichur,79
+Advay Desai,58,Male,Shopkeeper,Koppal,48
+Pavani Varma,52,Female,Student,Bengaluru Rural,26
+Amara Gara,58,Female,Homemaker,Shivamogga,50
+Rajeshri Warrior,37,Female,Software Engineer,Davangere,73
+Pooja Dora,69,Female,Retired Officer,Mangaluru (Dakshina Kannada),48
+Rushil Raghavan,40,Male,Retired Officer,Belagavi,65
+Samaksh Sen,63,Male,Bank Employee,Belagavi,68
+Warda Saini,58,Female,Bank Employee,Vijayapura,74
+Yachana Kapur,40,Female,Shopkeeper,Mandya,72
+Orinder Chadha,44,Male,Shopkeeper,Kolar,41
+Ekansh Pal,36,Male,Bank Employee,Bidar,60
+Kamala Pai,28,Female,Software Engineer,Davangere,55
+Ekapad Bhatnagar,33,Male,Retired Officer,Chikkamagaluru,36
+Akshay Jani,61,Male,Bank Employee,Bidar,88
+Tanay Dewan,16,Male,Software Engineer,Mangaluru (Dakshina Kannada),53
+Jeremiah Madan,61,Male,Software Engineer,Kolar,24
+Shivani Arya,39,Female,Software Engineer,Mangaluru (Dakshina Kannada),31
+Jhalak Bhagat,71,Female,Shopkeeper,Hubballi-Dharwad,52
+Janani Ravel,16,Female,Software Engineer,Belagavi,25
+Aashi Prasad,43,Female,Homemaker,Tumakuru,47
+Luke Chad,58,Male,Student,Vijayapura,68
+Advaith Om,47,Male,Shopkeeper,Chikkamagaluru,28
+Zilmil Khosla,22,Female,Retired Officer,Hubballi-Dharwad,44
+Chanchal Varghese,45,Female,Homemaker,Bidar,66
+Bhanumati Palan,38,Female,Retired Officer,Davangere,55
+Chameli Behl,29,Female,Bank Employee,Vijayapura,75
+Damini Babu,40,Female,Shopkeeper,Vijayapura,87
+Jagat Badami,53,Male,Software Engineer,Mandya,80
+Urvashi Ahluwalia,66,Female,Teacher,Shivamogga,28
+Kamya Thaker,40,Female,Bank Employee,Hassan,37
+Pratyush Manne,57,Male,Software Engineer,Kolar,66
+Wazir Narang,40,Male,Retired Officer,Vijayapura,35
+Bhanumati Samra,33,Female,Shopkeeper,Bidar,35
+Ishaan Dixit,68,Male,Teacher,Mysuru,68
+Yadavi Chauhan,24,Female,Bank Employee,Hassan,52
+Aayush Dua,26,Male,Software Engineer,Udupi,44
+Bhavna Bajaj,41,Female,Teacher,Udupi,30
+Azaan Saran,46,Male,Student,Kalaburagi,71
+Urvashi Warrior,43,Female,Shopkeeper,Bengaluru Urban,77
+Atharv Gade,32,Male,Software Engineer,Belagavi,58
+Manan Guha,64,Male,Teacher,Raichur,77
+Baljiwan Dugar,59,Male,Bank Employee,Ballari,73
+Kai Madan,49,Male,Shopkeeper,Tumakuru,81
+Ekta Hans,18,Female,Bank Employee,Tumakuru,82
+Zehaan Chopra,50,Male,Bank Employee,Davangere,59
+Pooja Sunder,59,Female,Teacher,Mangaluru (Dakshina Kannada),35
+Ekapad Dani,50,Male,Teacher,Koppal,75
+Adweta Rajan,58,Female,Homemaker,Kolar,62
+Kiaan Sidhu,64,Male,Student,Chikkamagaluru,27
+Balhaar Chaudhuri,20,Male,Software Engineer,Bengaluru Rural,87
+Warinder Kara,67,Male,Software Engineer,Raichur,41
+Janani Sidhu,31,Female,Shopkeeper,Bengaluru Urban,50
+Chavvi Kumer,55,Female,Software Engineer,Kolar,81
+Prisha Talwar,59,Female,Retired Officer,Bengaluru Rural,60
+Aayush Lad,56,Male,Software Engineer,Mandya,74
+Udant Sawhney,27,Male,Bank Employee,Kalaburagi,79
+Urvashi Mani,32,Female,Software Engineer,Udupi,83
+Nitesh Butala,22,Male,Teacher,Shivamogga,72
+Nathan Sachdeva,58,Male,Student,Bidar,40
+Harita Vig,58,Female,Bank Employee,Udupi,57
+Gauri Sama,34,Female,Bank Employee,Ballari,38
+Farhan Ganesh,68,Male,Student,Chikkamagaluru,81
+Harish Shenoy,31,Male,Software Engineer,Udupi,70
+Madhav Chanda,71,Male,Student,Hubballi-Dharwad,73
+Kai Srivastava,66,Male,Bank Employee,Mandya,67
+Siddharth Batra,38,Male,Retired Officer,Mysuru,29
+Amara Sethi,38,Female,Teacher,Mandya,34
+Lajita Narula,28,Female,Homemaker,Ballari,35
+Jeremiah Saran,58,Male,Homemaker,Udupi,56
+Yatin Walia,72,Male,Student,Ballari,42
+Kevin Venkataraman,69,Male,Retired Officer,Koppal,72
+Dalbir Maharaj,26,Male,Teacher,Mysuru,47
+Luke Sur,49,Male,Homemaker,Raichur,80
+Ryan Krish,35,Male,Shopkeeper,Chikkamagaluru,51
+Kashish Gopal,46,Female,Retired Officer,Kalaburagi,26
+Ryan Lad,56,Male,Teacher,Hubballi-Dharwad,86
+Fitan Lall,18,Male,Retired Officer,Raichur,87
+Charan Solanki,47,Male,Retired Officer,Bengaluru Rural,24
+Naksh Minhas,43,Male,Teacher,Hubballi-Dharwad,71
+Pratyush Narain,58,Male,Software Engineer,Kolar,47
+Mohammed Wagle,61,Male,Software Engineer,Tumakuru,78
+Daksha Lalla,67,Female,Shopkeeper,Kalaburagi,32
+Kashish Kumer,70,Female,Shopkeeper,Tumakuru,74
+Madhavi Lad,72,Female,Software Engineer,Koppal,82
+Zashil Kothari,63,Male,Homemaker,Mangaluru (Dakshina Kannada),52
+Tanish Mitter,21,Male,Shopkeeper,Mysuru,67
+Vrinda Dixit,41,Female,Teacher,Koppal,72
+Upma Kamdar,61,Female,Software Engineer,Mangaluru (Dakshina Kannada),60
+Dominic Gokhale,38,Male,Teacher,Koppal,27
+Falguni Shankar,28,Female,Shopkeeper,Koppal,62
+Vivaan Amble,22,Male,Homemaker,Kalaburagi,76
+Jackson Balay,63,Male,Teacher,Bidar,52
+Luke Mahal,56,Male,Bank Employee,Hubballi-Dharwad,23
+Shaurya Nayar,32,Male,Teacher,Mysuru,30
+Dominic Banerjee,64,Male,Retired Officer,Kalaburagi,78
+Banjeet Sundaram,36,Male,Shopkeeper,Mandya,70
+Chandani Balan,48,Female,Student,Ballari,26
+Priya Vig,17,Female,Retired Officer,Mandya,43
+Panini Singhal,61,Female,Bank Employee,Mysuru,77
+Frederick Lad,36,Male,Software Engineer,Chikkamagaluru,34
+Jagat Goswami,19,Male,Student,Bengaluru Rural,43
+Gabriel Pau,29,Male,Shopkeeper,Vijayapura,47
+Vedika Lad,49,Female,Shopkeeper,Kolar,42
+Jacob Dass,56,Male,Student,Raichur,29
+Dhriti Johal,68,Female,Shopkeeper,Chikkamagaluru,45
+Thomas Muni,26,Male,Software Engineer,Mysuru,35
+Chandresh Borde,37,Male,Bank Employee,Mandya,31
+Arya Bose,18,Female,Student,Bidar,27
+Nikita Kothari,19,Female,Homemaker,Mangaluru (Dakshina Kannada),82
+Nathan Pandit,67,Male,Retired Officer,Belagavi,20
+Yachana Buch,66,Female,Teacher,Shivamogga,61
+Krishna Dhar,63,Female,Bank Employee,Davangere,54
+Ekanta Balasubramanian,69,Female,Retired Officer,Bengaluru Rural,38
+Vasudha Baral,17,Female,Homemaker,Tumakuru,32
+Imaran Mishra,68,Male,Retired Officer,Kolar,86
+Reyansh Magar,43,Male,Student,Hassan,87
+Jacob Modi,41,Male,Student,Shivamogga,71
+Yug Nadkarni,51,Male,Teacher,Belagavi,52
+Karan Kanda,21,Male,Homemaker,Hassan,76
+Shaurya Gole,68,Male,Homemaker,Mangaluru (Dakshina Kannada),25
+Ladli Natt,40,Female,Teacher,Bengaluru Urban,23
+Anya Varty,24,Female,Bank Employee,Udupi,22
+Balveer Nayar,24,Male,Retired Officer,Mandya,42
+Jai Barman,53,Male,Student,Bengaluru Rural,54
+Shivani Garg,68,Female,Teacher,Bidar,31
+Kabir Choudhary,59,Male,Bank Employee,Kolar,75
+Dipta Bala,44,Female,Homemaker,Udupi,53
+Anirudh Pau,20,Male,Shopkeeper,Davangere,70
+Veer Mangat,32,Male,Homemaker,Udupi,24
+Owen More,46,Male,Retired Officer,Shivamogga,86
+Jyoti Jhaveri,52,Female,Homemaker,Udupi,23
+Chandani Upadhyay,33,Female,Bank Employee,Kolar,77
+Lopa Gill,42,Female,Retired Officer,Tumakuru,64
+Baljiwan Mistry,55,Male,Software Engineer,Davangere,64
+Hardik Karan,44,Male,Teacher,Tumakuru,36
+Ekanta Dugar,25,Female,Bank Employee,Belagavi,51
+Gautam Solanki,49,Male,Bank Employee,Kalaburagi,46
+Dhriti Mukhopadhyay,16,Female,Shopkeeper,Belagavi,85
+Imaran Deshpande,42,Male,Shopkeeper,Mysuru,66
+Urishilla Maharaj,53,Female,Homemaker,Kolar,42
+Pranav Chand,28,Male,Homemaker,Bengaluru Urban,49
+Aryan Bhat,25,Male,Retired Officer,Raichur,39
+Fitan Borra,71,Male,Bank Employee,Mysuru,83
+Samar Chaudhari,18,Male,Bank Employee,Hassan,23
+Onkar Pradhan,53,Male,Bank Employee,Bengaluru Rural,51
+Faras Kari,54,Male,Shopkeeper,Hassan,74
+Bhavani Handa,71,Female,Retired Officer,Kalaburagi,51
+Ganga Shroff,36,Female,Teacher,Mysuru,65
+Ria Karnik,25,Female,Student,Mangaluru (Dakshina Kannada),61
+Zashil Sibal,52,Male,Retired Officer,Raichur,33
+Siddharth D’Alia,17,Male,Teacher,Koppal,45
+Kai Mohanty,46,Male,Teacher,Bidar,78
+Ikbal Gaba,21,Male,Shopkeeper,Kalaburagi,61
+Ekaja Trivedi,71,Female,Bank Employee,Tumakuru,56
+Jeremiah Chowdhury,46,Male,Shopkeeper,Kalaburagi,29
+Nandini Amble,50,Female,Software Engineer,Mysuru,71
+Ikshita Raman,26,Female,Retired Officer,Tumakuru,35
+Dev Mutti,56,Male,Software Engineer,Kolar,26
+Garima Swamy,67,Female,Software Engineer,Koppal,23
+Yatin Swaminathan,39,Male,Retired Officer,Bidar,31
+Azad Tank,32,Male,Software Engineer,Kolar,28
+Krish Gara,62,Male,Software Engineer,Bidar,78
+Meera Zachariah,58,Female,Homemaker,Ballari,74
+Dev Ram,57,Male,Software Engineer,Belagavi,41
+Neha Naik,36,Female,Retired Officer,Belagavi,52
+Sarthak Choudhry,59,Male,Retired Officer,Hubballi-Dharwad,54
+Ishwar Nayak,41,Male,Bank Employee,Bidar,51
+Neha Vig,39,Female,Shopkeeper,Belagavi,70
+Kalpit Sahni,35,Male,Bank Employee,Bidar,85
+Patrick Khalsa,62,Male,Retired Officer,Ballari,65
+Omisha Malhotra,45,Female,Student,Bengaluru Rural,77
+Ronith Amble,60,Male,Bank Employee,Ballari,68
+Ati Munshi,40,Female,Shopkeeper,Bengaluru Rural,87
+Saumya Dave,46,Female,Teacher,Mandya,23
+Gaurav Varughese,34,Male,Student,Hubballi-Dharwad,37
+Vihaan Panchal,33,Male,Teacher,Hassan,38
+Jai Narain,50,Male,Student,Hubballi-Dharwad,59
+Omya Wagle,40,Female,Software Engineer,Davangere,81
+Mekhala Shenoy,32,Female,Teacher,Belagavi,22
+Ranbir Kuruvilla,61,Male,Homemaker,Vijayapura,59
+Laksh Pandya,20,Male,Bank Employee,Bidar,48
+Radha Banerjee,38,Female,Student,Mandya,39
+Dakshesh Tella,26,Male,Homemaker,Bidar,59
+Darpan Bose,71,Male,Homemaker,Kolar,49
+Eesha Srivastava,42,Female,Retired Officer,Bidar,26
+Megha Biswas,47,Female,Bank Employee,Vijayapura,26
+Jhalak Parekh,35,Female,Retired Officer,Kalaburagi,28
+Lipika Sengupta,22,Female,Teacher,Vijayapura,58
+Niharika Mangal,62,Female,Bank Employee,Raichur,40
+Udyati Sekhon,29,Female,Software Engineer,Kolar,71
+Hitesh Grewal,59,Male,Bank Employee,Raichur,33
+Maanav Salvi,53,Male,Retired Officer,Bengaluru Urban,73
+Kabir Bala,55,Male,Homemaker,Tumakuru,68
+Jason Rai,58,Male,Software Engineer,Raichur,89
+Dakshesh Chacko,26,Male,Teacher,Hassan,74
+Ekansh Shere,16,Male,Software Engineer,Hubballi-Dharwad,43
+Jai Sani,58,Male,Teacher,Mangaluru (Dakshina Kannada),41
+Osha Sridhar,66,Female,Bank Employee,Mandya,32
+Kevin Thaker,34,Male,Shopkeeper,Ballari,58
+Daniel Sawhney,68,Male,Bank Employee,Udupi,26
+Yochana Agate,61,Female,Student,Udupi,78
+Aradhana Contractor,19,Female,Retired Officer,Kolar,60
+Rehaan Solanki,26,Male,Teacher,Bengaluru Rural,47
+Yahvi Deo,60,Female,Retired Officer,Mysuru,41
+Watika Natarajan,62,Female,Student,Raichur,27
+Chandran Wagle,62,Male,Homemaker,Vijayapura,37
+Praneel Date,47,Male,Student,Koppal,69
+Udarsh Hans,69,Male,Bank Employee,Mangaluru (Dakshina Kannada),31
+Balveer Venkataraman,61,Male,Software Engineer,Shivamogga,22
+Manbir Trivedi,24,Male,Teacher,Bengaluru Urban,41
+Aarush Uppal,43,Male,Student,Vijayapura,37
+Laban Pingle,39,Male,Teacher,Davangere,59
+Anika Chakrabarti,72,Female,Homemaker,Ballari,38
+Aarnav Bakshi,40,Male,Student,Ballari,90
+Osha Nath,24,Female,Bank Employee,Davangere,45
+Dalbir Tailor,55,Male,Teacher,Kalaburagi,34
+Dipta Sama,65,Female,Bank Employee,Shivamogga,44
+Charvi Mannan,53,Female,Homemaker,Kalaburagi,69
+Elijah Barad,41,Male,Shopkeeper,Bengaluru Rural,60
+Qasim Shankar,21,Male,Shopkeeper,Hubballi-Dharwad,62
+Madhavi Guha,59,Female,Bank Employee,Mangaluru (Dakshina Kannada),86
+Pahal Balasubramanian,61,Female,Shopkeeper,Kalaburagi,27
+Krishna Kota,47,Female,Homemaker,Ballari,59
+Udant Ganesan,60,Male,Bank Employee,Belagavi,53
+Brinda Suri,49,Female,Teacher,Raichur,39
+Anya Sharma,56,Female,Homemaker,Mysuru,59
+Vaishnavi Devan,26,Female,Retired Officer,Mangaluru (Dakshina Kannada),30
+Kevin Bassi,30,Male,Bank Employee,Vijayapura,84
+Yatin Keer,53,Male,Homemaker,Shivamogga,64
+Xalak Borah,41,Female,Teacher,Raichur,40
+Edhitha Puri,18,Female,Software Engineer,Hassan,71
+Ojas Sunder,58,Male,Retired Officer,Bidar,47
+Tanay Mane,22,Male,Teacher,Hubballi-Dharwad,27
+Advik Raj,41,Male,Teacher,Kalaburagi,65
+Harinakshi Gupta,63,Female,Bank Employee,Udupi,70
+Aayush Contractor,64,Male,Bank Employee,Tumakuru,75
+Ikshita Pingle,25,Female,Software Engineer,Bidar,87
+Sanaya Mutti,52,Female,Retired Officer,Hubballi-Dharwad,28
+Kashish Kapadia,36,Female,Homemaker,Vijayapura,27
+Vincent Sahni,57,Male,Bank Employee,Koppal,26
+Anthony Chana,49,Male,Bank Employee,Vijayapura,78
+Advik Borra,53,Male,Homemaker,Hassan,66
+Deepa D’Alia,18,Female,Software Engineer,Davangere,41
+Advay Yadav,46,Male,Retired Officer,Raichur,39
+Umang Khosla,47,Male,Shopkeeper,Belagavi,32
+Vasana Sagar,39,Female,Bank Employee,Mandya,87
+Amruta Srinivasan,45,Female,Shopkeeper,Koppal,36
+Matthew Saran,54,Male,Student,Hubballi-Dharwad,30
+Radha Wason,57,Female,Student,Hassan,81
+Vrishti Palla,71,Female,Homemaker,Ballari,71
+Pranit Pandey,23,Male,Homemaker,Mangaluru (Dakshina Kannada),66
+Lakshmi Raj,65,Female,Software Engineer,Hubballi-Dharwad,54
+Tanmayi Dutta,17,Female,Software Engineer,Shivamogga,48
+Yuvraj Saran,71,Male,Student,Chikkamagaluru,88
+Guneet Sridhar,16,Male,Homemaker,Davangere,78
+Falguni Virk,35,Female,Software Engineer,Davangere,74
+Aryan Grewal,25,Male,Homemaker,Tumakuru,24
+Jagvi Rai,18,Female,Student,Davangere,51
+Aarini Chakraborty,23,Female,Teacher,Bengaluru Rural,69
+Vyanjana Grewal,31,Female,Homemaker,Belagavi,43
+Arin Mangal,17,Male,Student,Bengaluru Rural,37
+Bina Tella,70,Female,Shopkeeper,Raichur,71
+Lila Shenoy,55,Female,Retired Officer,Bidar,25
+Madhav Arya,33,Male,Homemaker,Chikkamagaluru,54
+Harrison Dyal,40,Male,Homemaker,Bengaluru Rural,49
+Vedant Sabharwal,47,Male,Software Engineer,Hassan,44
+Sarthak Raval,28,Male,Homemaker,Bidar,63
+Maanav Lall,48,Male,Homemaker,Hassan,59
+Dalaja Varma,67,Female,Teacher,Mandya,65
+Chandran Mander,63,Male,Shopkeeper,Belagavi,50
+Keya Barman,64,Female,Homemaker,Bidar,49
+Warda Kapur,53,Female,Shopkeeper,Hubballi-Dharwad,33
+Prisha Cheema,61,Female,Software Engineer,Ballari,42
+Lakshit Nori,34,Male,Retired Officer,Raichur,38
+Omya Madan,19,Female,Shopkeeper,Koppal,50
+Arjun Sengupta,71,Male,Student,Mangaluru (Dakshina Kannada),74
+Aarnav Kant,51,Male,Retired Officer,Chikkamagaluru,56
+Hemangini Bhandari,51,Female,Bank Employee,Hassan,22
+Lakshmi Bala,30,Female,Retired Officer,Bidar,82
+Nathan Jha,42,Male,Teacher,Raichur,83
+Manya Deep,71,Female,Retired Officer,Kalaburagi,63
+Anjali Mukhopadhyay,47,Female,Student,Chikkamagaluru,50
+Aarna Krishna,72,Female,Bank Employee,Mysuru,68
+Xavier Bal,34,Male,Shopkeeper,Davangere,21
+Elijah Saini,19,Male,Teacher,Kolar,45
+Shivansh Deshpande,71,Male,Student,Hassan,52
+Amaira Loke,49,Female,Homemaker,Mangaluru (Dakshina Kannada),35
+Ekanta Jain,43,Female,Student,Udupi,20
+Karan Nazareth,50,Male,Teacher,Kalaburagi,44
+Aarush Issac,40,Male,Bank Employee,Tumakuru,53
+Manya Edwin,21,Female,Bank Employee,Ballari,22
+Tejas Chaudhry,16,Male,Retired Officer,Hubballi-Dharwad,63
+Girindra Dave,68,Male,Retired Officer,Ballari,76
+Zehaan Nigam,28,Male,Shopkeeper,Belagavi,30
+Ijaya Chandran,41,Female,Teacher,Davangere,86
+Rachana Viswanathan,44,Female,Retired Officer,Koppal,68
+Ikbal Kaur,64,Male,Shopkeeper,Koppal,42
+David Dubey,41,Male,Retired Officer,Belagavi,64
+Caleb Babu,54,Male,Retired Officer,Tumakuru,46
+Parth Sharma,51,Male,Homemaker,Bengaluru Rural,81
+Hitesh Bala,66,Male,Software Engineer,Kalaburagi,28
+Lakshit Dubey,48,Male,Bank Employee,Chikkamagaluru,89
+Liam Korpal,29,Male,Teacher,Shivamogga,77
+Teerth Arya,45,Male,Student,Chikkamagaluru,50
+Abhiram Varughese,57,Male,Bank Employee,Bengaluru Urban,86
+Netra Arya,21,Female,Retired Officer,Chikkamagaluru,22
+Jagrati Rao,72,Female,Bank Employee,Bengaluru Urban,50
+Michael Suri,46,Male,Software Engineer,Udupi,87
+Gunbir Chawla,65,Male,Software Engineer,Raichur,45
+Gayathri Bava,50,Female,Software Engineer,Davangere,82
+Luke Dugar,44,Male,Shopkeeper,Koppal,41
+Ishwar Nazareth,69,Male,Student,Kolar,35
+Yashoda Varma,46,Female,Homemaker,Vijayapura,68
+Faraj Bose,44,Male,Bank Employee,Tumakuru,83
+Saksham Chand,43,Male,Bank Employee,Bengaluru Urban,74
+Bhavna Ghose,29,Female,Shopkeeper,Vijayapura,23
+Leela Rastogi,24,Female,Student,Koppal,83
+Yashodhara Prasad,19,Female,Software Engineer,Chikkamagaluru,22
+Praneel Dass,63,Male,Homemaker,Shivamogga,31
+Bhavika Nagar,67,Female,Retired Officer,Bengaluru Rural,87
+Kala Som,25,Female,Software Engineer,Kalaburagi,78
+Ishwar Rama,38,Male,Teacher,Mysuru,74
+Chanakya Kunda,46,Male,Student,Shivamogga,66
+Ojasvi Magar,31,Female,Shopkeeper,Mysuru,78
+Geetika Wason,18,Female,Retired Officer,Vijayapura,60
+Pallavi Khalsa,18,Female,Teacher,Vijayapura,38
+Liam Ghose,31,Male,Student,Raichur,72
