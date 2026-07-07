@@ -121,6 +121,11 @@ module.exports = async (req, res) => {
 
   // ── STEP 1: Parse & validate query params ────────────────────────────────
   const query       = parseQuery(req.url || '');
+
+  if (query.test === 'import') {
+    return require('./import-handler')(req, res);
+  }
+
   const lat         = parseFloat(query.lat);
   const lng         = parseFloat(query.lng);
   const radiusM     = parseInt(query.radius_meters, 10) || DEFAULT_RADIUS_M;

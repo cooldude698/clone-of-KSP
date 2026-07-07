@@ -106,7 +106,7 @@ module.exports = async (req, res) => {
       const item = row.FIR_Accused || row;
       return {
         name:     item.accused_full_name,
-        firCount: parseInt(item.fir_count, 10) || 0,
+        firCount: parseInt(item.fir_count || item['COUNT(ROWID)'], 10) || 0,
       };
     })
     .filter((acc) => acc.firCount >= minConnections)
@@ -142,16 +142,17 @@ module.exports = async (req, res) => {
         const detailsRes = await zcqlService.executeZCQLQuery(detailsQuery);
         const details    = detailsRes && detailsRes.length > 0 ? (detailsRes[0].Accused || detailsRes[0]) : null;
 
-        // Fetch linked FIRs with dates and crime types
-        const firsQuery =
-          `SELECT f.case_number, f.crime_type_code, f.date_filed ` +
-          `FROM FIRs f, FIR_Accused fa ` +
-          `WHERE fa.fir_case_number = f.case_number ` +
-          `AND fa.accused_full_name = '${safeName}' ` +
-          `LIMIT 20`;
+        // Fetch linked FIR case numbers first
+        const faQuery = `SELECT fir_case_number FROM FIR_Accused WHERE accused_full_name = '${safeName}' LIMIT 20`;
+        const faRes = await zcqlService.executeZCQLQuery(faQuery);
+        const caseNumbers = (faRes || []).map((row) => `'${(row.FIR_Accused || row).fir_case_number}'`);
 
-        const firsRes = await zcqlService.executeZCQLQuery(firsQuery);
-        const firs    = (firsRes || []).map((row) => row.FIRs || row);
+        let firs = [];
+        if (caseNumbers.length > 0) {
+          const firsQuery = `SELECT case_number, crime_type_code, date_filed FROM FIRs WHERE case_number IN (${caseNumbers.join(',')})`;
+          const firsRes = await zcqlService.executeZCQLQuery(firsQuery);
+          firs = (firsRes || []).map((row) => row.FIRs || row);
+        }
 
         // Filter FIRs by date in JavaScript (robust across standard databases)
         const activeFirs = firs.filter((f) => {

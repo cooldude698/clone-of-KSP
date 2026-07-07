@@ -4,8 +4,9 @@
 	"main": "index.js",
 	"author": "vedeshskhatri",
 	"dependencies": {
-		"zcatalyst-sdk-node": "latest",
+		"axios": "latest",
+		"csv-parser": "^3.2.1",
 		"dotenv": "latest",
-		"axios": "latest"
+		"zcatalyst-sdk-node": "latest"
 	}
 }
