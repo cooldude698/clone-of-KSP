@@ -8,7 +8,7 @@
 
 ## 🌟 The Vision
 
-**DRISHTI** transforms how Karnataka State Police officers interact with vast amounts of intelligence data. Instead of digging through complex databases or writing SQL queries, officers can simply **talk** to DRISHTI using natural language—whether in English, Kannada, or Hindi. 
+**DRISHTI** transforms how Karnataka State Police officers interact with vast amounts of intelligence data. Instead of digging through complex databases or writing SQL queries, officers can simply **talk** to DRISHTI using natural language—whether in English, Kannada, or Hindi.
 
 Powered by Agentic AI and Zoho Catalyst, DRISHTI instantly processes the query, retrieves real-time crime data, and renders dynamic, interactive visualizations directly onto a unified command center dashboard. It doesn't just answer questions; it acts as a proactive partner in crime prevention and officer safety.
 
@@ -17,21 +17,28 @@ Powered by Agentic AI and Zoho Catalyst, DRISHTI instantly processes the query, 
 ## 🔥 Killer Features (Datathon Highlights)
 
 ### 1. 🌙 Midnight Briefing Protocol
+
 **Context-Aware Proactive AI.** When an officer initializes a secure session during night shifts (18:00 - 06:00), DRISHTI doesn't wait to be asked. It automatically bypasses the standard standby mode and delivers a proactive, voice-synthesized sector summary, instantly plotting active crime hotspots on the dashboard.
 
 ### 2. 🚨 Overwatch Geo-Fencing (Officer Safety)
+
 **Predictive Threat Escalation.** When an officer queries suspect movement (triggering a `geo_trail`), DRISHTI’s intelligence engine automatically evaluates the route. If a suspect enters an unpatrolled sector, the AI escalates to `CRITICAL` urgency. The Siri-style orb begins pulsing red, and a high-alert warning banner drops from the UI to recommend the immediate dispatch of Hoysala units.
 
 ### 3. ⚡ Actionable Intelligence Workflows
+
 **From Query to Field Action in 1 Click.**
+
 - **[DOWNLOAD REPORT]**: Instantly compiles the multi-turn AI conversation and geographic intel into a highly-formatted, official KSP PDF intelligence report via Zoho Catalyst serverless functions.
 - **[DISPATCH UNITS]**: Seamless mock integration simulating the instant WhatsApp/SMS dispatch of suspect intelligence packages to on-ground patrol units.
 
 ### 4. 🎙️ Advanced Audio Engineering
+
 **Hands-Free Command.** Features robust double-clap wake detection (via Web Audio API) and persistent Push-To-Talk capabilities (Ctrl+Alt). DRISHTI speaks back natively in the officer's queried language, dynamically adapting its vocal tone and UI glow (calm, concerned, urgent, critical) based on the severity of the intelligence data.
 
 ### 5. 🗺️ Dynamic Multi-Modal Visualizations
+
 DRISHTI doesn't just return text blocks. The Agentic AI autonomously routes queries to specific internal tools and renders rich visuals:
+
 - Interactive Leaflet Heatmaps for crime density
 - Suspect Network Graphs for organized crime
 - Crime Trend Bar/Line Charts
@@ -109,18 +116,21 @@ kspdatathon2026/
 ## 🚀 Quick Start Guide
 
 ### Prerequisites
+
 - Node.js v24 (for Catalyst functions)
 - Node.js v20 (for Next.js frontend)
 - Zoho Catalyst CLI (`zcatalyst-cli`)
 - Gemini API key(s) from Google AI Studio
 
 ### 1. Clone & Setup
+
 ```bash
 git clone -b ai-engine https://github.com/vedeshskhatri/kspdatathon2026.git
 cd kspdatathon2026
 ```
 
 ### 2. Configure API Keys
+
 ```bash
 cp .env.example functions/chat/.env
 nano functions/chat/.env
@@ -128,6 +138,7 @@ nano functions/chat/.env
 ```
 
 ### 3. Start Catalyst Backend (Terminal 1)
+
 ```bash
 nvm use 24
 catalyst serve
@@ -135,6 +146,7 @@ catalyst serve
 ```
 
 ### 4. Start Next.js Frontend (Terminal 2)
+
 ```bash
 cd nextjs
 nvm use 20
