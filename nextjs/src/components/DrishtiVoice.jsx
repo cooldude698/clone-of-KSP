@@ -162,11 +162,13 @@ const useDrishtiVoice = ({
 
     recognition.onresult = (event) => {
       let currentTranscript = '';
+      let isFinal = false;
       for (let i = event.resultIndex; i < event.results.length; i++) {
         currentTranscript += event.results[i][0].transcript;
+        if (event.results[i].isFinal) isFinal = true;
       }
       setTranscript(currentTranscript);
-      if (callbacksRef.current.onTranscript) callbacksRef.current.onTranscript(currentTranscript);
+      if (callbacksRef.current.onTranscript) callbacksRef.current.onTranscript(currentTranscript, isFinal);
     };
 
     recognition.onerror = (event) => {

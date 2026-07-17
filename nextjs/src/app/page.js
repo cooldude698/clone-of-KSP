@@ -271,9 +271,11 @@ export default function DrishtiDashboard() {
 
   const { startListening, stopListening, speak } = useDrishtiVoice({
     onWake: () => handleWakeToggle(),
-    onTranscript: (text) => {
+    onTranscript: (text, isFinal = true) => {
       setTranscript(text);
-      handleQuery(text);
+      if (isFinal) {
+        handleQuery(text);
+      }
     },
     onSpeakStart: () => { },
     onSpeakEnd: () => setOrbState('idle'),
@@ -391,11 +393,14 @@ export default function DrishtiDashboard() {
     if (!response || !response.visualization) return null;
     const { type, data } = response.visualization;
     switch (type) {
+      case 'heatmap':
+      case 'map_pins':
       case 'hotspot_map':
-        return <CustomMap data={data} />;
+      case 'geo_trail':
+        return <CustomMap data={Array.isArray(data) ? data : data?.hotspots || data?.cameras || []} />;
       case 'bar_chart':
       case 'line_chart':
-        return <CustomBarChart data={data} />;
+        return <CustomBarChart data={Array.isArray(data) ? data : data?.trends || []} />;
       case 'network_graph':
         return <CustomNetworkGraph data={data} />;
       case 'stat_card':

@@ -175,7 +175,7 @@ const DrishtiChat = ({
 
           {/* Input Fallback */}
           <div className="p-3 border-t border-white/10 bg-black/40">
-             <form onSubmit={handleSend} className="flex items-center gap-2">
+             <div className="flex items-center gap-2">
                 <input
                   type="text"
                   value={inputText}
@@ -184,13 +184,13 @@ const DrishtiChat = ({
                   className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 focus:shadow-[0_0_10px_rgba(59,130,246,0.2)] transition-all"
                 />
                 <button
-                  type="submit"
+                  onClick={handleSend}
                   disabled={!inputText.trim()}
                   className="p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50 disabled:bg-white/10 disabled:text-white/30 disabled:cursor-not-allowed transition-colors"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
                 </button>
-             </form>
+             </div>
           </div>
         </motion.div>
       )}
