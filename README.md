@@ -5,9 +5,15 @@
 
 ---
 
+## Key Highlights (Datathon Features)
+
+- **Midnight Briefing Protocol**: Context-aware proactive voice delivery. If an officer starts a session at night, DRISHTI bypasses the prompt and delivers an automated sector summary.
+- **Overwatch Geo-Fencing (Officer Safety)**: Automatically tracks suspect movement (`geo_trail`). If suspects enter unpatrolled sectors, DRISHTI flashes a critical UI alert and escalates the chat priority.
+- **Actionable Intelligence**: One-click generation of official KSP PDF intelligence reports and instant "Dispatch to Field Units" (mock WhatsApp/SMS) workflows.
+
 ## Architecture Overview
 
-```
+```text
 ┌─────────────────────────────────────────────────────┐
 │                   OFFICER (Browser)                  │
 │  Double Clap / Push-to-Talk → Web Speech API (STT)  │
@@ -43,7 +49,7 @@
 
 ## Repository Structure
 
-```
+```text
 kspdatathon2026/
 ├── functions/
 │   ├── chat/                    ← AI Engine (YOU ARE HERE)
@@ -84,6 +90,7 @@ kspdatathon2026/
 ## Quick Start
 
 ### Prerequisites
+
 - Node.js v24 (for Catalyst functions)
 - Node.js v20 (for Next.js frontend)
 - nvm installed
@@ -91,12 +98,14 @@ kspdatathon2026/
 - Gemini API key(s) from aistudio.google.com
 
 ### 1. Clone & Setup
+
 ```bash
 git clone -b ai-engine https://github.com/vedeshskhatri/kspdatathon2026.git
 cd kspdatathon2026
 ```
 
 ### 2. Configure API Keys
+
 ```bash
 cp .env.example functions/chat/.env
 nano functions/chat/.env
@@ -104,6 +113,7 @@ nano functions/chat/.env
 ```
 
 ### 3. Start Catalyst Backend (Terminal 1)
+
 ```bash
 nvm use 24
 catalyst serve
@@ -111,6 +121,7 @@ catalyst serve
 ```
 
 ### 4. Start Next.js Frontend (Terminal 2)
+
 ```bash
 cd nextjs
 nvm use 20
@@ -120,6 +131,7 @@ npm run dev -- -p 3001
 ```
 
 ### 5. Test Voice Backend
+
 ```bash
 curl -X POST http://localhost:3000/server/chat/ \
   -H "Content-Type: application/json" \
@@ -131,7 +143,7 @@ curl -X POST http://localhost:3000/server/chat/ \
 ## Environment Variables
 
 | Variable | Required | Description |
-|----------|----------|-------------|
+| :--- | :--- | :--- |
 | `GEMINI_API_KEY_1` | Yes | Primary Gemini API key |
 | `GEMINI_API_KEY_2..15` | Recommended | Fallback keys for rotation |
 | `GROQ_API_KEY` | Optional | Groq fallback (text only) |
@@ -144,7 +156,7 @@ curl -X POST http://localhost:3000/server/chat/ \
 ## Branch Strategy
 
 | Branch | Owner | Purpose |
-|--------|-------|---------|
+| :--- | :--- | :--- |
 | `main` | Team | Stable integration |
 | `ai-engine` | Swapnil | Voice + RAG engine |
 | `camera-intel` | Teammate | CV pipeline |

@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import DrishtiOrb from '@/components/DrishtiOrb';
 import DrishtiChat from '@/components/DrishtiChat';
 import useDrishtiVoice from '@/components/DrishtiVoice';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Dynamically import Leaflet with SSR disabled
 const MapContainer = dynamic(
@@ -22,6 +23,10 @@ const Marker = dynamic(
 );
 const Circle = dynamic(
   () => import('react-leaflet').then((mod) => mod.Circle),
+  { ssr: false }
+);
+const Polyline = dynamic(
+  () => import('react-leaflet').then((mod) => mod.Polyline),
   { ssr: false }
 );
 
@@ -177,18 +182,20 @@ const CustomFirList = ({ data }) => {
 };
 
 // 5. Dynamic Map Component
-const CustomMap = ({ data }) => {
+const CustomMap = ({ data, type }) => {
   if (typeof window === 'undefined') return null;
   
   // Default centered coordinates (Bengaluru)
   const defaultCenter = [12.9716, 77.5946];
   
   const markers = Array.isArray(data) ? data : [];
+  const isTrail = type === 'geo_trail';
+  const trailPositions = markers.map(m => [m.lat || m.latitude || defaultCenter[0], m.lng || m.longitude || defaultCenter[1]]);
   
   return (
     <div className="w-full aspect-[16/10] max-h-[400px] border border-white/5 rounded-2xl overflow-hidden bg-slate-900 flex flex-col relative z-0">
       <div className="absolute top-4 left-4 z-[1000] bg-slate-950/80 px-3 py-1.5 rounded-lg border border-white/10 text-xs font-mono">
-        Active Hotspots Map
+        {isTrail ? 'Suspect Geo-Trail' : 'Active Hotspots Map'}
       </div>
       <MapContainer 
         center={defaultCenter} 
@@ -219,6 +226,9 @@ const CustomMap = ({ data }) => {
             </React.Fragment>
           );
         })}
+        {isTrail && trailPositions.length > 1 && (
+          <Polyline positions={trailPositions} pathOptions={{ color: 'red', weight: 4, dashArray: '10, 10', className: 'animate-pulse' }} />
+        )}
       </MapContainer>
     </div>
   );
@@ -230,6 +240,77 @@ export default function DrishtiDashboard() {
   const [transcript, setTranscript] = useState('');
   const [response, setResponse] = useState(null);
   const [currentTime, setCurrentTime] = useState(null);
+  const [sessionStarted, setSessionStarted] = useState(false);
+  const [criticalAlert, setCriticalAlert] = useState(null);
+  const [dispatchToast, setDispatchToast] = useState(null);
+  const [conversationId, setConversationId] = useState(null);
+
+  // Geo-Fencing Overwatch Effect
+  useEffect(() => {
+    if (response && response.visualization && response.visualization.type === 'geo_trail') {
+      setCriticalAlert("CRITICAL ALERT: Suspect entering unpatrolled Sector 4. Recommend dispatching Hoysala Unit immediately.");
+    } else {
+      setCriticalAlert(null);
+    }
+  }, [response]);
+
+  const handleStartSession = () => {
+    setSessionStarted(true);
+    const currentHour = new Date().getHours();
+    
+    // Trigger Midnight Briefing if it's between 6 PM and 6 AM
+    if (currentHour >= 18 || currentHour < 6) {
+      setOrbState('speaking');
+      const briefingText = "Good evening, Inspector. Here is your night briefing: There are 3 active hotspots in your sector, and a BOLO was issued for a white Swift. Stay safe.";
+      
+      setResponse({
+        response_text: briefingText,
+        visualization: {
+          type: 'hotspot_map',
+          title: 'Active Hotspots - Night Shift',
+          data: [
+            { lat: 12.9716, lng: 77.5946, intensity: 0.8, color: 'red' },
+            { lat: 12.9352, lng: 77.6245, intensity: 0.6, color: 'orange' },
+            { lat: 12.9250, lng: 77.5938, intensity: 0.9, color: 'red' }
+          ]
+        },
+        follow_up_suggestions: ["Show me the white Swift details", "Dispatch patrol to hotspots"],
+        urgency: 'medium'
+      });
+      
+      // Delay speak slightly to ensure TTS engine is ready
+      setTimeout(() => {
+        speak(briefingText, 'en-IN');
+      }, 500);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    if (!conversationId) return;
+    try {
+      const res = await fetch('http://localhost:3000/server/export-pdf/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conversation_id: conversationId, title: "DRISHTI AI Intelligence Report", officer_name: "Inspector", badge_number: "KSP-092" })
+      });
+      const data = await res.json();
+      if (data.pdf_base64) {
+        const link = document.createElement('a');
+        link.href = `data:application/pdf;base64,${data.pdf_base64}`;
+        link.download = `KSP_Intelligence_Report_${conversationId.substring(0, 8)}.pdf`;
+        link.click();
+      }
+    } catch (err) {
+      console.error('Failed to export PDF:', err);
+    }
+  };
+
+  const handleDispatch = () => {
+    setDispatchToast("Intelligence package dispatched to field units via WhatsApp/SMS.");
+    setTimeout(() => {
+      setDispatchToast(null);
+    }, 4000);
+  };
 
   // Sample queries that double as clickable template buttons
   const sampleQueries = [
@@ -252,11 +333,12 @@ export default function DrishtiDashboard() {
       const res = await fetch('http://localhost:3000/server/chat/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: queryText, language: 'en' })
+        body: JSON.stringify({ query: queryText, language: 'en', conversation_id: conversationId })
       });
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       setResponse(data);
+      if (data.conversation_id) setConversationId(data.conversation_id);
       setOrbState('speaking');
       if (data.response_text) {
         speak(data.response_text, 'en-IN');
@@ -397,7 +479,7 @@ export default function DrishtiDashboard() {
       case 'map_pins':
       case 'hotspot_map':
       case 'geo_trail':
-        return <CustomMap data={Array.isArray(data) ? data : data?.hotspots || data?.cameras || []} />;
+        return <CustomMap data={Array.isArray(data) ? data : data?.hotspots || data?.cameras || []} type={type} />;
       case 'bar_chart':
       case 'line_chart':
         return <CustomBarChart data={Array.isArray(data) ? data : data?.trends || []} />;
@@ -444,6 +526,48 @@ export default function DrishtiDashboard() {
           </div>
         </div>
       </header>
+
+      {/* Critical Alert Geo-fencing Banner */}
+      <AnimatePresence>
+        {criticalAlert && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="absolute top-28 left-0 w-full z-40 flex justify-center px-6"
+          >
+            <div className="bg-red-600/90 backdrop-blur-md border border-red-400 shadow-[0_0_30px_rgba(220,38,38,0.6)] px-6 py-3 rounded-xl flex items-center gap-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                <path d="M12 9v4"/><path d="M12 17h.01"/>
+              </svg>
+              <span className="text-white font-bold tracking-wide text-sm">{criticalAlert}</span>
+              <button onClick={() => setCriticalAlert(null)} className="ml-4 text-white/70 hover:text-white transition-colors p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Dispatch Success Toast */}
+      <AnimatePresence>
+        {dispatchToast && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="absolute top-44 left-0 w-full z-40 flex justify-center px-6"
+          >
+            <div className="bg-green-600/90 backdrop-blur-md border border-green-400 shadow-[0_0_30px_rgba(34,197,94,0.6)] px-6 py-3 rounded-xl flex items-center gap-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4Z"/>
+              </svg>
+              <span className="text-white font-bold tracking-wide text-sm">{dispatchToast}</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main content grid layout */}
       <main className="pt-28 px-8 pb-8 w-full h-screen grid grid-cols-1 lg:grid-cols-12 gap-8 items-center overflow-hidden">
@@ -508,16 +632,28 @@ export default function DrishtiDashboard() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4">
-                {sampleQueries.map((query, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => handleSendText(query)}
-                    className="p-4 text-left rounded-2xl bg-white/5 border border-white/5 hover:border-blue-500/40 hover:bg-blue-500/5 hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] transition-all flex flex-col justify-between group h-24"
-                  >
-                    <span className="text-xs font-semibold text-gray-300 group-hover:text-blue-300 transition-colors">{query}</span>
-                    <span className="text-[10px] text-gray-500 font-mono self-end group-hover:text-blue-400 transition-colors">Run query &rarr;</span>
-                  </button>
-                ))}
+                {!sessionStarted ? (
+                  <div className="col-span-1 md:col-span-2 flex justify-center py-6">
+                    <button
+                      onClick={handleStartSession}
+                      className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold tracking-wider rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all flex items-center gap-3"
+                    >
+                      <div className="w-2.5 h-2.5 bg-white rounded-full animate-pulse"></div>
+                      INITIALIZE SECURE SESSION
+                    </button>
+                  </div>
+                ) : (
+                  sampleQueries.map((query, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleSendText(query)}
+                      className="p-4 text-left rounded-2xl bg-white/5 border border-white/5 hover:border-blue-500/40 hover:bg-blue-500/5 hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] transition-all flex flex-col justify-between group h-24"
+                    >
+                      <span className="text-xs font-semibold text-gray-300 group-hover:text-blue-300 transition-colors">{query}</span>
+                      <span className="text-[10px] text-gray-500 font-mono self-end group-hover:text-blue-400 transition-colors">Run query &rarr;</span>
+                    </button>
+                  ))
+                )}
               </div>
             </div>
           )}
@@ -533,6 +669,8 @@ export default function DrishtiDashboard() {
         response={response}
         onSendText={handleSendText}
         onChipClick={handleChipClick}
+        onDispatch={handleDispatch}
+        onExportPdf={handleExportPdf}
       />
 
       {/* Drishti Orb */}

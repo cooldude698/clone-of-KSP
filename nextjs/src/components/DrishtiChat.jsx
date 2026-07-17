@@ -8,6 +8,8 @@ const DrishtiChat = ({
   response,
   onSendText,
   onChipClick,
+  onDispatch,
+  onExportPdf,
 }) => {
   const [inputText, setInputText] = useState('');
   const responseAreaRef = useRef(null);
@@ -165,6 +167,18 @@ const DrishtiChat = ({
                         ))}
                      </div>
                   )}
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-2 mt-4 pt-4 border-t border-white/10">
+                    <button onClick={onDispatch} className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white text-[11px] font-bold tracking-wider transition-colors shadow-lg shadow-green-500/20 border border-green-500/50">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4Z"/></svg>
+                      DISPATCH UNITS
+                    </button>
+                    <button onClick={onExportPdf} className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold tracking-wider transition-colors shadow-lg shadow-indigo-500/20 border border-indigo-500/50">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                      DOWNLOAD REPORT
+                    </button>
+                  </div>
                 </div>
              ) : (
                 <div className="flex items-center justify-center h-24">
