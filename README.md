@@ -1,17 +1,45 @@
-# DRISHTI ದೃಷ್ಟಿ — AI Engine
+<div align="center">
+  <h1>🛡️ DRISHTI (ದೃಷ್ಟಿ)</h1>
+  <p><strong>Voice-Driven Conversational Intelligence for the Karnataka State Police</strong></p>
+  <p><i>Built for the KSP Hack2Skill Datathon 2026</i></p>
+</div>
 
-> Voice-driven conversational intelligence for Karnataka State Police  
-> KSP Hack2Skill Datathon 2026
+<br />
+
+## 🌟 The Vision
+
+**DRISHTI** transforms how Karnataka State Police officers interact with vast amounts of intelligence data. Instead of digging through complex databases or writing SQL queries, officers can simply **talk** to DRISHTI using natural language—whether in English, Kannada, or Hindi. 
+
+Powered by Agentic AI and Zoho Catalyst, DRISHTI instantly processes the query, retrieves real-time crime data, and renders dynamic, interactive visualizations directly onto a unified command center dashboard. It doesn't just answer questions; it acts as a proactive partner in crime prevention and officer safety.
 
 ---
 
-## Key Highlights (Datathon Features)
+## 🔥 Killer Features (Datathon Highlights)
 
-- **Midnight Briefing Protocol**: Context-aware proactive voice delivery. If an officer starts a session at night, DRISHTI bypasses the prompt and delivers an automated sector summary.
-- **Overwatch Geo-Fencing (Officer Safety)**: Automatically tracks suspect movement (`geo_trail`). If suspects enter unpatrolled sectors, DRISHTI flashes a critical UI alert and escalates the chat priority.
-- **Actionable Intelligence**: One-click generation of official KSP PDF intelligence reports and instant "Dispatch to Field Units" (mock WhatsApp/SMS) workflows.
+### 1. 🌙 Midnight Briefing Protocol
+**Context-Aware Proactive AI.** When an officer initializes a secure session during night shifts (18:00 - 06:00), DRISHTI doesn't wait to be asked. It automatically bypasses the standard standby mode and delivers a proactive, voice-synthesized sector summary, instantly plotting active crime hotspots on the dashboard.
 
-## Architecture Overview
+### 2. 🚨 Overwatch Geo-Fencing (Officer Safety)
+**Predictive Threat Escalation.** When an officer queries suspect movement (triggering a `geo_trail`), DRISHTI’s intelligence engine automatically evaluates the route. If a suspect enters an unpatrolled sector, the AI escalates to `CRITICAL` urgency. The Siri-style orb begins pulsing red, and a high-alert warning banner drops from the UI to recommend the immediate dispatch of Hoysala units.
+
+### 3. ⚡ Actionable Intelligence Workflows
+**From Query to Field Action in 1 Click.**
+- **[DOWNLOAD REPORT]**: Instantly compiles the multi-turn AI conversation and geographic intel into a highly-formatted, official KSP PDF intelligence report via Zoho Catalyst serverless functions.
+- **[DISPATCH UNITS]**: Seamless mock integration simulating the instant WhatsApp/SMS dispatch of suspect intelligence packages to on-ground patrol units.
+
+### 4. 🎙️ Advanced Audio Engineering
+**Hands-Free Command.** Features robust double-clap wake detection (via Web Audio API) and persistent Push-To-Talk capabilities (Ctrl+Alt). DRISHTI speaks back natively in the officer's queried language, dynamically adapting its vocal tone and UI glow (calm, concerned, urgent, critical) based on the severity of the intelligence data.
+
+### 5. 🗺️ Dynamic Multi-Modal Visualizations
+DRISHTI doesn't just return text blocks. The Agentic AI autonomously routes queries to specific internal tools and renders rich visuals:
+- Interactive Leaflet Heatmaps for crime density
+- Suspect Network Graphs for organized crime
+- Crime Trend Bar/Line Charts
+- Pulsing Geo-Trail Polylines for active suspect tracking
+
+---
+
+## 🏗️ System Architecture
 
 ```text
 ┌─────────────────────────────────────────────────────┐
@@ -25,15 +53,10 @@
                     ▼
 ┌─────────────────────────────────────────────────────┐
 │            Zoho Catalyst (Serverless)                │
-│  /server/chat/          — Gemini 2.5 Flash RAG      │
-│  /server/hotspots/      — Crime hotspot data        │
-│  /server/firs/          — FIR records               │
-│  /server/trends/        — Crime trend analytics     │
-│  /server/anpr-check/    — ANPR plate lookup         │
-│  /server/cameras-nearby/ — Camera intel             │
-│  /server/trail/         — Suspect trail             │
-│  /server/network-graph-data/ — Network graph        │
-│  /server/repeat-offenders/  — Repeat offender data  │
+│  /server/chat/          — Gemini 2.5 Flash Agent    │
+│  /server/export-pdf/    — Generates official reports│
+│  /server/conversations/ — Fetches chat history      │
+│  ... (Data endpoints for Hotspots, FIRs, Trends)    │
 └───────────────────┬─────────────────────────────────┘
                     │
                     ▼
@@ -47,65 +70,57 @@
 
 ---
 
-## Repository Structure
+## 🛠️ Technology Stack
+
+- **Frontend Engine**: Next.js 16, React, Tailwind CSS
+- **Visuals & Motion**: Framer Motion, GSAP, Leaflet.js (Dynamic Maps)
+- **Backend Infrastructure**: Zoho Catalyst (Serverless Node.js 24 AdvancedIO)
+- **AI Brain**: Gemini 2.5 Flash (Agentic Function Calling, Fallback Rotation, Structured JSON)
+- **Data Persistence**: Catalyst NoSQL (Conversation tracking & history)
+
+---
+
+## 📁 Repository Structure
 
 ```text
 kspdatathon2026/
 ├── functions/
-│   ├── chat/                    ← AI Engine (YOU ARE HERE)
-│   │   ├── index.js             ← Main handler + Gemini integration
-│   │   ├── system-prompt.js     ← DRISHTI persona + schema enforcement
-│   │   ├── package.json
-│   │   └── .env                 ← API keys (gitignored)
-│   ├── hotspots/
+│   ├── chat/                    ← AI Engine (Agentic Loop & RAG)
+│   ├── export-pdf/              ← PDF generation endpoint
+│   ├── conversations/           ← Conversation history endpoint
+│   ├── hotspots/                ← Mock crime databases...
 │   ├── firs/
-│   ├── trends/
-│   ├── anpr-check/
-│   ├── cameras-nearby/
-│   ├── trail/
-│   ├── network-graph-data/
-│   ├── repeat-offenders/
-│   ├── victim-vulnerability/
-│   └── underreporting/
+│   └── anpr-check/
 ├── nextjs/
 │   ├── src/
 │   │   ├── app/
-│   │   │   ├── page.js          ← Main dashboard
-│   │   │   ├── layout.js
+│   │   │   ├── page.js          ← Main Command Dashboard
 │   │   │   └── globals.css
 │   │   └── components/
-│   │       ├── DrishtiOrb.jsx   ← Animated voice orb
-│   │       ├── DrishtiChat.jsx  ← Response panel
-│   │       └── DrishtiVoice.jsx ← Voice hook (STT/TTS/clap)
+│   │       ├── DrishtiOrb.jsx   ← Animated Siri-style voice orb
+│   │       ├── DrishtiChat.jsx  ← Response panel & Action Buttons
+│   │       └── DrishtiVoice.jsx ← Voice hook (STT/TTS/clap detection)
 │   └── package.json
-├── docs/
-│   └── ai-engine/               ← You are reading this
-├── camera-intel/                ← Teammate: CV pipeline
-├── crime-database/              ← Synthetic dataset
 └── catalyst.json
 ```
 
 ---
 
-## Quick Start
+## 🚀 Quick Start Guide
 
 ### Prerequisites
-
 - Node.js v24 (for Catalyst functions)
 - Node.js v20 (for Next.js frontend)
-- nvm installed
 - Zoho Catalyst CLI (`zcatalyst-cli`)
-- Gemini API key(s) from aistudio.google.com
+- Gemini API key(s) from Google AI Studio
 
 ### 1. Clone & Setup
-
 ```bash
 git clone -b ai-engine https://github.com/vedeshskhatri/kspdatathon2026.git
 cd kspdatathon2026
 ```
 
 ### 2. Configure API Keys
-
 ```bash
 cp .env.example functions/chat/.env
 nano functions/chat/.env
@@ -113,7 +128,6 @@ nano functions/chat/.env
 ```
 
 ### 3. Start Catalyst Backend (Terminal 1)
-
 ```bash
 nvm use 24
 catalyst serve
@@ -121,7 +135,6 @@ catalyst serve
 ```
 
 ### 4. Start Next.js Frontend (Terminal 2)
-
 ```bash
 cd nextjs
 nvm use 20
@@ -130,33 +143,20 @@ npm run dev -- -p 3001
 # UI available at http://localhost:3001
 ```
 
-### 5. Test Voice Backend
-
-```bash
-curl -X POST http://localhost:3000/server/chat/ \
-  -H "Content-Type: application/json" \
-  -d '{"query": "any hotspots forming in Whitefield?", "language": "en"}'
-```
-
 ---
 
-## Environment Variables
+## 🔐 Environment Variables
 
 | Variable | Required | Description |
 | :--- | :--- | :--- |
 | `GEMINI_API_KEY_1` | Yes | Primary Gemini API key |
-| `GEMINI_API_KEY_2..15` | Recommended | Fallback keys for rotation |
-| `GROQ_API_KEY` | Optional | Groq fallback (text only) |
+| `GEMINI_API_KEY_2..15` | Recommended | Fallback keys for rate-limit rotation |
+| `GROQ_API_KEY` | Optional | Groq fallback for ultra-fast text inference |
 | `GEMINI_MODEL` | No | Default: `gemini-2.5-flash` |
 | `NOSQL_CONVERSATIONS_COLLECTION` | No | Default: `conversations` |
-| `MAX_CONVERSATION_HISTORY` | No | Default: `10` |
 
 ---
 
-## Branch Strategy
-
-| Branch | Owner | Purpose |
-| :--- | :--- | :--- |
-| `main` | Team | Stable integration |
-| `ai-engine` | Swapnil | Voice + RAG engine |
-| `camera-intel` | Teammate | CV pipeline |
+<div align="center">
+  <p>Built with ❤️ for the safety and security of Karnataka.</p>
+</div>
