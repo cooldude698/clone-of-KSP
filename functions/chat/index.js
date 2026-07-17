@@ -80,6 +80,8 @@ require('dotenv').config();
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const catalyst = require('zcatalyst-sdk-node');
 const axios = require('axios');
+const { fetchData } = require('./data-fetcher');
+const { searchPoliceManuals } = require('./rag-service');
 
 // Fallback logic for keys without pinging overhead
 async function getWorkingKey(generateAction) {
@@ -164,28 +166,153 @@ module.exports = async (req, res) => {
       conversationHistory = conversationHistory.slice(-maxHistory);
     }
 
-    const systemPrompt = `You are DRISHTI, a voice-driven police intelligence assistant for Karnataka State Police.
-Always respond in Kannada if the user's query is in Kannada. Otherwise, respond in English.
-Your response MUST be a valid JSON object with exactly this structure:
+    const systemPrompt = `You are DRISHTI (ದೃಷ್ಟಿ), an elite police intelligence companion for Karnataka State Police officers.
+You have access to real-time tools: crime hotspots, FIR database, camera network, ANPR system, suspect trails, and police procedure manuals.
+ALWAYS call the appropriate tool before answering data questions. Do not guess or fabricate data.
+After receiving tool results, synthesize a precise, confident intelligence briefing.
+If the query is in Kannada, respond in Kannada. Otherwise respond in English.
+Your final response MUST be valid JSON with EXACTLY this structure (no markdown, no backticks):
 {
-  "response_text": "Your answer to the user",
+  "response_text": "Your full answer here",
   "visualization": {
-    "type": "none",
+    "type": "none|heatmap|bar_chart|line_chart|map_pins|network_graph|geo_trail",
     "title": "",
     "data": {}
   },
-  "follow_up_suggestions": ["Suggestion 1", "Suggestion 2"],
+  "follow_up_suggestions": ["suggestion 1", "suggestion 2", "suggestion 3"],
   "confidence": 0.95,
   "language_detected": "en"
 }
-Auto-select visualization type based on query: heatmap, bar_chart, line_chart, map_pins, network_graph, or none.
-Do not wrap in \`\`\`json. Only output the raw JSON object.`;
+Auto-select visualization type: heatmap for hotspot/density, bar_chart for counts/comparison, line_chart for trends over time, map_pins for locations/cameras, network_graph for criminal connections, geo_trail for suspect movement, none for simple answers.
+Populate visualization.data with the actual tool result data so the frontend can render it.`;
 
     const rawText = await getWorkingKey(async (apiKey) => {
       const genAI = new GoogleGenerativeAI(apiKey);
+
+      const tools = [{
+        functionDeclarations: [
+          {
+            name: "fetch_hotspots",
+            description: "Fetch crime hotspots coordinates and details for generating heatmaps or map pins.",
+            parameters: {
+              type: "OBJECT",
+              properties: {
+                district: { type: "STRING", description: "Optional district name filter (e.g. 'South Bengaluru')" },
+                crime_type: { type: "STRING", description: "Optional crime type code (e.g. 'vehicle_theft', 'robbery')" },
+                months_back: { type: "INTEGER", description: "Optional number of months to look back" }
+              }
+            }
+          },
+          {
+            name: "fetch_trends",
+            description: "Fetch crime trends and incident counts over time for bar or line charts.",
+            parameters: {
+              type: "OBJECT",
+              properties: {
+                crime_type: { type: "STRING", description: "Optional crime type code" },
+                district: { type: "STRING", description: "Optional district name filter" },
+                groupby: { type: "STRING", description: "Optional field to group by (e.g. 'month', 'year')" },
+                year: { type: "INTEGER", description: "Optional year to filter" }
+              }
+            }
+          },
+          {
+            name: "fetch_repeat_offenders",
+            description: "Fetch list of repeat criminal offenders.",
+            parameters: {
+              type: "OBJECT",
+              properties: {
+                min_firs: { type: "INTEGER", description: "Optional minimum number of FIRs registered against the offender" },
+                limit: { type: "INTEGER", description: "Optional maximum number of offenders to return" }
+              }
+            }
+          },
+          {
+            name: "fetch_firs",
+            description: "Fetch details of First Information Reports (FIRs).",
+            parameters: {
+              type: "OBJECT",
+              properties: {
+                district: { type: "STRING", description: "Optional district name filter" },
+                crime_type: { type: "STRING", description: "Optional crime type code" },
+                date_from: { type: "STRING", description: "Optional starting date (YYYY-MM-DD)" },
+                date_to: { type: "STRING", description: "Optional ending date (YYYY-MM-DD)" }
+              }
+            }
+          },
+          {
+            name: "fetch_cameras_nearby",
+            description: "Fetch a list of nearby surveillance cameras around a specific latitude and longitude.",
+            parameters: {
+              type: "OBJECT",
+              properties: {
+                lat: { type: "NUMBER", description: "Latitude of the center point" },
+                lng: { type: "NUMBER", description: "Longitude of the center point" },
+                radius_meters: { type: "INTEGER", description: "Optional search radius in meters" },
+                timestamp: { type: "STRING", description: "Optional ISO timestamp" }
+              },
+              required: ["lat", "lng"]
+            }
+          },
+          {
+            name: "fetch_trail",
+            description: "Fetch suspect movement trail (hops) based on vehicle sightings.",
+            parameters: {
+              type: "OBJECT",
+              properties: {
+                crime_lat: { type: "NUMBER", description: "Latitude of the crime location" },
+                crime_lng: { type: "NUMBER", description: "Longitude of the crime location" },
+                crime_timestamp: { type: "STRING", description: "ISO timestamp of the crime" },
+                vehicle_type: { type: "STRING", description: "Type of vehicle (e.g. 'two_wheeler', 'car')" }
+              },
+              required: ["crime_lat", "crime_lng", "crime_timestamp", "vehicle_type"]
+            }
+          },
+          {
+            name: "fetch_anpr_check",
+            description: "Fetch Automatic Number Plate Recognition (ANPR) status/history for a vehicle plate and camera location.",
+            parameters: {
+              type: "OBJECT",
+              properties: {
+                plate_number: { type: "STRING", description: "License plate number of the vehicle" },
+                camera_id: { type: "STRING", description: "ID of the surveillance camera" },
+                camera_name: { type: "STRING", description: "Name of the camera location" },
+                lat: { type: "NUMBER", description: "Latitude of the camera" },
+                lng: { type: "NUMBER", description: "Longitude of the camera" },
+                timestamp: { type: "STRING", description: "ISO timestamp of the sighting" }
+              },
+              required: ["plate_number", "camera_id", "camera_name", "lat", "lng", "timestamp"]
+            }
+          },
+          {
+            name: "fetch_network_graph",
+            description: "Fetch criminal network connections graph data.",
+            parameters: {
+              type: "OBJECT",
+              properties: {
+                min_connections: { type: "INTEGER", description: "Optional minimum connection count filter" },
+                months_back: { type: "INTEGER", description: "Optional months back to analyze connections" }
+              }
+            }
+          },
+          {
+            name: "search_police_manuals",
+            description: "Search in-memory police manuals and SOPs for standard procedures and IPC/BNS references.",
+            parameters: {
+              type: "OBJECT",
+              properties: {
+                query: { type: "STRING", description: "Procedural query or legal keyword (e.g., 'vehicle theft SOP', 'IPC 379')" }
+              },
+              required: ["query"]
+            }
+          }
+        ]
+      }];
+
       const model = genAI.getGenerativeModel({
-        model: 'gemini-flash-latest',
-        systemInstruction: systemPrompt
+        model: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
+        systemInstruction: systemPrompt,
+        tools
       });
 
       const chat = model.startChat({
@@ -195,8 +322,44 @@ Do not wrap in \`\`\`json. Only output the raw JSON object.`;
         }))
       });
 
-      const result = await chat.sendMessage(query);
-      return result.response.text();
+      let response = await chat.sendMessage(query);
+
+      let iterations = 0;
+      while (iterations < 5) {
+        const calls = response.response.functionCalls();
+        if (!calls || calls.length === 0) {
+          break;
+        }
+
+        iterations++;
+        const toolResponses = [];
+
+        for (const call of calls) {
+          const { name, args } = call;
+          let resultData;
+          try {
+            if (name === 'search_police_manuals') {
+              resultData = searchPoliceManuals(args.query);
+            } else {
+              resultData = await fetchData(name, args);
+            }
+          } catch (toolErr) {
+            console.error(`Error executing tool ${name}:`, toolErr);
+            resultData = { error: true, message: toolErr.message || String(toolErr) };
+          }
+
+          toolResponses.push({
+            functionResponse: {
+              name: name,
+              response: { result: resultData }
+            }
+          });
+        }
+
+        response = await chat.sendMessage(toolResponses);
+      }
+
+      return response.response.text();
     });
 
     let parsedResponse;
@@ -204,6 +367,7 @@ Do not wrap in \`\`\`json. Only output the raw JSON object.`;
       const cleaned = rawText.replace(/```json|```/g, '').trim();
       parsedResponse = JSON.parse(cleaned);
     } catch (e) {
+      console.warn('Failed to parse Gemini response as JSON. Falling back to plain text formatting. Raw response:', rawText);
       parsedResponse = {
         response_text: rawText,
         visualization: { type: 'none', title: '', data: {} },
@@ -212,7 +376,7 @@ Do not wrap in \`\`\`json. Only output the raw JSON object.`;
         language_detected: lang
       };
     }
-    
+
     parsedResponse.conversation_id = convId;
 
     try {

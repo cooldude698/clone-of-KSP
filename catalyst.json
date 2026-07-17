@@ -12,7 +12,9 @@
       "repeat-offenders",
       "victim-vulnerability",
       "underreporting",
-      "chat"
+      "chat",
+      "conversations",
+      "export-pdf"
     ],
     "ignore": [],
     "source": "functions"
