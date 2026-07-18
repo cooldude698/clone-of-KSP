@@ -7,6 +7,7 @@
 DRISHTI's UI should feel like a **mission control interface** — dark, authoritative, precise, and alive. It is not a consumer app. It is a professional intelligence tool that should inspire confidence in the officer using it.
 
 Three principles:
+
 1. **Clarity over decoration** — every element serves a function
 2. **State communicates** — the orb is the primary status indicator; its state is never ambiguous
 3. **Dark by default** — control rooms are dimly lit; high contrast dark UI is non-negotiable
@@ -16,6 +17,7 @@ Three principles:
 ## Color System
 
 ### Base Palette
+
 ```css
 --color-bg-primary:     #030712;  /* Near black — main background */
 --color-bg-secondary:   #0a0f1e;  /* Dark navy — panels, cards */
@@ -25,6 +27,7 @@ Three principles:
 ```
 
 ### Text
+
 ```css
 --color-text-primary:   #f1f5f9;  /* Primary text */
 --color-text-secondary: #94a3b8;  /* Secondary/muted text */
@@ -32,6 +35,7 @@ Three principles:
 ```
 
 ### DRISHTI Orb States
+
 ```css
 /* Idle — deep blue aurora */
 --orb-idle-primary:     #1e40af;
@@ -55,6 +59,7 @@ Three principles:
 ```
 
 ### UI Accents
+
 ```css
 --color-accent-blue:    #3b82f6;
 --color-accent-green:   #10b981;
@@ -82,8 +87,9 @@ text-transform: uppercase;
 ```
 
 ### Type Scale
+
 | Role | Size | Weight |
-|------|------|--------|
+| :--- | :--- | :--- |
 | Page title | 24px | 600 |
 | Section header | 18px | 600 |
 | Body | 14px | 400 |
@@ -96,6 +102,7 @@ text-transform: uppercase;
 ## Component Patterns
 
 ### Glassmorphism Card
+
 ```css
 background: rgba(10, 15, 30, 0.6);
 backdrop-filter: blur(16px);
@@ -104,14 +111,16 @@ border-radius: 16px;
 ```
 
 ### Active Glow Border
+
 ```css
 border: 1px solid rgba(59, 130, 246, 0.4);
 box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
 ```
 
 ### Urgency Indicators
+
 | Level | Color | Treatment |
-|-------|-------|-----------|
+| :--- | :--- | :--- |
 | `low` | `#10b981` green | Subtle left border |
 | `medium` | `#f59e0b` amber | Amber left border + mild glow |
 | `high` | `#f97316` orange | Orange border + pulse animation |
@@ -122,7 +131,8 @@ box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
 ## Layout
 
 ### Dashboard Grid
-```
+
+```text
 ┌─────────────────────────────────────────────────┐
 │  TOP BAR: KSP Logo | DRISHTI | Time | Status    │
 ├─────────────────────────────────────────────────┤
@@ -137,6 +147,7 @@ box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
 ```
 
 ### Orb Position
+
 - Fixed: `bottom: 32px`, `right: 32px`
 - Size: 120×120px idle, 160×160px active
 - Z-index: 9999 (always on top)
@@ -146,19 +157,23 @@ box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
 ## Animation Principles
 
 ### Orb State Transitions
+
 - Duration: 400ms ease-in-out
 - Never abrupt — always cross-fade between states
 - Glow expands before color changes
 
 ### Response Panel
+
 - Slides up from bottom: `translateY(100%) → translateY(0)`
 - Duration: 300ms cubic-bezier(0.34, 1.56, 0.64, 1) (spring)
 
 ### Follow-up Chips
+
 - Stagger in: 50ms delay between each chip
 - Fade + translateY(8px) → translateY(0)
 
 ### Urgency Pulse (high/critical)
+
 - Box-shadow pulse: 0.8s infinite alternate
 - Critical adds subtle shake: 50ms keyframe shake
 

@@ -1,10 +1,8 @@
-<div align="center">
-  <h1>🛡️ DRISHTI (ದೃಷ್ಟಿ)</h1>
-  <p><strong>Voice-Driven Conversational Intelligence for the Karnataka State Police</strong></p>
-  <p><i>Built for the KSP Hack2Skill Datathon 2026</i></p>
-</div>
+# 🛡️ DRISHTI (ದೃಷ್ಟಿ)
 
-<br />
+> Voice-Driven Conversational Intelligence for the Karnataka State Police
+>
+> Built for the KSP Hack2Skill Datathon 2026
 
 ## 🌟 The Vision
 
@@ -50,16 +48,16 @@ DRISHTI doesn't just return text blocks. The Agentic AI autonomously routes quer
 
 ```text
 ┌─────────────────────────────────────────────────────┐
-│                   OFFICER (Browser)                  │
+│                   OFFICER (Browser)                 │
 │  Double Clap / Push-to-Talk → Web Speech API (STT)  │
 │  DrishtiOrb (framer-motion + GSAP visual states)    │
-│  DrishtiChat (response panel + visualizations)       │
+│  DrishtiChat (response panel + visualizations)      │
 │  Web Speech API (TTS) ← speaks response back        │
 └───────────────────┬─────────────────────────────────┘
                     │ POST /server/chat/
                     ▼
 ┌─────────────────────────────────────────────────────┐
-│            Zoho Catalyst (Serverless)                │
+│            Zoho Catalyst (Serverless)               │
 │  /server/chat/          — Gemini 2.5 Flash Agent    │
 │  /server/export-pdf/    — Generates official reports│
 │  /server/conversations/ — Fetches chat history      │
@@ -68,7 +66,7 @@ DRISHTI doesn't just return text blocks. The Agentic AI autonomously routes quer
                     │
                     ▼
 ┌─────────────────────────────────────────────────────┐
-│                  Gemini 2.5 Flash                    │
+│                  Gemini 2.5 Flash                   │
 │  Key rotation: 15+ keys → Groq fallback             │
 │  Structured JSON output enforced                    │
 │  system-prompt.js defines DRISHTI persona           │
@@ -169,6 +167,4 @@ npm run dev -- -p 3001
 
 ---
 
-<div align="center">
-  <p>Built with ❤️ for the safety and security of Karnataka.</p>
-</div>
+**Built with ❤️ for the safety and security of Karnataka.**
