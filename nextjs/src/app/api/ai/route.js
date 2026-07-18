@@ -33,7 +33,8 @@ RULES:
 6. Keep response_text SHORT and conversational — it will be read aloud. No bullet points. No bold text. Natural speech patterns.
 7. follow_up_suggestions must be SPECIFIC to what the officer just asked — not generic. If they ask about vehicle theft, suggest related follow-ups about vehicle theft specifically.
 8. emotion: "urgent" for time-sensitive, "concerned" for worrying data, "reassuring" for uncertainty, "calm" as default.
-9. urgency: "low", "medium", "high", or "critical".`;
+9. urgency: "low", "medium", "high", or "critical".
+10. CRITICAL: The user is speaking via Speech-to-Text. Their input may contain phonetic errors (e.g., "drink the map" instead of "bring the map"). You MUST intelligently interpret phonetically similar words based on the context of a police intelligence dashboard.`;
 
 async function callGroq(messages, groqKey) {
   const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {

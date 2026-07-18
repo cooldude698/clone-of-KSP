@@ -157,6 +157,15 @@ export default function DashboardLayout({ children }) {
       if (data.conversation_id) setConversationId(data.conversation_id);
 
       const text = data.response_text;
+
+      // Auto-navigate if AI returned a visualization
+      if (data.visualization && data.visualization.type !== 'none') {
+        const vType = data.visualization.type;
+        if (vType === 'heatmap') router.push('/dashboard/map');
+        else if (vType === 'bar_chart' || vType === 'line_chart') router.push('/dashboard/analytics');
+        else if (vType === 'network') router.push('/dashboard/network');
+      }
+
       if (text) {
         setSessionLogs(prev => [...prev, { role: 'assistant', content: text, timestamp: ts() }]);
         setOrbState('speaking');
@@ -512,15 +521,15 @@ export default function DashboardLayout({ children }) {
     <div className="flex h-screen bg-void-000 overflow-hidden">
 
       {/* ── SIDEBAR ── */}
-      <aside className={`flex flex-col transition-all duration-300 ease-in-out border-r border-white/5 bg-void-000 relative z-20 ${collapsed ? 'w-16' : 'w-64'}`}>
-        <div className={`flex items-center gap-3 px-6 py-6 border-b border-white/5 ${collapsed ? 'justify-center px-4' : ''}`}>
-          <div className="w-8 h-8 rounded-lg bg-phosphor-500/20 border border-phosphor-500/40 flex items-center justify-center flex-shrink-0">
-            <Shield className="w-4 h-4 text-phosphor-500" />
+      <aside className={`flex flex-col transition-all duration-300 ease-in-out bg-void-000 relative z-20 ${collapsed ? 'w-16' : 'w-64'}`}>
+        <div className={`flex items-center gap-3 px-6 py-6 ${collapsed ? 'justify-center px-4' : ''}`}>
+          <div className="w-8 h-8 rounded-lg bg-phosphor-500 text-white flex items-center justify-center flex-shrink-0">
+            <Shield className="w-4 h-4" />
           </div>
           {!collapsed && (
             <div>
-              <span className="text-white font-semibold tracking-widest text-sm">DRISHTI</span>
-              <p className="text-white/40 text-[10px] tracking-widest uppercase mt-0.5">ದೃಷ್ಟಿ</p>
+              <span className="text-paper-100 font-semibold tracking-widest text-sm">DRISHTI</span>
+              <p className="text-paper-100/40 text-[10px] tracking-widest uppercase mt-0.5">ದೃಷ್ಟಿ</p>
             </div>
           )}
         </div>
@@ -530,14 +539,14 @@ export default function DashboardLayout({ children }) {
             const active = isActive(href);
             return (
               <Link key={href} href={href} id={id}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group relative
-                  ${active ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white hover:bg-white/5'}`}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group relative
+                  ${active ? 'bg-black/5 dark:bg-white/10 text-paper-100 font-semibold' : 'text-paper-100/60 hover:text-paper-100 hover:bg-black/5 dark:hover:bg-white/5'}`}
                 title={collapsed ? label : undefined}
               >
-                <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-white' : 'text-white/50 group-hover:text-white'}`} />
-                {!collapsed && <span className="text-sm font-medium tracking-wide">{label}</span>}
+                <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-phosphor-500' : 'text-paper-100/40 group-hover:text-paper-100'}`} />
+                {!collapsed && <span className="text-sm tracking-wide">{label}</span>}
                 {collapsed && (
-                  <div className="absolute left-full ml-2 px-3 py-1.5 rounded-lg bg-[#111] shadow-xl text-xs text-white/90 whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 border border-white/10">
+                  <div className="absolute left-full ml-2 px-3 py-1.5 rounded-lg bg-void-000 shadow-xl text-xs text-paper-100/90 whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 border border-steel-600/30">
                     {label}
                   </div>
                 )}
@@ -546,20 +555,20 @@ export default function DashboardLayout({ children }) {
           })}
         </nav>
 
-        <div className={`px-4 py-4 border-t border-white/5 ${collapsed ? 'flex justify-center' : ''}`}>
+        <div className={`px-4 py-4 ${collapsed ? 'flex justify-center' : ''}`}>
           {!collapsed && (
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5 border border-white/5 mb-3">
-              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-                <User className="w-4 h-4 text-white/70" />
+            <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-transparent mb-3">
+              <div className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
+                <User className="w-4 h-4 text-paper-100/70" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-semibold text-white/90 truncate tracking-wide">{employeeId}</p>
-                <p className="text-[10px] text-white/40 uppercase tracking-widest mt-0.5">{role}</p>
+                <p className="text-xs font-semibold text-paper-100/90 truncate tracking-wide">{employeeId}</p>
+                <p className="text-[10px] text-paper-100/40 uppercase tracking-widest mt-0.5">{role}</p>
               </div>
             </div>
           )}
           <button id="logout-btn" onClick={handleLogout}
-            className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg text-white/40 hover:text-white hover:bg-white/5 transition-all text-sm ${collapsed ? 'justify-center' : ''}`}
+            className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg text-paper-100/40 hover:text-paper-100 hover:bg-steel-600/10 transition-all text-sm ${collapsed ? 'justify-center' : ''}`}
             title={collapsed ? 'Logout' : undefined}>
             <LogOut className="w-4 h-4 flex-shrink-0" />
             {!collapsed && <span>Logout</span>}
@@ -567,31 +576,30 @@ export default function DashboardLayout({ children }) {
         </div>
 
         <button onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all z-30 shadow-lg"
+          className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-steel-700 border border-steel-600 flex items-center justify-center text-paper-100/50 hover:text-paper-100 transition-all z-30 shadow-sm"
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
           {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
         </button>
       </aside>
 
       {/* ── MAIN ── */}
-      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-        <header className="flex items-center justify-between px-8 py-5 border-b border-white/5 bg-void-000/80 backdrop-blur-xl flex-shrink-0 z-10 relative">
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0 bg-void-000 border-l border-steel-600">
+        <header className="flex items-center justify-between px-8 py-5 bg-transparent flex-shrink-0 z-10 relative">
           <div>
-            <h1 className="text-lg font-semibold text-white/90 tracking-wide">
+            <h1 className="text-xl font-semibold text-paper-100 tracking-tight">
               {NAV_ITEMS.find(n => isActive(n.href))?.label || 'Dashboard'}
             </h1>
-            <p className="text-[11px] text-white/40 tracking-wider uppercase mt-1">Karnataka State Police</p>
+            <p className="text-[11px] text-paper-100/40 tracking-wider uppercase mt-1">Karnataka State Police</p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/5 bg-white/[0.02]">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[11px] font-mono tracking-widest text-white/60">{currentTime}</span>
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5">
+              <span className="text-[12px] font-medium text-paper-100/60">{currentTime}</span>
             </div>
             <ThemeToggle />
             <AlertNotification />
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/5 bg-white/[0.02]">
-              <User className="w-3.5 h-3.5 text-white/40" />
-              <span className="text-[10px] text-white/60 tracking-widest uppercase font-semibold">{role}</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-steel-600/20 bg-steel-600/10">
+              <User className="w-3.5 h-3.5 text-paper-100/40" />
+              <span className="text-[10px] text-paper-100/60 tracking-widest uppercase font-semibold">{role}</span>
             </div>
           </div>
         </header>

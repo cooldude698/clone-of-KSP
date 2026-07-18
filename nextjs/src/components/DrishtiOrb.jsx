@@ -200,11 +200,7 @@ const DrishtiOrb = ({
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
             className={cn(
-              "siri-orb cursor-pointer transition-all duration-500 hover:scale-105 active:scale-95 relative",
-              "shadow-[0_0_20px_rgba(59,130,246,0.25)]",
-              state === 'listening' && "shadow-[0_0_24px_rgba(16,185,129,0.5)]",
-              state === 'thinking'  && "shadow-[0_0_24px_rgba(245,158,11,0.45)]",
-              state === 'speaking'  && "shadow-[0_0_24px_rgba(6,182,212,0.5)]",
+              "siri-orb cursor-pointer transition-all duration-500 hover:scale-105 active:scale-95 relative shadow-xl shadow-black/20"
             )}
             style={{
               width: boostedSize,
@@ -388,11 +384,7 @@ const DrishtiOrb = ({
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
           className={cn(
-            "siri-orb cursor-pointer transition-all duration-500 hover:scale-105 active:scale-95 relative",
-            "shadow-[0_0_50px_rgba(59,130,246,0.25)]",
-            state === 'listening' && "shadow-[0_0_60px_rgba(16,185,129,0.5)]",
-            state === 'thinking'  && "shadow-[0_0_60px_rgba(245,158,11,0.45)]",
-            state === 'speaking'  && "shadow-[0_0_60px_rgba(6,182,212,0.5)]",
+            "siri-orb cursor-pointer transition-all duration-500 hover:scale-105 active:scale-95 relative shadow-2xl shadow-black/40",
             className
           )}
           style={{
@@ -592,7 +584,7 @@ const DrishtiOrb = ({
       <div className="flex flex-col items-center gap-3 mt-4">
         {/* DRISHTI LABELS */}
         <div className="text-center flex flex-col items-center mb-1">
-          <div className="text-[10px] font-mono tracking-[0.4em] text-white/50 uppercase">
+          <div className="text-[10px] font-mono tracking-[0.4em] text-paper-100/50 uppercase">
             DRISHTI <span className="opacity-40 ml-1">ದೃಷ್ಟಿ</span>
           </div>
         </div>
@@ -608,8 +600,8 @@ const DrishtiOrb = ({
             onTouchEnd={e => { e.preventDefault(); onPttEnd?.(); }}
             className={`px-5 py-2.5 rounded-full text-[9px] uppercase font-bold tracking-[0.2em] select-none transition-all duration-300 backdrop-blur-md flex items-center gap-2
               ${isListening
-                ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)] scale-105'
-                : 'bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/10 hover:border-white/20'}`}
+                ? 'bg-paper-100 text-void-000 shadow-[0_0_20px_rgba(255,255,255,0.3)] scale-105'
+                : 'bg-steel-600/10 border border-steel-600/20 text-paper-100/50 hover:text-paper-100 hover:bg-steel-600/20 hover:border-steel-600/40'}`}
           >
             {isListening && <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />}
             {isListening ? 'RECORDING' : 'HOLD TO TALK'}
@@ -620,8 +612,8 @@ const DrishtiOrb = ({
             onClick={onToggleTyping}
             className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all duration-300 backdrop-blur-md
               ${showTypingInput
-                ? 'bg-white text-black border-transparent shadow-[0_0_15px_rgba(255,255,255,0.2)]'
-                : 'bg-white/5 border-white/10 text-white/40 hover:text-white hover:bg-white/10 hover:border-white/20'}`}
+                ? 'bg-paper-100 text-void-000 border-transparent shadow-[0_0_15px_rgba(255,255,255,0.2)]'
+                : 'bg-steel-600/10 border-steel-600/20 text-paper-100/40 hover:text-paper-100 hover:bg-steel-600/20 hover:border-steel-600/40'}`}
             title="Type instead"
           >
             {showTypingInput ? (

@@ -159,7 +159,7 @@ export default function LogsPage() {
             </div>
           </div>
         ) : (
-          <div className="max-w-3xl mx-auto space-y-6">
+          <div className="max-w-4xl mx-auto space-y-6 pr-2 lg:pr-[360px]">
             {grouped.map((group, gi) => (
               <div key={gi}>
                 {/* Group date separator */}
@@ -181,12 +181,12 @@ export default function LogsPage() {
                       <div
                         className={`max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed
                           ${log.role === 'user'
-                            ? 'bg-blue-600/15 border border-blue-500/20 text-blue-100 rounded-br-md'
-                            : 'bg-steel-700/70 border border-steel-600/50 text-paper-100/75 rounded-bl-md'}`}
+                            ? 'bg-blue-600/15 border border-blue-500/20 text-blue-900 dark:text-blue-100 rounded-br-md'
+                            : 'bg-steel-700/70 border border-steel-600/50 text-paper-100/80 rounded-bl-md'}`}
                       >
                         <div className="flex items-center justify-between gap-4 mb-1.5">
                           <span className={`text-[9px] uppercase tracking-widest font-bold
-                            ${log.role === 'user' ? 'text-blue-400' : 'text-phosphor-500'}`}>
+                            ${log.role === 'user' ? 'text-blue-700 dark:text-blue-400' : 'text-phosphor-500'}`}>
                             {log.role === 'user' ? 'You' : 'Drishti'}
                           </span>
                           {log.timestamp && (
