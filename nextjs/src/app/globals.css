@@ -1,33 +1,263 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  /* LIGHT MODE TOKENS */
+  --color-void-000: #F4F5F3;
+  --color-steel-700: #E1E4E1;
+  --color-steel-600: #C7CCC7;
+  --color-phosphor-500: #2E6B4C;
+  --color-warn-500: #B45F04;
+  --color-critical-500: #A11D1D;
+  --color-stamp-red-500: #9C2B2B;
+  --color-success-500: #2F6647;
+  --color-paper-100: #1A1D1B; /* text */
+
+  --scanline-color: rgba(46, 107, 76, 0.02);
+  --scroll-track: #E1E4E1;
+  --scroll-thumb: #C7CCC7;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+.dark, [data-theme="dark"] {
+  /* DARK MODE TOKENS */
+  --color-void-000: #0A0D0A;
+  --color-steel-700: #2B3238;
+  --color-steel-600: #3D4750;
+  --color-phosphor-500: #4A8B6F;
+  --color-warn-500: #D97706;
+  --color-critical-500: #B91C1C;
+  --color-stamp-red-500: #9C2B2B;
+  --color-success-500: #3F7A5C;
+  --color-paper-100: #E8E6DF; /* text */
+
+  --scanline-color: rgba(74, 139, 111, 0.04);
+  --scroll-track: #0A0D0A;
+  --scroll-thumb: #3D4750;
 }
 
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  max-width: 100vw;
+  background-color: var(--color-void-000);
+  color: var(--color-paper-100);
+  font-family: 'IBM Plex Sans', sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: var(--scroll-track);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-phosphor-500);
+}
+
+/* Custom visual utilities */
+.font-data {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.glass-card {
+  background: var(--color-steel-700);
+  border: 1px solid rgba(199, 204, 199, 0.15);
+}
+
+.dark .glass-card {
+  background: rgba(43, 50, 56, 0.7);
+  border: 1px solid rgba(61, 71, 80, 0.3);
+}
+
+/* Pulsing phosphor indicator */
+.pulse-phosphor {
+  box-shadow: 0 0 0 0 rgba(74, 139, 111, 0.6);
+  animation: pulse-phosphor-anim 2s infinite;
+}
+
+@keyframes pulse-phosphor-anim {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(74, 139, 111, 0.5);
+  }
+  70% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 6px rgba(74, 139, 111, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(74, 139, 111, 0);
   }
 }
+
+/* 1. Live indicator scanline overlay */
+.live-scanline {
+  position: relative;
+  overflow: hidden;
+}
+
+.live-scanline::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 1px,
+    var(--scanline-color) 1px,
+    var(--scanline-color) 3px
+  );
+}
+
+/* 2. Rubber Case Stamp styling */
+.case-stamp {
+  display: inline-block;
+  padding: 0.2rem 0.4rem;
+  border: 2px solid var(--color-stamp-red-500);
+  color: var(--color-stamp-red-500);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  transform: rotate(-8deg);
+  border-radius: 0.125rem;
+  background: transparent;
+  opacity: 0.9;
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 1px var(--color-stamp-red-500);
+  user-select: none;
+}
+
+/* Map override for dark/light themes */
+.leaflet-container {
+  background: var(--color-void-000) !important;
+}
+
+.dark .leaflet-tile-pane {
+  filter: brightness(0.6) saturate(0.5) hue-rotate(200deg) invert(1);
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--color-steel-700) !important;
+  color: var(--color-paper-100) !important;
+  border: 1px solid var(--color-steel-600) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PRINT / PDF  —  DRISHTI Investigation Report
+   ═══════════════════════════════════════════════════════ */
+@media print {
+  /* Hide everything except our report container */
+  body > * { display: none !important; }
+  #drishti-print-report { display: block !important; }
+
+  /* Reset page */
+  html, body {
+    background: #ffffff !important;
+    color: #0a0d0a !important;
+    font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11pt;
+    margin: 0;
+    padding: 0;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 18mm 16mm 18mm 16mm;
+  }
+
+  #drishti-print-report {
+    display: block;
+    width: 100%;
+    background: #fff;
+    color: #111;
+  }
+
+  /* Prevent page breaks inside a card/section */
+  .print-section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Headings */
+  .print-h1 { font-size: 18pt; font-weight: 700; color: #0a0d0a; margin-bottom: 4pt; }
+  .print-h2 { font-size: 13pt; font-weight: 700; color: #2E6B4C; margin-bottom: 6pt; border-bottom: 1.5pt solid #2E6B4C; padding-bottom: 3pt; }
+  .print-h3 { font-size: 11pt; font-weight: 600; color: #0a0d0a; margin-bottom: 4pt; }
+  .print-label { font-size: 8pt; text-transform: uppercase; letter-spacing: 0.06em; color: #555; font-weight: 600; }
+  .print-value { font-size: 10pt; color: #111; }
+  .print-mono  { font-family: 'IBM Plex Mono', 'Courier New', monospace; font-size: 9pt; }
+
+  .print-badge {
+    display: inline-block;
+    border: 1.2pt solid #2E6B4C;
+    color: #2E6B4C;
+    font-size: 7.5pt;
+    font-weight: 700;
+    padding: 1pt 5pt;
+    border-radius: 3pt;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .print-table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+  .print-table th {
+    background: #f0f4f2;
+    color: #2E6B4C;
+    font-weight: 700;
+    text-align: left;
+    padding: 5pt 8pt;
+    border-bottom: 1.5pt solid #c7ccc7;
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .print-table td { padding: 5pt 8pt; border-bottom: 0.5pt solid #e1e4e1; vertical-align: top; }
+  .print-table tr:last-child td { border-bottom: none; }
+  .print-table tr:nth-child(even) td { background: #f9fafb; }
+
+  .print-stamp {
+    display: inline-block;
+    border: 2.5pt solid #9C2B2B;
+    color: #9C2B2B;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9pt;
+    font-weight: 900;
+    padding: 3pt 10pt;
+    border-radius: 3pt;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    transform: rotate(-6deg);
+    opacity: 0.88;
+  }
+  .print-divider { border: none; border-top: 0.75pt solid #e1e4e1; margin: 10pt 0; }
+  .print-footer-line {
+    font-size: 8pt;
+    color: #888;
+    text-align: center;
+    border-top: 0.5pt solid #ddd;
+    margin-top: 18pt;
+    padding-top: 6pt;
+  }
+}
+
+/* Hidden by default — only shown during print */
+#drishti-print-report { display: none; }
+
