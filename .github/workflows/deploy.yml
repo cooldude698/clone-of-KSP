@@ -1,0 +1,47 @@
+name: Deploy to Zoho Catalyst
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Catalyst Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: nextjs/package-lock.json
+
+      - name: Install Zoho Catalyst CLI
+        run: npm install -g zcatalyst-cli
+
+      - name: Configure Catalyst credentials
+        run: |
+          mkdir -p ~/.zoho-catalyst
+          cat > ~/.zoho-catalyst/config.json << EOF
+          {
+            "client_id": "${{ secrets.CATALYST_CLIENT_ID }}",
+            "client_secret": "${{ secrets.CATALYST_CLIENT_SECRET }}",
+            "refresh_token": "${{ secrets.CATALYST_REFRESH_TOKEN }}",
+            "project_id": "${{ secrets.CATALYST_PROJECT_ID }}",
+            "project_key": "${{ secrets.CATALYST_PROJECT_KEY }}",
+            "environment": "development"
+          }
+          EOF
+
+      - name: Remove heavy dirs before upload
+        run: |
+          rm -rf nextjs/node_modules nextjs/.next
+
+      - name: Deploy to Catalyst
+        run: catalyst deploy
+        working-directory: ${{ github.workspace }}
