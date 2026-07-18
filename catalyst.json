@@ -17,8 +17,8 @@
       "export-pdf"
     ],
     "ignore": [
-      "node_modules",
-      ".git"
+      "**/node_modules/**",
+      "**/.git/**"
     ],
     "source": "functions"
   },
@@ -27,11 +27,11 @@
       "name": "nextjs",
       "source": "nextjs",
       "ignore": [
-        "node_modules",
-        ".next",
-        ".git",
-        ".cache",
-        "*.log"
+        "**/node_modules/**",
+        "**/.next/**",
+        "**/.git/**",
+        "**/.cache/**",
+        "**/*.log"
       ]
     }
   ]
