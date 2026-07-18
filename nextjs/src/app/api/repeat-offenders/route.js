@@ -1,10 +1,4 @@
-import { runCatalystHandler } from '@/lib/catalyst-adapter';
-const repeatOffendersHandler = require('../../../../../functions/repeat-offenders/index.js');
-
-export async function GET(request) {
-  return runCatalystHandler(repeatOffendersHandler, request);
-}
-
-export async function OPTIONS(request) {
-  return runCatalystHandler(repeatOffendersHandler, request);
-}
+import { proxyCatalystFunction, optionsResponse } from '@/lib/catalyst-proxy';
+export async function GET(req) { return proxyCatalystFunction('repeat-offenders', req); }
+export async function POST(req) { return proxyCatalystFunction('repeat-offenders', req); }
+export async function OPTIONS() { return optionsResponse(); }

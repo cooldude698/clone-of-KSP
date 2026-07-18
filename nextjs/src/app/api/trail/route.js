@@ -1,14 +1,4 @@
-import { runCatalystHandler } from '@/lib/catalyst-adapter';
-const trailHandler = require('../../../../../functions/trail/index.js');
-
-export async function POST(request) {
-  return runCatalystHandler(trailHandler, request);
-}
-
-export async function GET(request) {
-  return runCatalystHandler(trailHandler, request);
-}
-
-export async function OPTIONS(request) {
-  return runCatalystHandler(trailHandler, request);
-}
+import { proxyCatalystFunction, optionsResponse } from '@/lib/catalyst-proxy';
+export async function GET(req) { return proxyCatalystFunction('trail', req); }
+export async function POST(req) { return proxyCatalystFunction('trail', req); }
+export async function OPTIONS() { return optionsResponse(); }

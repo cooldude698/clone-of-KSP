@@ -1,10 +1,3 @@
-import { runCatalystHandler } from '@/lib/catalyst-adapter';
-const exportPdfHandler = require('../../../../../functions/export-pdf/index.js');
-
-export async function POST(request) {
-  return runCatalystHandler(exportPdfHandler, request);
-}
-
-export async function OPTIONS(request) {
-  return runCatalystHandler(exportPdfHandler, request);
-}
+import { proxyCatalystFunction, optionsResponse } from '@/lib/catalyst-proxy';
+export async function POST(req) { return proxyCatalystFunction('export-pdf', req); }
+export async function OPTIONS() { return optionsResponse(); }

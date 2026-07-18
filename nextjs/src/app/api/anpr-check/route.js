@@ -1,14 +1,4 @@
-import { runCatalystHandler } from '@/lib/catalyst-adapter';
-const anprCheckHandler = require('../../../../../functions/anpr-check/index.js');
-
-export async function POST(request) {
-  return runCatalystHandler(anprCheckHandler, request);
-}
-
-export async function GET(request) {
-  return runCatalystHandler(anprCheckHandler, request);
-}
-
-export async function OPTIONS(request) {
-  return runCatalystHandler(anprCheckHandler, request);
-}
+import { proxyCatalystFunction, optionsResponse } from '@/lib/catalyst-proxy';
+export async function GET(req) { return proxyCatalystFunction('anpr-check', req); }
+export async function POST(req) { return proxyCatalystFunction('anpr-check', req); }
+export async function OPTIONS() { return optionsResponse(); }
