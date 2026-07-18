@@ -1,0 +1,22 @@
+{
+  // Disable VS Code's built-in CSS validator — Tailwind's @tailwind, @layer, @apply
+  // directives are PostCSS extensions unknown to the standard CSS language server.
+  // The project uses PostCSS + Tailwind which handles linting correctly at build time.
+  "css.validate": false,
+  "scss.validate": false,
+  "less.validate": false,
+
+  // Tell the CSS IntelliSense engine that @tailwind / @apply / @layer are valid rules
+  "css.customData": [".vscode/tailwind.json"],
+
+  // Optional: use Tailwind CSS IntelliSense extension if installed
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "tailwindCSS.includeLanguages": {
+    "javascript": "javascript",
+    "javascriptreact": "javascriptreact",
+    "typescript": "typescript",
+    "typescriptreact": "typescriptreact"
+  }
+}
