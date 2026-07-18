@@ -41,22 +41,33 @@ export default function DashboardLayout({ children }) {
   const [response, setResponse] = useState(null);
   const [conversationId, setConversationId] = useState(null);
   const [dispatchToast, setDispatchToast] = useState(null);
+  const [language, setLanguage] = useState('en');
+  const isHoldingRef = useRef(false);
+  const pttStartTimeRef = useRef(0);
 
   const handleQuery = async (queryText) => {
+    if (!queryText.trim()) return;
     setOrbState('thinking');
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: queryText, language: 'en', conversation_id: conversationId })
+        body: JSON.stringify({ query: queryText, language: language, conversation_id: conversationId })
       });
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       setResponse(data);
       if (data.conversation_id) setConversationId(data.conversation_id);
-      setOrbState('speaking');
+      
       if (data.response_text) {
-        speak(data.response_text, 'en-IN');
+        setOrbState('speaking');
+        // Clean markdown syntax from text to ensure smooth TTS output
+        const cleanText = data.response_text
+          .replace(/[|*#`\-]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .substring(0, 600);
+        speak(cleanText, language === 'en' ? 'en-IN' : 'kn-IN');
       } else {
         setOrbState('idle');
       }
@@ -66,7 +77,7 @@ export default function DashboardLayout({ children }) {
     }
   };
 
-  const { startListening, stopListening, speak } = useDrishtiVoice({
+  const { startListening, stopListening, speak, stopSpeaking } = useDrishtiVoice({
     onWake: () => handleWakeToggle(),
     onTranscript: (text, isFinal = true) => {
       setTranscript(text);
@@ -102,12 +113,117 @@ export default function DashboardLayout({ children }) {
 
   useEffect(() => {
     if (orbState === 'listening') {
-      startListening('en-IN');
+      startListening(language === 'en' ? 'en-IN' : 'kn-IN');
     }
-  }, [orbState, startListening]);
+  }, [orbState, startListening, language]);
 
-  const handleOrbClick = () => {
-    handleWakeToggle();
+  const pttKeysRef = useRef({ ctrl: false, alt: false, meta: false, shift: false });
+  const isPttActiveRef = useRef(false);
+
+  // Cross-platform keyboard shortcut PTT logic
+  // Windows/Linux: Ctrl+Alt
+  // Mac: Cmd+Shift
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const isMac = /Mac|iPhone|iPod|iPad/i.test(navigator.userAgent);
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Control') pttKeysRef.current.ctrl = true;
+      if (e.key === 'Alt') pttKeysRef.current.alt = true;
+      if (e.key === 'Meta') pttKeysRef.current.meta = true;
+      if (e.key === 'Shift') pttKeysRef.current.shift = true;
+
+      const triggerPTT = isMac
+        ? (pttKeysRef.current.meta && pttKeysRef.current.shift)
+        : (pttKeysRef.current.ctrl && pttKeysRef.current.alt);
+
+      if (triggerPTT && !isPttActiveRef.current) {
+        isPttActiveRef.current = true;
+        stopSpeaking();
+        setOrbState('listening');
+        setIsChatOpen(true);
+        setTranscript('');
+        startListening(language === 'en' ? 'en-IN' : 'kn-IN');
+      }
+    };
+
+    const handleKeyUp = (e) => {
+      if (e.key === 'Control') pttKeysRef.current.ctrl = false;
+      if (e.key === 'Alt') pttKeysRef.current.alt = false;
+      if (e.key === 'Meta') pttKeysRef.current.meta = false;
+      if (e.key === 'Shift') pttKeysRef.current.shift = false;
+
+      const releasePTT = isMac
+        ? (!pttKeysRef.current.meta || !pttKeysRef.current.shift)
+        : (!pttKeysRef.current.ctrl || !pttKeysRef.current.alt);
+
+      if (releasePTT && isPttActiveRef.current) {
+        isPttActiveRef.current = false;
+        stopListening();
+        setOrbState('idle');
+      }
+    };
+
+    const handleBlur = () => {
+      pttKeysRef.current = { ctrl: false, alt: false, meta: false, shift: false };
+      if (isPttActiveRef.current) {
+        isPttActiveRef.current = false;
+        stopListening();
+        setOrbState('idle');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('blur', handleBlur);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, [language, startListening, stopListening, stopSpeaking]);
+
+  const handlePttStart = () => {
+    stopSpeaking();
+    pttStartTimeRef.current = Date.now();
+    isHoldingRef.current = true;
+    setOrbState('listening');
+    setIsChatOpen(true);
+    setTranscript('');
+    startListening(language === 'en' ? 'en-IN' : 'kn-IN');
+  };
+
+  const handlePttEnd = () => {
+    if (isHoldingRef.current) {
+      isHoldingRef.current = false;
+      const duration = Date.now() - pttStartTimeRef.current;
+      if (duration >= 250) {
+        stopListening();
+        setOrbState('idle');
+      }
+    }
+  };
+
+  const handleOrbClick = (e) => {
+    const duration = Date.now() - pttStartTimeRef.current;
+    if (duration >= 250) {
+      e?.preventDefault();
+      return;
+    }
+    
+    // Toggle behavior for standard click
+    if (orbState === 'listening') {
+      stopListening();
+      setOrbState('idle');
+    } else {
+      stopSpeaking();
+      setIsChatOpen(true);
+      setTranscript('');
+      setOrbState('listening');
+      startListening(language === 'en' ? 'en-IN' : 'kn-IN');
+    }
   };
 
   const handleChipClick = (chipText) => {
@@ -319,12 +435,21 @@ export default function DashboardLayout({ children }) {
         onChipClick={handleChipClick}
         onDispatch={handleDispatch}
         onExportPdf={handleExportPdf}
+        language={language}
+        onLanguageChange={setLanguage}
+        isRecording={orbState === 'listening'}
+        onPttStart={handlePttStart}
+        onPttEnd={handlePttEnd}
       />
 
       {/* Drishti Orb */}
       <DrishtiOrb
         state={orbState}
         onClick={handleOrbClick}
+        onMouseDown={handlePttStart}
+        onMouseUp={handlePttEnd}
+        onTouchStart={handlePttStart}
+        onTouchEnd={handlePttEnd}
       />
 
       {/* Dispatch Success Toast */}

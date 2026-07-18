@@ -10,6 +10,11 @@ const DrishtiChat = ({
   onChipClick,
   onDispatch,
   onExportPdf,
+  language = 'en',
+  onLanguageChange,
+  isRecording = false,
+  onPttStart,
+  onPttEnd,
 }) => {
   const [inputText, setInputText] = useState('');
   const responseAreaRef = useRef(null);
@@ -116,12 +121,29 @@ const DrishtiChat = ({
               <div className={`w-2 h-2 rounded-full ${dotColorClass}`}></div>
               <span className="text-white font-semibold text-sm tracking-widest">DRISHTI</span>
             </div>
-            <button 
-              onClick={onClose}
-              className="text-white/50 hover:text-white transition-colors p-1"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-            </button>
+            <div className="flex items-center gap-2">
+              {/* Language Selector */}
+              <div className="flex items-center gap-1 p-0.5 rounded bg-white/5 border border-white/10">
+                {['en', 'kn'].map((lang) => (
+                  <button
+                    key={lang}
+                    onClick={() => onLanguageChange && onLanguageChange(lang)}
+                    className={`px-1.5 py-0.5 rounded text-[10px] font-semibold transition-all
+                      ${language === lang
+                        ? 'bg-blue-600 text-white shadow'
+                        : 'text-white/50 hover:text-white'}`}
+                  >
+                    {lang === 'en' ? 'EN' : 'ಕನ್ನಡ'}
+                  </button>
+                ))}
+              </div>
+              <button 
+                onClick={onClose}
+                className="text-white/50 hover:text-white transition-colors p-1"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </button>
+            </div>
           </div>
 
           {/* Transcript Area */}
@@ -190,6 +212,25 @@ const DrishtiChat = ({
           {/* Input Fallback */}
           <div className="p-3 border-t border-white/10 bg-black/40">
              <div className="flex items-center gap-2">
+                {/* Hold to Talk button */}
+                <button
+                  id="chat-ptt-btn"
+                  onMouseDown={onPttStart}
+                  onMouseUp={onPttEnd}
+                  onTouchStart={onPttStart}
+                  onTouchEnd={onPttEnd}
+                  className={`p-2 rounded-lg border transition-all flex items-center justify-center flex-shrink-0
+                    ${isRecording 
+                      ? 'bg-red-600 border-red-500 text-white animate-pulse'
+                      : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:text-white'}`}
+                  title="Hold to Talk (PTT)"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" x2="12" y1="19" y2="22"/>
+                  </svg>
+                </button>
                 <input
                   type="text"
                   value={inputText}
@@ -202,7 +243,7 @@ const DrishtiChat = ({
                   disabled={!inputText.trim()}
                   className="p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50 disabled:bg-white/10 disabled:text-white/30 disabled:cursor-not-allowed transition-colors"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
                 </button>
              </div>
           </div>

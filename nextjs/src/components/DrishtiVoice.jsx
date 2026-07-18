@@ -5,7 +5,8 @@ const useDrishtiVoice = ({
   onTranscript,
   onSpeakStart,
   onSpeakEnd,
-  onError
+  onError,
+  enableClapWake = false
 } = {}) => {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -27,6 +28,7 @@ const useDrishtiVoice = ({
   // 1. Double-clap wake detection
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (!enableClapWake) return;
     if (audioInitializedRef.current) return; // already ran, skip
     audioInitializedRef.current = true;
 
@@ -82,12 +84,12 @@ const useDrishtiVoice = ({
           const avgEnergy = history.reduce((sum, val) => sum + val, 0) / (history.length || 1);
 
           // A clap is a transient onset:
-          // 1. Sudden energy spike relative to background (at least 2.2x the average background energy)
-          // 2. Mid/High-frequency dominance (relaxed ratio > 0.45 to support poor built-in laptop mics)
-          // 3. Minimum absolute volume to ignore quiet background noise (energy > 8)
-          const isClapCandidate = currentEnergy > 8 && 
-                                  currentEnergy > avgEnergy * 2.2 && 
-                                  (highEnergy / (lowEnergy + 1)) > 0.45;
+          // 1. Sudden energy spike relative to background (at least 4.5x the average background energy to ignore speech)
+          // 2. Mid/High-frequency dominance (higher ratio > 0.65 to filter speech vowels)
+          // 3. Minimum absolute volume to ignore quiet background noise (energy > 25)
+          const isClapCandidate = currentEnergy > 25 && 
+                                  currentEnergy > avgEnergy * 4.5 && 
+                                  (highEnergy / (lowEnergy + 1)) > 0.65;
 
           if (isClapCandidate) {
             if (!clapContextRef.current.isSpiking) {
@@ -158,17 +160,16 @@ const useDrishtiVoice = ({
 
     const recognition = new SpeechRecognition();
     recognition.interimResults = true;
-    recognition.continuous = false;
+    recognition.continuous = true;
 
+    let finalTranscript = '';
     recognition.onresult = (event) => {
-      let currentTranscript = '';
-      let isFinal = false;
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        currentTranscript += event.results[i][0].transcript;
-        if (event.results[i].isFinal) isFinal = true;
+      finalTranscript = '';
+      for (let i = 0; i < event.results.length; i++) {
+        finalTranscript += event.results[i][0].transcript;
       }
-      setTranscript(currentTranscript);
-      if (callbacksRef.current.onTranscript) callbacksRef.current.onTranscript(currentTranscript, isFinal);
+      setTranscript(finalTranscript);
+      if (callbacksRef.current.onTranscript) callbacksRef.current.onTranscript(finalTranscript, false);
     };
 
     recognition.onerror = (event) => {
@@ -182,6 +183,10 @@ const useDrishtiVoice = ({
 
     recognition.onend = () => {
       setIsListening(false);
+      if (callbacksRef.current.onTranscript && finalTranscript.trim()) {
+        callbacksRef.current.onTranscript(finalTranscript, true);
+      }
+      finalTranscript = '';
     };
 
     recognitionRef.current = recognition;
@@ -199,6 +204,10 @@ const useDrishtiVoice = ({
       setIsListening(true);
       setTranscript('');
     } catch (error) {
+      if (error.name === 'InvalidStateError') {
+        // Recognition has already started, this is safe to ignore
+        return;
+      }
       console.error('Failed to start listening:', error);
       setIsListening(false);
     }
@@ -207,7 +216,7 @@ const useDrishtiVoice = ({
   const stopListening = useCallback(() => {
     if (typeof window === 'undefined' || !recognitionRef.current) return;
     try {
-      recognitionRef.current.abort();
+      recognitionRef.current.stop();
       setIsListening(false);
     } catch (error) {
       console.error('Failed to stop listening:', error);
