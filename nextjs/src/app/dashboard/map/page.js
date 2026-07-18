@@ -4,22 +4,14 @@ import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import { Layers } from 'lucide-react';
 
-const MapContainer = dynamic(
-  () => import('react-leaflet').then((mod) => mod.MapContainer),
-  { ssr: false }
-);
-const TileLayer = dynamic(
-  () => import('react-leaflet').then((mod) => mod.TileLayer),
-  { ssr: false }
-);
-const CircleMarker = dynamic(
-  () => import('react-leaflet').then((mod) => mod.CircleMarker),
-  { ssr: false }
-);
-const Tooltip = dynamic(
-  () => import('react-leaflet').then((mod) => mod.Tooltip),
-  { ssr: false }
-);
+const MapView = dynamic(() => import('./MapView'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center bg-steel-700/50 text-paper-100/40 font-mono text-xs">
+      Loading Live Map...
+    </div>
+  ),
+});
 
 const MOCK_HOTSPOTS = [
   { lat: 12.9344, lng: 77.6264, area: 'Silk Board', count: 48, severity: 'critical' },
@@ -123,33 +115,14 @@ export default function MapPage() {
 
       <div className="flex-1 relative">
         {mounted && (
-          <MapContainer
-            center={[12.9716, 77.5946]}
-            zoom={12}
-            style={{ height: '100%', width: '100%' }}
-            scrollWheelZoom={true}
-          >
-            <TileLayer url={tileUrl} attribution="&copy; OpenStreetMap" />
-            {filtered.map((h, i) => (
-              <CircleMarker
-                key={i}
-                center={[h.lat, h.lng]}
-                radius={SEVERITY_RADIUS[h.severity]}
-                fillColor={SEVERITY_HEX[h.severity]}
-                fillOpacity={0.55}
-                color={SEVERITY_HEX[h.severity]}
-                weight={2}
-                eventHandlers={{ click: () => setSelectedHotspot(h) }}
-              >
-                <Tooltip>
-                  <div className="text-xs">
-                    <strong>{h.area}</strong>
-                    <p>{h.count} incidents -- {h.severity}</p>
-                  </div>
-                </Tooltip>
-              </CircleMarker>
-            ))}
-          </MapContainer>
+          <MapView
+            filtered={filtered}
+            selectedHotspot={selectedHotspot}
+            setSelectedHotspot={setSelectedHotspot}
+            SEVERITY_HEX={SEVERITY_HEX}
+            SEVERITY_RADIUS={SEVERITY_RADIUS}
+            tileUrl={tileUrl}
+          />
         )}
 
         {selectedHotspot && (
