@@ -279,14 +279,22 @@ export default function LandingPage() {
           <div className="w-full min-h-[200px] flex items-center justify-center mt-4">
             <AnimatePresence mode="wait">
               {!isSigningIn ? (
-                <motion.button
-                  key="cta-button"
-                  layoutId="authPanel"
-                  onClick={() => setIsSigningIn(true)}
-                  className="px-8 py-3 rounded-xl bg-warn-500 hover:bg-warn-500/90 text-paper-100 font-mono text-xs font-bold uppercase tracking-widest transition-all shadow-lg shadow-warn-500/20 active:scale-[0.98] border border-warn-500/30 focus:ring-2 focus:ring-warn-500/30 focus:outline-none"
-                >
-                  Sign In to Control Room
-                </motion.button>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <motion.button
+                    key="cta-button"
+                    layoutId="authPanel"
+                    onClick={() => setIsSigningIn(true)}
+                    className="px-8 py-3 rounded-xl bg-warn-500 hover:bg-warn-500/90 text-paper-100 font-mono text-xs font-bold uppercase tracking-widest transition-all shadow-lg shadow-warn-500/20 active:scale-[0.98] border border-warn-500/30 focus:ring-2 focus:ring-warn-500/30 focus:outline-none"
+                  >
+                    Sign In to Control Room
+                  </motion.button>
+                  <motion.button
+                    onClick={() => router.push('/ai-demo')}
+                    className="px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-600/90 text-paper-100 font-mono text-xs font-bold uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20 active:scale-[0.98] border border-blue-600/30 focus:ring-2 focus:ring-blue-600/30 focus:outline-none"
+                  >
+                    Launch AI Interactive Demo
+                  </motion.button>
+                </div>
               ) : (
                 <motion.div
                   key="auth-panel"

@@ -1,15 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, MessageSquare, Map, GitBranch,
   Camera, BarChart2, LogOut, Shield, Bell, ChevronLeft,
-  ChevronRight, AlertTriangle, User
+  ChevronRight, AlertTriangle, User, Sparkles
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '@/components/ThemeToggle';
 import AlertNotification from '@/components/AlertNotification';
+import DrishtiOrb from '@/components/DrishtiOrb';
+import DrishtiChat from '@/components/DrishtiChat';
+import useDrishtiVoice from '@/components/DrishtiVoice';
 
 const NAV_ITEMS = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Overview', id: 'nav-overview' },
@@ -18,6 +22,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/network', icon: GitBranch, label: 'Network Graph', id: 'nav-network' },
   { href: '/dashboard/surveillance', icon: Camera, label: 'Surveillance', id: 'nav-surveillance' },
   { href: '/dashboard/analytics', icon: BarChart2, label: 'Analytics', id: 'nav-analytics' },
+  { href: '/ai-demo', icon: Sparkles, label: 'AI Voice Demo', id: 'nav-ai-demo' },
 ];
 
 export default function DashboardLayout({ children }) {
@@ -28,6 +33,119 @@ export default function DashboardLayout({ children }) {
   const [employeeId, setEmployeeId] = useState('KSP-0000');
   const [alertCount] = useState(3);
   const [currentTime, setCurrentTime] = useState('');
+
+  // Voice states
+  const [orbState, setOrbState] = useState('idle');
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [response, setResponse] = useState(null);
+  const [conversationId, setConversationId] = useState(null);
+  const [dispatchToast, setDispatchToast] = useState(null);
+
+  const handleQuery = async (queryText) => {
+    setOrbState('thinking');
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: queryText, language: 'en', conversation_id: conversationId })
+      });
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const data = await res.json();
+      setResponse(data);
+      if (data.conversation_id) setConversationId(data.conversation_id);
+      setOrbState('speaking');
+      if (data.response_text) {
+        speak(data.response_text, 'en-IN');
+      } else {
+        setOrbState('idle');
+      }
+    } catch (err) {
+      console.error('Failed to handle query:', err);
+      setOrbState('idle');
+    }
+  };
+
+  const { startListening, stopListening, speak } = useDrishtiVoice({
+    onWake: () => handleWakeToggle(),
+    onTranscript: (text, isFinal = true) => {
+      setTranscript(text);
+      if (isFinal) {
+        handleQuery(text);
+      }
+    },
+    onSpeakStart: () => { },
+    onSpeakEnd: () => setOrbState('idle'),
+    onError: (err) => {
+      const errName = err?.name || err?.error || err;
+      if (
+        errName === 'aborted' ||
+        errName === 'NotFoundError' ||
+        errName === 'not-allowed' ||
+        errName === 'network'
+      ) return;
+      console.error('DrishtiVoice Error:', err);
+      setOrbState('idle');
+    }
+  });
+
+  const handleWakeToggle = () => {
+    setOrbState(prev => {
+      if (prev === 'listening') {
+        stopListening();
+        return 'idle';
+      }
+      setIsChatOpen(true);
+      return 'listening';
+    });
+  };
+
+  useEffect(() => {
+    if (orbState === 'listening') {
+      startListening('en-IN');
+    }
+  }, [orbState, startListening]);
+
+  const handleOrbClick = () => {
+    handleWakeToggle();
+  };
+
+  const handleChipClick = (chipText) => {
+    setTranscript(chipText);
+    handleQuery(chipText);
+  };
+
+  const handleSendText = (text) => {
+    setTranscript(text);
+    handleQuery(text);
+  };
+
+  const handleExportPdf = async () => {
+    if (!conversationId) return;
+    try {
+      const res = await fetch('/api/export-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conversation_id: conversationId, title: "DRISHTI AI Intelligence Report", officer_name: role, badge_number: employeeId })
+      });
+      const data = await res.json();
+      if (data.pdf_base64) {
+        const link = document.createElement('a');
+        link.href = `data:application/pdf;base64,${data.pdf_base64}`;
+        link.download = `KSP_Intelligence_Report_${conversationId.substring(0, 8)}.pdf`;
+        link.click();
+      }
+    } catch (err) {
+      console.error('Failed to export PDF:', err);
+    }
+  };
+
+  const handleDispatch = () => {
+    setDispatchToast("Intelligence package dispatched to field units via WhatsApp/SMS.");
+    setTimeout(() => {
+      setDispatchToast(null);
+    }, 4000);
+  };
 
   useEffect(() => {
     const savedRole = localStorage.getItem('drishti_role') || 'Inspector';
@@ -190,6 +308,43 @@ export default function DashboardLayout({ children }) {
           {children}
         </main>
       </div>
+
+      {/* Drishti Chat Panel */}
+      <DrishtiChat
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+        transcript={transcript}
+        response={response}
+        onSendText={handleSendText}
+        onChipClick={handleChipClick}
+        onDispatch={handleDispatch}
+        onExportPdf={handleExportPdf}
+      />
+
+      {/* Drishti Orb */}
+      <DrishtiOrb
+        state={orbState}
+        onClick={handleOrbClick}
+      />
+
+      {/* Dispatch Success Toast */}
+      <AnimatePresence>
+        {dispatchToast && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-24 left-0 w-full z-[9999] flex justify-center px-6 pointer-events-none"
+          >
+            <div className="bg-green-600/90 backdrop-blur-md border border-green-400 shadow-[0_0_30px_rgba(34,197,94,0.6)] px-6 py-3 rounded-xl flex items-center gap-4 pointer-events-auto">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4Z"/>
+              </svg>
+              <span className="text-white font-bold tracking-wide text-sm">{dispatchToast}</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
