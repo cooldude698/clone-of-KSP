@@ -385,56 +385,59 @@ export default function DrishtiDashboard() {
     });
   };
 
-  // Keyboard shortcut Ctrl+Alt PTT logic
-  const pressedKeysRef = useRef({ ctrl: false, alt: false });
-  const isPttRef = useRef(false);
-
+  // Cross-platform keyboard shortcut PTT logic
+  // Windows/Linux: Ctrl+Alt
+  // Mac: Cmd+Shift
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Control') pressedKeysRef.current.ctrl = true;
-      if (e.key === 'Alt') pressedKeysRef.current.alt = true;
+    if (typeof window === 'undefined') return;
 
-      if (pressedKeysRef.current.ctrl && pressedKeysRef.current.alt) {
-        setOrbState(prev => {
-          if (prev !== 'listening') {
-            isPttRef.current = true;
-            setIsChatOpen(true);
-            return 'listening';
-          }
-          return prev;
-        });
+    const isMac = /Mac|iPhone|iPod|iPad/i.test(navigator.userAgent);
+    const pressedKeys = { ctrl: false, alt: false, meta: false, shift: false };
+    let isPttActive = false;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Control') pressedKeys.ctrl = true;
+      if (e.key === 'Alt') pressedKeys.alt = true;
+      if (e.key === 'Meta') pressedKeys.meta = true;
+      if (e.key === 'Shift') pressedKeys.shift = true;
+
+      const triggerPTT = isMac
+        ? (pressedKeys.meta && pressedKeys.shift)
+        : (pressedKeys.ctrl && pressedKeys.alt);
+
+      if (triggerPTT && !isPttActive) {
+        isPttActive = true;
+        setOrbState('listening');
+        setIsChatOpen(true);
       }
     };
 
     const handleKeyUp = (e) => {
-      if (e.key === 'Control') pressedKeysRef.current.ctrl = false;
-      if (e.key === 'Alt') pressedKeysRef.current.alt = false;
+      if (e.key === 'Control') pressedKeys.ctrl = false;
+      if (e.key === 'Alt') pressedKeys.alt = false;
+      if (e.key === 'Meta') pressedKeys.meta = false;
+      if (e.key === 'Shift') pressedKeys.shift = false;
 
-      if (!pressedKeysRef.current.ctrl || !pressedKeysRef.current.alt) {
-        if (isPttRef.current) {
-          isPttRef.current = false;
-          setOrbState(prev => {
-            if (prev === 'listening') {
-              stopListening();
-              return 'idle';
-            }
-            return prev;
-          });
-        }
+      const releasePTT = isMac
+        ? (!pressedKeys.meta || !pressedKeys.shift)
+        : (!pressedKeys.ctrl || !pressedKeys.alt);
+
+      if (releasePTT && isPttActive) {
+        isPttActive = false;
+        stopListening();
+        setOrbState('idle');
       }
     };
 
     const handleBlur = () => {
-      pressedKeysRef.current = { ctrl: false, alt: false };
-      if (isPttRef.current) {
-        isPttRef.current = false;
-        setOrbState(prev => {
-          if (prev === 'listening') {
-            stopListening();
-            return 'idle';
-          }
-          return prev;
-        });
+      pressedKeys.ctrl = false;
+      pressedKeys.alt = false;
+      pressedKeys.meta = false;
+      pressedKeys.shift = false;
+      if (isPttActive) {
+        isPttActive = false;
+        stopListening();
+        setOrbState('idle');
       }
     };
 

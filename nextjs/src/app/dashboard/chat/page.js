@@ -187,6 +187,8 @@ export default function ChatPage() {
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
   const recognitionRef = useRef(null);
+  const pttStartTimeRef = useRef(0);
+  const isHoldingRef = useRef(false);
 
   // Investigator Wall states
   const [selectedFIR, setSelectedFIR] = useState(null);
@@ -483,25 +485,74 @@ export default function ChatPage() {
   const startVoice = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) return;
+    stopSpeech();
     const rec = new SpeechRecognition();
     recognitionRef.current = rec;
     rec.lang = language === 'en' ? 'en-IN' : 'kn-IN';
-    rec.continuous = false;
-    rec.interimResults = false;
+    rec.continuous = true;
+    rec.interimResults = true;
+    let currentTranscript = '';
+
     rec.onresult = (e) => {
-      const transcript = e.results[0][0].transcript;
-      setInput(transcript);
-      setIsRecording(false);
+      currentTranscript = '';
+      for (let i = 0; i < e.results.length; i++) {
+        currentTranscript += e.results[i][0].transcript;
+      }
+      setInput(currentTranscript);
     };
+
     rec.onerror = () => setIsRecording(false);
-    rec.onend = () => setIsRecording(false);
-    rec.start();
-    setIsRecording(true);
+    rec.onend = () => {
+      setIsRecording(false);
+      if (currentTranscript.trim()) {
+        sendMessage(currentTranscript);
+        setInput('');
+      }
+    };
+    try {
+      rec.start();
+      setIsRecording(true);
+    } catch (error) {
+      if (error.name === 'InvalidStateError') {
+        return;
+      }
+      console.error('Failed to start voice:', error);
+      setIsRecording(false);
+    }
   };
 
   const stopVoice = () => {
     recognitionRef.current?.stop();
     setIsRecording(false);
+  };
+
+  const handlePttStart = () => {
+    pttStartTimeRef.current = Date.now();
+    isHoldingRef.current = true;
+    startVoice();
+  };
+
+  const handlePttEnd = () => {
+    if (isHoldingRef.current) {
+      isHoldingRef.current = false;
+      const duration = Date.now() - pttStartTimeRef.current;
+      if (duration >= 250) {
+        stopVoice();
+      }
+    }
+  };
+
+  const handleMicClick = (e) => {
+    const duration = Date.now() - pttStartTimeRef.current;
+    if (duration >= 250) {
+      e?.preventDefault();
+      return;
+    }
+    if (isRecording) {
+      stopVoice();
+    } else {
+      startVoice();
+    }
   };
 
   const isEmpty = messages.length === 0;
@@ -603,9 +654,13 @@ export default function ChatPage() {
             {/* Voice Button */}
             <button
               id="voice-btn"
-              onClick={isRecording ? stopVoice : startVoice}
+              onClick={handleMicClick}
+              onMouseDown={handlePttStart}
+              onMouseUp={handlePttEnd}
+              onTouchStart={handlePttStart}
+              onTouchEnd={handlePttEnd}
               disabled={!speechSupported}
-              title={speechSupported ? (isRecording ? 'Stop recording' : 'Start voice input') : 'Voice not supported — use Chrome'}
+              title={speechSupported ? (isRecording ? 'Release to send / Click to stop' : 'Hold to Talk / Click to toggle') : 'Voice not supported — use Chrome'}
               className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all
                 ${isRecording
                   ? 'bg-critical-500 text-paper-100 animate-pulse'

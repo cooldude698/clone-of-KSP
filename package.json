@@ -6,9 +6,9 @@
     "nextjs"
   ],
   "scripts": {
-    "build": "cd nextjs && npm install && npm run build",
-    "start": "cd nextjs && npm run start",
-    "dev": "cd nextjs && npm run dev"
+    "build": "cd nextjs && npm run build || next build",
+    "start": "cd nextjs && npm run start || next start",
+    "dev": "cd nextjs && npm run dev || next dev"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

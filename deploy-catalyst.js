@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-console.log('=== Catalyst Optimized Deployer ===');
+console.log('=== Catalyst Slate Fast Deployer ===');
 
 const projectRoot = __dirname;
 const parentRoot = path.join(__dirname, '..');
@@ -22,9 +22,9 @@ try {
     fs.renameSync(nextCachePath, tempNextCache);
   }
 
-  console.log('🚀 Executing catalyst deploy...');
-  execSync('catalyst deploy', { stdio: 'inherit', cwd: projectRoot });
-  console.log('✅ Catalyst deployment completed successfully!');
+  console.log('🚀 Executing catalyst deploy --only slate:nextjs...');
+  execSync('catalyst deploy --only slate:nextjs', { stdio: 'inherit', cwd: projectRoot });
+  console.log('✅ Catalyst Slate deployment initiated successfully!');
 } catch (err) {
   console.error('❌ Deployment status:', err.message);
 } finally {
@@ -34,7 +34,7 @@ try {
       fs.renameSync(tempNodeModules, nodeModulesPath);
     }
   } catch (e) {
-    console.log('Note: node_modules restore skipped (can be recreated via npm install).');
+    console.log('Note: node_modules restore skipped.');
   }
 
   try {
@@ -43,5 +43,5 @@ try {
     }
   } catch (e) {}
 
-  console.log('🎉 Deployment phase complete!');
+  console.log('🎉 Done!');
 }

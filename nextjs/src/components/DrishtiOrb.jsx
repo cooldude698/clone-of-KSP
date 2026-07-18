@@ -83,7 +83,15 @@ const STATE_MAPPING = {
   }
 };
 
-const DrishtiOrb = ({ state = 'idle', onClick, className }) => {
+const DrishtiOrb = ({
+  state = 'idle',
+  onClick,
+  onMouseDown,
+  onMouseUp,
+  onTouchStart,
+  onTouchEnd,
+  className
+}) => {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -144,6 +152,10 @@ const DrishtiOrb = ({ state = 'idle', onClick, className }) => {
       {/* Siri Style Orb */}
       <div
         onClick={onClick}
+        onMouseDown={onMouseDown}
+        onMouseUp={onMouseUp}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
         className={cn(
           "siri-orb cursor-pointer transition-all duration-500 hover:scale-105 active:scale-95 relative",
           "shadow-[0_0_50px_rgba(59,130,246,0.25)]",
