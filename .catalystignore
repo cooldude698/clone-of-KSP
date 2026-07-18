@@ -1,0 +1,8 @@
+node_modules
+.next
+.git
+.cache
+*.log
+nextjs/node_modules
+nextjs/.next
+nextjs/.cache

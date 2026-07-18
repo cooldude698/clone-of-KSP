@@ -16,13 +16,23 @@
       "conversations",
       "export-pdf"
     ],
-    "ignore": [],
+    "ignore": [
+      "node_modules",
+      ".git"
+    ],
     "source": "functions"
   },
   "slate": [
     {
       "name": "nextjs",
-      "source": "nextjs"
+      "source": "nextjs",
+      "ignore": [
+        "node_modules",
+        ".next",
+        ".git",
+        ".cache",
+        "*.log"
+      ]
     }
   ]
 }
