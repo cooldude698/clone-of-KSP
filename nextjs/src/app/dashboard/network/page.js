@@ -339,31 +339,37 @@ export default function NetworkPage() {
 
       {/* Slide-in panel (Investigator Wall) */}
       {panelOpen && activeCaseData && (
-        <div className="w-full md:w-[600px] lg:w-[750px] border-l border-steel-600 bg-steel-700 flex flex-col animate-slide-in absolute right-0 top-0 bottom-0 z-50 shadow-2xl overflow-y-auto">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-steel-600 shrink-0 bg-steel-700/80 sticky top-0 z-30 backdrop-blur-md">
-            <div className="flex items-center gap-2 text-critical-500">
-              <ShieldAlert className="w-5 h-5" />
-              <h3 className="text-sm font-bold font-mono tracking-widest uppercase">Investigator Wall</h3>
+        <>
+          <div
+            onClick={() => setPanelOpen(false)}
+            className="fixed inset-0 bg-void-000/60 backdrop-blur-sm z-[99998] animate-fade-in"
+          />
+          <div className="fixed inset-y-0 right-0 w-full md:w-[600px] lg:w-[750px] border-l border-steel-600 bg-steel-700 flex flex-col animate-slide-in z-[99999] shadow-2xl overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-steel-600 shrink-0 bg-steel-700/80 sticky top-0 z-30 backdrop-blur-md">
+              <div className="flex items-center gap-2 text-critical-500">
+                <ShieldAlert className="w-5 h-5" />
+                <h3 className="text-sm font-bold font-mono tracking-widest uppercase">Investigator Wall</h3>
+              </div>
+              <button
+                onClick={() => setPanelOpen(false)}
+                className="w-8 h-8 rounded-lg bg-steel-600/50 hover:bg-steel-600 flex items-center justify-center text-paper-100/50 hover:text-paper-100 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
-            <button
-              onClick={() => setPanelOpen(false)}
-              className="w-8 h-8 rounded-lg bg-steel-600/50 hover:bg-steel-600 flex items-center justify-center text-paper-100/50 hover:text-paper-100 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
 
-          <div className="p-6">
-            <InvestigatorWall
-              fir={activeCaseData.fir}
-              accused={activeCaseData.accused}
-              victims={activeCaseData.victims}
-              related_firs={activeCaseData.related_firs}
-              case_summary={activeCaseData.case_summary}
-              isLoading={loadingCase}
-            />
+            <div className="p-6">
+              <InvestigatorWall
+                fir={activeCaseData.fir}
+                accused={activeCaseData.accused}
+                victims={activeCaseData.victims}
+                related_firs={activeCaseData.related_firs}
+                case_summary={activeCaseData.case_summary}
+                isLoading={loadingCase}
+              />
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
