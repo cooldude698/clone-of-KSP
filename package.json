@@ -6,41 +6,39 @@
     "nextjs"
   ],
   "scripts": {
-    "build": "cd nextjs && npm run build || next build",
-    "start": "cd nextjs && npm run start || next start",
-    "dev": "cd nextjs && npm run dev || next dev"
+    "build": "cd nextjs && npm install && npm run build",
+    "start": "cd nextjs && npm run start",
+    "dev": "cd nextjs && npm run dev"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@react-leaflet/core": "^2.1.0",
     "@types/d3": "^7.4.3",
     "@types/leaflet": "^1.9.21",
+    "@types/node": "^20.14.9",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
     "axios": "^1.18.1",
     "clsx": "^2.1.1",
     "d3": "^7.9.0",
     "dotenv": "^17.4.2",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.5",
     "framer-motion": "^12.42.0",
     "gsap": "^3.15.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.25.0",
     "next": "^16.2.10",
     "next-themes": "^0.4.6",
+    "postcss": "^8",
     "react": "^18",
     "react-dom": "^18",
     "react-leaflet": "^4.2.1",
     "recharts": "^3.9.2",
     "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.5.3",
     "uuid": "^14.0.1",
     "zcatalyst-sdk-node": "^3.4.0"
-  },
-  "devDependencies": {
-    "@types/node": "^20.14.9",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.5",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5.5.3"
   }
 }
