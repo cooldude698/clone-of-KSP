@@ -15,25 +15,30 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/
 
 // Realistic mock data for Bengaluru gang network nodes & edges
 const MOCK_NODES = [
-  { id: 'n1', label: 'Ramesh Kumar', type: 'accused', total_firs: 6, crime_types: ['robbery', 'assault'], first_crime_date: '2025-01-10', last_crime_date: '2026-07-02', risk_score: 92, size: 16, color: '#B91C1C' },
-  { id: 'n2', label: 'Suresh Naidu', type: 'accused', total_firs: 4, crime_types: ['burglary', 'vehicle_theft'], first_crime_date: '2025-02-15', last_crime_date: '2026-06-12', risk_score: 85, size: 14, color: '#D97706' },
-  { id: 'n3', label: 'Anand Murthy', type: 'accused', total_firs: 3, crime_types: ['fraud', 'cybercrime'], first_crime_date: '2025-04-18', last_crime_date: '2026-05-20', risk_score: 78, size: 13, color: '#D97706' },
-  { id: 'n4', label: 'Kiran Gowda', type: 'accused', total_firs: 2, crime_types: ['chain_snatching'], first_crime_date: '2025-06-02', last_crime_date: '2026-04-01', risk_score: 55, size: 11, color: '#4A8B6F' },
-  { id: 'n5', label: 'Vijay Bhaskar', type: 'accused', total_firs: 2, crime_types: ['vehicle_theft'], first_crime_date: '2025-08-11', last_crime_date: '2026-03-24', risk_score: 48, size: 11, color: '#4A8B6F' },
-  { id: 'n6', label: 'Prakash Raj', type: 'accused', total_firs: 1, crime_types: ['cybercrime'], first_crime_date: '2025-10-15', last_crime_date: '2025-10-15', risk_score: 35, size: 9, color: '#3D4750' },
-  { id: 'n7', label: 'Mohan Das', type: 'accused', total_firs: 1, crime_types: ['burglary'], first_crime_date: '2025-11-01', last_crime_date: '2025-11-01', risk_score: 28, size: 9, color: '#3D4750' },
-  { id: 'n8', label: 'Raju Shetty', type: 'accused', total_firs: 1, crime_types: ['assault'], first_crime_date: '2026-01-05', last_crime_date: '2026-01-05', risk_score: 22, size: 9, color: '#3D4750' },
+  { id: 'n1', label: 'Ramesh Kumar', type: 'accused', total_firs: 7, crime_types: ['vehicle_theft', 'robbery'], first_crime_date: '2025-01-10', last_crime_date: '2026-07-02', risk_score: 94, size: 22, color: '#c8372d' },
+  { id: 'n2', label: 'Suresh Naidu', type: 'accused', total_firs: 5, crime_types: ['robbery', 'chain_snatching'], first_crime_date: '2025-02-15', last_crime_date: '2026-06-12', risk_score: 86, size: 19, color: '#e05a3a' },
+  { id: 'n3', label: 'Anand Murthy', type: 'accused', total_firs: 4, crime_types: ['fraud', 'cybercrime'], first_crime_date: '2025-04-18', last_crime_date: '2026-05-20', risk_score: 78, size: 17, color: '#f0a848' },
+  { id: 'n4', label: 'Kiran Gowda', type: 'accused', total_firs: 3, crime_types: ['chain_snatching'], first_crime_date: '2025-06-02', last_crime_date: '2026-04-01', risk_score: 65, size: 15, color: '#f0a848' },
+  { id: 'n5', label: 'Vijay Bhaskar', type: 'accused', total_firs: 2, crime_types: ['vehicle_theft'], first_crime_date: '2025-08-11', last_crime_date: '2026-03-24', risk_score: 52, size: 14, color: '#4A8B6F' },
+  { id: 'n6', label: 'FIR-2026-BL-0492', type: 'case', total_firs: 1, crime_types: ['vehicle_theft'], first_crime_date: '2026-05-14', last_crime_date: '2026-05-14', risk_score: 0, size: 16, color: '#2d83d9' },
+  { id: 'n7', label: 'FIR-2026-BL-0811', type: 'case', total_firs: 1, crime_types: ['robbery'], first_crime_date: '2026-06-02', last_crime_date: '2026-06-02', risk_score: 0, size: 16, color: '#2d83d9' },
+  { id: 'n8', label: 'FIR-2026-BL-1104', type: 'case', total_firs: 1, crime_types: ['chain_snatching'], first_crime_date: '2026-06-18', last_crime_date: '2026-06-18', risk_score: 0, size: 16, color: '#2d83d9' },
+  { id: 'n9', label: 'Venkatesh Gowda', type: 'accused', total_firs: 4, crime_types: ['chain_snatching', 'assault'], first_crime_date: '2025-09-10', last_crime_date: '2026-05-15', risk_score: 72, size: 17, color: '#f0a848' },
+  { id: 'n10', label: 'Prakash Raj', type: 'accused', total_firs: 2, crime_types: ['cybercrime'], first_crime_date: '2025-10-15', last_crime_date: '2025-10-15', risk_score: 45, size: 13, color: '#4A8B6F' },
+  { id: 'n11', label: 'Silk Board Camera #45', type: 'camera', total_firs: 0, crime_types: ['surveillance'], first_crime_date: '2026-01-01', last_crime_date: '2026-07-18', risk_score: 0, size: 15, color: '#00F0FF' },
+  { id: 'n12', label: 'MG Road Camera #102', type: 'camera', total_firs: 0, crime_types: ['surveillance'], first_crime_date: '2026-01-01', last_crime_date: '2026-07-18', risk_score: 0, size: 15, color: '#00F0FF' }
 ];
 
 const MOCK_EDGES = [
-  { id: 'e1', source: 'n1', target: 'n2', fir_case_number: 'FIR-2026-BL-4921', date: '2025-02-15', crime_type: 'robbery', weight: 4 },
-  { id: 'e2', source: 'n1', target: 'n3', fir_case_number: 'FIR-2026-MY-1103', date: '2025-04-18', crime_type: 'fraud', weight: 3 },
-  { id: 'e3', source: 'n2', target: 'n4', fir_case_number: 'FIR-2026-HB-0872', date: '2025-06-02', crime_type: 'burglary', weight: 2 },
-  { id: 'e4', source: 'n2', target: 'n5', fir_case_number: 'FIR-2026-MG-0491', date: '2025-08-11', crime_type: 'vehicle_theft', weight: 2 },
-  { id: 'e5', source: 'n3', target: 'n6', fir_case_number: 'FIR-2025-BL-0112', date: '2025-10-15', crime_type: 'cybercrime', weight: 1 },
-  { id: 'e6', source: 'n4', target: 'n7', fir_case_number: 'FIR-2025-MY-0912', date: '2025-11-01', crime_type: 'burglary', weight: 1 },
-  { id: 'e7', source: 'n5', target: 'n8', fir_case_number: 'FIR-2026-BL-1104', date: '2026-01-05', crime_type: 'assault', weight: 1 },
-  { id: 'e8', source: 'n1', target: 'n7', fir_case_number: 'FIR-2026-BL-0994', date: '2026-07-02', crime_type: 'assault', weight: 2 },
+  { id: 'e1', source: 'n1', target: 'n6', fir_case_number: 'FIR-2026-BL-0492', date: '2026-05-14', crime_type: 'vehicle_theft', weight: 4 },
+  { id: 'e2', source: 'n1', target: 'n7', fir_case_number: 'FIR-2026-BL-0811', date: '2026-06-02', crime_type: 'robbery', weight: 4 },
+  { id: 'e3', source: 'n2', target: 'n7', fir_case_number: 'FIR-2026-BL-0811', date: '2026-06-02', crime_type: 'robbery', weight: 3 },
+  { id: 'e4', source: 'n2', target: 'n4', fir_case_number: 'FIR-2026-BL-0872', date: '2025-06-02', crime_type: 'chain_snatching', weight: 2 },
+  { id: 'e5', source: 'n3', target: 'n10', fir_case_number: 'FIR-2025-BL-0112', date: '2025-10-15', crime_type: 'cybercrime', weight: 2 },
+  { id: 'e6', source: 'n9', target: 'n8', fir_case_number: 'FIR-2026-BL-1104', date: '2026-06-18', crime_type: 'chain_snatching', weight: 3 },
+  { id: 'e7', source: 'n1', target: 'n11', fir_case_number: 'ANPR-MATCH-0492', date: '2026-07-02', crime_type: 'surveillance', weight: 3 },
+  { id: 'e8', source: 'n5', target: 'n6', fir_case_number: 'FIR-2026-BL-0492', date: '2026-05-14', crime_type: 'vehicle_theft', weight: 2 },
+  { id: 'e9', source: 'n2', target: 'n12', fir_case_number: 'ANPR-MATCH-0811', date: '2026-06-02', crime_type: 'surveillance', weight: 3 }
 ];
 
 export default function NetworkPage() {

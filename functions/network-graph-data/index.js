@@ -105,18 +105,29 @@ module.exports = async (req, res) => {
   if (candidateAccused.length === 0) {
     return sendJSON(res, 200, {
       nodes: [
-        { id: "accused_Ramesh_Kumar", label: "Ramesh Kumar", type: "accused", total_firs: 7, risk_score: 85, crime_types: ["vehicle_theft", "robbery"] },
-        { id: "accused_Suresh_Naidu", label: "Suresh Naidu", type: "accused", total_firs: 5, risk_score: 78, crime_types: ["robbery"] },
-        { id: "accused_Venkatesh_Gowda", label: "Venkatesh Gowda", type: "accused", total_firs: 4, risk_score: 70, crime_types: ["chain_snatching"] },
-        { id: "case_FIR-2026-BL-0492", label: "FIR-2026-BL-0492", type: "case", district: "South Bengaluru", crime_type: "vehicle_theft", date: "2026-05-14" },
-        { id: "case_FIR-2026-BL-0811", label: "FIR-2026-BL-0811", type: "case", district: "Central Bengaluru", crime_type: "robbery", date: "2026-06-02" }
+        { id: "accused_Ramesh_Kumar", label: "Ramesh Kumar", type: "accused", total_firs: 7, risk_score: 92, crime_types: ["vehicle_theft", "robbery"], first_crime_date: "2025-01-10", last_crime_date: "2026-07-02", size: 22, color: "#c8372d" },
+        { id: "accused_Suresh_Naidu", label: "Suresh Naidu", type: "accused", total_firs: 5, risk_score: 84, crime_types: ["robbery", "chain_snatching"], first_crime_date: "2025-02-15", last_crime_date: "2026-06-12", size: 19, color: "#e05a3a" },
+        { id: "accused_Anand_Murthy", label: "Anand Murthy", type: "accused", total_firs: 4, risk_score: 78, crime_types: ["fraud", "cybercrime"], first_crime_date: "2025-04-18", last_crime_date: "2026-05-20", size: 17, color: "#f0a848" },
+        { id: "accused_Venkatesh_Gowda", label: "Venkatesh Gowda", type: "accused", total_firs: 4, risk_score: 72, crime_types: ["chain_snatching", "assault"], first_crime_date: "2025-09-10", last_crime_date: "2026-05-15", size: 17, color: "#f0a848" },
+        { id: "accused_Kiran_Gowda", label: "Kiran Gowda", type: "accused", total_firs: 3, risk_score: 65, crime_types: ["chain_snatching"], first_crime_date: "2025-06-02", last_crime_date: "2026-04-01", size: 15, color: "#f0a848" },
+        { id: "accused_Vijay_Bhaskar", label: "Vijay Bhaskar", type: "accused", total_firs: 2, risk_score: 52, crime_types: ["vehicle_theft"], first_crime_date: "2025-08-11", last_crime_date: "2026-03-24", size: 14, color: "#4A8B6F" },
+        { id: "accused_Prakash_Raj", label: "Prakash Raj", type: "accused", total_firs: 2, risk_score: 45, crime_types: ["cybercrime"], first_crime_date: "2025-10-15", last_crime_date: "2025-10-15", size: 13, color: "#4A8B6F" },
+        { id: "case_FIR-2026-BL-0492", label: "FIR-2026-BL-0492", type: "case", district: "South Bengaluru", crime_type: "vehicle_theft", date: "2026-05-14", total_firs: 1, risk_score: 0, size: 16, color: "#2d83d9" },
+        { id: "case_FIR-2026-BL-0811", label: "FIR-2026-BL-0811", type: "case", district: "Central Bengaluru", crime_type: "robbery", date: "2026-06-02", total_firs: 1, risk_score: 0, size: 16, color: "#2d83d9" },
+        { id: "case_FIR-2026-BL-1104", label: "FIR-2026-BL-1104", type: "case", district: "East Bengaluru", crime_type: "chain_snatching", date: "2026-06-18", total_firs: 1, risk_score: 0, size: 16, color: "#2d83d9" },
+        { id: "camera_Silk_Board_45", label: "Silk Board ANPR Cam #45", type: "camera", district: "South Bengaluru", crime_type: "surveillance", date: "2026-07-02", total_firs: 0, risk_score: 0, size: 15, color: "#00F0FF" }
       ],
       edges: [
-        { source: "accused_Ramesh_Kumar", target: "case_FIR-2026-BL-0492", label: "accused_in" },
-        { source: "accused_Ramesh_Kumar", target: "case_FIR-2026-BL-0811", label: "co_accused_with" },
-        { source: "accused_Suresh_Naidu", target: "case_FIR-2026-BL-0811", label: "accused_in" }
+        { id: "e1", source: "accused_Ramesh_Kumar", target: "case_FIR-2026-BL-0492", fir_case_number: "FIR-2026-BL-0492", date: "2026-05-14", crime_type: "vehicle_theft", weight: 4 },
+        { id: "e2", source: "accused_Ramesh_Kumar", target: "case_FIR-2026-BL-0811", fir_case_number: "FIR-2026-BL-0811", date: "2026-06-02", crime_type: "robbery", weight: 4 },
+        { id: "e3", source: "accused_Suresh_Naidu", target: "case_FIR-2026-BL-0811", fir_case_number: "FIR-2026-BL-0811", date: "2026-06-02", crime_type: "robbery", weight: 3 },
+        { id: "e4", source: "accused_Suresh_Naidu", target: "accused_Kiran_Gowda", fir_case_number: "FIR-2026-BL-0872", date: "2025-06-02", crime_type: "chain_snatching", weight: 2 },
+        { id: "e5", source: "accused_Anand_Murthy", target: "accused_Prakash_Raj", fir_case_number: "FIR-2025-BL-0112", date: "2025-10-15", crime_type: "cybercrime", weight: 2 },
+        { id: "e6", source: "accused_Venkatesh_Gowda", target: "case_FIR-2026-BL-1104", fir_case_number: "FIR-2026-BL-1104", date: "2026-06-18", crime_type: "chain_snatching", weight: 3 },
+        { id: "e7", source: "accused_Ramesh_Kumar", target: "camera_Silk_Board_45", fir_case_number: "ANPR-MATCH-0492", date: "2026-07-02", crime_type: "vehicle_theft", weight: 3 },
+        { id: "e8", source: "accused_Vijay_Bhaskar", target: "case_FIR-2026-BL-0492", fir_case_number: "FIR-2026-BL-0492", date: "2026-05-14", crime_type: "vehicle_theft", weight: 2 }
       ],
-      date_range: { min: formatDate(cutoffDate), max: formatDate(new Date()) },
+      date_range: { min: "2025-01-01", max: "2026-07-18" },
       source: "demo_fallback"
     });
   }
