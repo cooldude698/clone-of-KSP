@@ -267,3 +267,36 @@ body {
 /* Hidden by default — only shown during print */
 #drishti-print-report { display: none; }
 
+/* ═══════════════════════════════════════════════════════
+   DRISHTI VOICE PANEL — Custom scrollbar & animations
+   ═══════════════════════════════════════════════════════ */
+.drishti-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.drishti-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.drishti-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+}
+.drishti-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Slide-in animations for panels */
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.animate-slide-in {
+  animation: slideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}

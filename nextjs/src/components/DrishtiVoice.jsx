@@ -1,279 +1,273 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
+/**
+ * useDrishtiVoice — Privacy-first PTT voice hook
+ *
+ * How PTT works:
+ * - continuous:true so recognition keeps capturing while held
+ * - Accumulates transcript (interim + final) while PTT is held
+ * - On PTT release → caller fires the accumulated text as the final query
+ * - Does NOT auto-restart, does NOT listen passively
+ */
 const useDrishtiVoice = ({
-  onWake,
-  onTranscript,
   onSpeakStart,
   onSpeakEnd,
   onError,
-  enableClapWake = false
+  enableClapWake = false,
+  onWake,
 } = {}) => {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [transcript, setTranscript] = useState('');
+  const [liveTranscript, setLiveTranscript] = useState('');
+  const [micPermission, setMicPermission] = useState('prompt');
 
-  const callbacksRef = useRef({ onWake, onTranscript, onSpeakStart, onSpeakEnd, onError });
+  const callbacksRef = useRef({ onSpeakStart, onSpeakEnd, onError, onWake });
   useEffect(() => {
-    callbacksRef.current = { onWake, onTranscript, onSpeakStart, onSpeakEnd, onError };
+    callbacksRef.current = { onSpeakStart, onSpeakEnd, onError, onWake };
   });
 
+  const recognitionRef = useRef(null);
+  const voicesCacheRef = useRef([]);
+  const langRef = useRef('en-IN');
+
+  // PTT transcript accumulation
+  const accumulatedFinalRef = useRef('');
+  const lastInterimRef = useRef('');
+
+  // Clap detection
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
-  const microphoneRef = useRef(null);
-  const animationFrameRef = useRef(null);
-  const clapContextRef = useRef({ lastClapTime: 0, clapCount: 0, isSpiking: false });
-  const recognitionRef = useRef(null);
-  const audioInitializedRef = useRef(false); // one-shot guard
+  const clapMicStreamRef = useRef(null);
+  const animFrameRef = useRef(null);
+  const clapStateRef = useRef({ lastClapTime: 0, count: 0, isSpiking: false, spikeStart: 0, history: [] });
 
-  // 1. Double-clap wake detection
+  // Check mic permission
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (!enableClapWake) return;
-    if (audioInitializedRef.current) return; // already ran, skip
-    audioInitializedRef.current = true;
-
-    const initAudio = async () => {
-      try {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          console.warn('Media devices not supported.');
-          return;
-        }
-
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
-
-        audioContextRef.current = new AudioContext();
-        analyserRef.current = audioContextRef.current.createAnalyser();
-        analyserRef.current.fftSize = 256;
-
-        microphoneRef.current = audioContextRef.current.createMediaStreamSource(stream);
-        microphoneRef.current.connect(analyserRef.current);
-
-        const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
-
-        const checkAudioLevels = () => {
-          if (!analyserRef.current) return;
-
-          analyserRef.current.getByteFrequencyData(dataArray);
-
-          // Calculate low frequency energy (bins 1-8, approx 150Hz - 1.3kHz)
-          let lowEnergy = 0;
-          for (let i = 1; i <= 8; i++) {
-            lowEnergy += dataArray[i];
-          }
-          lowEnergy /= 8;
-
-          // Calculate high frequency energy (bins 15-45, approx 2.5kHz - 7.5kHz)
-          let highEnergy = 0;
-          for (let i = 15; i <= 45; i++) {
-            highEnergy += dataArray[i];
-          }
-          highEnergy /= 31;
-
-          // Average energy of the current frame
-          const currentEnergy = (lowEnergy + highEnergy) / 2;
-
-          // Maintain a history of energy levels for running average (background noise tracker)
-          const history = clapContextRef.current.history || [];
-          history.push(currentEnergy);
-          if (history.length > 40) history.shift();
-          clapContextRef.current.history = history;
-
-          const avgEnergy = history.reduce((sum, val) => sum + val, 0) / (history.length || 1);
-
-          // A clap is a transient onset:
-          // 1. Sudden energy spike relative to background (at least 4.5x the average background energy to ignore speech)
-          // 2. Mid/High-frequency dominance (higher ratio > 0.65 to filter speech vowels)
-          // 3. Minimum absolute volume to ignore quiet background noise (energy > 25)
-          const isClapCandidate = currentEnergy > 25 && 
-                                  currentEnergy > avgEnergy * 4.5 && 
-                                  (highEnergy / (lowEnergy + 1)) > 0.65;
-
-          if (isClapCandidate) {
-            if (!clapContextRef.current.isSpiking) {
-              clapContextRef.current.spikeStartTime = Date.now();
-              clapContextRef.current.isSpiking = true;
-            }
-          } else {
-            if (clapContextRef.current.isSpiking) {
-              const duration = Date.now() - clapContextRef.current.spikeStartTime;
-              clapContextRef.current.isSpiking = false;
-
-              // Clap duration filter: must be very brief (10ms to 120ms)
-              if (duration >= 10 && duration <= 120) {
-                const now = Date.now();
-                const { lastClapTime, clapCount } = clapContextRef.current;
-                const timeSinceLastClap = now - lastClapTime;
-
-                // Double clap window: 150ms to 800ms
-                if (clapCount === 1 && timeSinceLastClap > 150 && timeSinceLastClap < 800) {
-                  clapContextRef.current.clapCount = 0;
-                  clapContextRef.current.lastClapTime = 0;
-                  if (callbacksRef.current.onWake) callbacksRef.current.onWake();
-                } else {
-                  clapContextRef.current.clapCount = 1;
-                  clapContextRef.current.lastClapTime = now;
-                }
-              }
-            }
-          }
-
-          animationFrameRef.current = requestAnimationFrame(checkAudioLevels);
-        };
-
-        checkAudioLevels();
-      } catch (error) {
-        if (
-          error.name === 'NotFoundError' ||
-          error.name === 'NotAllowedError' ||
-          error.name === 'OverconstrainedError'
-        ) {
-          console.warn('Microphone not available — wake detection disabled');
-          return;
-        }
-        if (callbacksRef.current.onError) callbacksRef.current.onError(error);
-      }
-    };
-
-    initAudio();
-
-    return () => {
-      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
-      if (microphoneRef.current) microphoneRef.current.disconnect();
-      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
-        audioContextRef.current.close();
-      }
-    };
+    if (typeof navigator === 'undefined') return;
+    navigator.permissions?.query({ name: 'microphone' }).then(r => {
+      setMicPermission(r.state);
+      r.onchange = () => setMicPermission(r.state);
+    }).catch(() => {});
   }, []);
 
-  // 2. Web Speech API STT
+  // Preload voices
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    const load = () => { voicesCacheRef.current = window.speechSynthesis.getVoices(); };
+    load();
+    window.speechSynthesis.addEventListener('voiceschanged', load);
+    return () => window.speechSynthesis.removeEventListener('voiceschanged', load);
+  }, []);
+
+  // Build recognition once
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { console.warn('[Drishti] SpeechRecognition not supported'); return; }
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      console.warn('Speech Recognition API not supported in this browser.');
-      return;
-    }
+    const rec = new SR();
+    rec.continuous = true;       // Keep listening while PTT held
+    rec.interimResults = true;   // Show live transcript
+    rec.maxAlternatives = 1;
 
-    const recognition = new SpeechRecognition();
-    recognition.interimResults = true;
-    recognition.continuous = true;
-
-    let finalTranscript = '';
-    recognition.onresult = (event) => {
-      finalTranscript = '';
-      for (let i = 0; i < event.results.length; i++) {
-        finalTranscript += event.results[i][0].transcript;
+    rec.onresult = (event) => {
+      let newFinal = '';
+      let newInterim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const r = event.results[i];
+        if (r.isFinal) newFinal += r[0].transcript;
+        else newInterim += r[0].transcript;
       }
-      setTranscript(finalTranscript);
-      if (callbacksRef.current.onTranscript) callbacksRef.current.onTranscript(finalTranscript, false);
+      if (newFinal) accumulatedFinalRef.current += ' ' + newFinal;
+      lastInterimRef.current = newInterim;
+      // Show live preview
+      const display = (accumulatedFinalRef.current + ' ' + newInterim).trim();
+      setLiveTranscript(display);
     };
 
-    recognition.onerror = (event) => {
-      if (
-        event.error === 'aborted' ||
-        event.error === 'no-speech' ||
-        event.error === 'network'
-      ) return;
-      if (callbacksRef.current.onError) callbacksRef.current.onError(event.error);
+    rec.onerror = (e) => {
+      const err = e.error;
+      if (['aborted', 'no-speech', 'network'].includes(err)) return;
+      if (['not-allowed', 'service-not-allowed'].includes(err)) {
+        setMicPermission('denied');
+        setIsListening(false);
+        return;
+      }
+      console.warn('[Drishti] Recognition error:', err);
     };
 
-    recognition.onend = () => {
+    rec.onend = () => {
       setIsListening(false);
-      if (callbacksRef.current.onTranscript && finalTranscript.trim()) {
-        callbacksRef.current.onTranscript(finalTranscript, true);
-      }
-      finalTranscript = '';
     };
 
-    recognitionRef.current = recognition;
-
-    return () => {
-      if (recognitionRef.current) recognitionRef.current.abort();
-    };
+    recognitionRef.current = rec;
+    return () => { try { rec.abort(); } catch (_) {} };
   }, []);
 
-  const startListening = useCallback((lang = 'en-IN') => {
-    if (typeof window === 'undefined' || !recognitionRef.current) return;
+  // Request mic permission
+  const requestMicPermission = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach(t => t.stop());
+      setMicPermission('granted');
+      return true;
+    } catch {
+      setMicPermission('denied');
+      return false;
+    }
+  }, []);
+
+  // Start PTT session
+  const startListening = useCallback(async (lang = 'en-IN') => {
+    if (!recognitionRef.current) return;
+    if (micPermission !== 'granted') {
+      const ok = await requestMicPermission();
+      if (!ok) return;
+    }
+    langRef.current = lang;
+    // Reset accumulators
+    accumulatedFinalRef.current = '';
+    lastInterimRef.current = '';
+    setLiveTranscript('');
     try {
       recognitionRef.current.lang = lang;
       recognitionRef.current.start();
       setIsListening(true);
-      setTranscript('');
-    } catch (error) {
-      if (error.name === 'InvalidStateError') {
-        // Recognition has already started, this is safe to ignore
-        return;
-      }
-      console.error('Failed to start listening:', error);
-      setIsListening(false);
+    } catch (e) {
+      if (e.name === 'InvalidStateError') { setIsListening(true); return; }
+      console.error('[Drishti] start failed:', e);
     }
+  }, [micPermission, requestMicPermission]);
+
+  // Stop PTT session — returns whatever was captured
+  const stopListeningAndGetTranscript = useCallback(() => {
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch (_) {}
+    }
+    setIsListening(false);
+    // Return best available transcript
+    const final = (accumulatedFinalRef.current + ' ' + lastInterimRef.current).trim();
+    accumulatedFinalRef.current = '';
+    lastInterimRef.current = '';
+    return final;
   }, []);
 
-  const stopListening = useCallback(() => {
-    if (typeof window === 'undefined' || !recognitionRef.current) return;
-    try {
-      recognitionRef.current.stop();
-      setIsListening(false);
-    } catch (error) {
-      console.error('Failed to stop listening:', error);
+  // Best TTS voice
+  const findBestVoice = useCallback((lang) => {
+    const voices = voicesCacheRef.current;
+    if (!voices.length) return null;
+    const prefix = lang.split('-')[0];
+    for (const brand of ['google', 'microsoft', 'apple']) {
+      const v = voices.find(v => v.lang === lang && v.name.toLowerCase().includes(brand));
+      if (v) return v;
     }
+    return voices.find(v => v.lang === lang) || voices.find(v => v.lang.startsWith(prefix)) || null;
   }, []);
 
-  // 3. TTS
   const speak = useCallback((text, lang = 'en-IN') => {
     if (typeof window === 'undefined' || !window.speechSynthesis) return;
-
     window.speechSynthesis.cancel();
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang;
-
-    const voices = window.speechSynthesis.getVoices();
-    const targetVoice =
-      voices.find(v => v.lang === lang) ||
-      voices.find(v => v.lang.startsWith(lang.split('-')[0]));
-    if (targetVoice) utterance.voice = targetVoice;
-
-    utterance.onstart = () => {
-      setIsSpeaking(true);
-      if (callbacksRef.current.onSpeakStart) callbacksRef.current.onSpeakStart();
-    };
-    utterance.onend = () => {
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang = lang;
+    utt.rate = 0.95;
+    utt.pitch = 1.0;
+    const v = findBestVoice(lang);
+    if (v) utt.voice = v;
+    utt.onstart = () => { setIsSpeaking(true); callbacksRef.current.onSpeakStart?.(); };
+    utt.onend = () => { setIsSpeaking(false); callbacksRef.current.onSpeakEnd?.(); };
+    utt.onerror = (e) => {
       setIsSpeaking(false);
-      if (callbacksRef.current.onSpeakEnd) callbacksRef.current.onSpeakEnd();
+      // Gracefully swallow all TTS errors — never show synthesis-failed to console
+      const silent = ['interrupted', 'canceled', 'synthesis-failed', 'synthesis-unavailable'];
+      if (silent.includes(e.error)) { callbacksRef.current.onSpeakEnd?.(); return; }
+      callbacksRef.current.onError?.(e.error);
     };
-    utterance.onerror = (event) => {
-      setIsSpeaking(false);
-      if (callbacksRef.current.onError) callbacksRef.current.onError(event.error);
-    };
-
-    window.speechSynthesis.speak(utterance);
-  }, []);
+    window.speechSynthesis.speak(utt);
+  }, [findBestVoice]);
 
   const stopSpeaking = useCallback(() => {
-    if (typeof window === 'undefined' || !window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
+    if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
     setIsSpeaking(false);
   }, []);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.getVoices();
-    }
+  const pauseSpeaking = useCallback(() => {
+    if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.pause();
   }, []);
+
+  const resumeSpeaking = useCallback(() => {
+    if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.resume();
+  }, []);
+
+  // Double-clap wake word
+  useEffect(() => {
+    if (!enableClapWake || micPermission !== 'granted') return;
+    let cancelled = false;
+
+    const init = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        if (cancelled) { stream.getTracks().forEach(t => t.stop()); return; }
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        audioContextRef.current = new Ctx();
+        analyserRef.current = audioContextRef.current.createAnalyser();
+        analyserRef.current.fftSize = 256;
+        audioContextRef.current.createMediaStreamSource(stream).connect(analyserRef.current);
+        clapMicStreamRef.current = stream;
+
+        const buf = new Uint8Array(analyserRef.current.frequencyBinCount);
+        const tick = () => {
+          if (cancelled) return;
+          analyserRef.current.getByteFrequencyData(buf);
+          let lo = 0; for (let i = 1; i <= 8; i++) lo += buf[i]; lo /= 8;
+          let hi = 0; for (let i = 15; i <= 45; i++) hi += buf[i]; hi /= 31;
+          const energy = (lo + hi) / 2;
+          const s = clapStateRef.current;
+          s.history = [...(s.history || []).slice(-39), energy];
+          const avg = s.history.reduce((a, v) => a + v, 0) / s.history.length;
+          const isClap = energy > 28 && energy > avg * 5 && (hi / (lo + 1)) > 0.6;
+          if (isClap && !s.isSpiking) { s.isSpiking = true; s.spikeStart = Date.now(); }
+          if (!isClap && s.isSpiking) {
+            s.isSpiking = false;
+            const dur = Date.now() - s.spikeStart;
+            if (dur >= 10 && dur <= 120) {
+              const now = Date.now();
+              const gap = now - s.lastClapTime;
+              if (s.count === 1 && gap > 150 && gap < 800) {
+                s.count = 0; s.lastClapTime = 0;
+                callbacksRef.current.onWake?.();
+              } else {
+                s.count = 1; s.lastClapTime = now;
+              }
+            }
+          }
+          animFrameRef.current = requestAnimationFrame(tick);
+        };
+        tick();
+      } catch (e) { console.warn('[Drishti] Clap init failed:', e.message); }
+    };
+
+    init();
+    return () => {
+      cancelled = true;
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+      clapMicStreamRef.current?.getTracks().forEach(t => t.stop());
+      if (audioContextRef.current?.state !== 'closed') audioContextRef.current?.close();
+    };
+  }, [enableClapWake, micPermission]);
 
   return {
     startListening,
-    stopListening,
+    stopListeningAndGetTranscript,
     speak,
     stopSpeaking,
+    pauseSpeaking,
+    resumeSpeaking,
+    requestMicPermission,
     isListening,
     isSpeaking,
-    transcript
+    liveTranscript,
+    micPermission,
   };
 };
 
