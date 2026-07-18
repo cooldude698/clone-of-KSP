@@ -125,7 +125,7 @@ export default function DrishtiPanel({
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 320 }}
-            className="fixed top-0 right-0 h-full w-[400px] z-[9995] flex flex-col"
+            className="fixed top-0 right-0 h-full w-[400px] z-[9995] flex flex-col pointer-events-auto"
             style={{
               background: 'linear-gradient(160deg, #0d1117 0%, #0a0f1a 100%)',
               borderLeft: '1px solid rgba(255,255,255,0.08)',
@@ -275,6 +275,7 @@ export default function DrishtiPanel({
                   </motion.div>
                 )}
 
+
                 {/* Thinking indicator */}
                 {orbState === 'thinking' && (
                   <div className="flex justify-start">
@@ -327,20 +328,20 @@ export default function DrishtiPanel({
                 )}
 
                 <div className="flex items-center gap-2">
-                  {/* PTT Button */}
+                  {/* PTT Button — big, prominent */}
                   <button
                     onMouseDown={onPttStart}
                     onMouseUp={onPttEnd}
                     onMouseLeave={isListening ? onPttEnd : undefined}
                     onTouchStart={(e) => { e.preventDefault(); onPttStart?.(); }}
                     onTouchEnd={(e) => { e.preventDefault(); onPttEnd?.(); }}
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 select-none transition-all
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 select-none transition-all duration-150
                       ${isListening
-                        ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-105'
-                        : 'bg-white/6 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white'}`}
-                    title="Hold to talk"
+                        ? 'bg-emerald-500 text-white shadow-xl shadow-emerald-500/40 scale-110 ring-4 ring-emerald-500/30'
+                        : 'bg-white/8 border border-white/12 text-white/60 hover:bg-blue-500/20 hover:border-blue-500/30 hover:text-blue-300 hover:scale-105'}`}
+                    title="Hold to talk (or hold Ctrl+Alt)"
                   >
-                    {isListening ? <Mic className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                    <Mic className={`w-5 h-5 ${isListening ? 'animate-pulse' : ''}`} />
                   </button>
 
                   {/* Text input */}

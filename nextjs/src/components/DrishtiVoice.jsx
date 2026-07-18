@@ -79,9 +79,9 @@ const useDrishtiVoice = ({
     if (!SR) { console.warn('[Drishti] SpeechRecognition not supported'); return; }
 
     const rec = new SR();
-    rec.continuous = false;      // Fix 1: more reliable for PTT — stops after one sentence
+    rec.continuous = true;       // Fix: MUST be true for hold-to-talk to work properly
     rec.interimResults = true;   // Show live transcript
-    rec.maxAlternatives = 3;     // Fix 1: try more alternatives for better accuracy
+    rec.maxAlternatives = 3;     // Try more alternatives for better accuracy
 
     rec.onresult = (event) => {
       let newFinal = '';
@@ -320,6 +320,7 @@ const useDrishtiVoice = ({
         callbacksRef.current.onError?.(e.error);
       };
 
+      // ACTUALLY SPEAK
       window.speechSynthesis.speak(utt);
     };
 
