@@ -36,6 +36,10 @@ const useDrishtiVoice = ({
   const accumulatedFinalRef = useRef('');
   const lastInterimRef = useRef('');
 
+  // Fix 1: retry counter for network errors
+  const retryCountRef = useRef(0);
+  const MAX_RETRIES = 2;
+
   // Clap detection
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
@@ -43,7 +47,7 @@ const useDrishtiVoice = ({
   const animFrameRef = useRef(null);
   const clapStateRef = useRef({ lastClapTime: 0, count: 0, isSpiking: false, spikeStart: 0, history: [] });
 
-  // Change 2: volume detection refs (separate stream from clap detection)
+  // Volume detection refs (separate stream from clap detection)
   const volumeAnalyserRef = useRef(null);
   const volumeContextRef = useRef(null);
   const volumeStreamRef = useRef(null);
@@ -75,15 +79,16 @@ const useDrishtiVoice = ({
     if (!SR) { console.warn('[Drishti] SpeechRecognition not supported'); return; }
 
     const rec = new SR();
-    rec.continuous = true;       // Keep listening while PTT held
+    rec.continuous = false;      // Fix 1: more reliable for PTT — stops after one sentence
     rec.interimResults = true;   // Show live transcript
-    rec.maxAlternatives = 1;
+    rec.maxAlternatives = 3;     // Fix 1: try more alternatives for better accuracy
 
     rec.onresult = (event) => {
       let newFinal = '';
       let newInterim = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const r = event.results[i];
+        // With maxAlternatives=3, pick the first (highest confidence) alternative
         if (r.isFinal) newFinal += r[0].transcript;
         else newInterim += r[0].transcript;
       }
@@ -94,15 +99,36 @@ const useDrishtiVoice = ({
       setLiveTranscript(display);
     };
 
+    // Fix 1: improved error handling with network retry using en-US fallback
     rec.onerror = (e) => {
       const err = e.error;
-      if (['aborted', 'no-speech', 'network'].includes(err)) return;
+      if (err === 'aborted') return;
+      if (err === 'no-speech') {
+        // No speech detected — this is fine, just stop
+        setIsListening(false);
+        return;
+      }
+      if (err === 'network') {
+        // Retry with en-US instead of en-IN
+        if (retryCountRef.current < MAX_RETRIES) {
+          retryCountRef.current++;
+          try {
+            recognitionRef.current.lang = 'en-US';
+            recognitionRef.current.start();
+            return;
+          } catch (_) {}
+        }
+        retryCountRef.current = 0;
+        setIsListening(false);
+        return;
+      }
       if (['not-allowed', 'service-not-allowed'].includes(err)) {
         setMicPermission('denied');
         setIsListening(false);
         return;
       }
       console.warn('[Drishti] Recognition error:', err);
+      setIsListening(false);
     };
 
     rec.onend = () => {
@@ -177,6 +203,8 @@ const useDrishtiVoice = ({
       if (!ok) return;
     }
     langRef.current = lang;
+    // Fix 1: reset retry counter on each new PTT session
+    retryCountRef.current = 0;
     // Reset accumulators
     accumulatedFinalRef.current = '';
     lastInterimRef.current = '';
@@ -185,7 +213,7 @@ const useDrishtiVoice = ({
       recognitionRef.current.lang = lang;
       recognitionRef.current.start();
       setIsListening(true);
-      // Change 2: start volume detection on a separate stream
+      // Start volume detection on a separate stream
       startVolumeDetection();
     } catch (e) {
       if (e.name === 'InvalidStateError') { setIsListening(true); return; }
@@ -239,25 +267,78 @@ const useDrishtiVoice = ({
            null;
   }, []);
 
+  // Fix 2: race-condition-safe speak() — waits for voices, Chrome keep-alive workaround
   const speak = useCallback((text, lang = 'en-IN') => {
     if (typeof window === 'undefined' || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
-    const utt = new SpeechSynthesisUtterance(text);
-    utt.lang = lang;
-    utt.rate = 0.92;   // Change 6: slightly slower for authoritative delivery
-    utt.pitch = 1.05;  // Change 6: slight pitch lift for clarity
-    const v = findBestVoice(lang);
-    if (v) utt.voice = v;
-    utt.onstart = () => { setIsSpeaking(true); callbacksRef.current.onSpeakStart?.(); };
-    utt.onend = () => { setIsSpeaking(false); callbacksRef.current.onSpeakEnd?.(); };
-    utt.onerror = (e) => {
-      setIsSpeaking(false);
-      // Gracefully swallow all TTS errors — never show synthesis-failed to console
-      const silent = ['interrupted', 'canceled', 'synthesis-failed', 'synthesis-unavailable'];
-      if (silent.includes(e.error)) { callbacksRef.current.onSpeakEnd?.(); return; }
-      callbacksRef.current.onError?.(e.error);
+
+    const doSpeak = () => {
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = lang;
+      utt.rate = 0.92;
+      utt.pitch = 1.05;
+      utt.volume = 1.0;
+
+      // Try to find best voice, fall back gracefully
+      const voices = window.speechSynthesis.getVoices();
+      voicesCacheRef.current = voices; // keep cache fresh
+
+      if (voices.length > 0) {
+        const v = findBestVoice(lang);
+        if (v) utt.voice = v;
+      }
+
+      // Chrome bug workaround: speechSynthesis sometimes stops mid-sentence.
+      // Keep it alive by pausing/resuming every 10s.
+      let keepAliveInterval = null;
+      keepAliveInterval = setInterval(() => {
+        if (window.speechSynthesis.speaking) {
+          window.speechSynthesis.pause();
+          window.speechSynthesis.resume();
+        } else {
+          clearInterval(keepAliveInterval);
+        }
+      }, 10000);
+
+      utt.onstart = () => {
+        setIsSpeaking(true);
+        callbacksRef.current.onSpeakStart?.();
+      };
+      utt.onend = () => {
+        clearInterval(keepAliveInterval);
+        setIsSpeaking(false);
+        callbacksRef.current.onSpeakEnd?.();
+      };
+      utt.onerror = (e) => {
+        clearInterval(keepAliveInterval);
+        setIsSpeaking(false);
+        const silent = ['interrupted', 'canceled', 'synthesis-failed', 'synthesis-unavailable'];
+        if (silent.includes(e.error)) {
+          callbacksRef.current.onSpeakEnd?.();
+          return;
+        }
+        callbacksRef.current.onError?.(e.error);
+      };
+
+      window.speechSynthesis.speak(utt);
     };
-    window.speechSynthesis.speak(utt);
+
+    // If voices are already loaded, speak immediately
+    if (window.speechSynthesis.getVoices().length > 0) {
+      doSpeak();
+    } else {
+      // Wait for voices to load then speak
+      const handler = () => {
+        window.speechSynthesis.removeEventListener('voiceschanged', handler);
+        doSpeak();
+      };
+      window.speechSynthesis.addEventListener('voiceschanged', handler);
+      // Timeout fallback — speak anyway after 1 second even if voices don't load
+      setTimeout(() => {
+        window.speechSynthesis.removeEventListener('voiceschanged', handler);
+        if (!window.speechSynthesis.speaking) doSpeak();
+      }, 1000);
+    }
   }, [findBestVoice]);
 
   const stopSpeaking = useCallback(() => {

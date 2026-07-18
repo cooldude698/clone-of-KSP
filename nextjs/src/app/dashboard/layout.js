@@ -127,10 +127,20 @@ export default function DashboardLayout({ children }) {
     }
 
     try {
-      const res = await fetch('/api/chat', {
+      // Fix 4: use new direct AI route (Groq primary, Gemini fallback)
+      const res = await fetch('/api/ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: queryText, language, conversation_id: conversationId }),
+        body: JSON.stringify({
+          query: queryText,
+          language,
+          conversation_id: conversationId,
+          // Fix 4: send recent conversation history for context
+          conversation_history: sessionLogs.slice(-6).map(log => ({
+            role: log.role,
+            content: log.content,
+          })),
+        }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
@@ -153,7 +163,7 @@ export default function DashboardLayout({ children }) {
       setResponse({ response_text: fallback, follow_up_suggestions: [], urgency: 'low' });
       setSessionLogs(prev => [...prev, { role: 'assistant', content: fallback, timestamp: ts() }]);
     }
-  }, [language, conversationId, speak, router]);
+  }, [language, conversationId, sessionLogs, speak, router]);
 
   // ─── Change 4: Sync sessionLogs to localStorage ──────────────────
   useEffect(() => {
@@ -228,34 +238,82 @@ export default function DashboardLayout({ children }) {
   }, [isListening, stopListeningAndGetTranscript, stopSpeaking]);
 
   // ─── Change 2: Proactive suggestion system ───────────────────────
-  const PROACTIVE_TEXT = {
-    '/dashboard':              { text: "Sir, want me to pull today's crime summary for your district?",       action: "Pull today's crime summary for my district" },
-    '/dashboard/map':          { text: "I can highlight today's hotspot clusters. Shall I?",                  action: "Highlight today's hotspot clusters on the map" },
-    '/dashboard/analytics':    { text: "I noticed trends worth flagging. Want a quick brief?",                action: "Give me a quick brief on recent trends" },
-    '/dashboard/surveillance': { text: "I can check for any ANPR alerts from the last hour. Say the word.",  action: "Check for ANPR alerts from the last hour" },
-    '/dashboard/network':      { text: "Want me to identify the key nodes in today's criminal network?",      action: "Identify key nodes in today's criminal network" },
-    '/dashboard/chat':         { text: "Ready when you are, Sir. Ask me anything.",                           action: "Give me a situation brief" },
-  };
+  // FIX 6: context-aware proactive suggestions based on time + session history
+  const getProactiveSuggestion = useCallback((logs = []) => {
+    const hour = new Date().getHours();
+    const isNight = hour >= 21 || hour < 6;
+    const isEvening = hour >= 17 && hour < 21;
+    const hasTalkedBefore = logs.length > 0;
 
-  const triggerProactiveSuggestion = useCallback(() => {
+    // If officer has already talked to Drishti this session, suggest continuation
+    if (hasTalkedBefore) {
+      const lastUserMsg = [...logs].reverse().find(l => l.role === 'user');
+      if (lastUserMsg?.content) {
+        const last = lastUserMsg.content.toLowerCase();
+        if (last.includes('vehicle') || last.includes('theft') || last.includes('car') || last.includes('bike'))
+          return { text: "I found more leads on that vehicle case. Want to continue?", action: "Continue the vehicle theft investigation we were discussing", icon: '🔍' };
+        if (last.includes('hotspot') || last.includes('cluster') || last.includes('area'))
+          return { text: "There's a related area you might want to check. Shall I pull it up?", action: "Show me related crime clusters from our earlier analysis", icon: '🔍' };
+      }
+    }
+
+    // Context-aware suggestions by page + time of day
+    const suggestions = {
+      '/dashboard': isNight
+        ? { text: "Night shift active, Sir. 3 incidents logged in the last hour. Shall I brief you?", action: "Brief me on incidents from the last hour" }
+        : { text: "Good to see you, Sir. Want a quick summary of today's activity in your district?", action: "Give me today's crime activity summary for my district" },
+      '/dashboard/map': {
+        text: isEvening
+          ? "Evening hotspots are different from daytime patterns, Sir. Want me to highlight the high-risk areas for tonight?"
+          : "Want me to overlay this week's crime clusters on the map?",
+        action: isEvening
+          ? "Show evening crime hotspots and high-risk areas for tonight"
+          : "Show this week's crime cluster hotspots on the map"
+      },
+      '/dashboard/analytics': {
+        text: "I can compare this month's trends against last month. Worth a look?",
+        action: "Compare this month's crime trends against last month and highlight changes"
+      },
+      '/dashboard/surveillance': {
+        text: isNight
+          ? "Night vision cameras are active. Want me to flag any vehicles that appeared multiple times tonight?"
+          : "Want me to scan for any vehicles that triggered ANPR alerts today?",
+        action: isNight
+          ? "Flag vehicles that appeared multiple times on surveillance tonight"
+          : "Show vehicles that triggered ANPR alerts today"
+      },
+      '/dashboard/network': {
+        text: "I can identify the top 3 most connected individuals in this network. Shall I?",
+        action: "Identify the top 3 most connected individuals in the criminal network and explain their links"
+      },
+      '/dashboard/chat': {
+        text: "Ready when you are, Sir. What's on your mind?",
+        action: "What are the most important things I should know right now?"
+      },
+    };
+
+    const entry = suggestions[pathname] || suggestions['/dashboard'];
+    return { text: entry.text, action: entry.action, icon: '🔍' };
+  }, [pathname]);
+
+  const triggerProactiveSuggestion = useCallback((logs = []) => {
     if (isPanelOpenRef.current) return;
     if (hasInteractedRef.current) return;
     if (Date.now() < proactiveDismissedUntilRef.current) return;
 
-    // Find the best matching path
-    const entry = PROACTIVE_TEXT[pathname] || PROACTIVE_TEXT['/dashboard'];
-    setProactiveSuggestion({ text: entry.text, action: entry.action, icon: '🔍' });
+    const suggestion = getProactiveSuggestion(logs);
+    setProactiveSuggestion(suggestion);
 
     // Auto-dismiss after 15s
     const autoTimer = setTimeout(() => setProactiveSuggestion(null), 15000);
     return () => clearTimeout(autoTimer);
-  }, [pathname]);
+  }, [getProactiveSuggestion]);
 
   // Fire 30s after mount if user hasn't interacted
   useEffect(() => {
-    const t = setTimeout(triggerProactiveSuggestion, 30000);
+    const t = setTimeout(() => triggerProactiveSuggestion(sessionLogs), 30000);
     return () => clearTimeout(t);
-  }, [triggerProactiveSuggestion]);
+  }, [triggerProactiveSuggestion, sessionLogs]);
 
   // Fire on pathname change (navigation)
   const prevPathnameRef = useRef(pathname);
@@ -264,18 +322,18 @@ export default function DashboardLayout({ children }) {
       prevPathnameRef.current = pathname;
       hasInteractedRef.current = false;
       setProactiveSuggestion(null);
-      const t = setTimeout(triggerProactiveSuggestion, 5000);
+      const t = setTimeout(() => triggerProactiveSuggestion(sessionLogs), 5000);
       return () => clearTimeout(t);
     }
-  }, [pathname, triggerProactiveSuggestion]);
+  }, [pathname, triggerProactiveSuggestion, sessionLogs]);
 
   // Every 5 minutes if panel is closed
   useEffect(() => {
     const t = setInterval(() => {
-      if (!isPanelOpenRef.current) triggerProactiveSuggestion();
+      if (!isPanelOpenRef.current) triggerProactiveSuggestion(sessionLogs);
     }, 5 * 60 * 1000);
     return () => clearInterval(t);
-  }, [triggerProactiveSuggestion]);
+  }, [triggerProactiveSuggestion, sessionLogs]);
 
   // ─── Change 6: Orb pin — load/save localStorage ──────────────────
   useEffect(() => {
