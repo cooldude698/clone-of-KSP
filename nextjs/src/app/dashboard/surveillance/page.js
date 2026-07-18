@@ -5,9 +5,9 @@ import { Camera, Wifi, WifiOff, Eye, MapPin, Clock, Maximize2, X, ShieldAlert, Z
 
 const MOCK_CAMERAS = [
   {
-    id: 'CAM-BL-001',
-    name: 'Silk Board Junction - Main',
-    location: 'Silk Board, Bengaluru',
+    id: 'CAM-BLR-0010',
+    name: 'Vijayanagar TTMC CCTV',
+    location: 'Vijayanagar TTMC, Bengaluru (12.9651, 77.5348)',
     camera_type: 'anpr',
     is_active: true,
     has_anpr: true,
@@ -19,9 +19,9 @@ const MOCK_CAMERAS = [
     fps: 30
   },
   {
-    id: 'CAM-BL-002',
-    name: 'MG Road BATCS East',
-    location: 'MG Road, Bengaluru',
+    id: 'CAM-BLR-0012',
+    name: 'MG Road BATCS Signal Pole 5',
+    location: 'MG Road, Bengaluru (12.9737, 77.6138)',
     camera_type: 'face_recognition',
     is_active: true,
     has_anpr: true,
@@ -33,9 +33,9 @@ const MOCK_CAMERAS = [
     fps: 60
   },
   {
-    id: 'CAM-BL-003',
-    name: 'Whitefield Gate 1',
-    location: 'Whitefield, Bengaluru',
+    id: 'CAM-BLR-0002',
+    name: 'Shalom Apt Gate Camera 1',
+    location: 'Banaswadi, Bengaluru (13.0040, 77.6192)',
     camera_type: 'cctv',
     is_active: false,
     has_anpr: false,
@@ -47,9 +47,9 @@ const MOCK_CAMERAS = [
     fps: 0
   },
   {
-    id: 'CAM-BL-004',
-    name: 'Hebbal Flyover Cam',
-    location: 'Hebbal, Bengaluru',
+    id: 'CAM-BLR-0015',
+    name: 'BTP Traffic Signal Dome 15',
+    location: 'Hebbal Flyover, Bengaluru (13.0064, 77.5787)',
     camera_type: 'anpr',
     is_active: true,
     has_anpr: true,
@@ -61,9 +61,9 @@ const MOCK_CAMERAS = [
     fps: 30
   },
   {
-    id: 'CAM-BL-005',
-    name: 'JP Nagar 6th Phase',
-    location: 'JP Nagar, Bengaluru',
+    id: 'CAM-BLR-0035',
+    name: 'Silk Board Junction BTP Panning',
+    location: 'Silk Board, Bengaluru (12.9344, 77.6123)',
     camera_type: 'cctv',
     is_active: true,
     has_anpr: false,
@@ -75,9 +75,9 @@ const MOCK_CAMERAS = [
     fps: 30
   },
   {
-    id: 'CAM-BL-006',
-    name: 'KR Puram Junction',
-    location: 'KR Puram, Bengaluru',
+    id: 'CAM-BLR-0042',
+    name: 'KR Puram Junction BATCS',
+    location: 'KR Puram, Bengaluru (12.9936, 77.6073)',
     camera_type: 'face_recognition',
     is_active: true,
     has_anpr: true,
@@ -368,8 +368,8 @@ export default function SurveillancePage() {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Cameras Mounted',  value: '6,842', icon: Camera, color: 'text-phosphor-500' },
-          { label: 'ANPR Optical Sensors',   value: '4,218', icon: Eye,    color: 'text-warn-500' },
+          { label: 'Bengaluru OSM Cameras',  value: '1,541', icon: Camera, color: 'text-phosphor-500' },
+          { label: 'ANPR Optical Sensors',   value: '1,024', icon: Eye,    color: 'text-warn-500' },
           { label: 'Live Target Matches',    value: '3 ACTIVE', icon: ShieldAlert, color: 'text-critical-500' },
           { label: 'Network Bandwidth',     value: '98.7% UP', icon: Wifi,  color: 'text-success-500' },
         ].map((s) => (

@@ -190,11 +190,16 @@ module.exports = async (req, res) => {
     const result    = await zcqlService.executeZCQLQuery(zcql);
     rawRows = result || [];
   } catch (err) {
-    console.warn('[cameras-nearby] DB query offline, using fallback cameras.');
-    rawRows = [
-      { Cameras: { camera_id: "SC-0045", external_id: "EXT-0045", name: "Silk Board Junction - South Camera", type: "Safe_City", lat: lat, lng: lng, district_name: "Bengaluru Urban", junction_name: "Silk Board", has_anpr: true, has_face_recog: true, coverage_radius_m: 100 } },
-      { Cameras: { camera_id: "BATCS-0102", external_id: "EXT-0102", name: "MG Road Signal East", type: "BATCS", lat: lat + 0.001, lng: lng + 0.001, district_name: "Bengaluru Urban", junction_name: "MG Road", has_anpr: true, has_face_recog: false, coverage_radius_m: 80 } }
-    ];
+    console.warn('[cameras-nearby] DB query offline, utilizing real Bengaluru KML dataset fallback.');
+    try {
+      const kmlCctvData = require('../../nextjs/src/data/bengaluru-cctv.json');
+      rawRows = kmlCctvData.map(c => ({ Cameras: c }));
+    } catch (e) {
+      rawRows = [
+        { Cameras: { camera_id: "SC-0045", external_id: "EXT-0045", name: "Silk Board Junction - South Camera", type: "Safe_City", lat: lat, lng: lng, district_name: "Bengaluru Urban", junction_name: "Silk Board", has_anpr: true, has_face_recog: true, coverage_radius_m: 100 } },
+        { Cameras: { camera_id: "BATCS-0102", external_id: "EXT-0102", name: "MG Road Signal East", type: "BATCS", lat: lat + 0.001, lng: lng + 0.001, district_name: "Bengaluru Urban", junction_name: "MG Road", has_anpr: true, has_face_recog: false, coverage_radius_m: 80 } }
+      ];
+    }
   }
 
   // ── STEP 4: Haversine exact filter ───────────────────────────────────────
