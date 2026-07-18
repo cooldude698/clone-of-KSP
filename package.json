@@ -1,5 +1,9 @@
 {
 	"dependencies": {
-		"next": "^16.2.10"
+		"@google/generative-ai": "^0.24.1",
+		"axios": "^1.18.1",
+		"dotenv": "^17.4.2",
+		"next": "^16.2.10",
+		"zcatalyst-sdk-node": "^3.4.0"
 	}
 }

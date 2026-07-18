@@ -288,7 +288,7 @@ export default function DrishtiDashboard() {
   const handleExportPdf = async () => {
     if (!conversationId) return;
     try {
-      const res = await fetch('http://localhost:3000/server/export-pdf/', {
+      const res = await fetch('/api/export-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ conversation_id: conversationId, title: "DRISHTI AI Intelligence Report", officer_name: "Inspector", badge_number: "KSP-092" })
@@ -330,7 +330,7 @@ export default function DrishtiDashboard() {
   const handleQuery = async (queryText) => {
     setOrbState('thinking');
     try {
-      const res = await fetch('http://localhost:3000/server/chat/', {
+      const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: queryText, language: 'en', conversation_id: conversationId })

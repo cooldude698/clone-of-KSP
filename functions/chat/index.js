@@ -86,9 +86,12 @@ const { searchPoliceManuals } = require('./rag-service');
 // Fallback logic for keys without pinging overhead
 async function getWorkingKey(generateAction) {
   const keys = [];
+  if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'PASTE_KEY_HERE') {
+    keys.push(process.env.GEMINI_API_KEY);
+  }
   for (let i = 1; i <= 10; i++) {
     const key = process.env[`GEMINI_API_KEY_${i}`];
-    if (key && key !== 'PASTE_KEY_HERE') keys.push(key);
+    if (key && key !== 'PASTE_KEY_HERE' && !keys.includes(key)) keys.push(key);
   }
 
   let lastError = null;
@@ -128,17 +131,19 @@ module.exports = async (req, res) => {
     return;
   }
 
-  let body;
-  try {
-    const raw = await new Promise((resolve, reject) => {
-      let data = '';
-      req.on('data', chunk => { data += chunk; });
-      req.on('end', () => resolve(data));
-      req.on('error', reject);
-    });
-    body = JSON.parse(raw);
-  } catch (e) {
-    return send(400, { error: true, message: 'Invalid JSON body' });
+  let body = req.body;
+  if (!body || Object.keys(body).length === 0) {
+    try {
+      const raw = await new Promise((resolve, reject) => {
+        let data = '';
+        req.on('data', chunk => { data += chunk; });
+        req.on('end', () => resolve(data));
+        req.on('error', reject);
+      });
+      body = JSON.parse(raw || '{}');
+    } catch (e) {
+      return send(400, { error: true, message: 'Invalid JSON body' });
+    }
   }
 
   try {
@@ -292,11 +297,21 @@ module.exports = async (req, res) => {
         ]
       }];
 
-      const model = genAI.getGenerativeModel({
-        model: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
-        systemInstruction: systemPrompt,
-        tools
-      });
+      let modelName = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+      let model;
+      try {
+        model = genAI.getGenerativeModel({
+          model: modelName,
+          systemInstruction: systemPrompt,
+          tools
+        });
+      } catch (mErr) {
+        model = genAI.getGenerativeModel({
+          model: 'gemini-1.5-flash',
+          systemInstruction: systemPrompt,
+          tools
+        });
+      }
 
       const chat = model.startChat({
         history: conversationHistory.map(m => ({

@@ -251,7 +251,7 @@ export default function LandingPage() {
         </div>
 
         {/* Foreground Content Stack */}
-        <div className="relative z-25 text-center max-w-xl mx-auto flex flex-col items-center gap-6">
+        <div className="relative z-[25] z-30 text-center max-w-xl mx-auto flex flex-col items-center gap-6">
           
           {/* Header Title */}
           <div className="flex items-baseline gap-2.5">

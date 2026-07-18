@@ -451,7 +451,7 @@ export default function ChatPage() {
         });
         if (res.ok) {
           const data = await res.json();
-          responseText = data.response || data.answer || JSON.stringify(data);
+          responseText = data.response_text || data.response || data.answer || (typeof data === 'string' ? data : JSON.stringify(data));
         } else {
           throw new Error('API not available');
         }
