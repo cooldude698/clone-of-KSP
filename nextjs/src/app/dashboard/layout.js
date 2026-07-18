@@ -67,6 +67,12 @@ export default function DashboardLayout({ children }) {
   // ─── Change 1 & 6: Orb pin state ─────────────────────────────────
   const [orbPinned, setOrbPinned] = useState(true);
 
+  // ─── Orb interaction state ───────────────────────────────────────
+  const [pendingTranscript, setPendingTranscript] = useState('');  // words captured, not yet sent
+  const [orbResponse,       setOrbResponse]       = useState('');  // last AI response text for bubble
+  const [showTypingInput,   setShowTypingInput]   = useState(false); // type-instead input visible
+  const [typingText,        setTypingText]        = useState('');  // text in the typing input
+
   // ─── Change 2: Proactive suggestion state ────────────────────────
   const [proactiveSuggestion, setProactiveSuggestion] = useState(null);
   // ref so timers can read latest values without stale closure
@@ -106,6 +112,8 @@ export default function DashboardLayout({ children }) {
 
   const handleQuery = useCallback(async (queryText) => {
     if (!queryText?.trim()) return;
+    setOrbResponse('');
+    setPendingTranscript('');
     hasInteractedRef.current = true;
 
     // Dismiss proactive suggestion if open
@@ -152,6 +160,7 @@ export default function DashboardLayout({ children }) {
       if (text) {
         setSessionLogs(prev => [...prev, { role: 'assistant', content: text, timestamp: ts() }]);
         setOrbState('speaking');
+        if (text) setOrbResponse(text);
         const clean = text.replace(/[|*#`]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 800);
         speak(clean, language === 'en' ? 'en-IN' : 'kn-IN');
       } else {
@@ -162,6 +171,7 @@ export default function DashboardLayout({ children }) {
       const fallback = "I'm having trouble reaching the network right now, Sir. Please try again.";
       setResponse({ response_text: fallback, follow_up_suggestions: [], urgency: 'low' });
       setSessionLogs(prev => [...prev, { role: 'assistant', content: fallback, timestamp: ts() }]);
+      setOrbResponse("I'm having trouble reaching the network right now, Sir. Please try again.");
     }
   }, [language, conversationId, sessionLogs, speak, router]);
 
@@ -199,8 +209,30 @@ export default function DashboardLayout({ children }) {
       setOrbState('idle');
       return;
     }
-    handleQuery(captured);
-  }, [stopListeningAndGetTranscript, handleQuery]);
+    // Don't send yet — show transcript bubble for user to confirm
+    setPendingTranscript(captured);
+    setOrbState('idle'); // orb goes back to idle while user reviews
+  }, [stopListeningAndGetTranscript]);
+
+  const handleConfirmSend = useCallback(() => {
+    if (!pendingTranscript.trim()) return;
+    const text = pendingTranscript;
+    setPendingTranscript('');
+    handleQuery(text);
+  }, [pendingTranscript, handleQuery]);
+
+  const handleCancelTranscript = useCallback(() => {
+    setPendingTranscript('');
+    setOrbState('idle');
+  }, []);
+
+  const handleConfirmTyping = useCallback(() => {
+    if (!typingText.trim()) return;
+    const text = typingText;
+    setTypingText('');
+    setShowTypingInput(false);
+    handleQuery(text);
+  }, [typingText, handleQuery]);
 
   // ─── Greeting on first open ──────────────────────────────────────
   const triggerGreeting = useCallback(() => {
@@ -303,11 +335,18 @@ export default function DashboardLayout({ children }) {
 
     const suggestion = getProactiveSuggestion(logs);
     setProactiveSuggestion(suggestion);
+    
+    // Change: Make Drishti actually speak the notification
+    setOrbState('speaking');
+    speak(suggestion.text, language === 'en' ? 'en-IN' : 'kn-IN');
 
     // Auto-dismiss after 15s
-    const autoTimer = setTimeout(() => setProactiveSuggestion(null), 15000);
+    const autoTimer = setTimeout(() => {
+      setProactiveSuggestion(null);
+      setOrbState('idle');
+    }, 15000);
     return () => clearTimeout(autoTimer);
-  }, [getProactiveSuggestion]);
+  }, [getProactiveSuggestion, speak, language]);
 
   // Fire 30s after mount if user hasn't interacted
   useEffect(() => {
@@ -355,7 +394,8 @@ export default function DashboardLayout({ children }) {
     if (typeof window === 'undefined') return;
     const mac = /Mac|iPhone|iPod|iPad/i.test(navigator.userAgent);
     const held = { ctrl: false, alt: false, meta: false, shift: false };
-    let kbPttActive = false;
+    let spacePttActive = false;
+    let modifierPttActive = false;
 
     const isInputFocused = () => {
       const el = document.activeElement;
@@ -372,24 +412,35 @@ export default function DashboardLayout({ children }) {
 
       // Original Ctrl+Alt / Cmd+Shift PTT
       const trigger = mac ? (held.meta && held.shift) : (held.ctrl && held.alt);
-      if (trigger && !kbPttActive) {
-        kbPttActive = true;
-        if (!isPanelOpen) { setIsPanelOpen(true); }
-        if (!hasGreeted)  { triggerGreeting(); setTimeout(handlePttStart, 500); }
-        else              { handlePttStart(); }
+      if (trigger && !modifierPttActive && !spacePttActive) {
+        modifierPttActive = true;
+        hasInteractedRef.current = true;
+        setProactiveSuggestion(null);
+        if (!hasGreeted) { triggerGreeting(); setTimeout(handlePttStart, 500); }
+        else             { handlePttStart(); }
       }
 
       // Space bar shortcut (Change 3)
       if (e.key === ' ' && !isInputFocused() && !e.repeat) {
         e.preventDefault();
-        if (!isPanelOpen) {
-          setIsPanelOpen(true);
+        if (!modifierPttActive && !spacePttActive) {
+          spacePttActive = true;
           hasInteractedRef.current = true;
           setProactiveSuggestion(null);
-          if (!hasGreeted) triggerGreeting();
-        } else {
-          handlePttStart();
+          if (!hasGreeted) { triggerGreeting(); setTimeout(handlePttStart, 500); }
+          else             { handlePttStart(); }
         }
+      }
+
+      // Enter to confirm pending voice transcript
+      if (e.key === 'Enter' && pendingTranscript && !isInputFocused()) {
+        e.preventDefault();
+        handleConfirmSend();
+      }
+      // Escape to cancel pending transcript
+      if (e.key === 'Escape' && pendingTranscript) {
+        e.preventDefault();
+        handleCancelTranscript();
       }
     };
 
@@ -398,13 +449,26 @@ export default function DashboardLayout({ children }) {
       if (e.key === 'Alt')     held.alt  = false;
       if (e.key === 'Meta')    held.meta = false;
       if (e.key === 'Shift')   held.shift = false;
+      
+      if (spacePttActive && e.key === ' ') {
+        spacePttActive = false;
+        handlePttEnd();
+      }
+
       const released = mac ? (!held.meta || !held.shift) : (!held.ctrl || !held.alt);
-      if (released && kbPttActive) { kbPttActive = false; handlePttEnd(); }
+      if (modifierPttActive && released) {
+        modifierPttActive = false;
+        handlePttEnd();
+      }
     };
 
     const blur = () => {
       held.ctrl = held.alt = held.meta = held.shift = false;
-      if (kbPttActive) { kbPttActive = false; handlePttEnd(); }
+      if (spacePttActive || modifierPttActive) {
+        spacePttActive = false;
+        modifierPttActive = false;
+        handlePttEnd();
+      }
     };
 
     window.addEventListener('keydown', down);
@@ -415,7 +479,7 @@ export default function DashboardLayout({ children }) {
       window.removeEventListener('keyup',   up);
       window.removeEventListener('blur',    blur);
     };
-  }, [isPanelOpen, hasGreeted, triggerGreeting, handlePttStart, handlePttEnd]);
+  }, [isPanelOpen, hasGreeted, triggerGreeting, handlePttStart, handlePttEnd, pendingTranscript, handleConfirmSend, handleCancelTranscript]);
 
   // ─── Load user info & clock ──────────────────────────────────────
   useEffect(() => {
@@ -448,15 +512,15 @@ export default function DashboardLayout({ children }) {
     <div className="flex h-screen bg-void-000 overflow-hidden">
 
       {/* ── SIDEBAR ── */}
-      <aside className={`flex flex-col transition-all duration-300 ease-in-out border-r border-steel-600/40 bg-steel-700 relative z-20 ${collapsed ? 'w-16' : 'w-60'}`}>
-        <div className={`flex items-center gap-3 px-4 py-5 border-b border-steel-600/40 ${collapsed ? 'justify-center' : ''}`}>
+      <aside className={`flex flex-col transition-all duration-300 ease-in-out border-r border-white/5 bg-void-000 relative z-20 ${collapsed ? 'w-16' : 'w-64'}`}>
+        <div className={`flex items-center gap-3 px-6 py-6 border-b border-white/5 ${collapsed ? 'justify-center px-4' : ''}`}>
           <div className="w-8 h-8 rounded-lg bg-phosphor-500/20 border border-phosphor-500/40 flex items-center justify-center flex-shrink-0">
             <Shield className="w-4 h-4 text-phosphor-500" />
           </div>
           {!collapsed && (
             <div>
-              <span className="text-paper-100 font-bold text-base tracking-wide">DRISHTI</span>
-              <p className="text-warn-500 text-xs leading-none">ದೃಷ್ಟಿ</p>
+              <span className="text-white font-semibold tracking-widest text-sm">DRISHTI</span>
+              <p className="text-white/40 text-[10px] tracking-widest uppercase mt-0.5">ದೃಷ್ಟಿ</p>
             </div>
           )}
         </div>
@@ -467,14 +531,13 @@ export default function DashboardLayout({ children }) {
             return (
               <Link key={href} href={href} id={id}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group relative
-                  ${active ? 'bg-phosphor-500/20 text-phosphor-500 border border-phosphor-500/30' : 'text-paper-100/60 hover:text-paper-100 hover:bg-steel-600/50'}`}
+                  ${active ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white hover:bg-white/5'}`}
                 title={collapsed ? label : undefined}
               >
-                <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-phosphor-500' : ''}`} />
-                {!collapsed && <span className="text-sm font-medium">{label}</span>}
-                {active && !collapsed && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-phosphor-500" />}
+                <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-white' : 'text-white/50 group-hover:text-white'}`} />
+                {!collapsed && <span className="text-sm font-medium tracking-wide">{label}</span>}
                 {collapsed && (
-                  <div className="absolute left-full ml-2 px-2 py-1 rounded bg-steel-700 text-xs text-paper-100 whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 border border-steel-600/40">
+                  <div className="absolute left-full ml-2 px-3 py-1.5 rounded-lg bg-[#111] shadow-xl text-xs text-white/90 whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 border border-white/10">
                     {label}
                   </div>
                 )}
@@ -483,20 +546,20 @@ export default function DashboardLayout({ children }) {
           })}
         </nav>
 
-        <div className={`px-3 py-3 border-t border-steel-600/40 ${collapsed ? 'flex justify-center' : ''}`}>
+        <div className={`px-4 py-4 border-t border-white/5 ${collapsed ? 'flex justify-center' : ''}`}>
           {!collapsed && (
-            <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-steel-600/40 mb-2">
-              <div className="w-7 h-7 rounded-full bg-phosphor-500/30 flex items-center justify-center flex-shrink-0">
-                <User className="w-3.5 h-3.5 text-phosphor-500" />
+            <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5 border border-white/5 mb-3">
+              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+                <User className="w-4 h-4 text-white/70" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-semibold text-paper-100 truncate">{employeeId}</p>
-                <p className="text-xs text-paper-100/50">{role}</p>
+                <p className="text-xs font-semibold text-white/90 truncate tracking-wide">{employeeId}</p>
+                <p className="text-[10px] text-white/40 uppercase tracking-widest mt-0.5">{role}</p>
               </div>
             </div>
           )}
           <button id="logout-btn" onClick={handleLogout}
-            className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg text-paper-100/50 hover:text-critical-500 hover:bg-critical-500/10 transition-all text-sm ${collapsed ? 'justify-center' : ''}`}
+            className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg text-white/40 hover:text-white hover:bg-white/5 transition-all text-sm ${collapsed ? 'justify-center' : ''}`}
             title={collapsed ? 'Logout' : undefined}>
             <LogOut className="w-4 h-4 flex-shrink-0" />
             {!collapsed && <span>Logout</span>}
@@ -504,7 +567,7 @@ export default function DashboardLayout({ children }) {
         </div>
 
         <button onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-steel-700 border border-steel-600/60 flex items-center justify-center text-paper-100/50 hover:text-paper-100 hover:bg-steel-600 transition-all z-30"
+          className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all z-30 shadow-lg"
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
           {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
         </button>
@@ -512,23 +575,23 @@ export default function DashboardLayout({ children }) {
 
       {/* ── MAIN ── */}
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-        <header className="flex items-center justify-between px-6 py-3.5 border-b border-steel-600/40 bg-steel-700/60 backdrop-blur-sm flex-shrink-0">
+        <header className="flex items-center justify-between px-8 py-5 border-b border-white/5 bg-void-000/80 backdrop-blur-xl flex-shrink-0 z-10 relative">
           <div>
-            <h1 className="text-sm font-semibold text-paper-100">
+            <h1 className="text-lg font-semibold text-white/90 tracking-wide">
               {NAV_ITEMS.find(n => isActive(n.href))?.label || 'Dashboard'}
             </h1>
-            <p className="text-xs text-paper-100/50">Karnataka State Police — Crime Intelligence Platform</p>
+            <p className="text-[11px] text-white/40 tracking-wider uppercase mt-1">Karnataka State Police</p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-steel-600/40 border border-steel-600/40">
-              <div className="w-1.5 h-1.5 rounded-full bg-success-500 pulse-phosphor" />
-              <span className="text-xs font-mono text-paper-100/70">{currentTime}</span>
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/5 bg-white/[0.02]">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[11px] font-mono tracking-widest text-white/60">{currentTime}</span>
             </div>
             <ThemeToggle />
             <AlertNotification />
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-steel-600/40 border border-steel-600/40">
-              <AlertTriangle className="w-3 h-3 text-warn-500" />
-              <span className="text-xs text-paper-100/70 font-mono">{role.toUpperCase()}</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/5 bg-white/[0.02]">
+              <User className="w-3.5 h-3.5 text-white/40" />
+              <span className="text-[10px] text-white/60 tracking-widest uppercase font-semibold">{role}</span>
             </div>
           </div>
         </header>
@@ -578,35 +641,48 @@ export default function DashboardLayout({ children }) {
           onClick={openPanel}
           compact={false}
           audioLevel={isListening ? audioLevel : 0}
+          pendingTranscript={pendingTranscript}
+          orbResponse={orbResponse}
+          onConfirmSend={handleConfirmSend}
+          onCancelTranscript={handleCancelTranscript}
+          showTypingInput={showTypingInput}
+          onToggleTyping={() => {
+            setShowTypingInput(v => !v);
+            setPendingTranscript('');
+            setTypingText('');
+          }}
+          typingText={typingText}
+          onTypingChange={setTypingText}
+          onTypingSubmit={handleConfirmTyping}
+          onPttStart={handlePttStart}
+          onPttEnd={handlePttEnd}
+          isListening={isListening}
+          liveTranscript={liveTranscript}
+          onReadAloud={() => {
+            setOrbState('speaking');
+            speak(orbResponse, language === 'en' ? 'en-IN' : 'kn-IN');
+          }}
         />
       )}
 
-      {/* ── Change 3: Keyboard shortcut hint ── */}
-      {!isPanelOpen && (
-        <div className="fixed bottom-2 right-8 z-[9998] pointer-events-none">
-          <span className="text-[10px] text-white/20 font-mono">
-            Space — open Drishti · Hold to talk
-          </span>
-        </div>
-      )}
 
       {/* ── Change 2: Proactive suggestion toast ── */}
       <AnimatePresence>
         {proactiveSuggestion && (
           <motion.div
             key="proactive-toast"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
             transition={{ type: 'spring', damping: 24, stiffness: 300 }}
-            className="fixed bottom-48 right-8 z-[9998] w-72"
+            className="fixed bottom-12 right-[360px] z-[9998] w-72"
           >
             <div className="bg-[#0d1117] border border-white/10 rounded-2xl shadow-2xl p-4 flex flex-col gap-3">
               <p className="text-white/80 text-sm leading-relaxed">
                 {proactiveSuggestion.icon && <span className="mr-1.5">{proactiveSuggestion.icon}</span>}
                 {proactiveSuggestion.text}
               </p>
-              <div className="flex gap-2">
+              <div className="flex gap-2 mt-1">
                 <button
                   onClick={() => {
                     setProactiveSuggestion(null);
@@ -617,6 +693,16 @@ export default function DashboardLayout({ children }) {
                   className="flex-1 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all"
                 >
                   Yes
+                </button>
+                <button
+                  onClick={() => {
+                    setOrbState('speaking');
+                    speak(proactiveSuggestion.text, language === 'en' ? 'en-IN' : 'kn-IN');
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all border border-white/10"
+                  title="Read Aloud"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
                 </button>
                 <button
                   onClick={() => {

@@ -267,10 +267,14 @@ const useDrishtiVoice = ({
            null;
   }, []);
 
-  // Fix 2: race-condition-safe speak() — waits for voices, Chrome keep-alive workaround
+  // Fix 2: race-condition-safe speak() — waits for voices, prevents cancel() race conditions
   const speak = useCallback((text, lang = 'en-IN') => {
     if (typeof window === 'undefined' || !window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
+    
+    // Only cancel if there's an active or pending utterance
+    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+      window.speechSynthesis.cancel();
+    }
 
     const doSpeak = () => {
       const utt = new SpeechSynthesisUtterance(text);
@@ -288,29 +292,15 @@ const useDrishtiVoice = ({
         if (v) utt.voice = v;
       }
 
-      // Chrome bug workaround: speechSynthesis sometimes stops mid-sentence.
-      // Keep it alive by pausing/resuming every 10s.
-      let keepAliveInterval = null;
-      keepAliveInterval = setInterval(() => {
-        if (window.speechSynthesis.speaking) {
-          window.speechSynthesis.pause();
-          window.speechSynthesis.resume();
-        } else {
-          clearInterval(keepAliveInterval);
-        }
-      }, 10000);
-
       utt.onstart = () => {
         setIsSpeaking(true);
         callbacksRef.current.onSpeakStart?.();
       };
       utt.onend = () => {
-        clearInterval(keepAliveInterval);
         setIsSpeaking(false);
         callbacksRef.current.onSpeakEnd?.();
       };
       utt.onerror = (e) => {
-        clearInterval(keepAliveInterval);
         setIsSpeaking(false);
         const silent = ['interrupted', 'canceled', 'synthesis-failed', 'synthesis-unavailable'];
         if (silent.includes(e.error)) {
@@ -324,22 +314,25 @@ const useDrishtiVoice = ({
       window.speechSynthesis.speak(utt);
     };
 
-    // If voices are already loaded, speak immediately
-    if (window.speechSynthesis.getVoices().length > 0) {
-      doSpeak();
-    } else {
-      // Wait for voices to load then speak
-      const handler = () => {
-        window.speechSynthesis.removeEventListener('voiceschanged', handler);
+    // Add a tiny delay to ensure cancel() flushes the OS audio queue before starting the new utterance
+    setTimeout(() => {
+      // If voices are already loaded, speak immediately
+      if (window.speechSynthesis.getVoices().length > 0) {
         doSpeak();
-      };
-      window.speechSynthesis.addEventListener('voiceschanged', handler);
-      // Timeout fallback — speak anyway after 1 second even if voices don't load
-      setTimeout(() => {
-        window.speechSynthesis.removeEventListener('voiceschanged', handler);
-        if (!window.speechSynthesis.speaking) doSpeak();
-      }, 1000);
-    }
+      } else {
+        // Wait for voices to load then speak
+        const handler = () => {
+          window.speechSynthesis.removeEventListener('voiceschanged', handler);
+          doSpeak();
+        };
+        window.speechSynthesis.addEventListener('voiceschanged', handler);
+        // Timeout fallback — speak anyway after 1 second even if voices don't load
+        setTimeout(() => {
+          window.speechSynthesis.removeEventListener('voiceschanged', handler);
+          if (!window.speechSynthesis.speaking) doSpeak();
+        }, 1000);
+      }
+    }, 50);
   }, [findBestVoice]);
 
   const stopSpeaking = useCallback(() => {

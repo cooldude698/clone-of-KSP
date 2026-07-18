@@ -99,6 +99,21 @@ const DrishtiOrb = ({
   compact = false,
   /** audioLevel: 0–1, drives reactive size and speed boost */
   audioLevel = 0,
+  // NEW props:
+  pendingTranscript = '',
+  orbResponse = '',
+  onConfirmSend,
+  onCancelTranscript,
+  showTypingInput = false,
+  onToggleTyping,
+  typingText = '',
+  onTypingChange,
+  onTypingSubmit,
+  onPttStart,
+  onPttEnd,
+  isListening = false,
+  liveTranscript = '',
+  onReadAloud,
 }) => {
   const [isClient, setIsClient] = useState(false);
 
@@ -231,10 +246,133 @@ const DrishtiOrb = ({
 
   // Full mode: fixed bottom-right with label
   return (
-    <div className="fixed bottom-8 right-8 z-[9999] flex flex-col items-center select-none gap-4">
-      {/* Siri Style Orb */}
+    <div className="fixed bottom-8 right-8 z-[9999] flex flex-col items-center select-none gap-3">
+
+      {/* ── TRANSCRIPT / RESPONSE BUBBLE — appears above orb ── */}
+      {(liveTranscript || pendingTranscript || orbResponse) && (
+        <div className="w-80 rounded-2xl overflow-hidden mb-2 animate-fade-in shadow-2xl relative">
+          {/* subtle glow behind bubble */}
+          <div className="absolute inset-0 bg-white/5 blur-xl pointer-events-none" />
+          <div
+            style={{
+              background: 'rgba(5, 5, 5, 0.65)',
+              backdropFilter: 'blur(24px)',
+            }}
+            className="px-5 py-4 border border-white/10 rounded-2xl relative z-10"
+          >
+            {/* Live transcript while listening */}
+            {liveTranscript && !pendingTranscript && (
+              <div>
+                <div className="flex items-center gap-1.5 mb-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-[9px] text-emerald-400 uppercase tracking-widest font-bold font-mono">
+                    Listening
+                  </span>
+                </div>
+                <p className="text-white/75 text-sm leading-relaxed italic">
+                  {liveTranscript}
+                </p>
+              </div>
+            )}
+
+            {/* Pending transcript — waiting for user to confirm */}
+            {pendingTranscript && (
+              <div>
+                <div className="flex items-center gap-1.5 mb-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                  <span className="text-[9px] text-blue-400 uppercase tracking-widest font-bold font-mono">
+                    Ready to send
+                  </span>
+                </div>
+                <p className="text-white/90 text-sm leading-relaxed mb-3">
+                  {pendingTranscript}
+                </p>
+                {/* Confirm / Cancel buttons */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={onConfirmSend}
+                    className="flex-1 py-2 rounded-xl bg-white text-black text-[10px] uppercase font-bold tracking-widest transition-all hover:bg-white/90 flex items-center justify-center gap-2"
+                  >
+                    <span>Send</span>
+                    <span className="opacity-40 text-xs">↵</span>
+                  </button>
+                  <button
+                    onClick={onCancelTranscript}
+                    className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/50 hover:text-white text-[10px] uppercase font-bold tracking-widest transition-all border border-white/10"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Orb response — shown after AI replies, when no pending transcript */}
+            {orbResponse && !pendingTranscript && !liveTranscript && (
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                    <span className="text-[9px] text-cyan-400 uppercase tracking-widest font-bold font-mono">
+                      Drishti
+                    </span>
+                  </div>
+                  {onReadAloud && (
+                    <button
+                      onClick={onReadAloud}
+                      className="text-white/40 hover:text-white transition-colors flex items-center justify-center p-1 rounded-full hover:bg-white/10"
+                      title="Read Aloud"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                    </button>
+                  )}
+                </div>
+                <p className="text-white/80 text-sm leading-relaxed">
+                  {orbResponse.length > 180 ? orbResponse.slice(0, 180) + '…' : orbResponse}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── TYPING INPUT — appears above orb when showTypingInput is true ── */}
+      {showTypingInput && (
+        <div
+          style={{
+            background: 'rgba(5, 5, 5, 0.7)',
+            backdropFilter: 'blur(24px)',
+          }}
+          className="w-80 rounded-2xl border border-white/10 shadow-2xl px-4 py-3 flex items-center gap-3 mb-2 animate-fade-in"
+        >
+          <input
+            autoFocus
+            type="text"
+            value={typingText}
+            onChange={e => onTypingChange?.(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && typingText.trim()) {
+                e.preventDefault();
+                onTypingSubmit?.();
+              }
+              if (e.key === 'Escape') onToggleTyping?.();
+            }}
+            placeholder="TYPE QUERY..."
+            className="flex-1 bg-transparent text-white text-[11px] tracking-widest placeholder-white/20 outline-none uppercase font-mono"
+          />
+          <button
+            onClick={() => typingText.trim() && onTypingSubmit?.()}
+            disabled={!typingText.trim()}
+            className="w-8 h-8 rounded-full bg-white hover:bg-white/90 disabled:opacity-20 disabled:bg-white/10 disabled:text-white text-black flex items-center justify-center transition-all flex-shrink-0"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+      )}
+
+      {/* ── EXISTING ORB — keep exactly as is ── */}
       <div className="relative flex items-center justify-center">
-        {/* Pulse rings when listening */}
         {state === 'listening' && (
           <>
             <div className="absolute inset-0 rounded-full border-2 border-emerald-400/60 animate-ping" />
@@ -242,7 +380,6 @@ const DrishtiOrb = ({
               style={{ inset: '-8px', animationDelay: '0.3s' }} />
           </>
         )}
-        {/* Change 4: data-state drives breathing CSS */}
         <div
           data-state={state}
           onClick={onClick}
@@ -426,7 +563,7 @@ const DrishtiOrb = ({
         </div>
       </div>
 
-      {/* Change 5: Sound wave bars when speaking */}
+      {/* ── SOUND WAVE BARS — keep exactly as is ── */}
       {state === 'speaking' && (
         <div className="flex items-center justify-center gap-[3px] h-6">
           {[0.4, 0.7, 1.0, 0.85, 0.6, 0.9, 0.5, 0.75, 0.45, 0.8].map((h, i) => (
@@ -451,13 +588,48 @@ const DrishtiOrb = ({
         </div>
       )}
 
-      {/* DRISHTI Labels */}
-      <div className="text-center flex flex-col items-center">
-        <div className="text-xs font-mono font-bold tracking-[0.25em] text-white/95 drop-shadow-[0_2px_10px_rgba(59,130,246,0.35)]">
-          DRISHTI ದೃಷ್ಟಿ
+      {/* ── CONTROLS & LABELS ── */}
+      <div className="flex flex-col items-center gap-3 mt-4">
+        {/* DRISHTI LABELS */}
+        <div className="text-center flex flex-col items-center mb-1">
+          <div className="text-[10px] font-mono tracking-[0.4em] text-white/50 uppercase">
+            DRISHTI <span className="opacity-40 ml-1">ದೃಷ್ಟಿ</span>
+          </div>
         </div>
-        <div className="text-[9px] uppercase tracking-widest text-white/50 mt-1 font-sans font-medium">
-          Karnataka State Police
+
+        {/* BUTTONS */}
+        <div className="flex items-center gap-3">
+          {/* PTT BUTTON */}
+          <button
+            onMouseDown={onPttStart}
+            onMouseUp={onPttEnd}
+            onMouseLeave={isListening ? onPttEnd : undefined}
+            onTouchStart={e => { e.preventDefault(); onPttStart?.(); }}
+            onTouchEnd={e => { e.preventDefault(); onPttEnd?.(); }}
+            className={`px-5 py-2.5 rounded-full text-[9px] uppercase font-bold tracking-[0.2em] select-none transition-all duration-300 backdrop-blur-md flex items-center gap-2
+              ${isListening
+                ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)] scale-105'
+                : 'bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/10 hover:border-white/20'}`}
+          >
+            {isListening && <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />}
+            {isListening ? 'RECORDING' : 'HOLD TO TALK'}
+          </button>
+
+          {/* TYPE INSTEAD BUTTON */}
+          <button
+            onClick={onToggleTyping}
+            className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all duration-300 backdrop-blur-md
+              ${showTypingInput
+                ? 'bg-white text-black border-transparent shadow-[0_0_15px_rgba(255,255,255,0.2)]'
+                : 'bg-white/5 border-white/10 text-white/40 hover:text-white hover:bg-white/10 hover:border-white/20'}`}
+            title="Type instead"
+          >
+            {showTypingInput ? (
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            ) : (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h16v10H4z"/><path d="M8 11h.01"/><path d="M12 11h.01"/><path d="M16 11h.01"/><path d="M7 14h10"/></svg>
+            )}
+          </button>
         </div>
       </div>
     </div>
