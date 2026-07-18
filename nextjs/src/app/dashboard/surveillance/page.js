@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Camera, Wifi, WifiOff, Eye, MapPin, Clock, Maximize2, X, ShieldAlert, Zap, RefreshCw } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Camera, Wifi, WifiOff, Eye, MapPin, Clock, Maximize2, X, ShieldAlert, Zap } from 'lucide-react';
 
 const MOCK_CAMERAS = [
   {
@@ -12,7 +12,7 @@ const MOCK_CAMERAS = [
     is_active: true,
     has_anpr: true,
     has_face_recog: false,
-    video_url: 'https://assets.mixkit.co/videos/preview/mixkit-traffic-in-a-busy-intersection-at-night-41551-large.mp4',
+    video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     detected_target: 'KA-01-MJ-8821',
     target_type: 'ANPR MATCH: STOLEN VEHICLE',
     confidence: 98.4,
@@ -26,7 +26,7 @@ const MOCK_CAMERAS = [
     is_active: true,
     has_anpr: true,
     has_face_recog: true,
-    video_url: 'https://assets.mixkit.co/videos/preview/mixkit-traffic-flowing-on-a-busy-street-41555-large.mp4',
+    video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
     detected_target: 'RAMESH KUMAR (SUSPECT)',
     target_type: 'FACE MATCH: RISK 94%',
     confidence: 96.1,
@@ -54,7 +54,7 @@ const MOCK_CAMERAS = [
     is_active: true,
     has_anpr: true,
     has_face_recog: false,
-    video_url: 'https://assets.mixkit.co/videos/preview/mixkit-car-traffic-on-a-highway-at-night-41549-large.mp4',
+    video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
     detected_target: 'KA-05-NB-1102',
     target_type: 'ANPR CHECK: WATCHLIST PASS',
     confidence: 99.1,
@@ -68,7 +68,7 @@ const MOCK_CAMERAS = [
     is_active: true,
     has_anpr: false,
     has_face_recog: false,
-    video_url: 'https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-city-traffic-at-night-41550-large.mp4',
+    video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyshakes.mp4',
     detected_target: 'SECTOR PATROL ACTIVE',
     target_type: 'PATROL MONITORING',
     confidence: 94.0,
@@ -82,7 +82,7 @@ const MOCK_CAMERAS = [
     is_active: true,
     has_anpr: true,
     has_face_recog: true,
-    video_url: 'https://assets.mixkit.co/videos/preview/mixkit-time-lapse-of-traffic-on-a-city-street-41553-large.mp4',
+    video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
     detected_target: 'SURESH NAIDU (CO-ACCUSED)',
     target_type: 'FACE MATCH: RISK 86%',
     confidence: 92.8,
@@ -96,9 +96,111 @@ const TYPE_BADGES = {
   cctv:             { label: 'CCTV',    className: 'bg-steel-600/60 text-paper-100/60 border-steel-600/50' },
 };
 
+// Canvas-based animated CCTV night vision traffic simulation fallback
+function AnimatedCCTVCanvas({ isFaceRecog }) {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+
+    // Simulation state
+    let width = (canvas.width = canvas.parentElement.clientWidth || 320);
+    let height = (canvas.height = canvas.parentElement.clientHeight || 200);
+
+    const vehicles = Array.from({ length: 6 }).map((_, i) => ({
+      x: Math.random() * width,
+      y: (i + 1) * (height / 7),
+      speed: (Math.random() * 1.5 + 0.8) * (i % 2 === 0 ? 1 : -1),
+      length: Math.random() * 30 + 20,
+      color: i % 3 === 0 ? '#ef4444' : i % 2 === 0 ? '#38bdf8' : '#10b981'
+    }));
+
+    let scanY = 0;
+
+    const render = () => {
+      // Clear with dark night vision tint
+      ctx.fillStyle = '#070b14';
+      ctx.fillRect(0, 0, width, height);
+
+      // Draw grid lines
+      ctx.strokeStyle = '#121e36';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < width; x += 30) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += 30) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      // Draw perspective road lines
+      ctx.strokeStyle = '#1d2c4d';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, height * 0.4);
+      ctx.lineTo(width, height * 0.4);
+      ctx.moveTo(0, height * 0.7);
+      ctx.lineTo(width, height * 0.7);
+      ctx.stroke();
+
+      // Render moving vehicles & headlights
+      vehicles.forEach(v => {
+        v.x += v.speed;
+        if (v.x > width + 40) v.x = -40;
+        if (v.x < -40) v.x = width + 40;
+
+        // Headlight trail glow
+        const grad = ctx.createLinearGradient(v.x, v.y, v.x + (v.speed > 0 ? 40 : -40), v.y);
+        grad.addColorStop(0, v.color);
+        grad.addColorStop(1, 'transparent');
+
+        ctx.fillStyle = grad;
+        ctx.fillRect(v.x, v.y - 2, v.speed > 0 ? 35 : -35, 4);
+
+        // Vehicle dot
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(v.x, v.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Bounding box target reticle
+        ctx.strokeStyle = v.color;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(v.x - 12, v.y - 12, 24, 24);
+      });
+
+      // Moving laser scan line
+      scanY = (scanY + 1.5) % height;
+      ctx.strokeStyle = isFaceRecog ? 'rgba(239, 68, 68, 0.4)' : 'rgba(16, 185, 129, 0.4)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, scanY);
+      ctx.lineTo(width, scanY);
+      ctx.stroke();
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [isFaceRecog]);
+
+  return <canvas ref={canvasRef} className="w-full h-full object-cover" />;
+}
+
 function CameraCard({ cam, onInspect }) {
   const typeCfg = TYPE_BADGES[cam.camera_type] || TYPE_BADGES.cctv;
   const [timecode, setTimecode] = useState('');
+  const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -114,24 +216,28 @@ function CameraCard({ cam, onInspect }) {
       className={`glass-card rounded-2xl overflow-hidden border transition-all hover:scale-[1.01] cursor-pointer relative group flex flex-col justify-between
       ${cam.is_active ? 'border-steel-600 hover:border-phosphor-500/50 shadow-2xl' : 'border-steel-600/30 opacity-60'}`}
     >
-      {/* Video / Stream Canvas Container */}
+      {/* Video / Animated Stream Container */}
       <div className="h-52 bg-void-000 relative flex items-center justify-center overflow-hidden">
-        {cam.is_active && cam.video_url ? (
+        {cam.is_active ? (
           <>
-            <video
-              src={cam.video_url}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover filter brightness-90 contrast-110"
-            />
+            {/* If video loads cleanly, render video; otherwise fallback to AnimatedCCTVCanvas */}
+            {!videoError && cam.video_url ? (
+              <video
+                src={cam.video_url}
+                autoPlay
+                loop
+                muted
+                playsInline
+                onError={() => setVideoError(true)}
+                className="w-full h-full object-cover filter brightness-90 contrast-110"
+              />
+            ) : (
+              <AnimatedCCTVCanvas isFaceRecog={cam.has_face_recog} />
+            )}
+
             {/* Scanline Overlay */}
             <div className="absolute inset-0 bg-scanlines opacity-40 pointer-events-none" />
             <div className="absolute inset-0 bg-gradient-to-b from-void-000/60 via-transparent to-void-000/80 pointer-events-none" />
-
-            {/* Laser Scan Animation Line */}
-            <div className="absolute inset-x-0 h-0.5 bg-phosphor-500/70 shadow-[0_0_8px_#10b981] animate-laser-scan pointer-events-none" />
 
             {/* Live Badge & Ticker */}
             <div className="absolute top-2.5 left-2.5 flex items-center gap-2 z-10">
@@ -146,14 +252,14 @@ function CameraCard({ cam, onInspect }) {
 
             <div className="absolute top-2.5 right-2.5 flex items-center gap-2 z-10">
               <span className="text-[10px] font-mono text-phosphor-500 bg-void-000/80 backdrop-blur-md px-2 py-1 rounded border border-steel-600/60">
-                {cam.fps} FPS
+                {cam.fps || 30} FPS
               </span>
             </div>
 
             {/* Target Detection Reticle Bounding Box */}
             {cam.detected_target && (
-              <div className={`absolute z-20 border-2 rounded p-1 transition-all animate-pulse-slow ${
-                cam.has_face_recog ? 'border-critical-500 bg-critical-500/10 top-1/4 left-1/3' : 'border-phosphor-500 bg-phosphor-500/10 bottom-1/4 right-1/4'
+              <div className={`absolute z-20 border-2 rounded p-1.5 transition-all animate-pulse-slow ${
+                cam.has_face_recog ? 'border-critical-500 bg-critical-500/15 top-1/4 left-1/3' : 'border-phosphor-500 bg-phosphor-500/15 bottom-1/4 right-1/4'
               }`}>
                 <div className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-void-000/90 text-paper-100 border border-steel-600 whitespace-nowrap flex items-center gap-1">
                   <Zap className="w-3 h-3 text-warn-500 animate-bounce" />
@@ -224,16 +330,7 @@ export default function SurveillancePage() {
   return (
     <div className="p-6 space-y-6 animate-fade-in relative min-h-screen bg-void-000">
       
-      {/* Keyframe animation for laser scanning line */}
       <style jsx global>{`
-        @keyframes laser-scan {
-          0% { top: 0%; }
-          50% { top: 95%; }
-          100% { top: 0%; }
-        }
-        .animate-laser-scan {
-          animation: laser-scan 3.5s linear infinite;
-        }
         .bg-scanlines {
           background: linear-gradient(
             to bottom,
@@ -356,7 +453,6 @@ export default function SurveillancePage() {
                     className="w-full h-full object-cover filter brightness-95 contrast-110"
                   />
                   <div className="absolute inset-0 bg-scanlines opacity-30 pointer-events-none" />
-                  <div className="absolute inset-x-0 h-0.5 bg-phosphor-500/80 shadow-[0_0_12px_#10b981] animate-laser-scan pointer-events-none" />
 
                   {/* High Tech Overlay Reticle */}
                   {activeCamModal.detected_target && (
