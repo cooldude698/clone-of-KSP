@@ -11,7 +11,10 @@
       "trends",
       "repeat-offenders",
       "victim-vulnerability",
-      "underreporting"
+      "underreporting",
+      "chat",
+      "conversations",
+      "export-pdf"
     ],
     "ignore": [],
     "source": "functions"
