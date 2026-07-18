@@ -1,10 +1,4 @@
-import { runCatalystHandler } from '@/lib/catalyst-adapter';
-const underreportingHandler = require('../../../../../functions/underreporting/index.js');
-
-export async function GET(request) {
-  return runCatalystHandler(underreportingHandler, request);
-}
-
-export async function OPTIONS(request) {
-  return runCatalystHandler(underreportingHandler, request);
-}
+import { proxyCatalystFunction, optionsResponse } from '@/lib/catalyst-proxy';
+export async function GET(req) { return proxyCatalystFunction('underreporting', req); }
+export async function POST(req) { return proxyCatalystFunction('underreporting', req); }
+export async function OPTIONS() { return optionsResponse(); }

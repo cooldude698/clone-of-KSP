@@ -1,10 +1,4 @@
-import { runCatalystHandler } from '@/lib/catalyst-adapter';
-const networkGraphHandler = require('../../../../../functions/network-graph-data/index.js');
-
-export async function GET(request) {
-  return runCatalystHandler(networkGraphHandler, request);
-}
-
-export async function OPTIONS(request) {
-  return runCatalystHandler(networkGraphHandler, request);
-}
+import { proxyCatalystFunction, optionsResponse } from '@/lib/catalyst-proxy';
+export async function GET(req) { return proxyCatalystFunction('network-graph-data', req); }
+export async function POST(req) { return proxyCatalystFunction('network-graph-data', req); }
+export async function OPTIONS() { return optionsResponse(); }

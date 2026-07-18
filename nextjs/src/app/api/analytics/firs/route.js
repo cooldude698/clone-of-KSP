@@ -1,10 +1,3 @@
-import { runCatalystHandler } from '@/lib/catalyst-adapter';
-const firsHandler = require('../../../../../../functions/firs/index.js');
-
-export async function GET(request) {
-  return runCatalystHandler(firsHandler, request);
-}
-
-export async function OPTIONS(request) {
-  return runCatalystHandler(firsHandler, request);
-}
+import { proxyCatalystFunction, optionsResponse } from '@/lib/catalyst-proxy';
+export async function GET(req) { return proxyCatalystFunction('firs', req); }
+export async function OPTIONS() { return optionsResponse(); }
