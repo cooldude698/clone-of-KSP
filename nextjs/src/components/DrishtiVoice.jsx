@@ -20,6 +20,8 @@ const useDrishtiVoice = ({
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [liveTranscript, setLiveTranscript] = useState('');
   const [micPermission, setMicPermission] = useState('prompt');
+  // Change 2: real-time audio level
+  const [audioLevel, setAudioLevel] = useState(0);
 
   const callbacksRef = useRef({ onSpeakStart, onSpeakEnd, onError, onWake });
   useEffect(() => {
@@ -40,6 +42,13 @@ const useDrishtiVoice = ({
   const clapMicStreamRef = useRef(null);
   const animFrameRef = useRef(null);
   const clapStateRef = useRef({ lastClapTime: 0, count: 0, isSpiking: false, spikeStart: 0, history: [] });
+
+  // Change 2: volume detection refs (separate stream from clap detection)
+  const volumeAnalyserRef = useRef(null);
+  const volumeContextRef = useRef(null);
+  const volumeStreamRef = useRef(null);
+  const volumeFrameRef = useRef(null);
+  const volumeSourceRef = useRef(null);
 
   // Check mic permission
   useEffect(() => {
@@ -104,6 +113,49 @@ const useDrishtiVoice = ({
     return () => { try { rec.abort(); } catch (_) {} };
   }, []);
 
+  // Change 2: volume detection — runs while listening (separate from clap stream)
+  const startVolumeDetection = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = new Ctx();
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
+      analyser.smoothingTimeConstant = 0.8;
+      const source = ctx.createMediaStreamSource(stream);
+      source.connect(analyser);
+
+      volumeContextRef.current = ctx;
+      volumeAnalyserRef.current = analyser;
+      volumeStreamRef.current = stream;
+      volumeSourceRef.current = source;
+
+      const buf = new Uint8Array(analyser.frequencyBinCount);
+      const tick = () => {
+        analyser.getByteFrequencyData(buf);
+        // Average of first 30 frequency bins (voice range)
+        let sum = 0;
+        for (let i = 0; i < 30; i++) sum += buf[i];
+        const avg = sum / 30;
+        // Normalize to 0–1, clamp
+        const level = Math.min(1, Math.max(0, (avg - 10) / 80));
+        setAudioLevel(level);
+        volumeFrameRef.current = requestAnimationFrame(tick);
+      };
+      tick();
+    } catch (e) {
+      console.warn('[Drishti] Volume detection failed:', e.message);
+    }
+  }, []);
+
+  const stopVolumeDetection = useCallback(() => {
+    if (volumeFrameRef.current) cancelAnimationFrame(volumeFrameRef.current);
+    volumeStreamRef.current?.getTracks().forEach(t => t.stop());
+    if (volumeContextRef.current?.state !== 'closed') volumeContextRef.current?.close();
+    setAudioLevel(0);
+  }, []);
+
   // Request mic permission
   const requestMicPermission = useCallback(async () => {
     try {
@@ -133,35 +185,58 @@ const useDrishtiVoice = ({
       recognitionRef.current.lang = lang;
       recognitionRef.current.start();
       setIsListening(true);
+      // Change 2: start volume detection on a separate stream
+      startVolumeDetection();
     } catch (e) {
       if (e.name === 'InvalidStateError') { setIsListening(true); return; }
       console.error('[Drishti] start failed:', e);
     }
-  }, [micPermission, requestMicPermission]);
+  }, [micPermission, requestMicPermission, startVolumeDetection]);
 
   // Stop PTT session — returns whatever was captured
   const stopListeningAndGetTranscript = useCallback(() => {
     if (recognitionRef.current) {
       try { recognitionRef.current.stop(); } catch (_) {}
     }
+    // Change 2: stop volume detection before returning
+    stopVolumeDetection();
     setIsListening(false);
     // Return best available transcript
     const final = (accumulatedFinalRef.current + ' ' + lastInterimRef.current).trim();
     accumulatedFinalRef.current = '';
     lastInterimRef.current = '';
     return final;
-  }, []);
+  }, [stopVolumeDetection]);
 
-  // Best TTS voice
+  // Change 6: improved voice selection — neural/natural voices first
   const findBestVoice = useCallback((lang) => {
     const voices = voicesCacheRef.current;
     if (!voices.length) return null;
+
     const prefix = lang.split('-')[0];
-    for (const brand of ['google', 'microsoft', 'apple']) {
-      const v = voices.find(v => v.lang === lang && v.name.toLowerCase().includes(brand));
+
+    // Priority 1: Neural/natural English voices (sound most human)
+    const neuralKeywords = ['neural', 'natural', 'enhanced', 'premium', 'wavenet', 'journey', 'aria', 'guy', 'jenny', 'sonia', 'ryan', 'libby'];
+    for (const kw of neuralKeywords) {
+      const v = voices.find(v =>
+        (v.lang === lang || v.lang.startsWith(prefix)) &&
+        v.name.toLowerCase().includes(kw)
+      );
       if (v) return v;
     }
-    return voices.find(v => v.lang === lang) || voices.find(v => v.lang.startsWith(prefix)) || null;
+
+    // Priority 2: Google voices (generally best quality)
+    const google = voices.find(v => v.lang === lang && v.name.toLowerCase().includes('google'));
+    if (google) return google;
+
+    // Priority 3: Microsoft voices
+    const ms = voices.find(v => v.lang === lang && v.name.toLowerCase().includes('microsoft'));
+    if (ms) return ms;
+
+    // Fallback: any matching language
+    return voices.find(v => v.lang === lang) ||
+           voices.find(v => v.lang.startsWith(prefix)) ||
+           null;
   }, []);
 
   const speak = useCallback((text, lang = 'en-IN') => {
@@ -169,8 +244,8 @@ const useDrishtiVoice = ({
     window.speechSynthesis.cancel();
     const utt = new SpeechSynthesisUtterance(text);
     utt.lang = lang;
-    utt.rate = 0.95;
-    utt.pitch = 1.0;
+    utt.rate = 0.92;   // Change 6: slightly slower for authoritative delivery
+    utt.pitch = 1.05;  // Change 6: slight pitch lift for clarity
     const v = findBestVoice(lang);
     if (v) utt.voice = v;
     utt.onstart = () => { setIsSpeaking(true); callbacksRef.current.onSpeakStart?.(); };
@@ -268,6 +343,8 @@ const useDrishtiVoice = ({
     isSpeaking,
     liveTranscript,
     micPermission,
+    // Change 2: expose audioLevel for the orb
+    audioLevel,
   };
 };
 

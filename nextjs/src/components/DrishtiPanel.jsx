@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, MicOff, Send, X, Volume2, VolumeX, ChevronDown, History } from 'lucide-react';
+import { Mic, MicOff, Send, X, Volume2, VolumeX, ChevronDown, History, Pin } from 'lucide-react';
 
 /** Typewriter — reveals text character by character */
 function useTypewriter(text, speed = 16) {
@@ -70,6 +70,8 @@ export default function DrishtiPanel({
   greetingText,
   micPermission,
   onRequestMicPermission,
+  orbPinned,
+  onToggleOrbPin,
 }) {
   const [inputText, setInputText] = useState('');
   const [showLogs, setShowLogs] = useState(false);
@@ -157,6 +159,17 @@ export default function DrishtiPanel({
                     ${showLogs ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30' : 'bg-white/5 text-white/40 hover:text-white border border-white/8'}`}
                   title="Session logs">
                   <History className="w-3.5 h-3.5" />
+                </button>
+                {/* Change 6: Orb pin toggle */}
+                <button
+                  onClick={onToggleOrbPin}
+                  title={orbPinned ? 'Orb always visible (click to hide when panel closes)' : 'Show orb only when called'}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all border
+                    ${orbPinned
+                      ? 'bg-blue-600/20 text-blue-400 border-blue-500/30'
+                      : 'bg-white/5 text-white/40 border-white/8 hover:text-white'}`}
+                >
+                  <Pin className="w-3.5 h-3.5" />
                 </button>
                 {/* Close */}
                 <button onClick={onClose}
@@ -352,7 +365,7 @@ export default function DrishtiPanel({
                 </div>
 
                 <p className="mt-2 text-[9px] text-white/18 font-mono text-center">
-                  Hold 🎤 to talk · <kbd className="opacity-60 bg-white/10 px-1 py-0.5 rounded text-[8px]">Ctrl+Alt</kbd> PTT · Double-clap to wake
+                  Hold 🎤 to talk · <kbd className="opacity-60 bg-white/10 px-1 py-0.5 rounded text-[8px]">Ctrl+Alt</kbd> PTT · <kbd className="opacity-60 bg-white/10 px-1 py-0.5 rounded text-[8px]">Space</kbd> open · Double-clap to wake
                 </p>
               </div>
             )}

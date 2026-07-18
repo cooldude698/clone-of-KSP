@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, MessageSquare, Map, GitBranch,
   Camera, BarChart2, LogOut, Shield, ChevronLeft,
-  ChevronRight, AlertTriangle, User,
+  ChevronRight, AlertTriangle, User, History,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -22,7 +22,28 @@ const NAV_ITEMS = [
   { href: '/dashboard/network',      icon: GitBranch,       label: 'Network Graph',  id: 'nav-network' },
   { href: '/dashboard/surveillance', icon: Camera,          label: 'Surveillance',   id: 'nav-surveillance' },
   { href: '/dashboard/analytics',    icon: BarChart2,       label: 'Analytics',      id: 'nav-analytics' },
+  { href: '/dashboard/logs',         icon: History,         label: 'AI Logs',        id: 'nav-logs' },
 ];
+
+// ─── Change 5: Local intent detector ─────────────────────────────────────────
+function detectLocalIntent(query) {
+  const q = query.toLowerCase().trim();
+  if (q.includes('go to') || q.includes('open') || q.includes('show me')) {
+    if (q.includes('map') || q.includes('crime map'))
+      return { type: 'navigate', path: '/dashboard/map',          reply: 'Opening the Crime Map for you, Sir.' };
+    if (q.includes('analytic') || q.includes('trend'))
+      return { type: 'navigate', path: '/dashboard/analytics',    reply: 'Opening Analytics now.' };
+    if (q.includes('surveillance') || q.includes('camera'))
+      return { type: 'navigate', path: '/dashboard/surveillance', reply: 'Switching to Surveillance.' };
+    if (q.includes('network') || q.includes('graph'))
+      return { type: 'navigate', path: '/dashboard/network',      reply: 'Opening the Network Graph.' };
+    if (q.includes('chat') || q.includes('co-pilot'))
+      return { type: 'navigate', path: '/dashboard/chat',         reply: 'Opening Co-Pilot Chat.' };
+  }
+  if (['yes', 'yeah', 'sure', 'okay', 'ok'].includes(q))
+    return { type: 'confirm', reply: 'On it, Sir.' };
+  return null;
+}
 
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
@@ -43,8 +64,20 @@ export default function DashboardLayout({ children }) {
   const [sessionLogs,      setSessionLogs]      = useState([]);
   const [dispatchToast,    setDispatchToast]    = useState(null);
 
-  const pttActiveRef    = useRef(false);
-  const roleRef         = useRef(role);
+  // ─── Change 1 & 6: Orb pin state ─────────────────────────────────
+  const [orbPinned, setOrbPinned] = useState(true);
+
+  // ─── Change 2: Proactive suggestion state ────────────────────────
+  const [proactiveSuggestion, setProactiveSuggestion] = useState(null);
+  // ref so timers can read latest values without stale closure
+  const isPanelOpenRef  = useRef(false);
+  const hasInteractedRef = useRef(false);
+  const proactiveDismissedUntilRef = useRef(0);
+
+  isPanelOpenRef.current = isPanelOpen;
+
+  const pttActiveRef = useRef(false);
+  const roleRef      = useRef(role);
   useEffect(() => { roleRef.current = role; }, [role]);
 
   // ─── Voice hook ──────────────────────────────────────────────────
@@ -56,30 +89,42 @@ export default function DashboardLayout({ children }) {
     isListening, isSpeaking,
     liveTranscript,
     micPermission,
+    // Change 3: wire real-time audio level
+    audioLevel,
   } = useDrishtiVoice({
-    enableClapWake: true,
+    enableClapWake: false,
     onWake: () => {
-      // Double-clap: open panel and start PTT
-      setIsPanelOpen(true);
-      if (!hasGreeted) {
-        // greeting will trigger after panel opens
-      } else {
-        handlePttStart();
-      }
+      // Disabled clap wake to prevent random opening
     },
     onSpeakStart: () => setOrbState('speaking'),
-    onSpeakEnd:   () => setOrbState('idle'),   // back to idle after speaking — do NOT auto-listen
-    onError:      () => {},                    // all errors silently swallowed in hook
+    onSpeakEnd:   () => setOrbState('idle'),
+    onError:      () => {},
   });
 
-  // ─── Send query to backend ───────────────────────────────────────
+  // ─── Change 5: handleQuery with local intent ─────────────────────
+  const ts = () => new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
   const handleQuery = useCallback(async (queryText) => {
     if (!queryText?.trim()) return;
+    hasInteractedRef.current = true;
+
+    // Dismiss proactive suggestion if open
+    setProactiveSuggestion(null);
 
     setOrbState('thinking');
-    const ts = () => new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-
     setSessionLogs(prev => [...prev, { role: 'user', content: queryText, timestamp: ts() }]);
+
+    // ── Local intent check (Change 5) ──
+    const localResult = detectLocalIntent(queryText);
+    if (localResult) {
+      if (localResult.type === 'navigate') router.push(localResult.path);
+      const reply = localResult.reply;
+      setResponse({ response_text: reply, follow_up_suggestions: [], confidence: 1.0 });
+      setSessionLogs(prev => [...prev, { role: 'assistant', content: reply, timestamp: ts() }]);
+      setOrbState('speaking');
+      speak(reply, language === 'en' ? 'en-IN' : 'kn-IN');
+      return; // skip API call
+    }
 
     try {
       const res = await fetch('/api/chat', {
@@ -97,7 +142,6 @@ export default function DashboardLayout({ children }) {
       if (text) {
         setSessionLogs(prev => [...prev, { role: 'assistant', content: text, timestamp: ts() }]);
         setOrbState('speaking');
-        // Strip markdown for TTS
         const clean = text.replace(/[|*#`]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 800);
         speak(clean, language === 'en' ? 'en-IN' : 'kn-IN');
       } else {
@@ -109,7 +153,16 @@ export default function DashboardLayout({ children }) {
       setResponse({ response_text: fallback, follow_up_suggestions: [], urgency: 'low' });
       setSessionLogs(prev => [...prev, { role: 'assistant', content: fallback, timestamp: ts() }]);
     }
-  }, [language, conversationId, speak]);
+  }, [language, conversationId, speak, router]);
+
+  // ─── Change 4: Sync sessionLogs to localStorage ──────────────────
+  useEffect(() => {
+    if (typeof window !== 'undefined' && sessionLogs.length > 0) {
+      try {
+        localStorage.setItem('drishti_session_logs', JSON.stringify(sessionLogs));
+      } catch (_) {}
+    }
+  }, [sessionLogs]);
 
   // ─── PTT handlers ────────────────────────────────────────────────
   const pttStartRef = useRef(0);
@@ -118,6 +171,7 @@ export default function DashboardLayout({ children }) {
     if (pttActiveRef.current) return;
     pttActiveRef.current = true;
     pttStartRef.current = Date.now();
+    hasInteractedRef.current = true;
 
     if (isSpeaking) stopSpeaking();
     setOrbState('listening');
@@ -132,12 +186,9 @@ export default function DashboardLayout({ children }) {
     const captured = stopListeningAndGetTranscript();
 
     if (duration < 300 || !captured) {
-      // Too short or empty — ignore
       setOrbState('idle');
       return;
     }
-
-    // We have a transcript — send it
     handleQuery(captured);
   }, [stopListeningAndGetTranscript, handleQuery]);
 
@@ -164,6 +215,8 @@ export default function DashboardLayout({ children }) {
 
   const openPanel = useCallback(() => {
     setIsPanelOpen(true);
+    hasInteractedRef.current = true;
+    setProactiveSuggestion(null);
     if (!hasGreeted) triggerGreeting();
   }, [hasGreeted, triggerGreeting]);
 
@@ -174,18 +227,92 @@ export default function DashboardLayout({ children }) {
     setOrbState('idle');
   }, [isListening, stopListeningAndGetTranscript, stopSpeaking]);
 
-  // ─── Keyboard PTT: Ctrl+Alt (Win/Linux) | Cmd+Shift (Mac) ───────
+  // ─── Change 2: Proactive suggestion system ───────────────────────
+  const PROACTIVE_TEXT = {
+    '/dashboard':              { text: "Sir, want me to pull today's crime summary for your district?",       action: "Pull today's crime summary for my district" },
+    '/dashboard/map':          { text: "I can highlight today's hotspot clusters. Shall I?",                  action: "Highlight today's hotspot clusters on the map" },
+    '/dashboard/analytics':    { text: "I noticed trends worth flagging. Want a quick brief?",                action: "Give me a quick brief on recent trends" },
+    '/dashboard/surveillance': { text: "I can check for any ANPR alerts from the last hour. Say the word.",  action: "Check for ANPR alerts from the last hour" },
+    '/dashboard/network':      { text: "Want me to identify the key nodes in today's criminal network?",      action: "Identify key nodes in today's criminal network" },
+    '/dashboard/chat':         { text: "Ready when you are, Sir. Ask me anything.",                           action: "Give me a situation brief" },
+  };
+
+  const triggerProactiveSuggestion = useCallback(() => {
+    if (isPanelOpenRef.current) return;
+    if (hasInteractedRef.current) return;
+    if (Date.now() < proactiveDismissedUntilRef.current) return;
+
+    // Find the best matching path
+    const entry = PROACTIVE_TEXT[pathname] || PROACTIVE_TEXT['/dashboard'];
+    setProactiveSuggestion({ text: entry.text, action: entry.action, icon: '🔍' });
+
+    // Auto-dismiss after 15s
+    const autoTimer = setTimeout(() => setProactiveSuggestion(null), 15000);
+    return () => clearTimeout(autoTimer);
+  }, [pathname]);
+
+  // Fire 30s after mount if user hasn't interacted
+  useEffect(() => {
+    const t = setTimeout(triggerProactiveSuggestion, 30000);
+    return () => clearTimeout(t);
+  }, [triggerProactiveSuggestion]);
+
+  // Fire on pathname change (navigation)
+  const prevPathnameRef = useRef(pathname);
+  useEffect(() => {
+    if (prevPathnameRef.current !== pathname) {
+      prevPathnameRef.current = pathname;
+      hasInteractedRef.current = false;
+      setProactiveSuggestion(null);
+      const t = setTimeout(triggerProactiveSuggestion, 5000);
+      return () => clearTimeout(t);
+    }
+  }, [pathname, triggerProactiveSuggestion]);
+
+  // Every 5 minutes if panel is closed
+  useEffect(() => {
+    const t = setInterval(() => {
+      if (!isPanelOpenRef.current) triggerProactiveSuggestion();
+    }, 5 * 60 * 1000);
+    return () => clearInterval(t);
+  }, [triggerProactiveSuggestion]);
+
+  // ─── Change 6: Orb pin — load/save localStorage ──────────────────
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const stored = localStorage.getItem('drishti_orb_pinned');
+    if (stored !== null) setOrbPinned(stored === 'true');
+  }, []);
+
+  const handleToggleOrbPin = useCallback(() => {
+    setOrbPinned(prev => {
+      const next = !prev;
+      localStorage.setItem('drishti_orb_pinned', String(next));
+      return next;
+    });
+  }, []);
+
+  // ─── Change 3: Space bar hotkey ──────────────────────────────────
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const mac = /Mac|iPhone|iPod|iPad/i.test(navigator.userAgent);
     const held = { ctrl: false, alt: false, meta: false, shift: false };
     let kbPttActive = false;
 
+    const isInputFocused = () => {
+      const el = document.activeElement;
+      if (!el) return false;
+      const tag = el.tagName.toLowerCase();
+      return tag === 'input' || tag === 'textarea' || el.isContentEditable;
+    };
+
     const down = (e) => {
       if (e.key === 'Control') held.ctrl = true;
       if (e.key === 'Alt')     held.alt  = true;
       if (e.key === 'Meta')    held.meta = true;
       if (e.key === 'Shift')   held.shift = true;
+
+      // Original Ctrl+Alt / Cmd+Shift PTT
       const trigger = mac ? (held.meta && held.shift) : (held.ctrl && held.alt);
       if (trigger && !kbPttActive) {
         kbPttActive = true;
@@ -193,7 +320,21 @@ export default function DashboardLayout({ children }) {
         if (!hasGreeted)  { triggerGreeting(); setTimeout(handlePttStart, 500); }
         else              { handlePttStart(); }
       }
+
+      // Space bar shortcut (Change 3)
+      if (e.key === ' ' && !isInputFocused() && !e.repeat) {
+        e.preventDefault();
+        if (!isPanelOpen) {
+          setIsPanelOpen(true);
+          hasInteractedRef.current = true;
+          setProactiveSuggestion(null);
+          if (!hasGreeted) triggerGreeting();
+        } else {
+          handlePttStart();
+        }
+      }
     };
+
     const up = (e) => {
       if (e.key === 'Control') held.ctrl = false;
       if (e.key === 'Alt')     held.alt  = false;
@@ -202,10 +343,12 @@ export default function DashboardLayout({ children }) {
       const released = mac ? (!held.meta || !held.shift) : (!held.ctrl || !held.alt);
       if (released && kbPttActive) { kbPttActive = false; handlePttEnd(); }
     };
+
     const blur = () => {
       held.ctrl = held.alt = held.meta = held.shift = false;
       if (kbPttActive) { kbPttActive = false; handlePttEnd(); }
     };
+
     window.addEventListener('keydown', down);
     window.addEventListener('keyup',   up);
     window.addEventListener('blur',    blur);
@@ -238,6 +381,10 @@ export default function DashboardLayout({ children }) {
   };
 
   const isActive = (href) => href === '/dashboard' ? pathname === href : pathname.startsWith(href);
+
+  // ─── Change 1: Orb visibility logic ─────────────────────────────
+  // orbPinned=true → always show; false → only when panel closed
+  const showOrb = orbPinned || !isPanelOpen;
 
   return (
     <div className="flex h-screen bg-void-000 overflow-hidden">
@@ -350,15 +497,83 @@ export default function DashboardLayout({ children }) {
         greetingText={greetingText}
         micPermission={micPermission}
         onRequestMicPermission={requestMicPermission}
+        orbPinned={orbPinned}
+        onToggleOrbPin={handleToggleOrbPin}
       />
 
-      {/* ── DRISHTI ORB — hide when panel is open so it doesn't overlap ── */}
-      {!isPanelOpen && (
+      {/* ── DRISHTI ORB (Change 1) ── */}
+      {/* When panel is open and orb is pinned, render compact orb anchored to top-right of panel */}
+      {isPanelOpen && orbPinned && (
+        <div className="fixed top-2 right-[408px] z-[9996]">
+          <DrishtiOrb
+            state={orbState}
+            onClick={closePanel}
+            compact={true}
+            audioLevel={isListening ? audioLevel : 0}
+          />
+        </div>
+      )}
+      {/* Full orb when panel is closed (or orbPinned off + panel closed) */}
+      {!isPanelOpen && showOrb && (
         <DrishtiOrb
           state={orbState}
           onClick={openPanel}
+          compact={false}
+          audioLevel={isListening ? audioLevel : 0}
         />
       )}
+
+      {/* ── Change 3: Keyboard shortcut hint ── */}
+      {!isPanelOpen && (
+        <div className="fixed bottom-2 right-8 z-[9998] pointer-events-none">
+          <span className="text-[10px] text-white/20 font-mono">
+            Space — open Drishti · Hold to talk
+          </span>
+        </div>
+      )}
+
+      {/* ── Change 2: Proactive suggestion toast ── */}
+      <AnimatePresence>
+        {proactiveSuggestion && (
+          <motion.div
+            key="proactive-toast"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ type: 'spring', damping: 24, stiffness: 300 }}
+            className="fixed bottom-48 right-8 z-[9998] w-72"
+          >
+            <div className="bg-[#0d1117] border border-white/10 rounded-2xl shadow-2xl p-4 flex flex-col gap-3">
+              <p className="text-white/80 text-sm leading-relaxed">
+                {proactiveSuggestion.icon && <span className="mr-1.5">{proactiveSuggestion.icon}</span>}
+                {proactiveSuggestion.text}
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setProactiveSuggestion(null);
+                    openPanel();
+                    // Small delay so panel opens first
+                    setTimeout(() => handleQuery(proactiveSuggestion.action), 400);
+                  }}
+                  className="flex-1 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all"
+                >
+                  Yes
+                </button>
+                <button
+                  onClick={() => {
+                    setProactiveSuggestion(null);
+                    proactiveDismissedUntilRef.current = Date.now() + 10 * 60 * 1000;
+                  }}
+                  className="flex-1 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/40 hover:text-white/70 text-xs font-semibold transition-all border border-white/8"
+                >
+                  Not now
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Dispatch toast */}
       <AnimatePresence>
