@@ -72,7 +72,7 @@ export default function MapPage() {
                 onClick={() => setFilterSeverity(s)}
                 className={`px-2.5 py-1 rounded-md text-xs font-medium capitalize transition-all
                   ${filterSeverity === s
-                    ? 'bg-phosphor-500 text-paper-100'
+                    ? 'bg-phosphor-500 text-white'
                     : 'bg-steel-600/40 text-paper-100/60 hover:text-paper-100 border border-steel-600/50'}`}
               >
                 {s}

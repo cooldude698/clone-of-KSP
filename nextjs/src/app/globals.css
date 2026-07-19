@@ -5,37 +5,35 @@
 @tailwind utilities;
 
 :root {
-  /* LIGHT MODE TOKENS */
-  --color-void-000: #F4F5F3;
-  --color-steel-700: #E1E4E1;
-  --color-steel-600: #C7CCC7;
-  --color-phosphor-500: #2E6B4C;
-  --color-warn-500: #B45F04;
-  --color-critical-500: #A11D1D;
-  --color-stamp-red-500: #9C2B2B;
-  --color-success-500: #2F6647;
-  --color-paper-100: #1A1D1B; /* text */
+  /* LIGHT MODE TOKENS - Ultra Clean Minimal */
+  --color-void-000: #FAFAFA;       /* Page background */
+  --color-steel-700: #FFFFFF;      /* Card background */
+  --color-steel-600: #E5E7EB;      /* Subtle borders (gray-200) */
+  --color-phosphor-500: #2563EB;   /* Primary accent (blue-600) */
+  --color-warn-500: #D97706;       /* Warning (amber-600) */
+  --color-critical-500: #DC2626;   /* Critical (red-600) */
+  --color-stamp-red-500: #DC2626;
+  --color-success-500: #059669;    /* Success (emerald-600) */
+  --color-paper-100: #111827;      /* Primary text (gray-900) */
 
-  --scanline-color: rgba(46, 107, 76, 0.02);
-  --scroll-track: #E1E4E1;
-  --scroll-thumb: #C7CCC7;
+  --scroll-track: #F3F4F6;
+  --scroll-thumb: #D1D5DB;
 }
 
 .dark, [data-theme="dark"] {
-  /* DARK MODE TOKENS */
-  --color-void-000: #0A0D0A;
-  --color-steel-700: #2B3238;
-  --color-steel-600: #3D4750;
-  --color-phosphor-500: #4A8B6F;
-  --color-warn-500: #D97706;
-  --color-critical-500: #B91C1C;
-  --color-stamp-red-500: #9C2B2B;
-  --color-success-500: #3F7A5C;
-  --color-paper-100: #E8E6DF; /* text */
+  /* DARK MODE TOKENS - Clean OLED Black */
+  --color-void-000: #000000;       /* Page background */
+  --color-steel-700: #0A0A0A;      /* Card background */
+  --color-steel-600: #27272A;      /* Subtle borders (zinc-800) */
+  --color-phosphor-500: #3B82F6;   /* Primary accent (blue-500) */
+  --color-warn-500: #F59E0B;       /* Warning (amber-500) */
+  --color-critical-500: #EF4444;   /* Critical (red-500) */
+  --color-stamp-red-500: #EF4444;
+  --color-success-500: #10B981;    /* Success (emerald-500) */
+  --color-paper-100: #F9FAFB;      /* Primary text (gray-50) */
 
-  --scanline-color: rgba(74, 139, 111, 0.04);
-  --scroll-track: #0A0D0A;
-  --scroll-thumb: #3D4750;
+  --scroll-track: #000000;
+  --scroll-thumb: #27272A;
 }
 
 * {
@@ -76,73 +74,12 @@ body {
 
 .glass-card {
   background: var(--color-steel-700);
-  border: 1px solid rgba(199, 204, 199, 0.15);
+  border: 1px solid var(--color-steel-600);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .dark .glass-card {
-  background: rgba(43, 50, 56, 0.7);
-  border: 1px solid rgba(61, 71, 80, 0.3);
-}
-
-/* Pulsing phosphor indicator */
-.pulse-phosphor {
-  box-shadow: 0 0 0 0 rgba(74, 139, 111, 0.6);
-  animation: pulse-phosphor-anim 2s infinite;
-}
-
-@keyframes pulse-phosphor-anim {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(74, 139, 111, 0.5);
-  }
-  70% {
-    transform: scale(1.1);
-    box-shadow: 0 0 0 6px rgba(74, 139, 111, 0);
-  }
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(74, 139, 111, 0);
-  }
-}
-
-/* 1. Live indicator scanline overlay */
-.live-scanline {
-  position: relative;
-  overflow: hidden;
-}
-
-.live-scanline::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 10;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 1px,
-    var(--scanline-color) 1px,
-    var(--scanline-color) 3px
-  );
-}
-
-/* 2. Rubber Case Stamp styling */
-.case-stamp {
-  display: inline-block;
-  padding: 0.2rem 0.4rem;
-  border: 2px solid var(--color-stamp-red-500);
-  color: var(--color-stamp-red-500);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  transform: rotate(-8deg);
-  border-radius: 0.125rem;
-  background: transparent;
-  opacity: 0.9;
-  letter-spacing: 0.05em;
-  box-shadow: 0 0 1px var(--color-stamp-red-500);
-  user-select: none;
+  box-shadow: none;
 }
 
 /* Map override for dark/light themes */
@@ -267,3 +204,36 @@ body {
 /* Hidden by default — only shown during print */
 #drishti-print-report { display: none; }
 
+/* ═══════════════════════════════════════════════════════
+   DRISHTI VOICE PANEL — Custom scrollbar & animations
+   ═══════════════════════════════════════════════════════ */
+.drishti-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.drishti-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.drishti-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+}
+.drishti-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Slide-in animations for panels */
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.animate-slide-in {
+  animation: slideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}

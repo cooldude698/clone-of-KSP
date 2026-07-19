@@ -351,14 +351,8 @@ export default function DrishtiDashboard() {
     }
   };
 
-  const { startListening, stopListening, speak } = useDrishtiVoice({
+  const { startListening, stopListeningAndGetTranscript, speak } = useDrishtiVoice({
     onWake: () => handleWakeToggle(),
-    onTranscript: (text, isFinal = true) => {
-      setTranscript(text);
-      if (isFinal) {
-        handleQuery(text);
-      }
-    },
     onSpeakStart: () => { },
     onSpeakEnd: () => setOrbState('idle'),
     onError: (err) => {
@@ -373,6 +367,14 @@ export default function DrishtiDashboard() {
       setOrbState('idle');
     }
   });
+
+  const stopListening = () => {
+    const text = stopListeningAndGetTranscript();
+    setTranscript(text || '');
+    if (text && text.trim().length > 0) {
+      handleQuery(text.trim());
+    }
+  };
 
   const handleWakeToggle = () => {
     setOrbState(prev => {
