@@ -114,6 +114,8 @@ const DrishtiOrb = ({
   isListening = false,
   liveTranscript = '',
   onReadAloud,
+  isMuted = false,
+  onToggleMute,
 }) => {
   const [isClient, setIsClient] = useState(false);
 
@@ -590,21 +592,21 @@ const DrishtiOrb = ({
         </div>
 
         {/* BUTTONS */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {/* PTT BUTTON */}
           <button
-            onMouseDown={onPttStart}
-            onMouseUp={onPttEnd}
-            onMouseLeave={isListening ? onPttEnd : undefined}
-            onTouchStart={e => { e.preventDefault(); onPttStart?.(); }}
-            onTouchEnd={e => { e.preventDefault(); onPttEnd?.(); }}
+            onMouseDown={(e) => { e.preventDefault(); onPttStart?.(); }}
+            onMouseUp={(e) => { e.preventDefault(); onPttEnd?.(); }}
+            onMouseLeave={isListening ? (e) => { e.preventDefault(); onPttEnd?.(); } : undefined}
+            onTouchStart={(e) => { e.preventDefault(); onPttStart?.(); }}
+            onTouchEnd={(e) => { e.preventDefault(); onPttEnd?.(); }}
             className={`px-5 py-2.5 rounded-full text-[9px] uppercase font-bold tracking-[0.2em] select-none transition-all duration-300 backdrop-blur-md flex items-center gap-2
               ${isListening
-                ? 'bg-paper-100 text-void-000 shadow-[0_0_20px_rgba(255,255,255,0.3)] scale-105'
-                : 'bg-steel-600/10 border border-steel-600/20 text-paper-100/50 hover:text-paper-100 hover:bg-steel-600/20 hover:border-steel-600/40'}`}
+                ? 'bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.5)] scale-105'
+                : 'bg-steel-600/10 border border-steel-600/20 text-paper-100/70 hover:text-paper-100 hover:bg-steel-600/20 hover:border-steel-600/40'}`}
           >
-            {isListening && <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />}
-            {isListening ? 'RECORDING' : 'HOLD TO TALK'}
+            {isListening && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
+            {isListening ? 'LISTENING…' : 'HOLD TO TALK'}
           </button>
 
           {/* TYPE INSTEAD BUTTON */}
@@ -614,13 +616,25 @@ const DrishtiOrb = ({
               ${showTypingInput
                 ? 'bg-paper-100 text-void-000 border-transparent shadow-[0_0_15px_rgba(255,255,255,0.2)]'
                 : 'bg-steel-600/10 border-steel-600/20 text-paper-100/40 hover:text-paper-100 hover:bg-steel-600/20 hover:border-steel-600/40'}`}
-            title="Type instead"
+            title="Type text message"
           >
             {showTypingInput ? (
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
             ) : (
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h16v10H4z"/><path d="M8 11h.01"/><path d="M12 11h.01"/><path d="M16 11h.01"/><path d="M7 14h10"/></svg>
             )}
+          </button>
+
+          {/* PERMANENT MUTE BUTTON */}
+          <button
+            onClick={onToggleMute}
+            className={`w-9 h-9 rounded-full border flex items-center justify-center text-xs transition-all duration-300 backdrop-blur-md
+              ${isMuted
+                ? 'bg-red-500/20 text-red-400 border-red-500/40 shadow-[0_0_12px_rgba(239,68,68,0.3)]'
+                : 'bg-steel-600/10 border-steel-600/20 text-paper-100/50 hover:text-paper-100 hover:bg-steel-600/20 hover:border-steel-600/40'}`}
+            title={isMuted ? "Unmute Spoken Audio (Alt+M)" : "Permanently Mute Spoken Audio (Alt+M)"}
+          >
+            {isMuted ? '🔇' : '🔊'}
           </button>
         </div>
       </div>

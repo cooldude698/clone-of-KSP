@@ -14,19 +14,6 @@ const SUGGESTIONS = [
   'Show details for case FIR-2026-BL-4921',
 ];
 
-const MOCK_RESPONSES = {
-  default: `I found **12 matching records** in the KSP database.\n\n| Case Number | Crime Type | District | Status |\n|---|---|---|---|\n| FIR-2026-BL-4921 | Vehicle Theft | Bengaluru Urban | Open |\n| FIR-2026-BL-4918 | Robbery | Bengaluru Urban | Under Investigation |\n| FIR-2026-MY-1103 | Chain Snatching | Mysuru | Open |\n\nWould you like me to filter by date range or district?`,
-  vehicle: `Querying FIR database for **vehicle theft cases**...\n\nFound **47 cases** in Bengaluru Urban this month.\n\n**Top Areas:** Silk Board (12), MG Road (8), Whitefield (6)\n\n**Peak Time:** Between 10 PM – 2 AM (68% of cases)\n\nMost recent critical link: **FIR-2026-BL-4921**.`,
-  repeat: `Identified **37 high-risk repeat offenders** with risk score > 70.\n\n**Top 3 flagged suspects:**\n- Ramesh Kumar — Risk: 92/100 — 6 FIRs (Case: **FIR-2026-BL-4921**)\n- Suresh Naidu — Risk: 85/100 — 4 FIRs (Case: **FIR-2026-BL-4918**) \n- Anand Murthy — Risk: 78/100 — 3 FIRs (Case: **FIR-2026-MY-1103**)\n\nClick on any case number to load the Investigator Wall.`,
-};
-
-function getMockResponse(query) {
-  const q = query.toLowerCase();
-  if (q.includes('vehicle') || q.includes('theft')) return MOCK_RESPONSES.vehicle;
-  if (q.includes('repeat') || q.includes('offender')) return MOCK_RESPONSES.repeat;
-  return MOCK_RESPONSES.default;
-}
-
 function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
   const [copied, setCopied] = useState(false);
   const isUser = msg.role === 'user';
@@ -428,6 +415,49 @@ export default function ChatPage() {
     }
   };
 
+  const fileInputRef = useRef(null);
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLoading(true);
+    const fileName = file.name;
+    const reader = new FileReader();
+
+    reader.onload = async (event) => {
+      const content = event.target?.result || '';
+      try {
+        const res = await fetch('/api/upload-fir', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fileName,
+            fileContent: typeof content === 'string' ? content : 'Binary FIR document attached',
+          }),
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          const rec = data.record;
+          const cardMsg = `📄 **AUTOMATED FIR ENTRY STORED IN CATALYST DATASTORE**\n\n- **Case Number:** \`${rec.case_number}\`\n- **Crime Type:** ${rec.crime_type_code}\n- **District:** ${rec.district_name}\n- **Police Station:** ${rec.police_station}\n- **Date Filed:** ${rec.date_filed}\n- **Status:** ${rec.status}\n\n**Document Summary:**\n_${rec.description}_\n\n✅ *This case has been indexed into Catalyst DataStore and is now searchable by DRISHTI RAG.*`;
+
+          setMessages((prev) => [
+            ...prev,
+            { role: 'user', content: `Uploaded document: ${fileName}`, timestamp: timestamp() },
+            { role: 'assistant', content: cardMsg, timestamp: timestamp() },
+          ]);
+        }
+      } catch (err) {
+        console.error('File upload error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    reader.readAsText(file);
+  };
+
   const sendMessage = async (text) => {
     if (!text.trim() || loading) return;
     const userMsg = { role: 'user', content: text, timestamp: timestamp() };
@@ -436,30 +466,25 @@ export default function ChatPage() {
     setLoading(true);
 
     try {
-      let responseText;
+      let responseText = '';
       try {
-        const res = await fetch(`${API_BASE}/chat/`, {
+        const res = await fetch('/api/askDrishtiAI', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            query: text,
-            language,
-            conversation_id: conversationId,
-            conversation_history: messages.slice(-10).map((m) => ({
-              role: m.role,
-              content: m.content,
-            })),
+            question: text,
+            lang: language,
           }),
         });
         if (res.ok) {
           const data = await res.json();
-          responseText = data.response_text || data.response || data.answer || (typeof data === 'string' ? data : JSON.stringify(data));
+          responseText = data.answer || data.response_text || 'Database query processed.';
         } else {
-          throw new Error('API not available');
+          throw new Error('API error');
         }
-      } catch {
-        await new Promise((r) => setTimeout(r, 800));
-        responseText = getMockResponse(text);
+      } catch (err) {
+        console.error('Copilot Chat API error:', err);
+        responseText = "I'm having trouble connecting to the intelligence database. Please try again.";
       }
 
       setMessages((prev) => [
@@ -467,8 +492,8 @@ export default function ChatPage() {
         { role: 'assistant', content: responseText, timestamp: timestamp() },
       ]);
 
-      // Auto-read the assistant response (index = messages.length after push)
-      const newMsgIdx = messages.length + 1; // +1 for user msg already added
+      // Auto-read the assistant response
+      const newMsgIdx = messages.length + 1;
       speakText(responseText, newMsgIdx);
 
       // Check if response mentions a specific FIR number to slide open the InvestigatorWall
@@ -670,6 +695,24 @@ export default function ChatPage() {
                 }`}
             >
               {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </button>
+
+            {/* File / FIR Document Upload Button */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.txt,.json,.doc,.docx,image/*"
+              className="hidden"
+              onChange={handleFileUpload}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={loading}
+              title="Upload FIR Document or Case File to Catalyst DataStore"
+              className="w-10 h-10 rounded-xl bg-steel-700 border border-steel-600/40 text-paper-100/60 hover:text-phosphor-500 hover:border-phosphor-500/40 flex items-center justify-center flex-shrink-0 transition-all shadow-sm"
+            >
+              <FileText className="w-4 h-4" />
             </button>
 
             {/* Text input */}

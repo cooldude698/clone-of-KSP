@@ -84,7 +84,42 @@ const POLICE_KNOWLEDGE_BASE = [
   }
 ];
 
-function findKnowledgeContext(query) {
+async function fetchLiveDatabaseContext(query) {
+  const q = query.toLowerCase();
+  let liveDataStr = '';
+
+  try {
+    // 1. FIRs & Case Records
+    if (q.includes('fir') || q.includes('case') || q.includes('theft') || q.includes('robbery') || q.includes('crime') || q.includes('detail') || q.includes('recent')) {
+      const res = await axios.get('http://localhost:3000/api/firs?limit=5', { timeout: 3000 }).catch(() => null);
+      if (res?.data?.firs?.length) {
+        liveDataStr += `\n\nLIVE FIR DATASTORE RECORDS FROM CATALYST:\n` + JSON.stringify(res.data.firs.slice(0, 5), null, 2);
+      }
+    }
+
+    // 2. Repeat Offenders & Suspects
+    if (q.includes('offender') || q.includes('repeat') || q.includes('suspect') || q.includes('accused') || q.includes('ramesh') || q.includes('suresh')) {
+      const res = await axios.get('http://localhost:3000/api/repeat-offenders?limit=5', { timeout: 3000 }).catch(() => null);
+      if (res?.data?.offenders?.length) {
+        liveDataStr += `\n\nLIVE REPEAT OFFENDERS DATASTORE RECORDS FROM CATALYST:\n` + JSON.stringify(res.data.offenders.slice(0, 5), null, 2);
+      }
+    }
+
+    // 3. ANPR Vehicle Tracking & Cameras
+    if (q.includes('anpr') || q.includes('plate') || q.includes('vehicle') || q.includes('camera') || q.includes('alert') || q.includes('silk')) {
+      const res = await axios.get('http://localhost:3000/api/anpr-check?limit=5', { timeout: 3000 }).catch(() => null);
+      if (res?.data) {
+        liveDataStr += `\n\nLIVE ANPR ALERTS & SURVEILLANCE RECORDS FROM CATALYST:\n` + JSON.stringify(res.data, null, 2);
+      }
+    }
+  } catch (e) {
+    console.warn('[DRISHTI] Live DB fetch error:', e.message);
+  }
+
+  return liveDataStr;
+}
+
+async function findKnowledgeContext(query) {
   const q = query.toLowerCase();
   let context = CRIME_DATABASE_SUMMARY;
 
@@ -95,19 +130,21 @@ function findKnowledgeContext(query) {
     context += `\n\nOFFICIAL KSP POLICE MANUAL REFERENCE & CONTEXT:\n` + matched.map(m => m.content).join('\n\n');
   }
 
+  // Inject live database queries from Catalyst DataStore
+  const liveDbData = await fetchLiveDatabaseContext(query);
+  if (liveDbData) {
+    context += liveDbData;
+  }
+
   return context;
 }
 
-/**
- * Call Catalyst Zia Translation endpoint.
- * Returns translated text, or throws on failure.
- */
 async function translateWithZia(text, sourceLang, targetLang) {
-  const url = process.env.QUICKML_TRANSLATE_ENDPOINT_URL;
+  const url = process.env.QUICKML_TRANSLATE_ENDPOINT_URL || 'https://api.catalyst.zoho.in/quickml/api/v1/models/zia/translate';
   const token = process.env.QUICKML_OAUTH_TOKEN;
-  const orgId = process.env.CATALYST_ORG_ID;
+  const orgId = process.env.CATALYST_ORG_ID || '60073715607';
 
-  if (!url || !token || !orgId) {
+  if (!url || !token) {
     throw new Error('Zia translation env vars not set');
   }
 
@@ -117,7 +154,7 @@ async function translateWithZia(text, sourceLang, targetLang) {
     {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Zoho-oauthtoken ${token}`,
+        Authorization: token.startsWith('Zoho-oauthtoken ') ? token : `Zoho-oauthtoken ${token}`,
         'CATALYST-ORG': orgId,
         Environment: 'Development',
       },
@@ -137,7 +174,7 @@ async function translateWithZia(text, sourceLang, targetLang) {
 async function translateWithGemini(text, sourceLang, targetLang) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return text;
-  const targetName = targetLang === 'kn' ? 'Kannada' : 'English';
+  const targetName = targetLang === 'kn' ? 'Kannada' : targetLang === 'hi' ? 'Hindi' : 'English';
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
   try {
     const response = await axios.post(
@@ -154,43 +191,6 @@ async function translateWithGemini(text, sourceLang, targetLang) {
   }
 }
 
-async function translateToKannada(text) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return { text, spokenText: text };
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-  try {
-    const response = await axios.post(
-      url,
-      {
-        contents: [
-          {
-            role: 'user',
-            parts: [
-              {
-                text: `Translate the following police intelligence response into Kannada. Return a JSON object with two properties:\n1. "text": Kannada script translation for screen display.\n2. "spokenText": Phonetic Romanized/Latin transliteration of the Kannada translation so a text-to-speech engine can read it out smoothly.\n\nJSON output ONLY:\n\nText: ${text}`,
-              },
-            ],
-          },
-        ],
-        generationConfig: { responseMimeType: 'application/json', temperature: 0.1 },
-      },
-      { headers: { 'Content-Type': 'application/json' }, timeout: 6000 }
-    );
-    const raw = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (raw) {
-      const clean = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
-      const parsed = JSON.parse(clean);
-      return {
-        text: parsed.text || text,
-        spokenText: parsed.spokenText || parsed.text || text,
-      };
-    }
-  } catch (e) {
-    console.warn('[DRISHTI] Kannada translation error:', e.message);
-  }
-  return { text, spokenText: text };
-}
-
 async function translateText(text, sourceLang, targetLang) {
   if (!text || sourceLang === targetLang) return text;
   try {
@@ -202,12 +202,7 @@ async function translateText(text, sourceLang, targetLang) {
   return await translateWithGemini(text, sourceLang, targetLang);
 }
 
-/**
- * Call Catalyst QuickML RAG endpoint with GLM-4.7-Flash.
- * Hard timeout: 8000 ms. Throws on error or timeout.
- */
 async function callQuickML(question, knowledgeContext = '') {
-  const url = process.env.QUICKML_RAG_ENDPOINT_URL || 'https://api.catalyst.zoho.in/quickml/v1/project/49149000000019001/rag/answer';
   const token = process.env.QUICKML_OAUTH_TOKEN;
   const orgId = process.env.CATALYST_ORG_ID || '60073715607';
 
@@ -215,48 +210,56 @@ async function callQuickML(question, knowledgeContext = '') {
     throw new Error('QuickML OAuth token not configured');
   }
 
-  const authHeader = token.startsWith('Zoho-oauthtoken ')
+  const authHeader = token.startsWith('Zoho-oauthtoken ') || token.startsWith('Bearer ')
     ? token
     : `Zoho-oauthtoken ${token}`;
 
   const promptContent = knowledgeContext
-    ? `${question}${knowledgeContext}`
+    ? `POLICE OFFICER QUERY: ${question}\n\nRELEVANT LIVE DATASTORE & POLICE KNOWLEDGE CONTEXT:\n${knowledgeContext}`
     : question;
 
-  const response = await axios.post(
-    url,
+  const targets = [
     {
-      model: 'GLM-4.7-Flash',
-      messages: [
-        {
-          role: 'user',
-          content: promptContent,
-        },
-      ],
-      temperature: 0.2,
-      top_p: 0.3,
-      max_tokens: 800,
+      url: process.env.QUICKML_RAG_ENDPOINT_URL || 'https://api.catalyst.zoho.in/quickml/v1/project/49149000000019001/rag/answer',
+      payload: { model: 'GLM-4.7-Flash', messages: [{ role: 'user', content: promptContent }], temperature: 0.2, max_tokens: 800 }
     },
     {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: authHeader,
-        'CATALYST-ORG': orgId,
-      },
-      timeout: 8000,
+      url: 'https://api.catalyst.zoho.in/quickml/v1/project/49149000000019001/glm/chat',
+      payload: { model: 'crm-di-glm47b_30b_it', messages: [{ role: 'user', content: promptContent }], temperature: 0.2, max_tokens: 800 }
     }
-  );
+  ];
 
-  const data = response.data;
-  const answer =
-    data?.choices?.[0]?.message?.content ||
-    data?.choices?.[0]?.delta?.content ||
-    data?.output ||
-    data?.answer ||
-    '';
+  let lastErr;
+  for (const target of targets) {
+    try {
+      const response = await axios.post(
+        target.url,
+        target.payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: authHeader,
+            'CATALYST-ORG': orgId,
+          },
+          timeout: 7000,
+        }
+      );
 
-  if (!answer) throw new Error('QuickML returned empty answer');
-  return answer;
+      const data = response.data;
+      const answer =
+        data?.choices?.[0]?.message?.content ||
+        data?.choices?.[0]?.delta?.content ||
+        data?.output ||
+        data?.answer ||
+        '';
+
+      if (answer && answer.trim()) return answer.trim();
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+
+  throw new Error(`QuickML endpoints failed: ${lastErr?.message}`);
 }
 
 /**
@@ -385,8 +388,8 @@ module.exports = async (req, res) => {
     workingQuestion = await translateText(workingQuestion, 'kn', 'en');
   }
 
-  // Lookup matching police manual SOP / legal context
-  const knowledgeContext = findKnowledgeContext(workingQuestion);
+  // Lookup matching police manual SOP / legal context & live DataStore records
+  const knowledgeContext = await findKnowledgeContext(workingQuestion);
 
   // Step 2: PRIMARY — QuickML RAG
   try {

@@ -35,6 +35,7 @@ const useDrishtiVoice = ({
   // PTT transcript accumulation
   const accumulatedFinalRef = useRef('');
   const lastInterimRef = useRef('');
+  const liveTranscriptRef = useRef('');
 
   // Fix 1: retry counter for network errors
   const retryCountRef = useRef(0);
@@ -88,14 +89,13 @@ const useDrishtiVoice = ({
       let newInterim = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const r = event.results[i];
-        // With maxAlternatives=3, pick the first (highest confidence) alternative
         if (r.isFinal) newFinal += r[0].transcript;
         else newInterim += r[0].transcript;
       }
       if (newFinal) accumulatedFinalRef.current += ' ' + newFinal;
       lastInterimRef.current = newInterim;
-      // Show live preview
       const display = (accumulatedFinalRef.current + ' ' + newInterim).trim();
+      liveTranscriptRef.current = display;
       setLiveTranscript(display);
     };
 
@@ -273,10 +273,11 @@ const useDrishtiVoice = ({
     try { stopVolumeDetection(); } catch (_) {}
     setIsListening(false);
     
-    const final = (accumulatedFinalRef.current + ' ' + lastInterimRef.current).trim();
+    const captured = (accumulatedFinalRef.current + ' ' + lastInterimRef.current).trim() || liveTranscriptRef.current?.trim() || '';
     accumulatedFinalRef.current = '';
     lastInterimRef.current = '';
-    return final;
+    liveTranscriptRef.current = '';
+    return captured;
   }, [stopVolumeDetection]);
 
   // Change 6: improved voice selection — neural/natural voices first

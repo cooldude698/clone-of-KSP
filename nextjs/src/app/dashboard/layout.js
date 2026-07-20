@@ -183,7 +183,7 @@ export default function DashboardLayout({ children }) {
         const ttsLang = (data.language || language) === 'kn' ? 'kn-IN' : 'en-IN';
         const spokenText = data.spokenAnswer || text;
         const clean = spokenText.replace(/[|*#`]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 800);
-        speak(clean, ttsLang);
+        safeSpeak(clean, ttsLang);
       } else {
         setOrbState('idle');
         setStateOverrideLabel('');
@@ -225,16 +225,20 @@ export default function DashboardLayout({ children }) {
     if (!pttActiveRef.current) return;
     pttActiveRef.current = false;
 
+    // Flush final speech events
+    await new Promise(r => setTimeout(r, 150));
+
     const browserCaptured = stopListeningAndGetTranscript();
     setOrbState('idle');
 
-    if (!browserCaptured?.trim()) {
+    const finalQuery = (browserCaptured || liveTranscript || pendingTranscript || '').trim();
+    if (!finalQuery) {
       return;
     }
 
     // Auto-send captured voice query immediately
-    handleQuery(browserCaptured.trim());
-  }, [stopListeningAndGetTranscript, handleQuery]);
+    handleQuery(finalQuery);
+  }, [stopListeningAndGetTranscript, liveTranscript, pendingTranscript, handleQuery]);
 
   const handleConfirmSend = useCallback(() => {
     if (!pendingTranscript.trim()) return;
@@ -292,110 +296,39 @@ export default function DashboardLayout({ children }) {
     setOrbState('idle');
   }, [isListening, stopListeningAndGetTranscript, stopSpeaking]);
 
-  // ─── Change 2: Proactive suggestion system ───────────────────────
-  // FIX 6: context-aware proactive suggestions based on time + session history
-  const getProactiveSuggestion = useCallback((logs = []) => {
-    const hour = new Date().getHours();
-    const isNight = hour >= 21 || hour < 6;
-    const isEvening = hour >= 17 && hour < 21;
-    const hasTalkedBefore = logs.length > 0;
+  // ─── Permanent Mute State ──────────────────────────────────────────
+  const [isMuted, setIsMuted] = useState(false);
+  const isMutedRef = useRef(false);
+  useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
 
-    // If officer has already talked to Drishti this session, suggest continuation
-    if (hasTalkedBefore) {
-      const lastUserMsg = [...logs].reverse().find(l => l.role === 'user');
-      if (lastUserMsg?.content) {
-        const last = lastUserMsg.content.toLowerCase();
-        if (last.includes('vehicle') || last.includes('theft') || last.includes('car') || last.includes('bike'))
-          return { text: "I found more leads on that vehicle case. Want to continue?", action: "Continue the vehicle theft investigation we were discussing", icon: '🔍' };
-        if (last.includes('hotspot') || last.includes('cluster') || last.includes('area'))
-          return { text: "There's a related area you might want to check. Shall I pull it up?", action: "Show me related crime clusters from our earlier analysis", icon: '🔍' };
+  const handleToggleMute = useCallback(() => {
+    setIsMuted(prev => {
+      const next = !prev;
+      if (next) stopSpeaking();
+      return next;
+    });
+  }, [stopSpeaking]);
+
+  const safeSpeak = useCallback((text, lang) => {
+    if (isMutedRef.current) return;
+    speak(text, lang);
+  }, [speak]);
+
+  // ─── Keyboard Shortcuts (Alt+O: Toggle Panel, Alt+M: Toggle Mute) ───
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.altKey && (e.key === 'o' || e.key === 'O')) {
+        e.preventDefault();
+        setIsPanelOpen(prev => !prev);
       }
-    }
-
-    // Context-aware suggestions by page + time of day
-    const suggestions = {
-      '/dashboard': isNight
-        ? { text: "Night shift active, Sir. 3 incidents logged in the last hour. Shall I brief you?", action: "Brief me on incidents from the last hour" }
-        : { text: "Good to see you, Sir. Want a quick summary of today's activity in your district?", action: "Give me today's crime activity summary for my district" },
-      '/dashboard/map': {
-        text: isEvening
-          ? "Evening hotspots are different from daytime patterns, Sir. Want me to highlight the high-risk areas for tonight?"
-          : "Want me to overlay this week's crime clusters on the map?",
-        action: isEvening
-          ? "Show evening crime hotspots and high-risk areas for tonight"
-          : "Show this week's crime cluster hotspots on the map"
-      },
-      '/dashboard/analytics': {
-        text: "I can compare this month's trends against last month. Worth a look?",
-        action: "Compare this month's crime trends against last month and highlight changes"
-      },
-      '/dashboard/surveillance': {
-        text: isNight
-          ? "Night vision cameras are active. Want me to flag any vehicles that appeared multiple times tonight?"
-          : "Want me to scan for any vehicles that triggered ANPR alerts today?",
-        action: isNight
-          ? "Flag vehicles that appeared multiple times on surveillance tonight"
-          : "Show vehicles that triggered ANPR alerts today"
-      },
-      '/dashboard/network': {
-        text: "I can identify the top 3 most connected individuals in this network. Shall I?",
-        action: "Identify the top 3 most connected individuals in the criminal network and explain their links"
-      },
-      '/dashboard/chat': {
-        text: "Ready when you are, Sir. What's on your mind?",
-        action: "What are the most important things I should know right now?"
-      },
+      if (e.altKey && (e.key === 'm' || e.key === 'M')) {
+        e.preventDefault();
+        handleToggleMute();
+      }
     };
-
-    const entry = suggestions[pathname] || suggestions['/dashboard'];
-    return { text: entry.text, action: entry.action, icon: '🔍' };
-  }, [pathname]);
-
-  const triggerProactiveSuggestion = useCallback((logs = []) => {
-    if (isPanelOpenRef.current) return;
-    if (hasInteractedRef.current) return;
-    if (Date.now() < proactiveDismissedUntilRef.current) return;
-
-    const suggestion = getProactiveSuggestion(logs);
-    setProactiveSuggestion(suggestion);
-    
-    // Change: Make Drishti actually speak the notification
-    setOrbState('speaking');
-    speak(suggestion.text, language === 'en' ? 'en-IN' : 'kn-IN');
-
-    // Auto-dismiss after 15s
-    const autoTimer = setTimeout(() => {
-      setProactiveSuggestion(null);
-      setOrbState('idle');
-    }, 15000);
-    return () => clearTimeout(autoTimer);
-  }, [getProactiveSuggestion, speak, language]);
-
-  // Fire 30s after mount if user hasn't interacted
-  useEffect(() => {
-    const t = setTimeout(() => triggerProactiveSuggestion(sessionLogs), 30000);
-    return () => clearTimeout(t);
-  }, [triggerProactiveSuggestion, sessionLogs]);
-
-  // Fire on pathname change (navigation)
-  const prevPathnameRef = useRef(pathname);
-  useEffect(() => {
-    if (prevPathnameRef.current !== pathname) {
-      prevPathnameRef.current = pathname;
-      hasInteractedRef.current = false;
-      setProactiveSuggestion(null);
-      const t = setTimeout(() => triggerProactiveSuggestion(sessionLogs), 5000);
-      return () => clearTimeout(t);
-    }
-  }, [pathname, triggerProactiveSuggestion, sessionLogs]);
-
-  // Every 5 minutes if panel is closed
-  useEffect(() => {
-    const t = setInterval(() => {
-      if (!isPanelOpenRef.current) triggerProactiveSuggestion(sessionLogs);
-    }, 5 * 60 * 1000);
-    return () => clearInterval(t);
-  }, [triggerProactiveSuggestion, sessionLogs]);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleToggleMute]);
 
   // ─── Change 6: Orb pin — load/save localStorage ──────────────────
   useEffect(() => {
@@ -654,8 +587,9 @@ export default function DashboardLayout({ children }) {
         onRequestMicPermission={requestMicPermission}
         orbPinned={orbPinned}
         onToggleOrbPin={handleToggleOrbPin}
-        stateOverrideLabel={stateOverrideLabel || undefined}
-        onSpeakText={speak}
+        onSpeakText={safeSpeak}
+        isMuted={isMuted}
+        onToggleMute={handleToggleMute}
       />
 
       {/* ── DRISHTI ORB (Change 1) ── */}
@@ -667,6 +601,8 @@ export default function DashboardLayout({ children }) {
             onClick={closePanel}
             compact={true}
             audioLevel={isListening ? audioLevel : 0}
+            isMuted={isMuted}
+            onToggleMute={handleToggleMute}
           />
         </div>
       )}
@@ -694,9 +630,11 @@ export default function DashboardLayout({ children }) {
           onPttEnd={handlePttEnd}
           isListening={isListening}
           liveTranscript={liveTranscript}
+          isMuted={isMuted}
+          onToggleMute={handleToggleMute}
           onReadAloud={() => {
             setOrbState('speaking');
-            speak(orbResponse, language === 'en' ? 'en-IN' : 'kn-IN');
+            safeSpeak(orbResponse, language === 'en' ? 'en-IN' : 'kn-IN');
           }}
         />
       )}
