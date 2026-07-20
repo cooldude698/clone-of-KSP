@@ -99,27 +99,38 @@ const useDrishtiVoice = ({
       setLiveTranscript(display);
     };
 
-    // Fix 1: improved error handling with network retry using en-US fallback
+    // Fix 1: auto-restart recognition if Chrome closes session on silence while user wants mic ON
     rec.onerror = (e) => {
       const err = e.error;
       if (err === 'aborted') return;
       if (err === 'no-speech') {
-        // No speech detected — this is fine, just stop
+        if (isPttPressedRef.current) {
+          try { rec.start(); } catch (_) {}
+          return;
+        }
         setIsListening(false);
         return;
       }
+      if (err === 'language-not-supported' || (err === 'network' && langRef.current?.startsWith('kn'))) {
+        console.warn('[Drishti] kn-IN not supported by browser speech engine, falling back to en-IN preview');
+        try {
+          rec.lang = 'en-IN';
+          rec.start();
+          return;
+        } catch (_) {}
+      }
       if (err === 'network') {
-        // Retry with en-US instead of en-IN
+        // Retry with en-IN locale
         if (retryCountRef.current < MAX_RETRIES) {
           retryCountRef.current++;
           try {
-            recognitionRef.current.lang = 'en-US';
+            recognitionRef.current.lang = 'en-IN';
             recognitionRef.current.start();
             return;
           } catch (_) {}
         }
         retryCountRef.current = 0;
-        setIsListening(false);
+        if (!isPttPressedRef.current) setIsListening(false);
         return;
       }
       if (['not-allowed', 'service-not-allowed'].includes(err)) {
@@ -128,11 +139,27 @@ const useDrishtiVoice = ({
         return;
       }
       console.warn('[Drishti] Recognition error:', err);
-      setIsListening(false);
+      if (!isPttPressedRef.current) {
+        setIsListening(false);
+      }
     };
 
     rec.onend = () => {
-      setIsListening(false);
+      if (isPttPressedRef.current) {
+        // User wants mic to STAY ON continuously — restart recognition!
+        try {
+          rec.start();
+        } catch (_) {
+          // If start fails, retry after brief tick
+          setTimeout(() => {
+            if (isPttPressedRef.current) {
+              try { rec.start(); } catch (_) {}
+            }
+          }, 100);
+        }
+      } else {
+        setIsListening(false);
+      }
     };
 
     recognitionRef.current = rec;
@@ -160,11 +187,9 @@ const useDrishtiVoice = ({
       const buf = new Uint8Array(analyser.frequencyBinCount);
       const tick = () => {
         analyser.getByteFrequencyData(buf);
-        // Average of first 30 frequency bins (voice range)
         let sum = 0;
         for (let i = 0; i < 30; i++) sum += buf[i];
         const avg = sum / 30;
-        // Normalize to 0–1, clamp
         const level = Math.min(1, Math.max(0, (avg - 10) / 80));
         setAudioLevel(level);
         volumeFrameRef.current = requestAnimationFrame(tick);
@@ -178,7 +203,9 @@ const useDrishtiVoice = ({
   const stopVolumeDetection = useCallback(() => {
     if (volumeFrameRef.current) cancelAnimationFrame(volumeFrameRef.current);
     volumeStreamRef.current?.getTracks().forEach(t => t.stop());
-    if (volumeContextRef.current?.state !== 'closed') volumeContextRef.current?.close();
+    if (volumeContextRef.current?.state !== 'closed') {
+      try { volumeContextRef.current?.close(); } catch (_) {}
+    }
     setAudioLevel(0);
   }, []);
 
@@ -195,41 +222,57 @@ const useDrishtiVoice = ({
     }
   }, []);
 
+  // PTT session state tracking
+  const isPttPressedRef = useRef(false);
+
   // Start PTT session
   const startListening = useCallback(async (lang = 'en-IN') => {
-    if (!recognitionRef.current) return;
-    if (micPermission !== 'granted') {
-      const ok = await requestMicPermission();
-      if (!ok) return;
-    }
+    isPttPressedRef.current = true;
+    setIsListening(true);
     langRef.current = lang;
-    // Fix 1: reset retry counter on each new PTT session
     retryCountRef.current = 0;
-    // Reset accumulators
     accumulatedFinalRef.current = '';
     lastInterimRef.current = '';
     setLiveTranscript('');
-    try {
-      recognitionRef.current.lang = lang;
-      recognitionRef.current.start();
-      setIsListening(true);
-      // Start volume detection on a separate stream
-      startVolumeDetection();
-    } catch (e) {
-      if (e.name === 'InvalidStateError') { setIsListening(true); return; }
-      console.error('[Drishti] start failed:', e);
+
+    if (micPermission !== 'granted') {
+      const ok = await requestMicPermission();
+      if (!ok || !isPttPressedRef.current) {
+        setIsListening(false);
+        isPttPressedRef.current = false;
+        return;
+      }
     }
+
+    if (recognitionRef.current) {
+      try {
+        // Enforce 'en-IN' for browser Web Speech API because Chrome 'kn-IN' hangs without onresult events
+        recognitionRef.current.lang = 'en-IN';
+        recognitionRef.current.start();
+      } catch (e) {
+        if (e.name === 'InvalidStateError') {
+          // Already running
+        } else {
+          try {
+            recognitionRef.current.lang = 'en-US';
+            recognitionRef.current.start();
+          } catch (_) {}
+        }
+      }
+    }
+
+    startVolumeDetection();
   }, [micPermission, requestMicPermission, startVolumeDetection]);
 
   // Stop PTT session — returns whatever was captured
   const stopListeningAndGetTranscript = useCallback(() => {
+    isPttPressedRef.current = false;
     if (recognitionRef.current) {
       try { recognitionRef.current.stop(); } catch (_) {}
     }
-    // Change 2: stop volume detection before returning
-    stopVolumeDetection();
+    try { stopVolumeDetection(); } catch (_) {}
     setIsListening(false);
-    // Return best available transcript
+    
     const final = (accumulatedFinalRef.current + ' ' + lastInterimRef.current).trim();
     accumulatedFinalRef.current = '';
     lastInterimRef.current = '';
@@ -242,6 +285,15 @@ const useDrishtiVoice = ({
     if (!voices.length) return null;
 
     const prefix = lang.split('-')[0];
+
+    // Explicit check for Kannada: if native Kannada voice available, use it; else fallback to en-IN
+    if (prefix === 'kn') {
+      const knVoice = voices.find(v => v.lang === 'kn-IN' || v.lang.startsWith('kn') || v.name.toLowerCase().includes('kannada'));
+      if (knVoice) return knVoice;
+
+      const inVoice = voices.find(v => v.lang === 'en-IN' || v.name.toLowerCase().includes('india') || v.name.toLowerCase().includes('heera') || v.name.toLowerCase().includes('kalpana'));
+      if (inVoice) return inVoice;
+    }
 
     // Priority 1: Neural/natural English voices (sound most human)
     const neuralKeywords = ['neural', 'natural', 'enhanced', 'premium', 'wavenet', 'journey', 'aria', 'guy', 'jenny', 'sonia', 'ryan', 'libby'];
@@ -267,75 +319,128 @@ const useDrishtiVoice = ({
            null;
   }, []);
 
-  // Fix 2: race-condition-safe speak() — waits for voices, prevents cancel() race conditions
-  const speak = useCallback((text, lang = 'en-IN') => {
-    if (typeof window === 'undefined' || !window.speechSynthesis) return;
-    
-    // Only cancel if there's an active or pending utterance
-    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+  // Fix 2: race-condition-safe speak() — attempts Catalyst Zia TTS primary, falls back to Web Speech API
+  const audioRef = useRef(null);
+
+  const speak = useCallback(async (text, lang = 'en-IN') => {
+    if (!text || !text.trim()) return;
+    const languageCode = lang.startsWith('kn') ? 'kn' : 'en';
+
+    // ALWAYS stop any playing audio or speech synthesis FIRST to prevent audio collision
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
       window.speechSynthesis.cancel();
     }
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
 
-    const doSpeak = () => {
-      const utt = new SpeechSynthesisUtterance(text);
-      utt.lang = lang;
-      utt.rate = 0.92;
-      utt.pitch = 1.05;
-      utt.volume = 1.0;
+    // Helper for browser Web Speech API fallback
+    const fallbackToBrowserSpeech = () => {
+      if (typeof window === 'undefined' || !window.speechSynthesis) return;
+      console.warn('[DRISHTI VOICE] Using Browser Web Speech API (Fallback)');
 
-      // Try to find best voice, fall back gracefully
-      const voices = window.speechSynthesis.getVoices();
-      voicesCacheRef.current = voices; // keep cache fresh
+      const doSpeak = () => {
+        const utt = new SpeechSynthesisUtterance(text);
+        utt.lang = lang;
+        utt.rate = 0.92;
+        utt.pitch = 1.05;
+        utt.volume = 1.0;
 
-      if (voices.length > 0) {
-        const v = findBestVoice(lang);
-        if (v) utt.voice = v;
-      }
+        const voices = window.speechSynthesis.getVoices();
+        voicesCacheRef.current = voices;
 
-      utt.onstart = () => {
-        setIsSpeaking(true);
-        callbacksRef.current.onSpeakStart?.();
-      };
-      utt.onend = () => {
-        setIsSpeaking(false);
-        callbacksRef.current.onSpeakEnd?.();
-      };
-      utt.onerror = (e) => {
-        setIsSpeaking(false);
-        const silent = ['interrupted', 'canceled', 'synthesis-failed', 'synthesis-unavailable'];
-        if (silent.includes(e.error)) {
-          callbacksRef.current.onSpeakEnd?.();
-          return;
+        if (voices.length > 0) {
+          const v = findBestVoice(lang);
+          if (v) utt.voice = v;
         }
-        callbacksRef.current.onError?.(e.error);
+
+        utt.onstart = () => {
+          setIsSpeaking(true);
+          callbacksRef.current.onSpeakStart?.();
+        };
+        utt.onend = () => {
+          setIsSpeaking(false);
+          callbacksRef.current.onSpeakEnd?.();
+        };
+        utt.onerror = (e) => {
+          setIsSpeaking(false);
+          const silent = ['interrupted', 'canceled', 'synthesis-failed', 'synthesis-unavailable'];
+          if (silent.includes(e.error)) {
+            callbacksRef.current.onSpeakEnd?.();
+            return;
+          }
+          callbacksRef.current.onError?.(e.error);
+        };
+
+        window.speechSynthesis.speak(utt);
       };
 
-      // ACTUALLY SPEAK
-      window.speechSynthesis.speak(utt);
+      setTimeout(() => {
+        if (window.speechSynthesis.getVoices().length > 0) {
+          doSpeak();
+        } else {
+          const handler = () => {
+            window.speechSynthesis.removeEventListener('voiceschanged', handler);
+            doSpeak();
+          };
+          window.speechSynthesis.addEventListener('voiceschanged', handler);
+          setTimeout(() => {
+            window.speechSynthesis.removeEventListener('voiceschanged', handler);
+            if (!window.speechSynthesis.speaking) doSpeak();
+          }, 1000);
+        }
+      }, 50);
     };
 
-    // Add a tiny delay to ensure cancel() flushes the OS audio queue before starting the new utterance
-    setTimeout(() => {
-      // If voices are already loaded, speak immediately
-      if (window.speechSynthesis.getVoices().length > 0) {
-        doSpeak();
-      } else {
-        // Wait for voices to load then speak
-        const handler = () => {
-          window.speechSynthesis.removeEventListener('voiceschanged', handler);
-          doSpeak();
+    // Primary path: Catalyst Zia TTS
+    try {
+      console.log('[DRISHTI VOICE] Requesting Catalyst Zia TTS (Primary)...');
+      const res = await fetch('/server/drishtiVoice/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'tts', text, lang: languageCode }),
+      });
+
+      if (!res.ok) throw new Error(`TTS HTTP error ${res.status}`);
+      const data = await res.json();
+
+      if (data.audioBase64 && data.source === 'zia') {
+        console.log('[DRISHTI VOICE] ✅ Playing Audio via Catalyst Zia TTS!');
+
+        const audio = new Audio(`data:${data.mimeType || 'audio/wav'};base64,${data.audioBase64}`);
+        audioRef.current = audio;
+
+        audio.onplay = () => {
+          setIsSpeaking(true);
+          callbacksRef.current.onSpeakStart?.();
         };
-        window.speechSynthesis.addEventListener('voiceschanged', handler);
-        // Timeout fallback — speak anyway after 1 second even if voices don't load
-        setTimeout(() => {
-          window.speechSynthesis.removeEventListener('voiceschanged', handler);
-          if (!window.speechSynthesis.speaking) doSpeak();
-        }, 1000);
+        audio.onended = () => {
+          setIsSpeaking(false);
+          callbacksRef.current.onSpeakEnd?.();
+        };
+        audio.onerror = (e) => {
+          console.warn('[DRISHTI VOICE] Audio playback error, falling back to Web Speech:', e);
+          setIsSpeaking(false);
+          fallbackToBrowserSpeech();
+        };
+
+        await audio.play();
+        return;
       }
-    }, 50);
+    } catch (err) {
+      console.warn('[DRISHTI VOICE] Primary Zia TTS failed, falling back to Web Speech API:', err.message);
+    }
+
+    // Fallback path if Zia fails or returns browser_fallback
+    fallbackToBrowserSpeech();
   }, [findBestVoice]);
 
   const stopSpeaking = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
     if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
     setIsSpeaking(false);
   }, []);

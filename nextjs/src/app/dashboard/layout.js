@@ -63,6 +63,8 @@ export default function DashboardLayout({ children }) {
   const [hasGreeted,       setHasGreeted]       = useState(false);
   const [sessionLogs,      setSessionLogs]      = useState([]);
   const [dispatchToast,    setDispatchToast]    = useState(null);
+  // Status label shown in DrishtiPanel header (overrides the default orbState label)
+  const [stateOverrideLabel, setStateOverrideLabel] = useState('');
 
   // ─── Change 1 & 6: Orb pin state ─────────────────────────────────
   const [orbPinned, setOrbPinned] = useState(true);
@@ -120,6 +122,7 @@ export default function DashboardLayout({ children }) {
     setProactiveSuggestion(null);
 
     setOrbState('thinking');
+    setStateOverrideLabel('Thinking…');
     setSessionLogs(prev => [...prev, { role: 'user', content: queryText, timestamp: ts() }]);
 
     // ── Local intent check (Change 5) ──
@@ -130,59 +133,70 @@ export default function DashboardLayout({ children }) {
       setResponse({ response_text: reply, follow_up_suggestions: [], confidence: 1.0 });
       setSessionLogs(prev => [...prev, { role: 'assistant', content: reply, timestamp: ts() }]);
       setOrbState('speaking');
+      setStateOverrideLabel('Speaking');
       speak(reply, language === 'en' ? 'en-IN' : 'kn-IN');
       return; // skip API call
     }
 
+    // Auto-detect if input contains Kannada script
+    const isKannadaInput = /[\u0C80-\u0CFF]/.test(queryText);
+    const targetLang = isKannadaInput ? 'kn' : language;
+
     try {
-      // Fix 4: use new direct AI route (Groq primary, Gemini fallback)
-      const res = await fetch('/api/ai', {
+      // ── Call askDrishtiAI (QuickML RAG primary, Gemini fallback, rawData last-resort) ──
+      const res = await fetch('/server/askDrishtiAI/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          query: queryText,
-          language,
-          conversation_id: conversationId,
-          // Fix 4: send recent conversation history for context
-          conversation_history: sessionLogs.slice(-6).map(log => ({
-            role: log.role,
-            content: log.content,
-          })),
+          question: queryText,
+          lang: targetLang,
         }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
 
-      setResponse(data);
-      if (data.conversation_id) setConversationId(data.conversation_id);
+      const text = data.answer || '';
+      const source = data.source || 'quickml';
 
-      const text = data.response_text;
+      // Map source -> status label
+      const speakingLabel = source === 'quickml' ? 'Speaking' : 'Speaking (fallback)';
 
-      // Auto-navigate if AI returned a visualization
-      if (data.visualization && data.visualization.type !== 'none') {
-        const vType = data.visualization.type;
-        if (vType === 'heatmap') router.push('/dashboard/map');
-        else if (vType === 'bar_chart' || vType === 'line_chart') router.push('/dashboard/analytics');
-        else if (vType === 'network') router.push('/dashboard/network');
-      }
+      // Build a response object compatible with the existing DrishtiPanel display
+      const compatResponse = {
+        response_text: text,
+        visualization: { type: 'none', title: '', data: {} },
+        follow_up_suggestions: [],
+        confidence: source === 'quickml' ? 0.9 : 0.6,
+        language_detected: data.language || language,
+        emotion: 'calm',
+        urgency: 'low',
+        source,
+      };
+      setResponse(compatResponse);
 
       if (text) {
         setSessionLogs(prev => [...prev, { role: 'assistant', content: text, timestamp: ts() }]);
         setOrbState('speaking');
+        setStateOverrideLabel(speakingLabel);
         if (text) setOrbResponse(text);
-        const clean = text.replace(/[|*#`]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 800);
-        speak(clean, language === 'en' ? 'en-IN' : 'kn-IN');
+        // Pass data.language so TTS uses the correct locale
+        const ttsLang = (data.language || language) === 'kn' ? 'kn-IN' : 'en-IN';
+        const spokenText = data.spokenAnswer || text;
+        const clean = spokenText.replace(/[|*#`]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 800);
+        speak(clean, ttsLang);
       } else {
         setOrbState('idle');
+        setStateOverrideLabel('');
       }
     } catch {
       setOrbState('idle');
+      setStateOverrideLabel('');
       const fallback = "I'm having trouble reaching the network right now, Sir. Please try again.";
       setResponse({ response_text: fallback, follow_up_suggestions: [], urgency: 'low' });
       setSessionLogs(prev => [...prev, { role: 'assistant', content: fallback, timestamp: ts() }]);
       setOrbResponse("I'm having trouble reaching the network right now, Sir. Please try again.");
     }
-  }, [language, conversationId, sessionLogs, speak, router]);
+  }, [language, sessionLogs, speak, router]);
 
   // ─── Change 4: Sync sessionLogs to localStorage ──────────────────
   useEffect(() => {
@@ -207,21 +221,20 @@ export default function DashboardLayout({ children }) {
     startListening(language === 'en' ? 'en-IN' : 'kn-IN');
   }, [isSpeaking, stopSpeaking, startListening, language]);
 
-  const handlePttEnd = useCallback(() => {
+  const handlePttEnd = useCallback(async () => {
     if (!pttActiveRef.current) return;
     pttActiveRef.current = false;
 
-    const duration = Date.now() - pttStartRef.current;
-    const captured = stopListeningAndGetTranscript();
+    const browserCaptured = stopListeningAndGetTranscript();
+    setOrbState('idle');
 
-    if (duration < 300 || !captured) {
-      setOrbState('idle');
+    if (!browserCaptured?.trim()) {
       return;
     }
-    // Don't send yet — show transcript bubble for user to confirm
-    setPendingTranscript(captured);
-    setOrbState('idle'); // orb goes back to idle while user reviews
-  }, [stopListeningAndGetTranscript]);
+
+    // Auto-send captured voice query immediately
+    handleQuery(browserCaptured.trim());
+  }, [stopListeningAndGetTranscript, handleQuery]);
 
   const handleConfirmSend = useCallback(() => {
     if (!pendingTranscript.trim()) return;
@@ -273,6 +286,7 @@ export default function DashboardLayout({ children }) {
 
   const closePanel = useCallback(() => {
     setIsPanelOpen(false);
+    setStateOverrideLabel('');
     if (isListening) { stopListeningAndGetTranscript(); }
     stopSpeaking();
     setOrbState('idle');
@@ -640,6 +654,8 @@ export default function DashboardLayout({ children }) {
         onRequestMicPermission={requestMicPermission}
         orbPinned={orbPinned}
         onToggleOrbPin={handleToggleOrbPin}
+        stateOverrideLabel={stateOverrideLabel || undefined}
+        onSpeakText={speak}
       />
 
       {/* ── DRISHTI ORB (Change 1) ── */}

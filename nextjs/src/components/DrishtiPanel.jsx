@@ -72,6 +72,9 @@ export default function DrishtiPanel({
   onRequestMicPermission,
   orbPinned,
   onToggleOrbPin,
+  /** Optional override for the status label (e.g. "Speaking (fallback)") */
+  stateOverrideLabel,
+  onSpeakText,
 }) {
   const [inputText, setInputText] = useState('');
   const [showLogs, setShowLogs] = useState(false);
@@ -99,12 +102,12 @@ export default function DrishtiPanel({
     speaking: 'bg-cyan-400',
   }[orbState] || 'bg-slate-500';
 
-  const stateLabel = {
+  const stateLabel = stateOverrideLabel || ({
     idle: 'Ready',
     listening: 'Listening…',
-    thinking: 'Processing…',
-    speaking: 'Speaking…',
-  }[orbState] || 'Ready';
+    thinking: 'Thinking…',
+    speaking: 'Speaking',
+  }[orbState] || 'Ready');
 
   return (
     <AnimatePresence>
@@ -179,29 +182,20 @@ export default function DrishtiPanel({
               </div>
             </div>
 
-            {/* ─── Mic permission gate ─── */}
-            {micPermission !== 'granted' ? (
-              <div className="flex-1 flex flex-col items-center justify-center gap-5 px-6">
-                <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/15 flex items-center justify-center">
-                  <Mic className="w-6 h-6 text-blue-400" />
-                </div>
-                <div className="text-center">
-                  <p className="text-white text-sm font-semibold mb-1.5">Microphone Access Needed</p>
-                  <p className="text-white/40 text-xs leading-relaxed max-w-[240px]">
-                    Drishti uses your mic only when you hold the talk button. Your audio is never stored.
-                  </p>
-                </div>
-                <button onClick={onRequestMicPermission}
-                  className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-all shadow-lg shadow-blue-600/25">
-                  Allow Microphone
+            {/* ─── Mic permission banner (non-blocking) ─── */}
+            {micPermission !== 'granted' && (
+              <div className="px-4 py-2 bg-blue-600/10 border-b border-blue-500/20 flex items-center justify-between gap-2">
+                <span className="text-[11px] text-blue-300 font-medium">Click to enable voice mic</span>
+                <button
+                  onClick={onRequestMicPermission}
+                  className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold tracking-wider transition-all"
+                >
+                  ALLOW MIC
                 </button>
-                {micPermission === 'denied' && (
-                  <p className="text-red-400 text-[11px] text-center">
-                    Blocked — enable mic in browser settings, then reload.
-                  </p>
-                )}
               </div>
-            ) : showLogs ? (
+            )}
+
+            {showLogs ? (
               /* ─── Logs View ─── */
               <div className="flex-1 overflow-y-auto drishti-scrollbar px-4 py-4 space-y-3">
                 <p className="text-[10px] text-white/25 uppercase tracking-widest font-mono mb-3">
@@ -237,7 +231,27 @@ export default function DrishtiPanel({
                         ? 'bg-blue-600/20 border border-blue-500/20 text-blue-100 rounded-br-md'
                         : 'bg-white/5 border border-white/8 text-white/80 rounded-bl-md'}`}>
                       <p className="whitespace-pre-wrap">{log.content}</p>
-                      <span className="text-[9px] text-white/20 font-mono mt-1 block">{log.timestamp}</span>
+                      <div className="flex items-center justify-between mt-1.5 pt-1 border-t border-white/5">
+                        <span className="text-[9px] text-white/20 font-mono">{log.timestamp}</span>
+                        {log.role === 'assistant' && (
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              onClick={() => onSpeakText?.(log.content, 'en-IN')}
+                              className="px-1.5 py-0.5 rounded bg-white/5 hover:bg-blue-500/20 text-white/50 hover:text-blue-300 text-[9px] font-medium transition-all flex items-center gap-1"
+                              title="Hear response in English"
+                            >
+                              <span>🔊</span> EN
+                            </button>
+                            <button
+                              onClick={() => onSpeakText?.(log.content, 'kn-IN')}
+                              className="px-1.5 py-0.5 rounded bg-white/5 hover:bg-emerald-500/20 text-white/50 hover:text-emerald-300 text-[9px] font-medium transition-all flex items-center gap-1"
+                              title="Hear response in Kannada"
+                            >
+                              <span>🔊</span> ಕನ್ನಡ
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -247,11 +261,31 @@ export default function DrishtiPanel({
                   <div className="flex justify-start">
                     <div className="max-w-[85%] px-4 py-3 rounded-2xl rounded-bl-md bg-white/5 border border-white/8 text-sm text-white/80 leading-relaxed">
                       <ResponseText text={displayed} isTyping={!done} onSkip={skip} />
-                      {!done && (
-                        <button onClick={skip} className="block mt-1.5 text-[10px] text-white/25 hover:text-white/45 transition-colors">
-                          skip →
-                        </button>
-                      )}
+                      <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-white/5">
+                        {!done ? (
+                          <button onClick={skip} className="text-[10px] text-white/25 hover:text-white/45 transition-colors">
+                            skip →
+                          </button>
+                        ) : (
+                          <span className="text-[9px] text-white/20 font-mono">Just now</span>
+                        )}
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => onSpeakText?.(latestResponseText, 'en-IN')}
+                            className="px-1.5 py-0.5 rounded bg-white/5 hover:bg-blue-500/20 text-white/50 hover:text-blue-300 text-[9px] font-medium transition-all flex items-center gap-1"
+                            title="Hear response in English"
+                          >
+                            <span>🔊</span> EN
+                          </button>
+                          <button
+                            onClick={() => onSpeakText?.(latestResponseText, 'kn-IN')}
+                            className="px-1.5 py-0.5 rounded bg-white/5 hover:bg-emerald-500/20 text-white/50 hover:text-emerald-300 text-[9px] font-medium transition-all flex items-center gap-1"
+                            title="Hear response in Kannada"
+                          >
+                            <span>🔊</span> ಕನ್ನಡ
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -313,63 +347,67 @@ export default function DrishtiPanel({
               </div>
             )}
 
-            {/* ─── Bottom Input Bar (only when mic granted) ─── */}
-            {micPermission === 'granted' && (
-              <div className="px-4 py-3 border-t border-white/[0.07] flex-shrink-0"
-                style={{ background: 'rgba(6,11,24,0.8)', backdropFilter: 'blur(12px)' }}>
+            {/* ─── Bottom Input Bar ─── */}
+            <div className="px-4 py-3 border-t border-white/[0.07] flex-shrink-0"
+              style={{ background: 'rgba(6,11,24,0.8)', backdropFilter: 'blur(12px)' }}>
 
-                {/* Stop speaking */}
-                {isSpeaking && (
-                  <button onClick={onStopSpeaking}
-                    className="w-full mb-2.5 py-2 rounded-xl bg-red-500/8 border border-red-500/15 text-red-400 text-[11px] font-semibold uppercase tracking-wider hover:bg-red-500/15 transition-all flex items-center justify-center gap-2">
-                    <VolumeX className="w-3.5 h-3.5" />
-                    Stop Speaking
-                  </button>
-                )}
+              {/* Stop speaking */}
+              {isSpeaking && (
+                <button onClick={onStopSpeaking}
+                  className="w-full mb-2.5 py-2 rounded-xl bg-red-500/8 border border-red-500/15 text-red-400 text-[11px] font-semibold uppercase tracking-wider hover:bg-red-500/15 transition-all flex items-center justify-center gap-2">
+                  <VolumeX className="w-3.5 h-3.5" />
+                  Stop Speaking
+                </button>
+              )}
 
-                <div className="flex items-center gap-2">
-                  {/* PTT Button — big, prominent */}
-                  <button
-                    onMouseDown={onPttStart}
-                    onMouseUp={onPttEnd}
-                    onMouseLeave={isListening ? onPttEnd : undefined}
-                    onTouchStart={(e) => { e.preventDefault(); onPttStart?.(); }}
-                    onTouchEnd={(e) => { e.preventDefault(); onPttEnd?.(); }}
-                    className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 select-none transition-all duration-150
-                      ${isListening
-                        ? 'bg-emerald-500 text-white shadow-xl shadow-emerald-500/40 scale-110 ring-4 ring-emerald-500/30'
-                        : 'bg-white/8 border border-white/12 text-white/60 hover:bg-blue-500/20 hover:border-blue-500/30 hover:text-blue-300 hover:scale-105'}`}
-                    title="Hold to talk (or hold Ctrl+Alt)"
-                  >
-                    <Mic className={`w-5 h-5 ${isListening ? 'animate-pulse' : ''}`} />
-                  </button>
+              <div className="flex items-center gap-2">
+                {/* PTT Button — big, prominent */}
+                {/* Toggle Mic Button — Click ON / Click OFF */}
+                <button
+                  id="chat-ptt-btn"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (micPermission !== 'granted') onRequestMicPermission?.();
+                    if (isListening) {
+                      onPttEnd?.(e);
+                    } else {
+                      onPttStart?.(e);
+                    }
+                  }}
+                  className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 select-none transition-all duration-150
+                    ${isListening
+                      ? 'bg-emerald-500 text-white shadow-xl shadow-emerald-500/40 scale-110 ring-4 ring-emerald-500/30 animate-pulse'
+                      : 'bg-white/8 border border-white/12 text-white/60 hover:bg-blue-500/20 hover:border-blue-500/30 hover:text-blue-300 hover:scale-105'}`}
+                  title={isListening ? "Click to STOP listening & send" : "Click to START voice input"}
+                >
+                  <Mic className={`w-5 h-5 ${isListening ? 'text-white' : ''}`} />
+                </button>
 
-                  {/* Text input */}
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={inputText}
-                    onChange={e => setInputText(e.target.value)}
-                    onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-                    placeholder={language === 'en' ? 'Type a message…' : 'ಸಂದೇಶ ಟೈಪ್ ಮಾಡಿ…'}
-                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white
-                      placeholder-white/20 focus:outline-none focus:border-blue-500/40 focus:ring-1
-                      focus:ring-blue-500/15 transition-all"
-                  />
+                {/* Text input */}
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputText}
+                  onChange={e => setInputText(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+                  placeholder={language === 'en' ? 'Type a message…' : 'ಸಂದೇಶ ಟೈಪ್ ಮಾಡಿ…'}
+                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white
+                    placeholder-white/20 focus:outline-none focus:border-blue-500/40 focus:ring-1
+                    focus:ring-blue-500/15 transition-all"
+                />
 
-                  {/* Send */}
-                  <button onClick={handleSend} disabled={!inputText.trim()}
-                    className="w-10 h-10 rounded-xl bg-blue-600 text-white hover:bg-blue-500
-                      disabled:opacity-25 disabled:pointer-events-none transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
-                    <Send className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <p className="mt-2 text-[9px] text-white/18 font-mono text-center">
-                  Hold 🎤 to talk · <kbd className="opacity-60 bg-white/10 px-1 py-0.5 rounded text-[8px]">Ctrl+Alt</kbd> PTT · <kbd className="opacity-60 bg-white/10 px-1 py-0.5 rounded text-[8px]">Space</kbd> open · Double-clap to wake
-                </p>
+                {/* Send */}
+                <button onClick={handleSend} disabled={!inputText.trim()}
+                  className="w-10 h-10 rounded-xl bg-blue-600 text-white hover:bg-blue-500
+                    disabled:opacity-25 disabled:pointer-events-none transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
+                  <Send className="w-4 h-4" />
+                </button>
               </div>
-            )}
+
+              <p className="mt-2 text-[9px] text-white/18 font-mono text-center">
+                Click 🎤 to turn mic ON/OFF · <kbd className="opacity-60 bg-white/10 px-1 py-0.5 rounded text-[8px]">Ctrl+Alt</kbd> PTT · <kbd className="opacity-60 bg-white/10 px-1 py-0.5 rounded text-[8px]">Space</kbd> open · Double-clap to wake
+              </p>
+            </div>
           </motion.div>
         </>
       )}
