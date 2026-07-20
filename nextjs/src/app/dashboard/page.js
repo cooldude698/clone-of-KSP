@@ -340,7 +340,7 @@ export default function DashboardOverview() {
                <div>
                  <h4 className="text-sm font-semibold text-paper-100 mb-1">Tip: Voice Commands</h4>
                  <p className="text-xs text-paper-100/70 leading-relaxed">
-                   Hold the spacebar anywhere on the dashboard to activate Drishti. Try asking <em>"Show me hotspots in Bengaluru"</em> or <em>"Any new cases assigned to me?"</em>
+                   Hold the spacebar anywhere on the dashboard to activate Drishti. Try asking <em>&quot;Show me hotspots in Bengaluru&quot;</em> or <em>&quot;Any new cases assigned to me?&quot;</em>
                  </p>
                </div>
              </div>

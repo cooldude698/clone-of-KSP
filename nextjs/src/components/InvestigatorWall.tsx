@@ -310,7 +310,7 @@ export default function InvestigatorWall({
             <div className="text-xs">
               <span className="text-[10px] text-paper-100/50 uppercase tracking-widest block mb-1.5">Official Case Details</span>
               <p className="text-paper-100/80 leading-relaxed bg-void-000/40 rounded-xl p-4 border border-steel-600/30 max-h-40 overflow-y-auto font-serif italic">
-                "{fir.description}"
+                &quot;{fir.description}&quot;
               </p>
             </div>
           </motion.div>
