@@ -1,7 +1,56 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Camera, Wifi, WifiOff, Eye, MapPin, Clock, Maximize2, X, ShieldAlert, Zap } from 'lucide-react';
+import { Camera, Wifi, WifiOff, Eye, MapPin, Maximize2, X, ShieldAlert } from 'lucide-react';
+
+// ─── Local Real-life Surveillance Loop Video URLs ───────────────────────────
+// ANPR: Overhead traffic cams
+// Face AI: Pedestrians walking on street
+// CCTV: Intersection overview
+const SURVEILLANCE_VIDEOS = {
+  anpr: [
+    '/videos/traffic1.mp4',
+    '/videos/traffic2.mp4'
+  ],
+  face_recognition: [
+    '/videos/people1.mp4',
+    '/videos/people2.mp4'
+  ],
+  cctv: [
+    '/videos/people3.mp4',
+    '/videos/traffic1.mp4'
+  ]
+};
+
+// Map each camera ID explicitly to a unique, locally hosted direct mp4 URL
+const CAMERA_SPECIFIC_VIDEOS = {
+  'CAM-BLR-0010': '/videos/traffic1.mp4', // Real street traffic (vehicles, bikes, pedestrians)
+  'CAM-BLR-0012': '/videos/people1.mp4',   // High-angle pedestrian crossing/crowd
+  'CAM-BLR-0015': '/videos/traffic2.mp4',  // Freeway multi-lane highway traffic
+  'CAM-BLR-0035': '/videos/people3.mp4',   // Direct CCTV pedestrian pathway tracking
+  'CAM-BLR-0042': '/videos/people2.mp4',   // Close-up sidewalk walk (Face AI context)
+};
+
+function CameraStream({ cam }) {
+  const videoUrl = CAMERA_SPECIFIC_VIDEOS[cam.id] || '/videos/traffic1.mp4';
+
+
+
+  return (
+    <video
+      src={videoUrl}
+      autoPlay
+      loop
+      muted
+      playsInline
+      crossOrigin="anonymous"
+      className="absolute inset-0 w-full h-full object-cover filter brightness-90 contrast-110 pointer-events-none"
+    />
+  );
+}
+
+
+
 
 const MOCK_CAMERAS = [
   {
@@ -12,11 +61,14 @@ const MOCK_CAMERAS = [
     is_active: true,
     has_anpr: true,
     has_face_recog: false,
-    video_url: 'https://vjs.zencdn.net/v/oceans.mp4',
+    // Overhead traffic / highway cam — matches ANPR context
+    video_url: 'https://videos.pexels.com/video-files/3195394/3195394-uhd_2560_1440_25fps.mp4',
     detected_target: 'KA-01-MJ-8821',
     target_type: 'ANPR MATCH: STOLEN VEHICLE',
     confidence: 98.4,
-    fps: 30
+    fps: 30,
+    // where to place the detection box: top|center|bottom + left|center|right
+    boxPos: 'bottom-center',
   },
   {
     id: 'CAM-BLR-0012',
@@ -26,11 +78,13 @@ const MOCK_CAMERAS = [
     is_active: true,
     has_anpr: true,
     has_face_recog: true,
-    video_url: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4',
+    // Pedestrian / crowd street — matches face-recog context
+    video_url: 'https://videos.pexels.com/video-files/856555/856555-hd_1920_1080_25fps.mp4',
     detected_target: 'RAMESH KUMAR (SUSPECT)',
     target_type: 'FACE MATCH: RISK 94%',
     confidence: 96.1,
-    fps: 60
+    fps: 60,
+    boxPos: 'center-center',
   },
   {
     id: 'CAM-BLR-0002',
@@ -44,7 +98,8 @@ const MOCK_CAMERAS = [
     detected_target: null,
     target_type: null,
     confidence: 0,
-    fps: 0
+    fps: 0,
+    boxPos: null,
   },
   {
     id: 'CAM-BLR-0015',
@@ -54,11 +109,13 @@ const MOCK_CAMERAS = [
     is_active: true,
     has_anpr: true,
     has_face_recog: false,
-    video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    // Junction / intersection overhead — matches ANPR dome cam
+    video_url: 'https://videos.pexels.com/video-files/4167518/4167518-uhd_2560_1440_30fps.mp4',
     detected_target: 'KA-05-NB-1102 (MOTORBIKE)',
     target_type: 'ANPR CHECK: WATCHLIST PASS',
     confidence: 99.1,
-    fps: 30
+    fps: 30,
+    boxPos: 'bottom-right',
   },
   {
     id: 'CAM-BLR-0035',
@@ -68,11 +125,13 @@ const MOCK_CAMERAS = [
     is_active: true,
     has_anpr: false,
     has_face_recog: false,
-    video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    // Busy road / flyover patrol view
+    video_url: 'https://videos.pexels.com/video-files/2103099/2103099-uhd_2560_1440_24fps.mp4',
     detected_target: 'SECTOR PATROL ACTIVE',
     target_type: 'PATROL MONITORING',
     confidence: 94.0,
-    fps: 30
+    fps: 30,
+    boxPos: 'top-right',
   },
   {
     id: 'CAM-BLR-0042',
@@ -82,11 +141,13 @@ const MOCK_CAMERAS = [
     is_active: true,
     has_anpr: true,
     has_face_recog: true,
-    video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+    // Street-level pedestrian / mixed — face recognition context
+    video_url: 'https://videos.pexels.com/video-files/2103099/2103099-uhd_2560_1440_24fps.mp4',
     detected_target: 'SURESH NAIDU (CO-ACCUSED)',
     target_type: 'FACE MATCH: RISK 86%',
     confidence: 92.8,
-    fps: 60
+    fps: 60,
+    boxPos: 'center-left',
   },
 ];
 
@@ -96,111 +157,326 @@ const TYPE_BADGES = {
   cctv:             { label: 'CCTV',    className: 'bg-steel-600/60 text-paper-100/60 border-steel-600/50' },
 };
 
-// Canvas-based animated CCTV night vision traffic simulation fallback
-function AnimatedCCTVCanvas({ isFaceRecog }) {
-  const canvasRef = useRef(null);
 
+// ─── ANPR Canvas: top-down road, vehicles moving, plate-reader flash ──────────
+function ANPRCanvas() {
+  const canvasRef = useRef(null);
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    let animationFrameId;
+    let raf;
+    const resize = () => {
+      canvas.width  = canvas.parentElement.clientWidth  || 320;
+      canvas.height = canvas.parentElement.clientHeight || 200;
+    };
+    resize();
 
-    // Simulation state
-    let width = (canvas.width = canvas.parentElement.clientWidth || 320);
-    let height = (canvas.height = canvas.parentElement.clientHeight || 200);
-
-    const vehicles = Array.from({ length: 6 }).map((_, i) => ({
-      x: Math.random() * width,
-      y: (i + 1) * (height / 7),
-      speed: (Math.random() * 1.5 + 0.8) * (i % 2 === 0 ? 1 : -1),
-      length: Math.random() * 30 + 20,
-      color: i % 3 === 0 ? '#ef4444' : i % 2 === 0 ? '#38bdf8' : '#10b981'
+    // lanes
+    const lanes = [0.28, 0.44, 0.60, 0.76].map(f => ({ y: canvas.height * f }));
+    const vehicles = lanes.map((l, i) => ({
+      x: Math.random() * canvas.width,
+      speed: (1.2 + Math.random() * 1.4) * (i % 2 === 0 ? 1 : -1),
+      w: 26 + Math.random() * 14,
+      h: 14,
+      color: ['#e5e5e5','#b0b0b0','#787878','#f0f0f0'][i],
+      y: l.y,
+      flash: 0,
     }));
+    let scanLine = 0;
+    let flashTimer = 0;
 
-    let scanY = 0;
+    const draw = () => {
+      const W = canvas.width, H = canvas.height;
+      // Dark asphalt
+      ctx.fillStyle = '#0d0f0d';
+      ctx.fillRect(0, 0, W, H);
 
-    const render = () => {
-      // Clear with dark night vision tint
-      ctx.fillStyle = '#070b14';
-      ctx.fillRect(0, 0, width, height);
+      // Road surface band
+      ctx.fillStyle = '#111311';
+      ctx.fillRect(0, H * 0.22, W, H * 0.62);
 
-      // Draw grid lines
-      ctx.strokeStyle = '#121e36';
-      ctx.lineWidth = 1;
-      for (let x = 0; x < width; x += 30) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
-      }
-      for (let y = 0; y < height; y += 30) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
-      }
-
-      // Draw perspective road lines
-      ctx.strokeStyle = '#1d2c4d';
+      // Lane dividers (dashed white)
+      ctx.setLineDash([14, 10]);
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
       ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(0, height * 0.4);
-      ctx.lineTo(width, height * 0.4);
-      ctx.moveTo(0, height * 0.7);
-      ctx.lineTo(width, height * 0.7);
-      ctx.stroke();
+      [0.36, 0.52, 0.68].forEach(f => {
+        ctx.beginPath(); ctx.moveTo(0, H * f); ctx.lineTo(W, H * f); ctx.stroke();
+      });
+      ctx.setLineDash([]);
 
-      // Render moving vehicles & headlights
+      // Road edges
+      ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(0, H * 0.22); ctx.lineTo(W, H * 0.22); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, H * 0.84); ctx.lineTo(W, H * 0.84); ctx.stroke();
+
+      // Vehicles
       vehicles.forEach(v => {
         v.x += v.speed;
-        if (v.x > width + 40) v.x = -40;
-        if (v.x < -40) v.x = width + 40;
+        if (v.speed > 0 && v.x > W + 30) v.x = -30;
+        if (v.speed < 0 && v.x < -30) v.x = W + 30;
 
-        // Headlight trail glow
-        const grad = ctx.createLinearGradient(v.x, v.y, v.x + (v.speed > 0 ? 40 : -40), v.y);
-        grad.addColorStop(0, v.color);
-        grad.addColorStop(1, 'transparent');
-
-        ctx.fillStyle = grad;
-        ctx.fillRect(v.x, v.y - 2, v.speed > 0 ? 35 : -35, 4);
-
-        // Vehicle dot
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(v.x, v.y, 3, 0, Math.PI * 2);
+        // Headlight / tail light glow
+        const gl = ctx.createRadialGradient(v.speed > 0 ? v.x - v.w/2 : v.x + v.w/2, v.y, 1,
+                                              v.speed > 0 ? v.x - v.w/2 : v.x + v.w/2, v.y, 18);
+        gl.addColorStop(0, v.speed > 0 ? 'rgba(255,240,180,0.6)' : 'rgba(255,60,60,0.5)');
+        gl.addColorStop(1, 'transparent');
+        ctx.fillStyle = gl; ctx.beginPath();
+        ctx.arc(v.speed > 0 ? v.x - v.w/2 : v.x + v.w/2, v.y, 18, 0, Math.PI * 2);
         ctx.fill();
 
-        // Bounding box target reticle
-        ctx.strokeStyle = v.color;
-        ctx.lineWidth = 1;
-        ctx.strokeRect(v.x - 12, v.y - 12, 24, 24);
+        // Vehicle body
+        ctx.fillStyle = v.color;
+        ctx.fillRect(v.x - v.w/2, v.y - v.h/2, v.w, v.h);
+
+        // ANPR flash when near center
+        if (Math.abs(v.x - W/2) < 20 && v.flash <= 0) {
+          v.flash = 8;
+          flashTimer = 12;
+        }
+        if (v.flash > 0) {
+          ctx.strokeStyle = `rgba(16,185,129,${v.flash/8})`;
+          ctx.lineWidth = 2;
+          ctx.strokeRect(v.x - v.w/2 - 4, v.y - v.h/2 - 4, v.w + 8, v.h + 8);
+          // Plate reading bar
+          ctx.fillStyle = `rgba(16,185,129,${v.flash/8 * 0.9})`;
+          ctx.fillRect(v.x - v.w/2, v.y + v.h/2 + 2, v.w, 4);
+          v.flash--;
+        }
       });
 
-      // Moving laser scan line
-      scanY = (scanY + 1.5) % height;
-      ctx.strokeStyle = isFaceRecog ? 'rgba(239, 68, 68, 0.4)' : 'rgba(16, 185, 129, 0.4)';
+      // ANPR scan beam
+      scanLine = (scanLine + 1.8) % H;
+      ctx.strokeStyle = 'rgba(16,185,129,0.25)';
       ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(0, scanY);
-      ctx.lineTo(width, scanY);
-      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, scanLine); ctx.lineTo(W, scanLine); ctx.stroke();
 
-      animationFrameId = requestAnimationFrame(render);
+      // Flash strobe (plate read event)
+      if (flashTimer > 0) {
+        ctx.fillStyle = `rgba(255,255,255,${flashTimer / 80})`;
+        ctx.fillRect(0, 0, W, H);
+        flashTimer--;
+      }
+
+      // Noise grain
+      for (let i = 0; i < 120; i++) {
+        const nx = Math.random() * W, ny = Math.random() * H;
+        ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.03})`;
+        ctx.fillRect(nx, ny, 1, 1);
+      }
+
+      raf = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return <canvas ref={canvasRef} className="w-full h-full" />;
+}
+
+// ─── Face AI Canvas: grayscale street, pedestrian shapes, face box ────────────
+function FaceCanvas() {
+  const canvasRef = useRef(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let raf;
+    canvas.width  = canvas.parentElement.clientWidth  || 320;
+    canvas.height = canvas.parentElement.clientHeight || 200;
+    const W = canvas.width, H = canvas.height;
+
+    const people = Array.from({ length: 5 }, (_, i) => ({
+      x: (i * W / 5) + Math.random() * 40,
+      y: H * 0.45 + Math.random() * (H * 0.3),
+      speed: (Math.random() * 0.5 + 0.3) * (Math.random() > 0.5 ? 1 : -1),
+      size: 0.55 + Math.random() * 0.3,
+      detected: i === 1,
+    }));
+    let scanY = 0, tick = 0;
+
+    const drawPerson = (p) => {
+      const s = p.size;
+      const bh = 32 * s, bw = 14 * s;
+      // Body (silhouette)
+      ctx.fillStyle = p.detected ? 'rgba(200,200,200,0.95)' : 'rgba(140,140,140,0.7)';
+      ctx.fillRect(p.x - bw/2, p.y, bw, bh);
+      // Head
+      ctx.beginPath();
+      ctx.arc(p.x, p.y - 5 * s, 8 * s, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (p.detected) {
+        // Face detection box around head
+        const fw = 26 * s, fh = 28 * s;
+        const fx = p.x - fw/2, fy = p.y - fh * 0.9;
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(fx, fy, fw, fh);
+        // corner brackets
+        const cs = 5;
+        [
+          [fx, fy, cs, 0, 0, cs],
+          [fx+fw, fy, -cs, 0, 0, cs],
+          [fx, fy+fh, cs, 0, 0, -cs],
+          [fx+fw, fy+fh, -cs, 0, 0, -cs],
+        ].forEach(([x, y, dx1, dy1, dx2, dy2]) => {
+          ctx.beginPath();
+          ctx.moveTo(x+dx1, y+dy1); ctx.lineTo(x, y); ctx.lineTo(x+dx2, y+dy2);
+          ctx.stroke();
+        });
+        // scanning bar inside box
+        const barY = fy + ((tick * 1.5) % fh);
+        ctx.fillStyle = 'rgba(239,68,68,0.3)';
+        ctx.fillRect(fx, barY, fw, 2);
+      }
     };
 
-    render();
+    const draw = () => {
+      tick++;
+      // Grayscale foggy street background
+      ctx.fillStyle = '#141414';
+      ctx.fillRect(0, 0, W, H);
 
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [isFaceRecog]);
+      // Pavement / sidewalk
+      ctx.fillStyle = '#1c1c1c';
+      ctx.fillRect(0, H * 0.38, W, H * 0.62);
 
-  return <canvas ref={canvasRef} className="w-full h-full object-cover" />;
+      // Sidewalk texture lines
+      ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+      ctx.lineWidth = 1;
+      for (let gx = 0; gx < W; gx += 24) {
+        ctx.beginPath(); ctx.moveTo(gx, H * 0.38); ctx.lineTo(gx, H); ctx.stroke();
+      }
+
+      // Move and draw people
+      people.forEach(p => {
+        p.x += p.speed;
+        if (p.x > W + 20) p.x = -20;
+        if (p.x < -20) p.x = W + 20;
+        drawPerson(p);
+      });
+
+      // Scan sweep
+      scanY = (scanY + 1.2) % H;
+      ctx.strokeStyle = 'rgba(239,68,68,0.2)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(0, scanY); ctx.lineTo(W, scanY); ctx.stroke();
+
+      // Grain
+      for (let i = 0; i < 80; i++) {
+        ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.025})`;
+        ctx.fillRect(Math.random() * W, Math.random() * H, 1, 1);
+      }
+
+      raf = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return <canvas ref={canvasRef} className="w-full h-full" />;
 }
+
+// ─── CCTV Canvas: wide intersection, top-down, cars + patrol sweep ────────────
+function CCTVCanvas() {
+  const canvasRef = useRef(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let raf;
+    canvas.width  = canvas.parentElement.clientWidth  || 320;
+    canvas.height = canvas.parentElement.clientHeight || 200;
+    const W = canvas.width, H = canvas.height;
+
+    const cars = [
+      { x: 0,    y: H * 0.42, sx: 1.1,  sy: 0,    w: 22, h: 12, c: '#aaa' },
+      { x: W,    y: H * 0.58, sx: -0.9, sy: 0,    w: 18, h: 11, c: '#888' },
+      { x: W/2,  y: 0,        sx: 0,    sy: 1.0,  w: 12, h: 20, c: '#bbb' },
+      { x: W/2 + 24, y: H,   sx: 0,    sy: -1.1, w: 12, h: 20, c: '#999' },
+    ];
+    let patrolAngle = 0;
+
+    const draw = () => {
+      // Dark road surface
+      ctx.fillStyle = '#0e100e';
+      ctx.fillRect(0, 0, W, H);
+
+      // Horizontal road band
+      ctx.fillStyle = '#131513';
+      ctx.fillRect(0, H * 0.38, W, H * 0.24);
+      // Vertical road band
+      ctx.fillStyle = '#131513';
+      ctx.fillRect(W * 0.44, 0, W * 0.12, H);
+
+      // Centre lines
+      ctx.setLineDash([10, 8]);
+      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(0, H * 0.5); ctx.lineTo(W, H * 0.5); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(W * 0.5, 0); ctx.lineTo(W * 0.5, H); ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Cars
+      cars.forEach(c => {
+        c.x += c.sx; c.y += c.sy;
+        if (c.x > W + 20) c.x = -20;
+        if (c.x < -20) c.x = W + 20;
+        if (c.y > H + 20) c.y = -20;
+        if (c.y < -20) c.y = H + 20;
+
+        // headlight glow
+        const dir = c.sx !== 0 ? (c.sx > 0 ? -1 : 1) : (c.sy > 0 ? -1 : 1);
+        const glx = c.sx !== 0 ? c.x + dir * c.w/2 : c.x;
+        const gly = c.sy !== 0 ? c.y + dir * c.h/2 : c.y;
+        const gl = ctx.createRadialGradient(glx, gly, 1, glx, gly, 14);
+        gl.addColorStop(0, 'rgba(255,240,200,0.45)'); gl.addColorStop(1, 'transparent');
+        ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(glx, gly, 14, 0, Math.PI*2); ctx.fill();
+
+        ctx.fillStyle = c.c;
+        ctx.fillRect(c.x - c.w/2, c.y - c.h/2, c.w, c.h);
+      });
+
+      // Patrol sweep (rotating sector)
+      patrolAngle = (patrolAngle + 0.015) % (Math.PI * 2);
+      const sweepGrad = ctx.createConicalGradient
+        ? null
+        : null; // fallback arc sweep
+      ctx.strokeStyle = 'rgba(16,185,129,0.15)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(W/2, H/2);
+      ctx.arc(W/2, H/2, Math.max(W, H) * 0.8, patrolAngle, patrolAngle + 0.4);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(16,185,129,0.06)';
+      ctx.fill();
+      ctx.stroke();
+
+      // Grain
+      for (let i = 0; i < 60; i++) {
+        ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.02})`;
+        ctx.fillRect(Math.random() * W, Math.random() * H, 1, 1);
+      }
+
+      raf = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return <canvas ref={canvasRef} className="w-full h-full" />;
+}
+
+function CameraCanvas({ cam }) {
+  if (cam.camera_type === 'face_recognition') return <FaceCanvas />;
+  if (cam.camera_type === 'cctv')             return <CCTVCanvas />;
+  return <ANPRCanvas />;
+}
+
+
 
 function CameraCard({ cam, onInspect }) {
   const typeCfg = TYPE_BADGES[cam.camera_type] || TYPE_BADGES.cctv;
   const [timecode, setTimecode] = useState('');
-  const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -213,67 +489,104 @@ function CameraCard({ cam, onInspect }) {
   return (
     <div
       onClick={() => onInspect(cam)}
-      className={`glass-card rounded-2xl overflow-hidden border transition-all hover:scale-[1.01] cursor-pointer relative group flex flex-col justify-between
-      ${cam.is_active ? 'border-steel-600 hover:border-phosphor-500/50 shadow-2xl' : 'border-steel-600/30 opacity-60'}`}
+      className={`glass-card rounded-2xl overflow-hidden border transition-all hover:scale-[1.01] cursor-pointer relative group flex flex-col
+      ${cam.is_active ? 'border-steel-600 hover:border-phosphor-500/50' : 'border-steel-600/30 opacity-60'}`}
     >
-      {/* Video / Animated Stream Container */}
-      <div className="h-52 bg-void-000 relative flex items-center justify-center overflow-hidden">
+      {/* Stream container */}
+      <div className="h-52 bg-[#0d0f0d] relative flex items-center justify-center overflow-hidden">
         {cam.is_active ? (
           <>
-            {/* If video loads cleanly, render video; otherwise fallback to AnimatedCCTVCanvas */}
-            {!videoError && cam.video_url ? (
-              <video
-                src={cam.video_url}
-                autoPlay
-                loop
-                muted
-                playsInline
-                onError={() => setVideoError(true)}
-                className="w-full h-full object-cover filter brightness-90 contrast-110"
-              />
-            ) : (
-              <AnimatedCCTVCanvas isFaceRecog={cam.has_face_recog} />
-            )}
+            {/* Real-life YouTube footage — contextually matched */}
+            <CameraStream cam={cam} />
 
-            {/* Scanline Overlay */}
-            <div className="absolute inset-0 bg-scanlines opacity-40 pointer-events-none" />
-            <div className="absolute inset-0 bg-gradient-to-b from-void-000/60 via-transparent to-void-000/80 pointer-events-none" />
+            {/* Scanline CRT overlay */}
+            <div className="absolute inset-0 pointer-events-none" style={{
+              backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px)',
+            }} />
 
-            {/* Live Badge & Ticker */}
-            <div className="absolute top-2.5 left-2.5 flex items-center gap-2 z-10">
-              <div className="flex items-center gap-1.5 bg-void-000/80 backdrop-blur-md px-2.5 py-1 rounded-md border border-steel-600/60">
-                <div className="w-1.5 h-1.5 rounded-full bg-critical-500 animate-ping" />
-                <span className="text-[10px] font-mono font-bold tracking-widest text-critical-500 uppercase">LIVE</span>
+            {/* Vignette */}
+            <div className="absolute inset-0 pointer-events-none"
+              style={{ background: 'radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.65) 100%)' }} />
+
+            {/* ── TOP-LEFT: LIVE badge + timecode ── */}
+            <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 z-10">
+              <div className="flex items-center gap-1.5 bg-black/70 backdrop-blur-sm px-2 py-0.5 rounded border border-white/10">
+                <span className="w-1.5 h-1.5 rounded-full bg-critical-500 animate-ping" />
+                <span className="text-[9px] font-mono font-bold tracking-widest text-critical-500">LIVE</span>
               </div>
-              <span className="text-[10px] font-mono text-paper-100/70 bg-void-000/80 backdrop-blur-md px-2 py-1 rounded border border-steel-600/60">
+              <span className="text-[9px] font-mono text-white/60 bg-black/60 px-1.5 py-0.5 rounded border border-white/10">
                 {timecode}
               </span>
             </div>
 
-            <div className="absolute top-2.5 right-2.5 flex items-center gap-2 z-10">
-              <span className="text-[10px] font-mono text-phosphor-500 bg-void-000/80 backdrop-blur-md px-2 py-1 rounded border border-steel-600/60">
+            {/* ── TOP-RIGHT: FPS badge ── */}
+            <div className="absolute top-2.5 right-2.5 z-10">
+              <span className="text-[9px] font-mono text-white/50 bg-black/60 px-1.5 py-0.5 rounded border border-white/10">
                 {cam.fps || 30} FPS
               </span>
             </div>
 
-            {/* Target Detection Reticle Bounding Box */}
-            {cam.detected_target && (
-              <div className={`absolute z-20 border-2 rounded p-1.5 transition-all animate-pulse-slow ${
-                cam.has_face_recog ? 'border-critical-500 bg-critical-500/15 top-1/4 left-1/3' : 'border-phosphor-500 bg-phosphor-500/15 bottom-1/4 right-1/4'
-              }`}>
-                <div className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-void-000/90 text-paper-100 border border-steel-600 whitespace-nowrap flex items-center gap-1">
-                  <Zap className="w-3 h-3 text-warn-500 animate-bounce" />
-                  <span>{cam.detected_target}</span>
+            {/* ── DETECTION OVERLAY — positioned by boxPos, label below box ── */}
+            {cam.detected_target && (() => {
+              const posMap = {
+                'top-left':      'top-10 left-3',
+                'top-right':     'top-10 right-3',
+                'center-left':   'top-1/3 left-4',
+                'center-center': 'top-1/3 left-[35%]',
+                'center-right':  'top-1/3 right-4',
+                'bottom-left':   'bottom-10 left-3',
+                'bottom-center': 'bottom-10 left-[30%]',
+                'bottom-right':  'bottom-10 right-3',
+              };
+              const posClass = posMap[cam.boxPos] || 'top-1/3 left-[30%]';
+              const isRisk = cam.has_face_recog;
+              const color  = isRisk ? '#ef4444' : '#10b981';
+              return (
+                <div className={`absolute z-20 ${posClass}`}>
+                  {/* Reticle box */}
+                  <div style={{ border: `1.5px solid ${color}`, width: 68, height: 52, borderRadius: 3, position: 'relative' }}>
+                    {/* Corner brackets */}
+                    {[['top:0;left:0', 'borderTop', 'borderLeft'],
+                      ['top:0;right:0', 'borderTop', 'borderRight'],
+                      ['bottom:0;left:0', 'borderBottom', 'borderLeft'],
+                      ['bottom:0;right:0', 'borderBottom', 'borderRight'],
+                    ].map(([pos], idx) => (
+                      <span key={idx} style={{
+                        position: 'absolute',
+                        width: 8, height: 8,
+                        [pos.split(';')[0].split(':')[0]]: -1,
+                        [pos.split(';')[1].split(':')[0]]: -1,
+                        borderTop:    pos.includes('top')    ? `2px solid ${color}` : 'none',
+                        borderBottom: pos.includes('bottom') ? `2px solid ${color}` : 'none',
+                        borderLeft:   pos.includes('left')   ? `2px solid ${color}` : 'none',
+                        borderRight:  pos.includes('right')  ? `2px solid ${color}` : 'none',
+                      }} />
+                    ))}
+                  </div>
+                  {/* Label — below box, hard capped width */}
+                  <div style={{
+                    marginTop: 3,
+                    background: 'rgba(0,0,0,0.82)',
+                    border: `1px solid ${color}55`,
+                    borderRadius: 2,
+                    padding: '2px 6px',
+                    maxWidth: 120,
+                    overflow: 'hidden',
+                  }}>
+                    <div style={{ color, fontSize: 8, fontFamily: 'monospace', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {cam.detected_target}
+                    </div>
+                    <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 7, fontFamily: 'monospace' }}>
+                      CONF: {cam.confidence}%
+                    </div>
+                  </div>
                 </div>
-                <div className="text-[8px] font-mono text-phosphor-500 mt-0.5 text-right font-semibold">
-                  MATCH: {cam.confidence}%
-                </div>
-              </div>
-            )}
+              );
+            })()}
 
-            {/* Hover Expand Icon */}
+            {/* Hover expand icon */}
             <div className="absolute bottom-2.5 right-2.5 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
-              <div className="p-1.5 rounded-lg bg-steel-700/90 text-paper-100 hover:bg-phosphor-500 transition-colors">
+              <div className="p-1.5 rounded bg-black/70 text-white/70 hover:text-white transition-colors">
                 <Maximize2 className="w-3.5 h-3.5" />
               </div>
             </div>
@@ -442,17 +755,12 @@ export default function SurveillancePage() {
 
             {/* Modal Video Stream Main */}
             <div className="flex-1 bg-void-000 relative flex items-center justify-center overflow-hidden">
-              {activeCamModal.video_url ? (
+              {activeCamModal.is_active ? (
                 <>
-                  <video
-                    src={activeCamModal.video_url}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="w-full h-full object-cover filter brightness-95 contrast-110"
-                  />
-                  <div className="absolute inset-0 bg-scanlines opacity-30 pointer-events-none" />
+                  <CameraStream cam={activeCamModal} />
+                  <div className="absolute inset-0 pointer-events-none" style={{
+                    backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px)',
+                  }} />
 
                   {/* High Tech Overlay Reticle */}
                   {activeCamModal.detected_target && (

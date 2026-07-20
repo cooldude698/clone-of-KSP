@@ -1,39 +1,72 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
+/* ═══════════════════════════════════════════════════════
+   DRISHTI — "Graphite & Oxblood" Design System
+   Fonts: Manrope (UI) · JetBrains Mono (data) · Noto Sans Kannada
+   ═══════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Kannada:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ─── LIGHT MODE (default) ──────────────────────────────── */
 :root {
-  /* LIGHT MODE TOKENS - Ultra Clean Minimal */
-  --color-void-000: #FAFAFA;       /* Page background */
-  --color-steel-700: #FFFFFF;      /* Card background */
-  --color-steel-600: #E5E7EB;      /* Subtle borders (gray-200) */
-  --color-phosphor-500: #2563EB;   /* Primary accent (blue-600) */
-  --color-warn-500: #D97706;       /* Warning (amber-600) */
-  --color-critical-500: #DC2626;   /* Critical (red-600) */
-  --color-stamp-red-500: #DC2626;
-  --color-success-500: #059669;    /* Success (emerald-600) */
-  --color-paper-100: #111827;      /* Primary text (gray-900) */
+  --surface-0:        #F4F3F0;
+  --surface-1:        #FFFFFF;
+  --border:           #DEDBD4;
+  --text-primary:     #1A1A1A;
+  --text-secondary:   #5C5A54;
+  --accent:           #6E2029;
+  --accent-warm:      #6B6142;
+  --status-critical:  #A33F36;
+  --status-warning:   #8F7430;
+  --status-success:   #3F6B45;
 
-  --scroll-track: #F3F4F6;
-  --scroll-thumb: #D1D5DB;
+  /* ── Legacy aliases (keeps existing Tailwind classes working) ── */
+  --color-void-000:       var(--surface-0);
+  --color-steel-700:      var(--surface-1);
+  --color-steel-600:      var(--border);
+  --color-phosphor-500:   var(--accent);
+  --color-warn-500:       var(--status-warning);
+  --color-critical-500:   var(--status-critical);
+  --color-stamp-red-500:  var(--status-critical);
+  --color-success-500:    var(--status-success);
+  --color-paper-100:      var(--text-primary);
+
+  --scroll-track: #ECEAE5;
+  --scroll-thumb: #C4C1B8;
+
+  /* ── Design tokens ── */
+  --radius-sm:   4px;
+  --radius-md:   6px;
+  --radius-lg:   8px;
 }
 
+/* ─── DARK MODE ──────────────────────────────────────────── */
 .dark, [data-theme="dark"] {
-  /* DARK MODE TOKENS - Clean OLED Black */
-  --color-void-000: #000000;       /* Page background */
-  --color-steel-700: #0A0A0A;      /* Card background */
-  --color-steel-600: #27272A;      /* Subtle borders (zinc-800) */
-  --color-phosphor-500: #3B82F6;   /* Primary accent (blue-500) */
-  --color-warn-500: #F59E0B;       /* Warning (amber-500) */
-  --color-critical-500: #EF4444;   /* Critical (red-500) */
-  --color-stamp-red-500: #EF4444;
-  --color-success-500: #10B981;    /* Success (emerald-500) */
-  --color-paper-100: #F9FAFB;      /* Primary text (gray-50) */
+  --surface-0:        #15161A;
+  --surface-1:        #1E2024;
+  --border:           #2E3036;
+  --text-primary:     #F1EFEA;
+  --text-secondary:   #9B9994;
+  --accent:           #8C2F39;
+  --accent-warm:      #8A7F5C;
+  --status-critical:  #B84C42;
+  --status-warning:   #B5923F;
+  --status-success:   #5E8A63;
 
-  --scroll-track: #000000;
-  --scroll-thumb: #27272A;
+  /* ── Legacy aliases ── */
+  --color-void-000:       var(--surface-0);
+  --color-steel-700:      var(--surface-1);
+  --color-steel-600:      var(--border);
+  --color-phosphor-500:   var(--accent);
+  --color-warn-500:       var(--status-warning);
+  --color-critical-500:   var(--status-critical);
+  --color-stamp-red-500:  var(--status-critical);
+  --color-success-500:    var(--status-success);
+  --color-paper-100:      var(--text-primary);
+
+  --scroll-track: #15161A;
+  --scroll-thumb: #2E3036;
 }
 
 * {
@@ -45,10 +78,14 @@
 html,
 body {
   max-width: 100vw;
-  background-color: var(--color-void-000);
-  color: var(--color-paper-100);
-  font-family: 'IBM Plex Sans', sans-serif;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  background-color: var(--surface-0);
+  color: var(--text-primary);
+  /* Manrope for all UI text. JetBrains Mono only via .font-data utility. */
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-feature-settings: 'cv01', 'cv02', 'cv03', 'cv04';
+  transition: background-color 0.15s ease, color 0.15s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Scrollbars */
@@ -64,22 +101,123 @@ body {
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-phosphor-500);
+  background: var(--accent);
 }
 
-/* Custom visual utilities */
-.font-data {
-  font-family: 'IBM Plex Mono', monospace;
+/* ═══════════════════════════════════════════════════════
+   TYPOGRAPHY UTILITIES
+   ═══════════════════════════════════════════════════════ */
+
+/* JetBrains Mono — data only: FIR numbers, timestamps, coords, camera IDs */
+.font-data,
+.font-mono {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
 }
 
+/* Noto Sans Kannada — Kannada UI strings only */
+.font-kannada {
+  font-family: 'Noto Sans Kannada', 'Manrope', sans-serif;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SURFACE & CARD UTILITIES
+   ═══════════════════════════════════════════════════════ */
+
+/* Standard card: surface-1 bg, hairline border, no shadow */
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+/* Legacy alias — keeps existing components working */
 .glass-card {
-  background: var(--color-steel-700);
-  border: 1px solid var(--color-steel-600);
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
 }
 
-.dark .glass-card {
-  box-shadow: none;
+/* ═══════════════════════════════════════════════════════
+   STATUS BADGE UTILITIES
+   Status colors are ONLY for badges/tags — never card bg
+   ═══════════════════════════════════════════════════════ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-family: 'Manrope', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid;
+}
+
+.badge-critical {
+  color: var(--status-critical);
+  border-color: var(--status-critical);
+  background: transparent;
+}
+
+.badge-warning {
+  color: var(--status-warning);
+  border-color: var(--status-warning);
+  background: transparent;
+}
+
+.badge-success {
+  color: var(--status-success);
+  border-color: var(--status-success);
+  background: transparent;
+}
+
+/* ═══════════════════════════════════════════════════════
+   BUTTON UTILITIES
+   Primary uses --accent sparingly; secondary is outlined
+   ═══════════════════════════════════════════════════════ */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: #F1EFEA;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.btn-primary:hover  { opacity: 0.88; }
+.btn-primary:active { opacity: 0.75; }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-secondary:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
 }
 
 /* Map override for dark/light themes */
@@ -236,4 +374,9 @@ body {
 }
 .animate-fade-in {
   animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes scan {
+  0%, 100% { top: 0%; opacity: 0.3; }
+  50% { top: 92%; opacity: 1; }
 }

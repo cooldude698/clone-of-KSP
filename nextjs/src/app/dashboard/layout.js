@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, MessageSquare, Map, GitBranch,
   Camera, BarChart2, LogOut, Shield, ChevronLeft,
-  ChevronRight, AlertTriangle, User, History,
+  ChevronRight, AlertTriangle, User, History, Eye
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -523,13 +523,25 @@ export default function DashboardLayout({ children }) {
       {/* ── SIDEBAR ── */}
       <aside className={`flex flex-col transition-all duration-300 ease-in-out bg-void-000 relative z-20 ${collapsed ? 'w-16' : 'w-64'}`}>
         <div className={`flex items-center gap-3 px-6 py-6 ${collapsed ? 'justify-center px-4' : ''}`}>
-          <div className="w-8 h-8 rounded-lg bg-phosphor-500 text-white flex items-center justify-center flex-shrink-0">
-            <Shield className="w-4 h-4" />
+          <div className="relative w-8 h-8 rounded bg-accent text-white flex items-center justify-center flex-shrink-0 group/logo overflow-hidden border border-accent/20">
+            {/* Cool cybernetic scanning line */}
+            <div className="absolute inset-x-0 h-0.5 bg-status-success/80 top-0 animate-[scan_2s_ease-in-out_infinite]" />
+            <Eye className="w-4 h-4 text-white z-10 transition-transform duration-300 group-hover/logo:scale-110" />
+            
+            {/* Corner brackets */}
+            <span className="absolute top-0.5 left-0.5 w-1.5 h-1.5 border-t border-l border-white/40" />
+            <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 border-t border-r border-white/40" />
+            <span className="absolute bottom-0.5 left-0.5 w-1.5 h-1.5 border-b border-l border-white/40" />
+            <span className="absolute bottom-0.5 right-0.5 w-1.5 h-1.5 border-b border-r border-white/40" />
           </div>
           {!collapsed && (
-            <div>
-              <span className="text-paper-100 font-semibold tracking-widest text-sm">DRISHTI</span>
-              <p className="text-paper-100/40 text-[10px] tracking-widest uppercase mt-0.5">ದೃಷ್ಟಿ</p>
+            <div className="relative">
+              <div className="flex items-center gap-1.5">
+                <span className="text-paper-100 font-bold tracking-widest text-sm font-sans">DRISHTI</span>
+                {/* Active scan status blinker */}
+                <span className="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse" />
+              </div>
+              <p className="text-paper-100/40 text-[9px] font-kannada tracking-wide uppercase mt-0.5">ದೃಷ್ಟಿ · matrix active</p>
             </div>
           )}
         </div>

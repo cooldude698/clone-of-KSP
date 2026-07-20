@@ -157,39 +157,39 @@ export default function LandingPage() {
   return (
     <main 
       onMouseMove={handleMouseMove}
-      className="min-h-screen bg-void-000 text-paper-100 flex flex-col font-sans relative overflow-hidden transition-colors duration-200"
+      className="min-h-screen bg-[var(--surface-0)] text-[var(--text-primary)] flex flex-col font-sans relative overflow-hidden transition-colors duration-200"
     >
       
       {/* ── SECTION 1: HERO (100vh) ────────────────────────────────────────── */}
-      <section className="h-screen w-full relative flex items-center justify-center p-6 border-b border-steel-600/30 overflow-hidden select-none select-none">
+      <section className="h-screen w-full relative flex items-center justify-center p-6 border-b border-[var(--border)] overflow-hidden select-none">
         
         {/* Interactive Mouse Spotlight */}
         <div 
           className="absolute inset-0 pointer-events-none z-0 opacity-100 transition-opacity duration-300"
           style={{
-            background: `radial-gradient(800px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255,255,255,0.06), transparent 40%)`
+            background: `radial-gradient(800px circle at ${mousePos.x}px ${mousePos.y}px, var(--border), transparent 40%)`
           }}
         />
         
-        <div className="absolute inset-0 grid grid-cols-6 sm:grid-cols-8 md:grid-cols-12 gap-1 p-2 bg-void-000 z-0">
+        <div className="absolute inset-0 grid grid-cols-6 sm:grid-cols-8 md:grid-cols-12 gap-1 p-2 bg-[var(--surface-0)] z-0">
           {HERO_TILES.map((tile) => {
             const shouldAnimate = tile.isLit && !prefersReducedMotion;
             return (
               <motion.div
                 key={tile.id}
-                initial={{ opacity: 0.1, backgroundColor: 'rgba(255,255,255,0)', borderColor: 'rgba(255,255,255,0.05)' }}
+                initial={{ opacity: 0.1, backgroundColor: 'transparent', borderColor: 'var(--border)' }}
                 animate={shouldAnimate ? {
                   opacity: [0.1, 0.4, 0.15, 1],
-                  borderColor: ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.2)', 'rgba(255,255,255,0.15)'],
-                  backgroundColor: ['rgba(255,255,255,0)', 'rgba(255,255,255,0.03)', 'rgba(255,255,255,0.01)']
+                  borderColor: ['var(--border)', 'var(--accent)', 'var(--border)'],
+                  backgroundColor: ['transparent', 'var(--surface-1)', 'transparent']
                 } : tile.isLit ? {
                   opacity: 1,
-                  borderColor: 'rgba(255,255,255,0.15)',
-                  backgroundColor: 'rgba(255,255,255,0.01)'
+                  borderColor: 'var(--border)',
+                  backgroundColor: 'var(--surface-1)'
                 } : {
                   opacity: 0.15,
-                  borderColor: 'rgba(255,255,255,0.05)',
-                  backgroundColor: 'rgba(255,255,255,0)'
+                  borderColor: 'var(--border)',
+                  backgroundColor: 'transparent'
                 }}
                 transition={shouldAnimate ? {
                   delay: tile.litDelay,
@@ -197,24 +197,24 @@ export default function LandingPage() {
                   times: [0, 0.2, 0.5, 1],
                   ease: 'easeInOut'
                 } : { duration: 0.2 }}
-                className={`relative border rounded-md text-[6px] font-mono p-1.5 flex flex-col justify-between overflow-hidden ${tile.spanClass} transition-colors duration-350`}
+                className={`relative border rounded-md text-[6px] font-mono p-1.5 flex flex-col justify-between overflow-hidden ${tile.spanClass} transition-colors duration-350 bg-[var(--surface-1)] border-[var(--border)]`}
               >
                 {/* Visual live scanline animation only for lit cameras */}
                 {tile.isLit && (
                   <div className="absolute inset-0 live-scanline opacity-30 pointer-events-none z-0" />
                 )}
 
-                <div className="flex items-center justify-between z-10 opacity-60">
-                  <span className="text-white/60 tracking-wider">{tile.label}</span>
+                <div className="flex items-center justify-between z-10 opacity-70">
+                  <span className="text-[var(--text-secondary)] tracking-wider font-semibold">{tile.label}</span>
                   {tile.isLit && (
                     <div className="flex items-center gap-1.5">
-                      <span className="w-1 h-1 rounded-full bg-white/80 animate-pulse" />
-                      <span className="text-[5px] text-white/80 font-bold uppercase tracking-widest">LIVE</span>
+                      <span className="w-1 h-1 rounded-full bg-[var(--status-critical)] animate-pulse" />
+                      <span className="text-[5px] text-[var(--status-critical)] font-bold uppercase tracking-widest">LIVE</span>
                     </div>
                   )}
                 </div>
 
-                <span className="text-[5px] text-white/20 font-mono z-10 select-none tracking-widest">
+                <span className="text-[5px] text-[var(--text-secondary)]/50 font-mono z-10 select-none tracking-widest">
                   {tile.isLit ? '00:00:00 / REC' : 'STBY'}
                 </span>
               </motion.div>
@@ -223,107 +223,101 @@ export default function LandingPage() {
         </div>
 
         {/* Ambient Dark radial overlay for foreground contrast */}
-        <div className="absolute inset-0 bg-gradient-radial from-transparent via-void-000/60 to-void-000 z-10 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-radial from-transparent via-[var(--surface-0)]/60 to-[var(--surface-0)] z-10 pointer-events-none" />
 
         {/* Floating annotations with technical leader lines */}
         <div className="absolute inset-0 z-10 pointer-events-none hidden lg:block">
           
           {/* Annotation 1 (Top Left) */}
           <div className="absolute top-[20%] left-[8%] flex flex-col items-start font-mono text-[9px] tracking-widest select-none">
-            <span className="text-white/40 uppercase">SYSTEM FEED INDEX</span>
-            <span className="text-white/90 font-bold border border-white/10 bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-sm mt-1.5">
+            <span className="text-[var(--text-secondary)] uppercase">SYSTEM FEED INDEX</span>
+            <span className="text-[var(--text-primary)] font-bold border border-[var(--border)] bg-[var(--surface-1)] backdrop-blur-sm px-2.5 py-1 rounded-sm mt-1.5 shadow-sm">
               5,35,815+ MCCTNS
             </span>
             <svg width="150" height="60" className="opacity-30 mt-1">
-              <path d="M 0 0 Q 30 40 130 50" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="1" strokeDasharray="2 2" />
-              <circle cx="130" cy="50" r="1.5" fill="rgba(255,255,255,0.8)" />
+              <path d="M 0 0 Q 30 40 130 50" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-[var(--text-secondary)]" />
+              <circle cx="130" cy="50" r="1.5" fill="currentColor" className="text-[var(--text-secondary)]" />
             </svg>
           </div>
 
           {/* Annotation 2 (Top Right) */}
           <div className="absolute top-[22%] right-[10%] flex flex-col items-end font-mono text-[9px] tracking-widest select-none">
-            <span className="text-white/40 uppercase">PRECINCT COVERAGE</span>
-            <span className="text-white/90 font-bold border border-white/10 bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-sm mt-1.5">
+            <span className="text-[var(--text-secondary)] uppercase">PRECINCT COVERAGE</span>
+            <span className="text-[var(--text-primary)] font-bold border border-[var(--border)] bg-[var(--surface-1)] backdrop-blur-sm px-2.5 py-1 rounded-sm mt-1.5 shadow-sm">
               7,000+ Safe City
             </span>
             <svg width="150" height="60" className="opacity-30 mt-1">
-              <path d="M 150 0 Q 120 40 20 50" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="1" strokeDasharray="2 2" />
-              <circle cx="20" cy="50" r="1.5" fill="rgba(255,255,255,0.8)" />
+              <path d="M 150 0 Q 120 40 20 50" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-[var(--text-secondary)]" />
+              <circle cx="20" cy="50" r="1.5" fill="currentColor" className="text-[var(--text-secondary)]" />
             </svg>
           </div>
 
           {/* Annotation 3 (Bottom Right) */}
           <div className="absolute bottom-[20%] right-[12%] flex flex-col items-end font-mono text-[9px] tracking-widest select-none">
-            <span className="text-white/40 uppercase">INTELLIGENT JUNCTIONS</span>
-            <span className="text-white/90 font-bold border border-white/10 bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-sm mt-1.5">
+            <span className="text-[var(--text-secondary)] uppercase">INTELLIGENT JUNCTIONS</span>
+            <span className="text-[var(--text-primary)] font-bold border border-[var(--border)] bg-[var(--surface-1)] backdrop-blur-sm px-2.5 py-1 rounded-sm mt-1.5 shadow-sm">
               169+ BATCS JUNCTIONS
             </span>
             <svg width="120" height="80" className="opacity-30 mt-1">
-              <path d="M 120 80 Q 90 20 10 10" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="1" strokeDasharray="2 2" />
-              <circle cx="10" cy="10" r="1.5" fill="rgba(255,255,255,0.8)" />
+              <path d="M 120 80 Q 90 20 10 10" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-[var(--text-secondary)]" />
+              <circle cx="10" cy="10" r="1.5" fill="currentColor" className="text-[var(--text-secondary)]" />
             </svg>
           </div>
         </div>
 
         {/* Foreground Content Stack */}
-        <div className="relative z-[25] z-30 text-center max-w-xl mx-auto flex flex-col items-center gap-6">
+        <div className="relative z-30 text-center max-w-xl mx-auto flex flex-col items-center gap-6">
           
           {/* Header Title */}
           <div className="flex flex-col items-center gap-1">
             <div className="flex items-baseline gap-4">
-              <h1 className="text-5xl sm:text-7xl font-bold tracking-[0.2em] text-white font-sans">
+              <h1 className="text-5xl sm:text-7xl font-bold tracking-[0.2em] text-[var(--text-primary)] font-sans">
                 DRISHTI
               </h1>
-              <span className="text-2xl sm:text-3xl text-white/40 font-mono font-light">
+              <span className="text-2xl sm:text-3xl text-[var(--text-secondary)] font-mono font-light font-kannada">
                 ದೃಷ್ಟಿ
               </span>
             </div>
             {/* Tagline */}
-            <p className="mt-4 text-xs sm:text-sm text-white/50 font-mono tracking-[0.3em] uppercase leading-relaxed">
+            <p className="mt-4 text-xs sm:text-sm text-[var(--text-secondary)] font-mono tracking-[0.3em] uppercase leading-relaxed">
               Intelligence that sees what others miss
             </p>
           </div>
 
           {/* Stature annotation tags for mobile */}
           <div className="flex flex-wrap justify-center gap-3 lg:hidden text-[9px] font-mono tracking-wider">
-            <span className="bg-black/40 border border-white/10 px-2 py-1 rounded text-white/90">5,35,815+ MCCTNS</span>
-            <span className="bg-black/40 border border-white/10 px-2 py-1 rounded text-white/90">7,000+ Safe City</span>
-            <span className="bg-black/40 border border-white/10 px-2 py-1 rounded text-white/90">169+ BATCS</span>
+            <span className="bg-[var(--surface-1)] border border-[var(--border)] px-2 py-1 rounded text-[var(--text-primary)]">5,35,815+ MCCTNS</span>
+            <span className="bg-[var(--surface-1)] border border-[var(--border)] px-2 py-1 rounded text-[var(--text-primary)]">7,000+ Safe City</span>
+            <span className="bg-[var(--surface-1)] border border-[var(--border)] px-2 py-1 rounded text-[var(--text-primary)]">169+ BATCS</span>
           </div>
 
           {/* Expandable CTA Panel Wrapper */}
           <div className="w-full min-h-[200px] flex items-center justify-center mt-6">
             <AnimatePresence mode="wait">
               {!isSigningIn ? (
-                <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
+                <div className="flex justify-center items-center">
                   <motion.button
                     key="cta-button"
                     layoutId="authPanel"
                     onClick={() => setIsSigningIn(true)}
-                    className="px-8 py-3.5 rounded-full bg-white/5 hover:bg-white/10 text-white font-mono text-xs font-semibold uppercase tracking-[0.2em] transition-all border border-white/10 hover:border-white/20 focus:ring-1 focus:ring-white/20 focus:outline-none backdrop-blur-md"
+                    className="px-8 py-3.5 rounded bg-[var(--accent)] text-white font-mono text-xs font-semibold uppercase tracking-[0.2em] transition-all border border-[var(--accent)] hover:opacity-90 focus:outline-none shadow-sm"
                   >
                     SIGN IN TO CONTROL ROOM
-                  </motion.button>
-                  <motion.button
-                    onClick={() => router.push('/ai-demo')}
-                    className="px-8 py-3.5 rounded-full bg-white hover:bg-gray-100 text-black font-mono text-xs font-bold uppercase tracking-[0.2em] transition-all border border-transparent shadow-[0_0_20px_rgba(255,255,255,0.2)] focus:ring-2 focus:ring-white focus:outline-none"
-                  >
-                    LAUNCH AI PLATFORM
                   </motion.button>
                 </div>
               ) : (
                 <motion.div
                   key="auth-panel"
                   layoutId="authPanel"
-                  className="w-full max-w-md rounded-3xl bg-black/60 border border-white/10 p-7 shadow-[0_0_40px_rgba(0,0,0,0.5)] backdrop-blur-2xl text-white flex flex-col gap-5 text-left"
+                  className="w-full max-w-md rounded bg-[var(--surface-1)] border border-[var(--border)] p-7 text-[var(--text-primary)] flex flex-col gap-5 text-left"
                 >
                   {/* Panel Header */}
-                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                    <span className="text-[10px] font-mono font-bold uppercase text-white/60 tracking-[0.2em]">SYSTEM AUTHENTICATION</span>
+                  <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
+                    <span className="text-[10px] font-mono font-bold uppercase text-[var(--text-secondary)] tracking-[0.2em]">SYSTEM AUTHENTICATION</span>
                     <button
                       onClick={() => setIsSigningIn(false)}
                       aria-label="Back to landing menu"
-                      className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white transition-colors focus:ring-1 focus:ring-white/30 outline-none"
+                      className="w-8 h-8 rounded-full bg-[var(--surface-0)] hover:bg-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] transition-colors outline-none"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -331,7 +325,7 @@ export default function LandingPage() {
 
                   {/* Panel Error Display */}
                   {error && (
-                    <div className="text-[10px] font-mono text-red-400 bg-red-400/10 border border-red-400/20 px-3 py-2 rounded flex items-center gap-1.5 animate-slide-in">
+                    <div className="text-[10px] font-mono text-[var(--status-critical)] bg-[var(--status-critical)]/10 border border-[var(--status-critical)]/20 px-3 py-2 rounded flex items-center gap-1.5 animate-slide-in">
                       <ShieldAlert className="w-4 h-4 shrink-0" />
                       <span>{error}</span>
                     </div>
@@ -339,20 +333,20 @@ export default function LandingPage() {
 
                   {/* Employee ID */}
                   <div className="flex flex-col gap-1.5">
-                    <label htmlFor="employee-id" className="text-[9px] font-mono text-white/50 uppercase tracking-[0.1em] pl-1">Employee ID / User Name</label>
+                    <label htmlFor="employee-id" className="text-[9px] font-mono text-[var(--text-secondary)] uppercase tracking-[0.1em] pl-1">Employee ID / User Name</label>
                     <input
                       id="employee-id"
                       type="text"
                       placeholder="e.g. inspector"
                       value={employeeId}
                       onChange={(e) => setEmployeeId(e.target.value)}
-                      className="px-4 py-3 rounded-xl bg-black/40 border border-white/10 placeholder-white/20 text-xs focus:border-white/30 focus:ring-1 focus:ring-white/30 focus:outline-none transition-all font-mono text-white"
+                      className="px-4 py-3 rounded bg-[var(--surface-0)] border border-[var(--border)] placeholder-[var(--text-secondary)]/40 text-xs focus:border-[var(--accent)] focus:outline-none transition-all font-mono text-[var(--text-primary)]"
                     />
                   </div>
 
                   {/* Password */}
                   <div className="flex flex-col gap-1.5">
-                    <label htmlFor="password" className="text-[9px] font-mono text-white/50 uppercase tracking-[0.1em] pl-1">Security Password</label>
+                    <label htmlFor="password" className="text-[9px] font-mono text-[var(--text-secondary)] uppercase tracking-[0.1em] pl-1">Security Password</label>
                     <div className="relative">
                       <input
                         id="password"
@@ -360,12 +354,12 @@ export default function LandingPage() {
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-4 py-3 pr-10 rounded-xl bg-black/40 border border-white/10 placeholder-white/20 text-xs focus:border-white/30 focus:ring-1 focus:ring-white/30 focus:outline-none transition-all font-mono text-white"
+                        className="w-full px-4 py-3 pr-10 rounded bg-[var(--surface-0)] border border-[var(--border)] placeholder-[var(--text-secondary)]/40 text-xs focus:border-[var(--accent)] focus:outline-none transition-all font-mono text-[var(--text-primary)]"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80 focus:outline-none"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] focus:outline-none"
                       >
                         {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                       </button>
@@ -374,16 +368,16 @@ export default function LandingPage() {
 
                   {/* System Role dropdown */}
                   <div className="flex flex-col gap-1.5">
-                    <label htmlFor="role" className="text-[9px] font-mono text-white/50 uppercase tracking-[0.1em] pl-1">Role Access Clearence</label>
+                    <label htmlFor="role" className="text-[9px] font-mono text-[var(--text-secondary)] uppercase tracking-[0.1em] pl-1">Role Access Clearence</label>
                     <select
                       id="role"
                       value={role}
                       onChange={(e) => setRole(e.target.value)}
-                      className="px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-xs focus:border-white/30 focus:ring-1 focus:ring-white/30 focus:outline-none transition-all cursor-pointer font-sans text-white appearance-none"
+                      className="px-4 py-3 rounded bg-[var(--surface-0)] border border-[var(--border)] text-xs focus:border-[var(--accent)] focus:outline-none transition-all cursor-pointer font-sans text-[var(--text-primary)] appearance-none"
                     >
-                      <option value="" disabled className="bg-[#111] text-white/50">Select Clearence Tier...</option>
+                      <option value="" disabled className="bg-[var(--surface-0)] text-[var(--text-secondary)]/50">Select Clearence Tier...</option>
                       {ROLES.map((r) => (
-                        <option key={r} value={r} className="bg-[#111] text-white">{r}</option>
+                        <option key={r} value={r} className="bg-[var(--surface-0)] text-[var(--text-primary)]">{r}</option>
                       ))}
                     </select>
                   </div>
@@ -392,13 +386,13 @@ export default function LandingPage() {
                   <button
                     onClick={() => handleSignInSubmit()}
                     disabled={loading}
-                    className="mt-3 w-full py-3.5 rounded-full bg-white text-black font-mono text-xs font-bold uppercase tracking-[0.1em] transition-all disabled:opacity-50 select-none hover:bg-gray-200 active:scale-[0.98] focus:ring-2 focus:ring-white/50 focus:outline-none shadow-[0_0_15px_rgba(255,255,255,0.15)]"
+                    className="mt-3 w-full py-3.5 rounded bg-[var(--accent)] text-white font-mono text-xs font-bold uppercase tracking-[0.1em] transition-all disabled:opacity-50 select-none hover:opacity-90 active:scale-[0.98] focus:outline-none"
                   >
                     {loading ? 'Authenticating Access...' : 'Authenticate Access'}
                   </button>
 
                   {/* Developer Quick Demo Bypass Button */}
-                  <div className="flex flex-col gap-1.5 mt-2 pt-3 border-t border-white/10">
+                  <div className="flex flex-col gap-1.5 mt-2 pt-3 border-t border-[var(--border)]">
                     <button
                       type="button"
                       onClick={() => {
@@ -407,7 +401,7 @@ export default function LandingPage() {
                         setRole('Inspector');
                         handleSignInSubmit('inspector', 'drishti125', 'Inspector');
                       }}
-                      className="w-full py-2 rounded-full border border-white/10 bg-transparent hover:bg-white/5 text-white/60 hover:text-white font-mono text-[9px] font-bold uppercase tracking-wider transition-all select-none active:scale-[0.98] focus:ring-1 focus:ring-white/20 outline-none"
+                      className="w-full py-2 rounded border border-[var(--border)] bg-transparent hover:bg-[var(--surface-0)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-mono text-[9px] font-bold uppercase tracking-wider transition-all select-none active:scale-[0.98] focus:outline-none"
                     >
                       ⚡ Quick Bypass: Login as Inspector
                     </button>
@@ -425,12 +419,12 @@ export default function LandingPage() {
       </section>
 
       {/* ── SECTION 2: THE GAP (Scroll Fade In) ────────────────────────────── */}
-      <section className="py-24 px-6 max-w-4xl mx-auto text-center border-b border-steel-600/20">
+      <section className="py-24 px-6 max-w-4xl mx-auto text-center border-b border-[var(--border)]">
         <motion.div {...scrollAnimation} className="flex flex-col gap-6">
-          <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-paper-100 font-sans">
+          <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[var(--text-primary)] font-sans">
             5 lakh cameras. Thousands of FIRs. Zero connection.
           </h2>
-          <p className="text-sm sm:text-base text-paper-100/70 max-w-2xl mx-auto font-mono tracking-wide leading-relaxed">
+          <p className="text-sm sm:text-base text-[var(--text-secondary)] max-w-2xl mx-auto font-mono tracking-wide leading-relaxed">
             An investigator still checks three systems by hand to find what should already be obvious.
           </p>
         </motion.div>
@@ -440,49 +434,49 @@ export default function LandingPage() {
       <section className="py-24 px-6 max-w-6xl mx-auto">
         <motion.div {...scrollAnimation} className="flex flex-col gap-12">
           <div className="text-center">
-            <span className="text-[10px] font-mono font-bold text-phosphor-500 uppercase tracking-widest">DRISHTI INTELLIGENCE TOOLS</span>
-            <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-paper-100 mt-2 font-mono">Precision Analytical Suite</h3>
+            <span className="text-[10px] font-mono font-bold text-[var(--accent)] uppercase tracking-widest">DRISHTI INTELLIGENCE TOOLS</span>
+            <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)] mt-2 font-mono">Precision Analytical Suite</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Card A: Chat + Heatmap */}
             <div className="flex flex-col gap-3 group">
-              <Card className="relative overflow-hidden">
+              <Card className="relative overflow-hidden border-[var(--border)]">
                 {/* Official CASE STAMP rotated badge */}
                 <div className="absolute top-3 right-3 z-20">
                   <div className="case-stamp">CASE: CHAT-AI</div>
                 </div>
                 <ChatHeatmapMockup />
               </Card>
-              <span className="text-[10px] font-mono text-paper-100/70 text-center uppercase tracking-wider block mt-1">
+              <span className="text-[10px] font-mono text-[var(--text-secondary)] text-center uppercase tracking-wider block mt-1">
                 AI interface — inline hotspot maps, instant query.
               </span>
             </div>
 
             {/* Card B: Geo-trail Map */}
             <div className="flex flex-col gap-3 group">
-              <Card className="relative overflow-hidden">
+              <Card className="relative overflow-hidden border-[var(--border)]">
                 {/* Official CASE STAMP rotated badge */}
                 <div className="absolute top-3 right-3 z-20">
                   <div className="case-stamp">CASE: GEO-09</div>
                 </div>
                 <GeoTrailMockup />
               </Card>
-              <span className="text-[10px] font-mono text-paper-100/70 text-center uppercase tracking-wider block mt-1">
+              <span className="text-[10px] font-mono text-[var(--text-secondary)] text-center uppercase tracking-wider block mt-1">
                 Suspect geo-trail — 5 camera hops, one click.
               </span>
             </div>
 
             {/* Card C: Chrono-criminal Network Graph */}
             <div className="flex flex-col gap-3 group">
-              <Card className="relative overflow-hidden">
+              <Card className="relative overflow-hidden border-[var(--border)]">
                 {/* Official CASE STAMP rotated badge */}
                 <div className="absolute top-3 right-3 z-20">
                   <div className="case-stamp">CASE: NET-32</div>
                 </div>
                 <ChronoNetworkMockup />
               </Card>
-              <span className="text-[10px] font-mono text-paper-100/70 text-center uppercase tracking-wider block mt-1">
+              <span className="text-[10px] font-mono text-[var(--text-secondary)] text-center uppercase tracking-wider block mt-1">
                 Accomplice formations — chronological relationship maps.
               </span>
             </div>
@@ -491,17 +485,17 @@ export default function LandingPage() {
       </section>
 
       {/* ── SECTION 4: FOOTER ─────────────────────────────────────────────── */}
-      <footer className="mt-auto py-12 px-6 bg-void-000 border-t border-steel-600/30 text-xs text-paper-100/60 select-none">
+      <footer className="mt-auto py-12 px-6 bg-[var(--surface-1)] border-t border-[var(--border)] text-xs text-[var(--text-secondary)] select-none">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col gap-1 items-center sm:items-start text-center sm:text-left">
-            <span className="font-mono font-bold text-paper-100/80 uppercase tracking-widest">Karnataka State Police</span>
-            <span className="text-[10px] text-paper-100/60 uppercase tracking-wider">State Crime Records Bureau</span>
+            <span className="font-mono font-bold text-[var(--text-primary)] uppercase tracking-widest">Karnataka State Police</span>
+            <span className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">State Crime Records Bureau</span>
           </div>
 
           <div className="flex items-center gap-6">
             <div className="flex flex-col items-end">
-              <span className="text-[8px] text-paper-100/50 tracking-widest uppercase">Technology Partner</span>
-              <span className="text-[10px] text-paper-100/80 font-mono font-bold">Catalyst by Zoho</span>
+              <span className="text-[8px] text-[var(--text-secondary)]/50 tracking-widest uppercase">Technology Partner</span>
+              <span className="text-[10px] text-[var(--text-primary)] font-mono font-bold">Catalyst by Zoho</span>
             </div>
             <ThemeToggle />
           </div>

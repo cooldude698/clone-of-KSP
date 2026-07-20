@@ -18,8 +18,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: nextjs/package-lock.json
+
+      - name: Install Next.js Dependencies & Build
+        run: |
+          cd nextjs
+          npm install
+          npm run build
 
       - name: Install Zoho Catalyst CLI
         run: npm install -g zcatalyst-cli
@@ -27,6 +31,7 @@ jobs:
       - name: Configure Catalyst credentials
         run: |
           mkdir -p ~/.zoho-catalyst
+          mkdir -p ~/.catalyst
           cat > ~/.zoho-catalyst/config.json << EOF
           {
             "client_id": "${{ secrets.CATALYST_CLIENT_ID }}",
@@ -38,10 +43,7 @@ jobs:
           }
           EOF
 
-      - name: Remove heavy dirs before upload
-        run: |
-          rm -rf nextjs/node_modules nextjs/.next
-
       - name: Deploy to Catalyst
-        run: catalyst deploy
+        run: catalyst deploy --non-interactive
         working-directory: ${{ github.workspace }}
+
