@@ -48,13 +48,7 @@ export async function POST(request: Request) {
           },
           token: 'mock_token_for_hackathon_demo',
         });
-
-        const errData = await response.json().catch(() => ({}));
-        return NextResponse.json(
-          { success: false, message: errData.message || 'Invalid credentials' },
-          { status: 401 }
-      );
-    }
+      }
   } catch (fetchErr) {
     // In local dev offline mode, or if project domain is not reachable, support standard demo credentials
     if (password === 'drishti123' || password === 'drishti125' || password === '1234') {

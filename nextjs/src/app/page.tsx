@@ -315,7 +315,7 @@ export default function LandingPage() {
                   <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
                     <span className="text-[10px] font-mono font-bold uppercase text-[var(--text-secondary)] tracking-[0.2em]">SYSTEM AUTHENTICATION</span>
                     <button
-                      onClick={() => setIsSigningIn(false)}
+                      onClick={() => { setIsSigningIn(false); setError(''); }}
                       aria-label="Back to landing menu"
                       className="w-8 h-8 rounded-full bg-[var(--surface-0)] hover:bg-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] transition-colors outline-none"
                     >
@@ -396,10 +396,13 @@ export default function LandingPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        setEmployeeId('inspector');
-                        setPassword('drishti125');
-                        setRole('Inspector');
-                        handleSignInSubmit('inspector', 'drishti125', 'Inspector');
+                        // True bypass: skip network call entirely, write session directly
+                        localStorage.setItem('role', 'Inspector');
+                        localStorage.setItem('userName', 'Inspector Officer');
+                        localStorage.setItem('userEmail', 'inspector@drishti.ksp');
+                        localStorage.setItem('drishti_role', 'Inspector');
+                        localStorage.setItem('drishti_employee_id', 'inspector');
+                        router.push('/dashboard');
                       }}
                       className="w-full py-2 rounded border border-[var(--border)] bg-transparent hover:bg-[var(--surface-0)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-mono text-[9px] font-bold uppercase tracking-wider transition-all select-none active:scale-[0.98] focus:outline-none"
                     >
