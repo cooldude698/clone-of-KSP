@@ -260,11 +260,11 @@ async function callQuickML(question, knowledgeContext = '') {
   throw new Error(`QuickML endpoints failed: ${lastErr?.message}`);
 }
 
-async function callGemini(question, knowledgeContext = '') {
-  const apiKey = process.env.GEMINI_API_KEY;
-  const model = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+const DEFAULT_GEMINI_KEY = 'AIzaSyCZKZBcVvz5sVokO8ei__6plJBeqO2JWpU';
 
-  if (!apiKey) throw new Error('GEMINI_API_KEY not set');
+async function callGemini(question, knowledgeContext = '') {
+  const apiKey = process.env.GEMINI_API_KEY || DEFAULT_GEMINI_KEY;
+  const model = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 

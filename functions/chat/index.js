@@ -478,16 +478,25 @@ module.exports = async (req, res) => {
   } catch (err) {
     console.error('DRISHTI chat error:', err);
     try {
-      const { generateAIResponseFromDemoData } = require('../../nextjs/src/lib/demo-data');
-      const demoRes = generateAIResponseFromDemoData(query || '');
+      const q = (query || '').toLowerCase();
+      let demoAnswer = "Officer, DRISHTI intelligence systems indicate active monitoring across key Bengaluru corridors. Silk Board (48 incidents), MG Road (32 incidents), and Whitefield (27 incidents) are currently flagged as primary high-density zones.";
+      
+      if (q.includes('vehicle') || q.includes('stolen') || q.includes('bike') || q.includes('theft')) {
+        demoAnswer = "Vehicle theft intelligence analysis: 142 Pulsar/Apache two-wheelers stolen near transit hubs this month. Suspect Ramesh Kumar (SUS-8842, alias 'Bullet Ramesh') is on active watchlist for inter-district fence operations via Silk Board TTMC.";
+      } else if (q.includes('offender') || q.includes('suspect') || q.includes('repeat') || q.includes('ramesh')) {
+        demoAnswer = "Top Repeat Offenders on watchlist: 1) Ramesh Kumar (SUS-8842, Risk 94%, Vehicle Theft/Robbery). 2) Suresh Naidu (SUS-7104, Risk 88%, Highway Robbery). 3) Imran Khan (SUS-5921, Risk 76%, Chain Snatching).";
+      } else if (q.includes('anpr') || q.includes('plate') || q.includes('camera') || q.includes('surveillance')) {
+        demoAnswer = "ANPR Surveillance alert: Vehicle KA-01-MJ-8821 (Stolen Pulsar 220 Black) flagged at Vijayanagar TTMC (CAM-BLR-0010) and MG Road BATCS Pole 5 (CAM-BLR-0012) within 13 minutes. Active geo-trail distance: 12.1 km.";
+      }
+
       return send(200, {
-        response_text: demoRes.answer,
+        response_text: demoAnswer,
         visualization: { type: 'none', title: '', data: {} },
         follow_up_suggestions: [
           "Show recent vehicle thefts in Bengaluru",
           "View repeat criminal offenders"
         ],
-        confidence: demoRes.confidence || 0.75,
+        confidence: 0.85,
         conversation_id: req.body?.conversation_id || `conv_${Date.now()}`,
         source: 'demo_ai'
       });

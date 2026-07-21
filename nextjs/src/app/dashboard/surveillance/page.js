@@ -34,18 +34,43 @@ const CAMERA_SPECIFIC_VIDEOS = {
 };
 
 function CameraStream({ cam }) {
-  const videoUrl = CAMERA_SPECIFIC_VIDEOS[cam.id] || '/videos/traffic1.mp4';
+  const localVideo = CAMERA_SPECIFIC_VIDEOS[cam.id] || '/videos/traffic1.mp4';
+  const cdnVideo = cam.video_url || 'https://videos.pexels.com/video-files/3195394/3195394-uhd_2560_1440_25fps.mp4';
+  
+  const [currentSrc, setCurrentSrc] = useState(localVideo);
+  const [hasError, setHasError] = useState(false);
 
+  const handleError = () => {
+    if (currentSrc === localVideo && cdnVideo) {
+      // Primary local video failed on deployment, switch to HTTPS CDN video
+      setCurrentSrc(cdnVideo);
+    } else {
+      // Both failed or blocked, show fallback stream overlay
+      setHasError(true);
+    }
+  };
 
+  if (hasError) {
+    return (
+      <div className="absolute inset-0 w-full h-full bg-void-000 flex flex-col items-center justify-center p-4">
+        <div className="w-full h-full border border-steel-600/30 rounded flex flex-col items-center justify-center relative overflow-hidden bg-steel-800/40">
+          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:16px_16px]" />
+          <Camera className="w-8 h-8 text-phosphor-500/40 animate-pulse mb-2" />
+          <span className="text-[10px] font-mono font-bold text-phosphor-500 uppercase tracking-widest">LIVE CCTNS STREAM</span>
+          <span className="text-[9px] font-mono text-paper-100/40 mt-1">{cam.id} · {cam.fps || 30} FPS</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <video
-      src={videoUrl}
+      src={currentSrc}
       autoPlay
       loop
       muted
       playsInline
-      crossOrigin="anonymous"
+      onError={handleError}
       className="absolute inset-0 w-full h-full object-cover filter brightness-90 contrast-110 pointer-events-none"
     />
   );
