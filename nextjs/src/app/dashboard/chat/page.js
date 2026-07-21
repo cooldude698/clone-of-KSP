@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Send, Mic, MicOff, Volume2, VolumeX, Bot, User, Sparkles, Copy, Check, X, ShieldAlert, FileText } from 'lucide-react';
 import Spinner from '@/components/ui/Spinner';
 import InvestigatorWall from '@/components/InvestigatorWall';
+import VoiceDebugStatus from '@/components/VoiceDebugStatus';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
 
@@ -110,9 +111,13 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
           }
         </div>
         {/* Timestamp + actions */}
-        <div className={`flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity
-          ${isUser ? 'flex-row-reverse' : ''}`}>
-          <span className="text-[10px] text-paper-100/40 font-mono">{msg.timestamp}</span>
+        <div className={`flex items-center gap-2 transition-opacity ${isUser ? 'flex-row-reverse' : ''}`}>
+          {msg.isDemo && (
+            <span className="text-[9px] font-bold font-mono uppercase bg-warn-500/20 text-warn-500 border border-warn-500/30 rounded px-1 py-0.5" title="Responding based on sample data">
+              Demo Data
+            </span>
+          )}
+          <span className="text-[10px] text-paper-100/40 font-mono opacity-0 group-hover:opacity-100 transition-opacity">{msg.timestamp}</span>
           {!isUser && (
             <>
               <button onClick={handleCopy} className="text-paper-100/40 hover:text-paper-100/80 transition-colors" title="Copy">
@@ -167,6 +172,9 @@ export default function ChatPage() {
   const [isRecording, setIsRecording] = useState(false);
   const [language, setLanguage] = useState('en');
   const [speechSupported, setSpeechSupported] = useState(false);
+  const [micPermission, setMicPermission] = useState('prompt');
+  const [error, setError] = useState(null);
+  const consecutiveErrorsRef = useRef(0);
   const [conversationId, setConversationId] = useState('');
   // TTS state
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -315,6 +323,12 @@ export default function ChatPage() {
 
   useEffect(() => {
     setSpeechSupported(!!(window.SpeechRecognition || window.webkitSpeechRecognition));
+    if (typeof navigator !== 'undefined' && navigator.permissions) {
+      navigator.permissions.query({ name: 'microphone' }).then(r => {
+        setMicPermission(r.state);
+        r.onchange = () => setMicPermission(r.state);
+      }).catch(() => {});
+    }
   }, []);
 
   // ── TTS helpers ────────────────────────────────────────────────
@@ -467,6 +481,7 @@ export default function ChatPage() {
 
     try {
       let responseText = '';
+      let isDemoResp = false;
       try {
         const res = await fetch('/api/askDrishtiAI', {
           method: 'POST',
@@ -479,17 +494,21 @@ export default function ChatPage() {
         if (res.ok) {
           const data = await res.json();
           responseText = data.answer || data.response_text || 'Database query processed.';
+          isDemoResp = data.source === 'demo_ai';
         } else {
           throw new Error('API error');
         }
       } catch (err) {
-        console.error('Copilot Chat API error:', err);
-        responseText = "I'm having trouble connecting to the intelligence database. Please try again.";
+        console.error('Copilot Chat API error, invoking local demo fallback:', err);
+        const { generateAIResponseFromDemoData } = await import('@/lib/demo-data');
+        const demoRes = generateAIResponseFromDemoData(text);
+        responseText = demoRes.answer;
+        isDemoResp = true;
       }
 
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: responseText, timestamp: timestamp() },
+        { role: 'assistant', content: responseText, isDemo: isDemoResp, timestamp: timestamp() },
       ]);
 
       // Auto-read the assistant response
@@ -507,7 +526,19 @@ export default function ChatPage() {
     }
   };
 
-  const startVoice = () => {
+  const startVoice = async () => {
+    if (micPermission !== 'granted') {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach(t => t.stop());
+        setMicPermission('granted');
+      } catch {
+        setMicPermission('denied');
+        setError('not-allowed');
+        return;
+      }
+    }
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) return;
     stopSpeech();
@@ -519,6 +550,8 @@ export default function ChatPage() {
     let currentTranscript = '';
 
     rec.onresult = (e) => {
+      setError(null);
+      consecutiveErrorsRef.current = 0;
       currentTranscript = '';
       for (let i = 0; i < e.results.length; i++) {
         currentTranscript += e.results[i][0].transcript;
@@ -526,7 +559,12 @@ export default function ChatPage() {
       setInput(currentTranscript);
     };
 
-    rec.onerror = () => setIsRecording(false);
+    rec.onerror = (e) => {
+       const err = e.error;
+       setError(err);
+       if (err !== 'no-speech') consecutiveErrorsRef.current += 1;
+       setIsRecording(false);
+    };
     rec.onend = () => {
       setIsRecording(false);
       if (currentTranscript.trim()) {
@@ -817,6 +855,20 @@ export default function ChatPage() {
 
       {/* Hidden print-only report container — populated by downloadReport() before window.print() */}
       <div id="drishti-print-report" aria-hidden="true" />
+
+      <VoiceDebugStatus 
+        micPermission={micPermission}
+        isListening={isRecording}
+        error={error}
+        lastTranscript={input}
+        consecutiveErrors={consecutiveErrorsRef.current}
+        onTryAgain={() => {
+          if (!isRecording) startVoice();
+        }}
+        onUseText={() => {
+          inputRef.current?.focus();
+        }}
+      />
     </div>
   );
 }

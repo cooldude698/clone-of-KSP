@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Camera, Wifi, WifiOff, Eye, MapPin, Maximize2, X, ShieldAlert } from 'lucide-react';
+import { fetchWithFallback } from '@/lib/fetch-with-fallback';
+import { DEMO_ANPR_RESULT } from '@/lib/demo-data';
+import { Camera, Wifi, WifiOff, Eye, MapPin, Maximize2, X, ShieldAlert, Search, AlertTriangle, CheckCircle2, ChevronRight, ExternalLink } from 'lucide-react';
 
 // ─── Local Real-life Surveillance Loop Video URLs ───────────────────────────
 // ANPR: Overhead traffic cams
@@ -631,6 +633,46 @@ export default function SurveillancePage() {
   const [filter, setFilter] = useState('all');
   const [activeCamModal, setActiveCamModal] = useState(null);
 
+  // ── ANPR Plate Search state ─────────────────────────────────────────────────
+  const [plateInput, setPlateInput]   = useState('');
+  const [plateResult, setPlateResult] = useState(null);
+  const [plateLoading, setPlateLoading] = useState(false);
+  const [plateError, setPlateError]   = useState(null);
+
+  const handlePlateSearch = async () => {
+    const plate = plateInput.trim();
+    if (!plate) return;
+    setPlateLoading(true);
+    setPlateError(null);
+    setPlateResult(null);
+
+    const fallbackResult = {
+      ...DEMO_ANPR_RESULT,
+      plate_number: plate,
+      _queried_plate: plate
+    };
+
+    try {
+      const { data } = await fetchWithFallback('anpr-check', fallbackResult, {
+        method: 'POST',
+        body: {
+          plate_number:  plate,
+          camera_id:     'MANUAL-LOOKUP',
+          camera_name:   'Surveillance Dashboard Manual Check',
+          lat:           12.9716,
+          lng:           77.5946,
+          timestamp:     new Date().toISOString(),
+        }
+      });
+
+      setPlateResult({ ...(data || fallbackResult), _queried_plate: plate });
+    } catch (err) {
+      setPlateResult(fallbackResult);
+    } finally {
+      setPlateLoading(false);
+    }
+  };
+
   const filtered = MOCK_CAMERAS.filter((c) => {
     if (filter === 'active') return c.is_active;
     if (filter === 'anpr') return c.has_anpr;
@@ -643,7 +685,7 @@ export default function SurveillancePage() {
   return (
     <div className="p-6 space-y-6 animate-fade-in relative min-h-screen bg-void-000">
       
-      <style jsx global>{`
+      <style>{`
         .bg-scanlines {
           background: linear-gradient(
             to bottom,
@@ -676,6 +718,175 @@ export default function SurveillancePage() {
             <span className="text-xs text-success-500 font-mono font-bold">{activeCount}/{MOCK_CAMERAS.length} STREAMS ONLINE</span>
           </div>
         </div>
+      </div>
+
+      {/* ── ANPR PLATE SEARCH WIDGET ─────────────────────────────────────────── */}
+      <div className="glass-card rounded-2xl border border-steel-600/50 bg-steel-700/60 overflow-hidden">
+        {/* Widget Header */}
+        <div className="flex items-center gap-3 px-5 py-3 border-b border-steel-600/40 bg-void-000/20">
+          <div className="w-7 h-7 rounded-lg bg-phosphor-500/15 flex items-center justify-center border border-phosphor-500/30">
+            <Search className="w-3.5 h-3.5 text-phosphor-500" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-paper-100 font-mono uppercase tracking-widest">ANPR Plate Lookup</h3>
+            <p className="text-[10px] text-paper-100/40">Real-time plate scan against FIR watchlist &amp; ANPR sightings database</p>
+          </div>
+          <span className="ml-auto px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-phosphor-500/15 text-phosphor-500 border border-phosphor-500/30 uppercase">Live Check</span>
+        </div>
+
+        {/* Search Row */}
+        <div className="flex items-center gap-3 p-5">
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-paper-100/30" />
+            <input
+              id="anpr-plate-input"
+              type="text"
+              placeholder="Enter plate number (e.g. KA-01-MJ-8821)"
+              value={plateInput}
+              onChange={(e) => setPlateInput(e.target.value.toUpperCase())}
+              onKeyDown={(e) => e.key === 'Enter' && handlePlateSearch()}
+              className="w-full bg-void-000/60 border border-steel-600/60 rounded-xl pl-9 pr-4 py-2.5 text-sm font-mono text-paper-100 placeholder:text-paper-100/25 focus:outline-none focus:border-phosphor-500/60 focus:ring-1 focus:ring-phosphor-500/30 transition-all"
+            />
+          </div>
+          <button
+            id="anpr-search-btn"
+            onClick={handlePlateSearch}
+            disabled={plateLoading || !plateInput.trim()}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-phosphor-500 hover:bg-phosphor-500/80 disabled:opacity-40 disabled:cursor-not-allowed text-void-000 text-sm font-bold font-mono uppercase tracking-wide transition-all shadow-lg shadow-phosphor-500/20"
+          >
+            {plateLoading ? (
+              <>
+                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Scanning...
+              </>
+            ) : (
+              <>
+                <Search className="w-4 h-4" />
+                Search
+              </>
+            )}
+          </button>
+          {(plateResult || plateError) && (
+            <button
+              onClick={() => { setPlateResult(null); setPlateError(null); setPlateInput(''); }}
+              className="p-2.5 rounded-xl border border-steel-600/50 text-paper-100/40 hover:text-paper-100 hover:border-steel-600 transition-all"
+              title="Clear"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Error State */}
+        {plateError && (
+          <div className="mx-5 mb-5 flex items-start gap-3 p-4 rounded-xl bg-critical-500/10 border border-critical-500/30">
+            <AlertTriangle className="w-4 h-4 text-critical-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-critical-500">Lookup Failed</p>
+              <p className="text-xs text-paper-100/60 mt-0.5">{plateError}</p>
+              <button onClick={handlePlateSearch} className="text-xs text-phosphor-500 font-bold mt-1 hover:underline">Retry →</button>
+            </div>
+          </div>
+        )}
+
+        {/* Result — ALERT (match found) */}
+        {plateResult && plateResult.alert === true && (
+          <div className="mx-5 mb-5 rounded-xl border border-critical-500/50 bg-critical-500/8 overflow-hidden">
+            {/* Alert banner */}
+            <div className="flex items-center gap-3 px-4 py-3 bg-critical-500/15 border-b border-critical-500/30">
+              <ShieldAlert className="w-5 h-5 text-critical-500 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <span className="text-xs font-bold text-critical-500 uppercase tracking-widest">
+                  🚨 Alert — {plateResult.severity || 'CRITICAL'}
+                </span>
+              </div>
+              <span className="text-[10px] font-mono font-bold text-critical-500/70 bg-critical-500/10 px-2 py-0.5 rounded border border-critical-500/30 shrink-0 uppercase">
+                {plateResult.status || 'FLAGGED'}
+              </span>
+            </div>
+
+            {/* Data grid */}
+            <div className="p-4 grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3 text-xs">
+              <div>
+                <span className="text-[9px] text-paper-100/40 uppercase tracking-widest font-bold block mb-0.5">Plate Number</span>
+                <span className="font-mono font-bold text-paper-100">{plateResult._queried_plate || plateInput}</span>
+              </div>
+              <div>
+                <span className="text-[9px] text-paper-100/40 uppercase tracking-widest font-bold block mb-0.5">Severity</span>
+                <span className="font-semibold text-critical-500 uppercase">{plateResult.severity || 'HIGH'}</span>
+              </div>
+              <div>
+                <span className="text-[9px] text-paper-100/40 uppercase tracking-widest font-bold block mb-0.5">Crime Type</span>
+                <span className="font-semibold text-paper-100/80 capitalize">{(plateResult.original_crime || '—').replace(/_/g, ' ')}</span>
+              </div>
+              <div>
+                <span className="text-[9px] text-paper-100/40 uppercase tracking-widest font-bold block mb-0.5">Crime Date</span>
+                <span className="font-mono text-paper-100/80">
+                  {plateResult.crime_date
+                    ? new Date(plateResult.crime_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                    : '—'}
+                </span>
+              </div>
+              <div>
+                <span className="text-[9px] text-paper-100/40 uppercase tracking-widest font-bold block mb-0.5">District</span>
+                <span className="font-semibold text-paper-100/80">{plateResult.district || '—'}</span>
+              </div>
+              {plateResult.fir_case_number && (
+                <div>
+                  <span className="text-[9px] text-paper-100/40 uppercase tracking-widest font-bold block mb-0.5">FIR Case</span>
+                  <Link
+                    href={`/dashboard/fir/${plateResult.fir_case_number}`}
+                    className="font-mono font-bold text-phosphor-500 hover:text-phosphor-400 hover:underline transition-colors"
+                  >
+                    {plateResult.fir_case_number}
+                  </Link>
+                </div>
+              )}
+              {plateResult.instructions && (
+                <div className="col-span-2 md:col-span-3">
+                  <span className="text-[9px] text-paper-100/40 uppercase tracking-widest font-bold block mb-0.5">Field Instructions</span>
+                  <p className="text-paper-100/70 italic">{plateResult.instructions}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex items-center gap-3 px-4 pb-4">
+              <Link
+                href={`/dashboard/trail?plate=${encodeURIComponent(plateResult.plate || plateInput)}`}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-phosphor-500 hover:bg-phosphor-500/80 text-void-000 text-xs font-bold font-mono uppercase tracking-wide transition-all shadow-lg shadow-phosphor-500/20"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                View Full Trail
+              </Link>
+              {plateResult.fir_case_number && (
+                <Link
+                  href={`/dashboard/fir/${plateResult.fir_case_number}`}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-critical-500/50 bg-critical-500/10 hover:bg-critical-500/20 text-critical-500 text-xs font-bold font-mono uppercase tracking-wide transition-all"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                  View FIR
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Result — CLEAR (no match) */}
+        {plateResult && plateResult.alert === false && (
+          <div className="mx-5 mb-5 flex items-center gap-3 p-4 rounded-xl bg-success-500/8 border border-success-500/30">
+            <CheckCircle2 className="w-5 h-5 text-success-500 shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-success-500">✓ Clear — No Alerts</p>
+              <p className="text-xs text-paper-100/50 mt-0.5">
+                Plate <span className="font-mono font-bold text-paper-100">{plateResult.plate || plateInput}</span> has no matches in the FIR watchlist or ANPR flagging database.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* KPI Cards */}

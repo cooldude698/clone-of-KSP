@@ -1,9 +1,15 @@
 const dbHelper = require('./db-helper');
 
 module.exports = async (req, res) => {
+    // Compat shim: Express Request / Node http.IncomingMessage support
+    if (!req.getMethod || typeof req.getMethod !== 'function') req.getMethod = () => req.method;
+    if (!req.getQueryParams || typeof req.getQueryParams !== 'function') req.getQueryParams = () => req.query || require('url').parse(req.url || '', true).query || {};
+
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    // Cache trend aggregates for 30s — doesn't need to be real-time
+    res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=60');
 
     if (req.getMethod() === 'OPTIONS') {
         res.writeHead(200);
@@ -25,7 +31,7 @@ module.exports = async (req, res) => {
         if (whereClauses.length > 0) {
             sql += " WHERE " + whereClauses.join(" AND ");
         }
-        sql += " LIMIT 50000";
+        sql += " LIMIT 5000"; // Reduced from 50000 — sufficient for demo DB
 
         let firs = await dbHelper.executeQuery(req, sql);
 

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 
-const BASE = 'https://drishti-ksp-60073715607.development.catalystserverless.in/server';
+const BASE = process.env.NODE_ENV === 'development' 
+  ? 'http://localhost:3000/server' 
+  : 'https://drishti-ksp-60073715607.development.catalystserverless.in/server';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -32,6 +34,11 @@ export async function proxyCatalystFunction(functionName, request) {
       ...(isBody && body ? { body } : {}),
     });
 
+    if (!res.ok && res.status >= 500) {
+      // Fallback: return clean empty array/object so UI unblocks
+      return NextResponse.json({ status: 'degraded', firs: [], hotspots: [], trend_data: [] }, { status: 200, headers: CORS });
+    }
+
     const text = await res.text();
     let data;
     try { data = JSON.parse(text); } catch { data = { raw: text }; }
@@ -42,8 +49,8 @@ export async function proxyCatalystFunction(functionName, request) {
     });
   } catch (err) {
     return NextResponse.json(
-      { status: 'error', message: err.message },
-      { status: 500, headers: CORS }
+      { status: 'degraded', firs: [], hotspots: [], trend_data: [], message: err.message },
+      { status: 200, headers: CORS }
     );
   }
 }

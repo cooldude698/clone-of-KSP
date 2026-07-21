@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 // ── TypeScript Type Definitions ──────────────────────────────────────────────
@@ -86,6 +87,16 @@ const getRiskColor = (score: number) => {
   return "bg-blue-500/10 text-blue-400 border border-blue-500/20";
 };
 
+const getRiskLabel = (score: number) => {
+  if (score > 70) return "HIGH";
+  if (score > 40) return "MED";
+  return "LOW";
+};
+
+// Derive a URL-safe slug from a name: "Ramesh Kumar" → "ramesh-kumar"
+const nameToSlug = (name: string) =>
+  name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
 const getVulnerabilityColor = (score: number) => {
   if (score > 70) return "bg-rose-500/15 text-rose-400 border border-rose-500/20";
   if (score > 40) return "bg-amber-500/15 text-amber-400 border border-amber-500/20";
@@ -127,12 +138,10 @@ export default function InvestigatorWall({
       {/* Visual Overlay Effect */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-phosphor-500/5 via-transparent to-transparent pointer-events-none" />
 
-      {/* SVG Dash Offset Animation definition */}
-      <style jsx global>{`
+      {/* SVG Dash Offset Animation definition (plain <style> — valid in App Router) */}
+      <style>{`
         @keyframes dash {
-          to {
-            stroke-dashoffset: 0;
-          }
+          to { stroke-dashoffset: 0; }
         }
         .animate-dash-line {
           stroke-dasharray: 6, 4;
@@ -225,7 +234,7 @@ export default function InvestigatorWall({
                         {item.full_name}
                       </h4>
                       <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold shrink-0 ${getRiskColor(item.risk_score)}`}>
-                        Risk: {item.risk_score}
+                        {item.risk_score}/100 · {getRiskLabel(item.risk_score)}
                       </span>
                     </div>
                     {item.alias && (
@@ -256,6 +265,17 @@ export default function InvestigatorWall({
                     </p>
                   </div>
                 )}
+
+                {/* View Full Profile CTA */}
+                <Link
+                  href={`/dashboard/suspect/${nameToSlug(item.full_name)}`}
+                  className="mt-3 flex items-center justify-center gap-1.5 w-full py-1.5 rounded-lg bg-phosphor-500/10 hover:bg-phosphor-500/20 border border-phosphor-500/25 text-[10px] font-bold text-phosphor-500 uppercase tracking-widest transition-all"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-3 h-3">
+                    <path fillRule="evenodd" d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0Zm-5-1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0ZM8 12a4 4 0 0 0 3.193-1.603.75.75 0 1 0-1.186-.918A2.5 2.5 0 0 1 8 10.5a2.5 2.5 0 0 1-2.007-1.021.75.75 0 1 0-1.186.918A4 4 0 0 0 8 12Z" clipRule="evenodd" />
+                  </svg>
+                  View Full Profile
+                </Link>
               </motion.div>
             ))
           )}
@@ -271,7 +291,22 @@ export default function InvestigatorWall({
           >
             {/* Rubber Case Stamp */}
             <div className="absolute top-4 right-4 z-20">
-              <div className="case-stamp select-none">
+              <div
+                className="select-none"
+                style={{
+                  fontFamily: "'JetBrains Mono', 'Courier New', monospace",
+                  fontSize: "10px",
+                  fontWeight: 900,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "var(--status-critical)",
+                  border: "2px solid var(--status-critical)",
+                  padding: "3px 8px",
+                  borderRadius: "3px",
+                  transform: "rotate(-6deg)",
+                  opacity: 0.8,
+                }}
+              >
                 {fir.case_number}
               </div>
             </div>
@@ -281,9 +316,12 @@ export default function InvestigatorWall({
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-phosphor-500/10 text-phosphor-500 border border-phosphor-500/20">
                   {fir.crime_type.replace('_', ' ')}
                 </span>
-                <h3 className="text-xl font-bold text-paper-100 tracking-wide mt-6 font-mono">
-                  {fir.case_number}
-                </h3>
+                <Link href={`/dashboard/fir/${fir.case_number}`} className="group/fir flex items-center gap-2 mt-6">
+                  <h3 className="text-xl font-bold text-paper-100 tracking-wide font-mono group-hover/fir:text-phosphor-500 transition-colors">
+                    {fir.case_number}
+                  </h3>
+                  <span className="text-[10px] text-phosphor-500/60 group-hover/fir:text-phosphor-500 transition-colors opacity-0 group-hover/fir:opacity-100">→ View Detail</span>
+                </Link>
               </div>
               
               <div className="text-left md:text-right shrink-0 mt-6 md:mt-0">
@@ -415,9 +453,10 @@ export default function InvestigatorWall({
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
             {related_firs.map((refFir) => (
-              <div
+              <Link
                 key={refFir.case_number}
-                className="group rounded-2xl bg-void-000 border border-steel-600/40 p-4 hover:border-critical-500/35 hover:bg-void-000/20 transition-all duration-200 shadow-lg relative overflow-hidden"
+                href={`/dashboard/fir/${refFir.case_number}`}
+                className="group rounded-2xl bg-void-000 border border-steel-600/40 p-4 hover:border-critical-500/35 hover:bg-void-000/20 transition-all duration-200 shadow-lg relative overflow-hidden block"
               >
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <span className="text-xs font-mono font-bold text-paper-100 group-hover:text-critical-500 transition-colors">
@@ -433,7 +472,7 @@ export default function InvestigatorWall({
                 <div className="py-1.5 px-2.5 rounded-lg bg-critical-500/10 border border-critical-500/20 text-[10px] text-critical-500 font-medium italic">
                   Link: {refFir.link_reason}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

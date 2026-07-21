@@ -1,19 +1,27 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, MessageSquare, Map, GitBranch,
   Camera, BarChart2, LogOut, Shield, ChevronLeft,
-  ChevronRight, AlertTriangle, User, History, Eye
+  ChevronRight, AlertTriangle, User, History, Eye, Navigation
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '@/components/ThemeToggle';
-import AlertNotification from '@/components/AlertNotification';
-import DrishtiOrb from '@/components/DrishtiOrb';
-import DrishtiPanel from '@/components/DrishtiPanel';
-import useDrishtiVoice from '@/components/DrishtiVoice';
+import useDrishtiVoice from '@/components/DrishtiVoice'; // hook — must be static import
+
+// ── Lazy-loaded heavy components ─────────────────────────────────────────────
+// Deferred so they don't block the initial sidebar + page render.
+// DrishtiOrb/Panel are only needed after the user clicks the orb (interaction-driven).
+const AlertNotification  = dynamic(() => import('@/components/AlertNotification'),  { ssr: false });
+const DrishtiOrb         = dynamic(() => import('@/components/DrishtiOrb'),          { ssr: false });
+const DrishtiPanel       = dynamic(() => import('@/components/DrishtiPanel'),         { ssr: false });
+const VoiceDebugStatus   = dynamic(() => import('@/components/VoiceDebugStatus'),    { ssr: false });
+const SystemStatusFooter = dynamic(() => import('@/components/SystemStatusFooter'),  { ssr: false });
+
 
 const NAV_ITEMS = [
   { href: '/dashboard',              icon: LayoutDashboard, label: 'Overview',       id: 'nav-overview' },
@@ -23,6 +31,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/surveillance', icon: Camera,          label: 'Surveillance',   id: 'nav-surveillance' },
   { href: '/dashboard/analytics',    icon: BarChart2,       label: 'Analytics',      id: 'nav-analytics' },
   { href: '/dashboard/logs',         icon: History,         label: 'AI Logs',        id: 'nav-logs' },
+  { href: '/dashboard/trail',        icon: Navigation,      label: 'Geo Trail',      id: 'nav-trail' },
 ];
 
 // ─── Change 5: Local intent detector ─────────────────────────────────────────
@@ -99,6 +108,8 @@ export default function DashboardLayout({ children }) {
     micPermission,
     // Change 3: wire real-time audio level
     audioLevel,
+    error,
+    consecutiveErrors,
   } = useDrishtiVoice({
     enableClapWake: false,
     onWake: () => {
@@ -563,6 +574,7 @@ export default function DashboardLayout({ children }) {
           </div>
         </header>
         <main className="flex-1 overflow-auto bg-void-000">{children}</main>
+        <SystemStatusFooter />
       </div>
 
       {/* ── DRISHTI SIDE PANEL ── */}
@@ -708,6 +720,23 @@ export default function DashboardLayout({ children }) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <VoiceDebugStatus 
+        micPermission={micPermission}
+        isListening={isListening}
+        error={error}
+        lastTranscript={liveTranscript || pendingTranscript}
+        consecutiveErrors={consecutiveErrors}
+        onTryAgain={() => {
+          if (!isListening) {
+             startListening(language === 'en' ? 'en-IN' : 'kn-IN');
+          }
+        }}
+        onUseText={() => {
+           if (!isPanelOpen) openPanel();
+           setShowTypingInput(true);
+        }}
+      />
     </div>
   );
 }

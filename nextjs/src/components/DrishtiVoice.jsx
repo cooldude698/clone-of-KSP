@@ -22,6 +22,11 @@ const useDrishtiVoice = ({
   const [micPermission, setMicPermission] = useState('prompt');
   // Change 2: real-time audio level
   const [audioLevel, setAudioLevel] = useState(0);
+  
+  // Voice debug state
+  const [error, setError] = useState(null);
+  const consecutiveErrorsRef = useRef(0);
+
 
   const callbacksRef = useRef({ onSpeakStart, onSpeakEnd, onError, onWake });
   useEffect(() => {
@@ -85,6 +90,8 @@ const useDrishtiVoice = ({
     rec.maxAlternatives = 3;     // Try more alternatives for better accuracy
 
     rec.onresult = (event) => {
+      setError(null);
+      consecutiveErrorsRef.current = 0;
       let newFinal = '';
       let newInterim = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -102,6 +109,10 @@ const useDrishtiVoice = ({
     // Fix 1: auto-restart recognition if Chrome closes session on silence while user wants mic ON
     rec.onerror = (e) => {
       const err = e.error;
+      setError(err);
+      if (err !== 'no-speech') {
+        consecutiveErrorsRef.current += 1;
+      }
       if (err === 'aborted') return;
       if (err === 'no-speech') {
         if (isPttPressedRef.current) {
@@ -240,6 +251,7 @@ const useDrishtiVoice = ({
       if (!ok || !isPttPressedRef.current) {
         setIsListening(false);
         isPttPressedRef.current = false;
+        setError('not-allowed');
         return;
       }
     }
@@ -526,6 +538,9 @@ const useDrishtiVoice = ({
     micPermission,
     // Change 2: expose audioLevel for the orb
     audioLevel,
+    // Voice debug states
+    error,
+    consecutiveErrors: consecutiveErrorsRef.current,
   };
 };
 

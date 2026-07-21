@@ -1,10 +1,17 @@
 const dbHelper = require('./db-helper');
 
 module.exports = async (req, res) => {
+    // Compat shim: local catalyst serve passes a plain Node.js http.IncomingMessage
+    // which lacks getMethod()/getQueryParams(). Patch them in so both envs work.
+    if (!req.getMethod || typeof req.getMethod !== 'function') req.getMethod = () => req.method;
+    if (!req.getQueryParams || typeof req.getQueryParams !== 'function') req.getQueryParams = () => req.query || require('url').parse(req.url || '', true).query || {};
+
     // Handle CORS preflight
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    // Short cache — FIRs list can tolerate 10s staleness
+    res.setHeader('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=30');
     
     if (req.getMethod() === 'OPTIONS') {
         res.writeHead(200);
@@ -25,7 +32,7 @@ module.exports = async (req, res) => {
         const firs = await dbHelper.getFIRsFiltered(req, filters);
 
         // Run a count query
-        let countSql = "SELECT COUNT(case_number) FROM FIRs";
+        let countSql = "SELECT COUNT(ROWID) FROM FIRs";
         let whereClauses = [];
         if (district) whereClauses.push(`district_name = '${district.replace(/'/g, "''")}'`);
         if (crime_type) whereClauses.push(`crime_type_code = '${crime_type.replace(/'/g, "''")}'`);
@@ -35,7 +42,7 @@ module.exports = async (req, res) => {
         }
 
         const countResult = await dbHelper.executeQuery(req, countSql);
-        const total_count = countResult.length > 0 ? (countResult[0].FIRs.case_number || 0) : 0;
+        const total_count = countResult.length > 0 ? (countResult[0].FIRs?.ROWID || countResult[0].FIRs?.case_number || Object.values(countResult[0].FIRs || {})[0] || 0) : 0;
 
         let resultFirs = firs.map(f => f.FIRs || f);
         if (resultFirs.length === 0) {
@@ -46,10 +53,12 @@ module.exports = async (req, res) => {
             ];
         }
 
+        const realTotalCount = parseInt(total_count, 10) || resultFirs.length;
+
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.write(JSON.stringify({
             firs: resultFirs,
-            total_count: resultFirs.length,
+            total_count: realTotalCount,
             filters_applied: { district, crime_type, date_from, date_to, status }
         }));
         res.end();

@@ -6,7 +6,13 @@
  * Flow:
  *  1. If lang==="kn", translate question -> English (Zia)
  *  2. PRIMARY: QuickML RAG endpoint (GLM-4.7-Flash, 6 s timeout)
- *  3. FALLBACK: Gemini API (if QuickML throws/times out)
+ *     NOTE: QuickML does NOT support OpenAI-style tools/function-calling.
+ *     Primary path remains pure text-RAG — confirmed 2026-07-21.
+ *  3. FALLBACK: Gemini REST API with 9 live-data tool declarations.
+ *     Gemini can call fetch_hotspots, fetch_trends, fetch_firs,
+ *     fetch_repeat_offenders, fetch_cameras_nearby, fetch_trail,
+ *     fetch_anpr_check, fetch_network_graph, search_police_manuals.
+ *     Tool logic ported from functions/chat/index.js (now deprecated).
  *  4. LAST-RESORT: stringify rawData OR apology string
  *  5. If lang==="kn", translate final answer back -> Kannada (Zia)
  *  6. Return { answer, language, source }
@@ -15,6 +21,123 @@
  */
 
 const axios = require('axios');
+
+// ---------------------------------------------------------------------------
+// INLINE TOOL DATA FETCHER
+// Equivalent of functions/chat/data-fetcher.js — kept inline so this function
+// deploys independently without cross-function require() paths.
+// ---------------------------------------------------------------------------
+
+const TOOL_BASE_URL = process.env.ANALYTICS_API_URL || 'http://localhost:3000/server';
+
+const TOOL_CONFIGS = {
+  fetch_hotspots: {
+    method: 'GET', endpoint: '/hotspots/',
+    fallback: { hotspots: [
+      { location_lat: 12.9352, location_lng: 77.6245, crime_type_code: 'vehicle_theft', district_name: 'South Bengaluru', incident_count: 47 },
+      { location_lat: 12.9716, location_lng: 77.5946, crime_type_code: 'robbery', district_name: 'Central Bengaluru', incident_count: 31 }
+    ], total: 2, source: 'mock' }
+  },
+  fetch_trends: {
+    method: 'GET', endpoint: '/trends/',
+    fallback: { trends: [
+      { period: 'Jan 2026', count: 142 }, { period: 'Feb 2026', count: 118 },
+      { period: 'Mar 2026', count: 167 }, { period: 'Apr 2026', count: 134 },
+      { period: 'May 2026', count: 189 }, { period: 'Jun 2026', count: 201 }
+    ], source: 'mock' }
+  },
+  fetch_repeat_offenders: {
+    method: 'GET', endpoint: '/repeat-offenders/',
+    fallback: { offenders: [
+      { accused_full_name: 'Ramesh Kumar', fir_count: 7, crime_types: ['vehicle_theft', 'robbery'] },
+      { accused_full_name: 'Suresh Naidu', fir_count: 5, crime_types: ['robbery'] }
+    ], source: 'mock' }
+  },
+  fetch_firs: {
+    method: 'GET', endpoint: '/firs/',
+    fallback: { firs: [
+      { fir_case_number: 'FIR-2026-BL-0492', district_name: 'South Bengaluru', crime_type_code: 'vehicle_theft', date_filed: '2026-05-14' }
+    ], source: 'mock' }
+  },
+  fetch_cameras_nearby: {
+    method: 'GET', endpoint: '/cameras-nearby/',
+    fallback: { cameras: [
+      { camera_id: 'SC-0045', name: 'Silk Board Junction - South Camera', lat: 12.9175, lng: 77.6215, distance_meters: 55, has_anpr: true }
+    ], total_found: 1, source: 'mock' }
+  },
+  fetch_trail: {
+    method: 'POST', endpoint: '/trail/',
+    fallback: { trail: [
+      { hop: 1, camera_name: 'Silk Board Signal - East Approach', lat: 12.9170, lng: 77.6208, timestamp: '2026-06-01T14:02:15Z', plate_detected: 'KA-01-HE-4920', confidence: 92 }
+    ], total_hops: 1, trail_status: 'active', source: 'mock' }
+  },
+  fetch_anpr_check: {
+    method: 'POST', endpoint: '/anpr-check/',
+    fallback: { alert: false, plate_number: 'UNKNOWN', source: 'mock' }
+  },
+  fetch_network_graph: {
+    method: 'GET', endpoint: '/network-graph-data/',
+    fallback: { nodes: [
+      { id: 'accused_Ramesh_Kumar', label: 'Ramesh Kumar', total_firs: 4, risk_score: 85, crime_types: ['vehicle_theft', 'robbery'] }
+    ], edges: [], source: 'mock' }
+  }
+};
+
+async function fetchToolData(toolName, params) {
+  const config = TOOL_CONFIGS[toolName];
+  if (!config) return { error: true, message: `Unknown tool: ${toolName}`, source: 'mock' };
+  try {
+    const base = TOOL_BASE_URL.replace(/\/$/, '');
+    const ep   = config.endpoint.replace(/^\//, '');
+    const req  = { method: config.method, url: `${base}/${ep}`, timeout: 4000 };
+    if (config.method === 'GET')  req.params = params;
+    else                          req.data   = params;
+    const res = await axios(req);
+    return res.data;
+  } catch (e) {
+    console.warn(`[askDrishtiAI] tool ${toolName} live call failed, using mock:`, e.message);
+    return config.fallback;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// INLINE POLICE MANUAL SEARCH
+// Equivalent of functions/chat/rag-service.js — keyword-matched SOP lookup.
+// ---------------------------------------------------------------------------
+
+const MANUAL_KB = [
+  {
+    keywords: ['vehicle', 'theft', 'stolen', 'car', 'bike', 'two wheeler', '379', '411'],
+    content: 'KSP SOP — Vehicle Theft: FIR u/s 379 IPC. Enter chassis/engine into CCTNS within 2 hrs. Trigger ANPR watchlist. Set dynamic nakabandis. Notify RTO & insurance.'
+  },
+  {
+    keywords: ['robbery', 'chain', 'snatch', 'mobile', 'armed', '392', '394', '397'],
+    content: 'KSP SOP — Robbery/Chain Snatching: Dispatch PCR & Hoysala within 30 min. FIR u/s 392/394/397 IPC. Collect suspect description. Sweep CCTV 2 km radius. Wound certificate if injuries.'
+  },
+  {
+    keywords: ['kidnap', 'missing', 'abduction', 'child', '363', '364', '365'],
+    content: 'KSP SOP — Kidnapping: Immediate FIR u/s 363/364/365 IPC (Zero FIR if outside jurisdiction). CDR/IPDR tracking via Cyber Cell. Form search teams under DCP/SP.'
+  },
+  {
+    keywords: ['cyber', 'online', 'fraud', 'scam', 'upi', 'bank', '1930', '66c', '66d'],
+    content: 'KSP SOP — Cybercrime: IT Act 66C/66D + IPC 420. Guide victim to 1930 / cybercrime.gov.in. Freeze accounts within 30 min via Bank Nodal Officers.'
+  },
+  {
+    keywords: ['domestic', 'violence', 'wife', 'husband', '498a', 'pwdva'],
+    content: 'KSP SOP — Domestic Violence: FIR u/s 498A IPC. Notify Protection Officer within 24 hrs under PWDVA 2005. Medical exam + DLSA legal aid.'
+  },
+  {
+    keywords: ['drug', 'narcotics', 'ndps', 'ganja', 'cocaine', 'contraband'],
+    content: 'KSP SOP — NDPS: Register u/s 20/22/27 NDPS Act 1985. Search in presence of Gazetted Officer (Sec 50 NDPS). Panchanama with 2 witnesses. FSL sample within 72 hrs.'
+  }
+];
+
+function searchPoliceManuals(query) {
+  const q = (query || '').toLowerCase();
+  const hits = MANUAL_KB.filter(item => item.keywords.some(kw => q.includes(kw)));
+  if (!hits.length) return { results: [], query, note: 'No direct SOP match found. Recommend checking the KSP Police Manual directly.' };
+  return { results: hits.map(h => h.content), query, count: hits.length };
+}
 
 // --- Helpers -----------------------------------------------------------------
 
@@ -263,7 +386,8 @@ async function callQuickML(question, knowledgeContext = '') {
 }
 
 /**
- * Call Gemini REST API (no SDK dependency).
+ * callGemini — plain text fallback (no tools).
+ * Used when a bare text answer is sufficient (voice last-resort path).
  * Uses GEMINI_API_KEY + GEMINI_MODEL env vars.
  */
 async function callGemini(question, knowledgeContext = '') {
@@ -282,26 +406,254 @@ async function callGemini(question, knowledgeContext = '') {
     url,
     {
       system_instruction: {
-        parts: [
-          {
-            text:
-              'You are DRISHTI (ದೃಷ್ಟಿ), the AI crime-intelligence assistant for the Karnataka State Police. Answer factually, clearly, and thoroughly with specific legal sections (IPC/BNS/IT Act) and SOP steps when applicable. Speak directly and concisely without Markdown formatting.',
-          },
-        ],
+        parts: [{
+          text: 'You are DRISHTI (ದೃಷ್ಟಿ), the AI crime-intelligence assistant for the Karnataka State Police. Answer factually, clearly, and thoroughly with specific legal sections (IPC/BNS/IT Act) and SOP steps when applicable. Speak directly and concisely without Markdown formatting.',
+        }],
       },
       contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
       generationConfig: { maxOutputTokens: 800, temperature: 0.3 },
     },
-    {
-      headers: { 'Content-Type': 'application/json' },
-      timeout: 10000,
-    }
+    { headers: { 'Content-Type': 'application/json' }, timeout: 10000 }
   );
 
-  const answer =
-    response.data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  const answer = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
   if (!answer) throw new Error('Gemini returned empty answer');
   return answer;
+}
+
+/**
+ * callGeminiWithTools — Gemini fallback with 9 live-data tool declarations.
+ *
+ * Uses the Gemini REST API's native function-calling (tools.function_declarations).
+ * Runs a multi-turn while loop: each time Gemini emits a functionCall part,
+ * we dispatch to the live Catalyst endpoint (or mock fallback) and feed the
+ * functionResponse back.  Stops when Gemini returns a final text part or
+ * after MAX_TOOL_ITERATIONS guard.
+ *
+ * Ported from functions/chat/index.js Gemini fallback (deprecated 2026-07-21).
+ */
+async function callGeminiWithTools(question, knowledgeContext = '') {
+  // Collect all configured Gemini API keys (supports up to GEMINI_API_KEY_10)
+  const keys = [];
+  const primaryKey = process.env.GEMINI_API_KEY;
+  if (primaryKey && primaryKey !== 'PASTE_KEY_HERE') keys.push(primaryKey);
+  for (let i = 1; i <= 10; i++) {
+    const k = process.env[`GEMINI_API_KEY_${i}`];
+    if (k && k !== 'PASTE_KEY_HERE' && !keys.includes(k)) keys.push(k);
+  }
+  if (!keys.length) throw new Error('No GEMINI_API_KEY configured');
+
+  const modelName = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+
+  // 9 function declarations — mirrors functions/chat/index.js tool definitions
+  const functionDeclarations = [
+    {
+      name: 'fetch_hotspots',
+      description: 'Fetch crime hotspot coordinates for heatmaps or map pins.',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          district:   { type: 'STRING',  description: 'Optional district name filter' },
+          crime_type: { type: 'STRING',  description: 'Optional crime type code' },
+          months_back:{ type: 'INTEGER', description: 'Optional months to look back' }
+        }
+      }
+    },
+    {
+      name: 'fetch_trends',
+      description: 'Fetch crime trends and incident counts over time for charts.',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          crime_type: { type: 'STRING',  description: 'Optional crime type code' },
+          district:   { type: 'STRING',  description: 'Optional district name' },
+          groupby:    { type: 'STRING',  description: 'Group by field e.g. month, year' },
+          year:       { type: 'INTEGER', description: 'Optional year filter' }
+        }
+      }
+    },
+    {
+      name: 'fetch_repeat_offenders',
+      description: 'Fetch list of repeat criminal offenders.',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          min_firs: { type: 'INTEGER', description: 'Minimum FIR count' },
+          limit:    { type: 'INTEGER', description: 'Max records to return' }
+        }
+      }
+    },
+    {
+      name: 'fetch_firs',
+      description: 'Fetch First Information Reports (FIRs).',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          district:   { type: 'STRING', description: 'Optional district filter' },
+          crime_type: { type: 'STRING', description: 'Optional crime type' },
+          date_from:  { type: 'STRING', description: 'Start date YYYY-MM-DD' },
+          date_to:    { type: 'STRING', description: 'End date YYYY-MM-DD' }
+        }
+      }
+    },
+    {
+      name: 'fetch_cameras_nearby',
+      description: 'Fetch surveillance cameras near a given latitude/longitude.',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          lat:           { type: 'NUMBER',  description: 'Latitude' },
+          lng:           { type: 'NUMBER',  description: 'Longitude' },
+          radius_meters: { type: 'INTEGER', description: 'Search radius in metres' },
+          timestamp:     { type: 'STRING',  description: 'Optional ISO timestamp' }
+        },
+        required: ['lat', 'lng']
+      }
+    },
+    {
+      name: 'fetch_trail',
+      description: 'Fetch suspect movement trail from vehicle sightings.',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          crime_lat:       { type: 'NUMBER', description: 'Crime location latitude' },
+          crime_lng:       { type: 'NUMBER', description: 'Crime location longitude' },
+          crime_timestamp: { type: 'STRING', description: 'ISO timestamp of crime' },
+          vehicle_type:    { type: 'STRING', description: 'e.g. two_wheeler, car' }
+        },
+        required: ['crime_lat', 'crime_lng', 'crime_timestamp', 'vehicle_type']
+      }
+    },
+    {
+      name: 'fetch_anpr_check',
+      description: 'Fetch ANPR status/history for a vehicle plate.',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          plate_number: { type: 'STRING', description: 'License plate number' },
+          camera_id:    { type: 'STRING', description: 'Camera ID' },
+          camera_name:  { type: 'STRING', description: 'Camera location name' },
+          lat:          { type: 'NUMBER', description: 'Camera latitude' },
+          lng:          { type: 'NUMBER', description: 'Camera longitude' },
+          timestamp:    { type: 'STRING', description: 'ISO timestamp of sighting' }
+        },
+        required: ['plate_number', 'camera_id', 'camera_name', 'lat', 'lng', 'timestamp']
+      }
+    },
+    {
+      name: 'fetch_network_graph',
+      description: 'Fetch criminal network connections graph data.',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          min_connections: { type: 'INTEGER', description: 'Minimum connection count' },
+          months_back:     { type: 'INTEGER', description: 'Months to look back' }
+        }
+      }
+    },
+    {
+      name: 'search_police_manuals',
+      description: 'Search KSP police manuals/SOPs for procedures and IPC/BNS references.',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          query: { type: 'STRING', description: 'Procedural query or legal keyword' }
+        },
+        required: ['query']
+      }
+    }
+  ];
+
+  const systemText = 'You are DRISHTI (ದೃಷ್ಟಿ), the AI crime-intelligence assistant for Karnataka State Police. Answer factually, clearly, and thoroughly with specific legal sections (IPC/BNS/IT Act) and SOP steps when applicable. When you need live data, call the provided tools. Speak directly and concisely without Markdown formatting.';
+
+  const fullPrompt = knowledgeContext
+    ? `${question}\n\nADDITIONAL CONTEXT:\n${knowledgeContext}`
+    : question;
+
+  // Multi-key rotation — try each key until one succeeds or all fail
+  let lastError;
+  for (const apiKey of keys) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+
+      // Build conversation history for multi-turn tool loop
+      const contents = [{ role: 'user', parts: [{ text: fullPrompt }] }];
+
+      const MAX_TOOL_ITERATIONS = 5;
+      let iterations = 0;
+
+      while (iterations <= MAX_TOOL_ITERATIONS) {
+        const body = {
+          system_instruction: { parts: [{ text: systemText }] },
+          contents,
+          tools: [{ function_declarations: functionDeclarations }],
+          generationConfig: { maxOutputTokens: 1024, temperature: 0.3 },
+        };
+
+        const response = await axios.post(url, body, {
+          headers: { 'Content-Type': 'application/json' },
+          timeout: 15000,
+        });
+
+        const candidate = response.data?.candidates?.[0];
+        if (!candidate) throw new Error('Gemini returned no candidates');
+
+        const parts = candidate?.content?.parts || [];
+
+        // Collect all functionCall parts in this response
+        const functionCallParts = parts.filter(p => p.functionCall);
+
+        if (functionCallParts.length === 0) {
+          // No more tool calls — extract final text and return
+          const textPart = parts.find(p => p.text);
+          const finalText = textPart?.text || '';
+          if (!finalText) throw new Error('Gemini returned empty final answer');
+          return finalText;
+        }
+
+        // Push the model's response (with functionCall parts) into history
+        contents.push({ role: 'model', parts });
+
+        // Execute each tool call and collect functionResponse parts
+        const toolResponseParts = [];
+        for (const part of functionCallParts) {
+          const { name, args } = part.functionCall;
+          let result;
+          try {
+            if (name === 'search_police_manuals') {
+              result = searchPoliceManuals(args.query);
+            } else {
+              result = await fetchToolData(name, args);
+            }
+          } catch (toolErr) {
+            console.error(`[askDrishtiAI] Tool ${name} execution error:`, toolErr.message);
+            result = { error: true, message: toolErr.message };
+          }
+          toolResponseParts.push({
+            functionResponse: { name, response: { result } }
+          });
+        }
+
+        // Push tool results as user turn and loop
+        contents.push({ role: 'user', parts: toolResponseParts });
+        iterations++;
+      }
+
+      throw new Error('Gemini tool loop exceeded maximum iterations without a final answer');
+
+    } catch (err) {
+      const status = err.status || err.response?.status || 500;
+      const msg = (err.message || '').toLowerCase();
+      if (status === 429 || status === 403 || msg.includes('quota') || msg.includes('exhausted') || msg.includes('rate')) {
+        console.warn(`[askDrishtiAI] Key ${apiKey.substring(0, 15)}... rate-limited, trying next key`);
+        lastError = err;
+        continue;
+      }
+      throw err; // Non-quota error — propagate immediately
+    }
+  }
+
+  throw lastError || new Error('All Gemini API keys failed');
 }
 
 /**
@@ -391,23 +743,45 @@ module.exports = async (req, res) => {
   // Lookup matching police manual SOP / legal context & live DataStore records
   const knowledgeContext = await findKnowledgeContext(workingQuestion);
 
-  // Step 2: PRIMARY — QuickML RAG
+  // Step 2: PRIMARY — QuickML RAG (text-only, no tool calling — confirmed unsupported)
   try {
     finalAnswer = await callQuickML(workingQuestion, knowledgeContext);
     source = 'quickml';
   } catch (quickmlErr) {
     console.error('[askDrishtiAI] QuickML RAG failed:', quickmlErr.message);
 
-    // Step 3: FALLBACK — Gemini (with knowledge context)
+    // Step 3: FALLBACK — Gemini with 9 live-data tools (wrapped in 10s timeout)
     try {
-      finalAnswer = await callGemini(workingQuestion, knowledgeContext);
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('callGeminiWithTools timed out after 10s')), 10000)
+      );
+      finalAnswer = await Promise.race([
+        callGeminiWithTools(workingQuestion, knowledgeContext),
+        timeoutPromise
+      ]);
       source = 'gemini';
     } catch (geminiErr) {
-      console.error('[askDrishtiAI] Gemini failed:', geminiErr.message);
+      console.error('[askDrishtiAI] Gemini with tools failed or timed out:', geminiErr.message);
 
-      // Step 4: LAST-RESORT
-      finalAnswer = buildFallbackAnswer(rawData);
-      source = 'raw_fallback';
+      // Step 4: LAST-RESORT plain Gemini (no tools, just context)
+      try {
+        finalAnswer = await callGemini(workingQuestion, knowledgeContext);
+        source = 'gemini_plain';
+      } catch (geminiPlainErr) {
+        console.error('[askDrishtiAI] Gemini plain fallback failed:', geminiPlainErr.message);
+        
+        // Step 5: Demo AI pattern-matching fallback before raw apology string
+        try {
+          const { generateAIResponseFromDemoData } = require('../../nextjs/src/lib/demo-data');
+          const demoRes = generateAIResponseFromDemoData(workingQuestion);
+          finalAnswer = demoRes.answer;
+          source = 'demo_ai';
+        } catch (demoErr) {
+          console.error('[askDrishtiAI] Demo data fallback failed:', demoErr.message);
+          finalAnswer = buildFallbackAnswer(rawData);
+          source = 'raw_fallback';
+        }
+      }
     }
   }
 

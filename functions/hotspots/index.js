@@ -1,9 +1,16 @@
 const dbHelper = require('./db-helper');
 
 module.exports = async (req, res) => {
+    // Compat shim: local catalyst serve passes a plain Node.js http.IncomingMessage
+    // which lacks getMethod()/getQueryParams(). Patch them in so both envs work.
+    if (!req.getMethod || typeof req.getMethod !== 'function') req.getMethod = () => req.method;
+    if (!req.getQueryParams || typeof req.getQueryParams !== 'function') req.getQueryParams = () => req.query || require('url').parse(req.url || '', true).query || {};
+
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    // Hotspot aggregates are expensive — cache for 30s
+    res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=60');
 
     if (req.getMethod() === 'OPTIONS') {
         res.writeHead(200);
