@@ -6,7 +6,7 @@ import Spinner from '@/components/ui/Spinner';
 import InvestigatorWall from '@/components/InvestigatorWall';
 import VoiceDebugStatus from '@/components/VoiceDebugStatus';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
 
 const SUGGESTIONS = [
   'Show all vehicle thefts in Bengaluru this month',
