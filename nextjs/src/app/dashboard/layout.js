@@ -148,7 +148,7 @@ export default function DashboardLayout({ children }) {
   // ─── Change 5: handleQuery with local intent ─────────────────────
   const ts = () => new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
-  const handleQuery = useCallback(async (queryText) => {
+  const handleQuery = useCallback(async (queryText, isFollowUp = false) => {
     if (!queryText?.trim()) return;
     setOrbResponse('');
     setPendingTranscript('');
@@ -167,7 +167,7 @@ export default function DashboardLayout({ children }) {
     const targetLang = isKannadaInput ? 'kn' : isHindiInput ? 'hi' : language;
 
     // ── Local intent check ──
-    const localResult = detectLocalIntent(queryText);
+    const localResult = isFollowUp ? null : detectLocalIntent(queryText);
     if (localResult) {
       if (localResult.type === 'navigate') router.push(localResult.path);
       const reply = localResult.reply;
@@ -182,7 +182,7 @@ export default function DashboardLayout({ children }) {
       // After 1.8s, automatically fire a follow-up intel query for this page
       if (localResult.followUpQuery) {
         setTimeout(() => {
-          handleQuery(localResult.followUpQuery);
+          handleQuery(localResult.followUpQuery, true);
         }, 1800);
       }
       return; // skip API call
