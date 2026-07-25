@@ -59,6 +59,7 @@ const useDrishtiVoice = ({
   const audioLevelFrameRef = useRef(null);
   const lastTranscriptLenRef = useRef(0);
   const audioLevelLastUpdateRef = useRef(0);
+  const activeTtsIdRef = useRef(0);
 
   // Check mic permission
   useEffect(() => {
@@ -337,6 +338,8 @@ const useDrishtiVoice = ({
     if (!text || !text.trim()) return;
     const languageCode = lang.startsWith('kn') ? 'kn' : lang.startsWith('hi') ? 'hi' : 'en';
 
+    const currentTtsId = ++activeTtsIdRef.current;
+
     // ALWAYS stop any playing audio or speech synthesis FIRST to prevent audio collision
     if (typeof window !== 'undefined' && window.speechSynthesis) {
       window.speechSynthesis.cancel();
@@ -345,15 +348,24 @@ const useDrishtiVoice = ({
       try { audioRef.current.pause(); } catch (_) {}
       audioRef.current = null;
     }
+    setIsSpeaking(false);
 
     // Helper: play a base64 audio string
     const playBase64Audio = (audioBase64, mimeType, source) => {
       return new Promise((resolve, reject) => {
+        if (currentTtsId !== activeTtsIdRef.current) {
+          resolve();
+          return;
+        }
         try {
           const audio = new Audio();
           audioRef.current = audio;
 
           audio.oncanplaythrough = () => {
+            if (currentTtsId !== activeTtsIdRef.current) {
+              resolve();
+              return;
+            }
             setIsSpeaking(true);
             callbacksRef.current.onSpeakStart?.();
             audio.play().catch(reject);
@@ -379,10 +391,12 @@ const useDrishtiVoice = ({
 
     // Helper for browser Web Speech API fallback
     const fallbackToBrowserSpeech = () => {
+      if (currentTtsId !== activeTtsIdRef.current) return;
       if (typeof window === 'undefined' || !window.speechSynthesis) return;
       console.warn('[DRISHTI VOICE] Using Browser Web Speech API (Fallback)');
 
       const doSpeak = () => {
+        if (currentTtsId !== activeTtsIdRef.current) return;
         const utt = new SpeechSynthesisUtterance(text);
         const voices = window.speechSynthesis.getVoices();
         voicesCacheRef.current = voices;
@@ -476,6 +490,7 @@ const useDrishtiVoice = ({
       if (!res.ok) throw new Error(`TTS HTTP error ${res.status}`);
       const data = await res.json();
 
+      if (currentTtsId !== activeTtsIdRef.current) return;
       if (data.audioBase64 && (data.source === 'zia' || data.source === 'neural_tts')) {
         console.log(`[DRISHTI VOICE] ✅ Got audio from ${data.source}, playing...`);
         try {
@@ -492,13 +507,15 @@ const useDrishtiVoice = ({
       console.warn('[DRISHTI VOICE] TTS API call failed, falling back to Web Speech API:', err.message);
     }
 
+    if (currentTtsId !== activeTtsIdRef.current) return;
     // Final fallback: browser Web Speech API
     fallbackToBrowserSpeech();
   }, [findBestVoice]);
 
   const stopSpeaking = useCallback(() => {
+    activeTtsIdRef.current++;
     if (audioRef.current) {
-      audioRef.current.pause();
+      try { audioRef.current.pause(); } catch (_) {}
       audioRef.current = null;
     }
     if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();

@@ -150,6 +150,10 @@ export default function DashboardLayout({ children }) {
 
   const handleQuery = useCallback(async (queryText, isFollowUp = false) => {
     if (!queryText?.trim()) return;
+
+    // Stop any currently playing audio immediately upon receiving a new query
+    stopSpeaking();
+
     setOrbResponse('');
     setPendingTranscript('');
     hasInteractedRef.current = true;
