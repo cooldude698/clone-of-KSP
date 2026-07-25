@@ -66,6 +66,10 @@ function detectLocalIntent(query) {
   if (/^(yes|yeah|sure|okay|ok|do it|go ahead|proceed|affirmative)$/.test(q))
     return { type: 'confirm', reply: 'On it, Sir.' };
 
+  // Greetings
+  if (/^(hi|hello|hey|whats\s*up|what's\s*up|greetings|hello\s*drishti|hi\s*drishti|good\s*morning|good\s*afternoon|good\s*evening)(\s+(.*))?$/.test(q))
+    return { type: 'greeting', reply: 'Hello, Sir. Drishti is active. How can I assist you with the intelligence network today?' };
+
   return null;
 }
 
