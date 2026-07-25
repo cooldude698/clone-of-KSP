@@ -42,7 +42,7 @@ function detectLocalIntent(query) {
   const isOpenAction = q.includes('open') || q.includes('show') || q.includes('view') || q.includes('bring up') || q.includes('pull up') || q.includes('check') || q.includes('case file') || q.includes('profile') || q.includes('file');
 
   if (isOpenAction) {
-    if (q.includes('anant') || q.includes('anand') || q.includes('gowda') || q.includes('godwa')) {
+    if (q.includes('anant') || q.includes('anand') || q.includes('gowda') || q.includes('godwa') || q.includes('buda') || q.includes('guda') || q.includes('goda')) {
       return nav('/dashboard/suspect/anand-gowda', 'Opening suspect profile for Anand Gowda, Sir.', null);
     }
     if (q.includes('ramesh') || q.includes('bullet ramesh')) {
@@ -212,7 +212,13 @@ export default function DashboardLayout({ children }) {
     // ── Local intent check ──
     const localResult = isFollowUp ? null : detectLocalIntent(queryText);
     if (localResult) {
-      if (localResult.type === 'navigate') router.push(localResult.path);
+      if (localResult.type === 'navigate') {
+        if (typeof window !== 'undefined') {
+          window.location.href = localResult.path;
+        } else {
+          router.push(localResult.path);
+        }
+      }
       const reply = localResult.reply;
       setResponse({ response_text: reply, follow_up_suggestions: [], confidence: 1.0 });
       originalResponseRef.current = { text: reply, lang: 'en' };

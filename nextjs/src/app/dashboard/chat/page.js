@@ -456,7 +456,7 @@ export default function ChatPage() {
 
     if (isOpenAction) {
       let targetRoute = null;
-      if (qLower.includes('anant') || qLower.includes('anand') || qLower.includes('gowda') || qLower.includes('godwa')) {
+      if (qLower.includes('anant') || qLower.includes('anand') || qLower.includes('gowda') || qLower.includes('godwa') || qLower.includes('buda') || qLower.includes('guda') || qLower.includes('goda')) {
         targetRoute = '/dashboard/suspect/anand-gowda';
       } else if (qLower.includes('ramesh') || qLower.includes('bullet ramesh')) {
         targetRoute = '/dashboard/suspect/ramesh-kumar';
@@ -478,8 +478,10 @@ export default function ChatPage() {
 
       if (targetRoute) {
         setTimeout(() => {
-          router.push(targetRoute);
-        }, 1200);
+          if (typeof window !== 'undefined') {
+            window.location.href = targetRoute;
+          }
+        }, 800);
       }
     }
 
