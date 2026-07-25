@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Send, Mic, MicOff, Volume2, VolumeX, Bot, User, Sparkles, 
@@ -216,6 +217,7 @@ function TypingIndicator() {
 const CHAT_STORAGE_KEY = 'drishti_chat_history_v2';
 
 export default function ChatPage() {
+  const router = useRouter();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -447,6 +449,39 @@ export default function ChatPage() {
     setMessages((prev) => [...prev, userMsg]);
     setInput('');
     setLoading(true);
+
+    // Auto-detect open suspect / FIR intent and navigate
+    const qLower = text.toLowerCase().trim();
+    const isOpenAction = qLower.includes('open') || qLower.includes('show') || qLower.includes('view') || qLower.includes('bring up') || qLower.includes('pull up') || qLower.includes('check') || qLower.includes('case file') || qLower.includes('profile') || qLower.includes('file');
+
+    if (isOpenAction) {
+      let targetRoute = null;
+      if (qLower.includes('anant') || qLower.includes('anand') || qLower.includes('gowda') || qLower.includes('godwa')) {
+        targetRoute = '/dashboard/suspect/anand-gowda';
+      } else if (qLower.includes('ramesh') || qLower.includes('bullet ramesh')) {
+        targetRoute = '/dashboard/suspect/ramesh-kumar';
+      } else if (qLower.includes('suresh') || qLower.includes('naidu')) {
+        targetRoute = '/dashboard/suspect/suresh-naidu';
+      } else if (qLower.includes('imran') || qLower.includes('chotta imran')) {
+        targetRoute = '/dashboard/suspect/imran-khan';
+      } else if (qLower.includes('farid') || qLower.includes('mirza')) {
+        targetRoute = '/dashboard/suspect/farid-mirza';
+      } else if (qLower.includes('4921') || qLower.includes('492')) {
+        targetRoute = '/dashboard/fir/FIR-2026-BL-4921';
+      } else if (qLower.includes('4000')) {
+        targetRoute = '/dashboard/fir/FIR-2026-BL-4000';
+      } else if (qLower.includes('112') || qLower.includes('mys')) {
+        targetRoute = '/dashboard/fir/FIR-2026-MYS-0112';
+      } else if (qLower.includes('case file') || qLower.includes('this case') || qLower.includes('fir') || qLower.includes('case')) {
+        targetRoute = '/dashboard/fir/FIR-2026-BL-4000';
+      }
+
+      if (targetRoute) {
+        setTimeout(() => {
+          router.push(targetRoute);
+        }, 1200);
+      }
+    }
 
     try {
       let responseText = '';

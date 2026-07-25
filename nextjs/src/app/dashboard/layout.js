@@ -36,9 +36,42 @@ const NAV_ITEMS = [
 function detectLocalIntent(query) {
   const q = query.toLowerCase().trim();
 
-  // Navigation — many natural phrasings
   const nav = (path, reply, followUpQuery) => ({ type: 'navigate', path, reply, followUpQuery });
 
+  // 1. Suspect Profile & Case File Direct Intent
+  const isOpenAction = q.includes('open') || q.includes('show') || q.includes('view') || q.includes('bring up') || q.includes('pull up') || q.includes('check') || q.includes('case file') || q.includes('profile') || q.includes('file');
+
+  if (isOpenAction) {
+    if (q.includes('anant') || q.includes('anand') || q.includes('gowda') || q.includes('godwa')) {
+      return nav('/dashboard/suspect/anand-gowda', 'Opening suspect profile for Anand Gowda, Sir.', null);
+    }
+    if (q.includes('ramesh') || q.includes('bullet ramesh')) {
+      return nav('/dashboard/suspect/ramesh-kumar', 'Opening suspect profile for Ramesh Kumar, Sir.', null);
+    }
+    if (q.includes('suresh') || q.includes('naidu')) {
+      return nav('/dashboard/suspect/suresh-naidu', 'Opening suspect profile for Suresh Naidu, Sir.', null);
+    }
+    if (q.includes('imran') || q.includes('chotta imran')) {
+      return nav('/dashboard/suspect/imran-khan', 'Opening suspect profile for Imran Khan, Sir.', null);
+    }
+    if (q.includes('farid') || q.includes('mirza')) {
+      return nav('/dashboard/suspect/farid-mirza', 'Opening suspect profile for Farid Mirza, Sir.', null);
+    }
+    if (q.includes('4921') || q.includes('492')) {
+      return nav('/dashboard/fir/FIR-2026-BL-4921', 'Opening case file FIR-2026-BL-4921, Sir.', null);
+    }
+    if (q.includes('4000')) {
+      return nav('/dashboard/fir/FIR-2026-BL-4000', 'Opening case file FIR-2026-BL-4000, Sir.', null);
+    }
+    if (q.includes('112') || q.includes('mys')) {
+      return nav('/dashboard/fir/FIR-2026-MYS-0112', 'Opening case file FIR-2026-MYS-0112, Sir.', null);
+    }
+    if (q.includes('case file') || q.includes('this case') || q.includes('fir') || q.includes('case')) {
+      return nav('/dashboard/fir/FIR-2026-BL-4000', 'Opening active case file FIR-2026-BL-4000, Sir.', null);
+    }
+  }
+
+  // Navigation — many natural phrasings
   if (/\b(map|crime map|hotspot|heatmap|location|where.*crime)\b/.test(q))
     return nav('/dashboard/map', 'Opening the Crime Map, Sir.', 'Give me a quick briefing on the current hotspots.');
 
