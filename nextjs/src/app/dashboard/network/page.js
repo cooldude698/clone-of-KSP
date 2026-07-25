@@ -353,15 +353,15 @@ export default function NetworkPage() {
             onClick={() => setPanelOpen(false)}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[99998] animate-fade-in"
           />
-          <div className="fixed top-1/2 left-[50%] md:left-[calc(50%+130px)] -translate-x-1/2 -translate-y-1/2 w-[95%] md:w-[760px] lg:w-[950px] max-h-[92vh] border border-steel-600 bg-steel-700 flex flex-col animate-newspaper-spin z-[99999] shadow-2xl overflow-y-auto rounded-3xl">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-steel-600 shrink-0 bg-steel-700/80 sticky top-0 z-30 backdrop-blur-md rounded-t-3xl">
-              <div className="flex items-center gap-2 text-critical-500">
+          <div className="fixed top-1/2 left-[50%] md:left-[calc(50%+130px)] -translate-x-1/2 -translate-y-1/2 w-[95%] md:w-[760px] lg:w-[950px] max-h-[92vh] border border-slate-300 bg-[#F5F2EB] flex flex-col animate-newspaper-spin z-[99999] shadow-2xl overflow-y-auto rounded-3xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 shrink-0 bg-[#F5F2EB]/95 sticky top-0 z-30 backdrop-blur-md rounded-t-3xl text-slate-800">
+              <div className="flex items-center gap-2 text-slate-700">
                 <ShieldAlert className="w-5 h-5" />
-                <h3 className="text-sm font-bold font-mono tracking-widest uppercase">Investigator Wall</h3>
+                <h3 className="text-sm font-bold font-serif tracking-wide uppercase">Investigator Chronicle</h3>
               </div>
               <button
                 onClick={() => setPanelOpen(false)}
-                className="w-8 h-8 rounded-lg bg-steel-600/50 hover:bg-steel-600 flex items-center justify-center text-paper-100/50 hover:text-paper-100 transition-colors"
+                className="w-8 h-8 rounded-lg bg-slate-200/50 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-850 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
