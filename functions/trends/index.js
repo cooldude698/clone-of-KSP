@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
         if (whereClauses.length > 0) {
             sql += " WHERE " + whereClauses.join(" AND ");
         }
-        sql += " LIMIT 5000"; // Reduced from 50000 — sufficient for demo DB
+        sql += " LIMIT 300"; // Reduced to comply with Catalyst ZCQL 300 limit
 
         let firs = await dbHelper.executeQuery(req, sql);
 

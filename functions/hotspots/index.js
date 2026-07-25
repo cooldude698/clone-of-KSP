@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
         if (crime_type) {
             sql += ` AND crime_type_code = '${crime_type.replace(/'/g, "''")}'`;
         }
-        sql += " LIMIT 10000";
+        sql += " LIMIT 300";
 
         const firs = await dbHelper.executeQuery(req, sql);
         

@@ -75,7 +75,7 @@ export default function AlertNotification() {
     fetchAlerts();
     const interval = setInterval(fetchAlerts, 5000);
     return () => clearInterval(interval);
-  }, [alerts.length]);
+  }, []);
 
   // Click outside listener to close panel
   useEffect(() => {
