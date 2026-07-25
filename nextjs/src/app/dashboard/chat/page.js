@@ -763,12 +763,8 @@ export default function ChatPage() {
       {/* Center Modal (Investigator Wall) */}
       {rightPanelOpen && activeCaseDetails && (
         <>
-          <div
-            onClick={() => setRightPanelOpen(false)}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[99998] transition-opacity animate-fade-in"
-          />
-          <div className="fixed top-1/2 left-[50%] md:left-[calc(50%+130px)] -translate-x-1/2 -translate-y-1/2 w-[95%] md:w-[760px] lg:w-[950px] max-h-[92vh] border border-slate-300 bg-[#F5F2EB] flex flex-col animate-newspaper-spin z-[99999] shadow-2xl overflow-y-auto rounded-3xl">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 shrink-0 bg-[#F5F2EB]/95 sticky top-0 z-30 backdrop-blur-md rounded-t-3xl text-slate-800">
+          <div className="fixed inset-0 bg-[#F5F2EB] flex flex-col animate-newspaper-spin z-[99999] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-3 border-b border-slate-300 shrink-0 bg-[#F5F2EB]/95 sticky top-0 z-30 backdrop-blur-md">
               <div className="flex items-center gap-2 text-slate-700">
                 <ShieldAlert className="w-5 h-5" />
                 <h3 className="text-sm font-bold font-serif tracking-wide uppercase">Investigator Chronicle</h3>
@@ -794,13 +790,14 @@ export default function ChatPage() {
                 </button>
                 <button
                   onClick={() => setRightPanelOpen(false)}
-                  className="w-8 h-8 rounded-xl bg-slate-200/50 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-850 transition-colors cursor-pointer"
+                  className="w-9 h-9 rounded-xl bg-slate-200/60 hover:bg-red-100 flex items-center justify-center text-slate-500 hover:text-red-600 transition-all cursor-pointer"
+                  title="Close"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
-            <div className="p-6">
+            <div className="flex-1 p-6 md:p-8 lg:p-10 max-w-[1200px] w-full mx-auto">
               <InvestigatorWall
                 fir={activeCaseDetails.fir}
                 accused={activeCaseDetails.accused}
