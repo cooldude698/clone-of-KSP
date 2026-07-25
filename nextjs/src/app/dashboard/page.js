@@ -678,6 +678,38 @@ export default function DashboardPage() {
       {/* ── Intel Feed Ticker ── */}
       <IntelTicker />
 
+      {/* Today's Intel Brief */}
+      <div className="glass-panel rounded-2xl border border-[var(--border)] overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+          <div className="flex items-center gap-3">
+            <Zap className="w-4 h-4 text-[var(--status-critical)]" />
+            <h3 className="text-sm font-bold font-mono uppercase tracking-widest text-[var(--text-primary)]">Today's Intel Brief</h3>
+          </div>
+          <span className="text-[10px] font-mono text-[var(--text-secondary)] bg-[var(--surface-2)] px-2 py-1 rounded border border-[var(--border)]">
+            AUTO-GENERATED · {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+          </span>
+        </div>
+        <div className="p-6 space-y-3">
+          {[
+            { severity: 'critical', icon: '🔴', text: 'SUS-8842 (Ramesh Kumar) ANPR hit confirmed — Silk Board Junction 14:22 hrs. Watchlist active. Patrol units alerted.' },
+            { severity: 'warn',    icon: '🟡', text: '3 new vehicle theft FIRs registered — Koramangala, HSR Layout, Electronic City. Pattern matches Bullet Ramesh MO.' },
+            { severity: 'warn',    icon: '🟡', text: 'CAM-BLR-0042 face match: Suresh Naidu (SUS-7104) spotted Koramangala 14:28. Highway patrol notified.' },
+            { severity: 'info',    icon: '🔵', text: 'Dark zone alert: Raichur district — underreporting index 75.0. Beat policing gaps suspected. Field verification requested.' },
+            { severity: 'success', icon: '🟢', text: 'Charge sheet filed: FIR-2026-BL-4921. Case moved to prosecution. Court date pending assignment.' },
+          ].map((item, i) => (
+            <div key={i} className={`flex items-start gap-3 p-3 rounded-xl border ${
+              item.severity === 'critical' ? 'bg-[var(--status-critical)]/8 border-[var(--status-critical)]/20' :
+              item.severity === 'warn'    ? 'bg-[var(--status-warning)]/8 border-[var(--status-warning)]/20' :
+              item.severity === 'success' ? 'bg-[var(--status-success)]/8 border-[var(--status-success)]/20' :
+              'bg-[var(--surface-2)] border-[var(--border)]'
+            }`}>
+              <span className="text-base shrink-0 mt-0.5">{item.icon}</span>
+              <p className="text-xs font-mono text-[var(--text-primary)] leading-relaxed">{item.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
     </div>
   );
 }

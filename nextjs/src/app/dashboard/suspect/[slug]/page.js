@@ -259,6 +259,54 @@ export default function SuspectProfilePage() {
                   </div>
                 </div>
               </div>
+
+              {/* IPC Sections */}
+              {suspect.ipc_sections?.length > 0 && (
+                <div className="mt-4 p-3 rounded-xl bg-[var(--status-critical)]/8 border border-[var(--status-critical)]/20">
+                  <p className="text-[10px] font-mono font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-2">IPC/BNS Charges</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {suspect.ipc_sections.map((s, i) => (
+                      <span key={i} className="px-2 py-0.5 rounded bg-[var(--status-critical)]/15 border border-[var(--status-critical)]/30 text-[var(--status-critical)] text-[10px] font-mono font-bold">{s}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Known Associates */}
+              {suspect.known_associates?.length > 0 && (
+                <div className="mt-3 p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+                  <p className="text-[10px] font-mono font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-2">Known Associates</p>
+                  <div className="space-y-1">
+                    {suspect.known_associates.map((a, i) => (
+                      <div key={i} className="flex items-center gap-2 text-xs text-[var(--text-primary)] font-mono">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[var(--status-warning)] shrink-0" />
+                        {a}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Last Known Location */}
+              {suspect.last_known_location && (
+                <div className="mt-3 p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+                  <p className="text-[10px] font-mono font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">Last Known Location</p>
+                  <p className="text-xs text-[var(--text-primary)] font-mono">{suspect.last_known_location}</p>
+                </div>
+              )}
+
+              {/* ANPR & Camera Hits */}
+              <div className="mt-3 flex gap-2">
+                <div className="flex-1 p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
+                  <p className="text-2xl font-black font-mono text-[var(--accent)]">{suspect.anpr_hits || 0}</p>
+                  <p className="text-[9px] font-mono text-[var(--text-secondary)] uppercase tracking-widest mt-0.5">ANPR Hits</p>
+                </div>
+                <div className="flex-1 p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
+                  <p className="text-2xl font-black font-mono text-[var(--accent)]">{suspect.camera_sightings?.length || 0}</p>
+                  <p className="text-[9px] font-mono text-[var(--text-secondary)] uppercase tracking-widest mt-0.5">Camera Sightings</p>
+                </div>
+              </div>
+
             </div>
 
             {/* Known Hangouts */}
