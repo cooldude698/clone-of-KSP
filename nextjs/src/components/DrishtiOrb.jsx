@@ -240,11 +240,26 @@ const DrishtiOrb = ({
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          setPosition(parsed);
-          activePosition.current = parsed;
-          currentPos.current = parsed;
+          // Safety check: ensure coordinates are within current viewport bounds
+          const maxWidth = window.innerWidth || 1200;
+          const maxHeight = window.innerHeight || 800;
+          if (
+            parsed &&
+            typeof parsed.x === 'number' &&
+            typeof parsed.y === 'number' &&
+            Math.abs(parsed.x) < maxWidth &&
+            Math.abs(parsed.y) < maxHeight
+          ) {
+            setPosition(parsed);
+            activePosition.current = parsed;
+            currentPos.current = parsed;
+          } else {
+            sessionStorage.removeItem('drishti_orb_position');
+            setPosition({ x: 0, y: 0 });
+          }
         } catch (err) {
-          // ignore
+          sessionStorage.removeItem('drishti_orb_position');
+          setPosition({ x: 0, y: 0 });
         }
       }
     }
