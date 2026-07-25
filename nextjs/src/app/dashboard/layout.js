@@ -177,7 +177,6 @@ export default function DashboardLayout({ children }) {
       const reply = localResult.reply;
       setResponse({ response_text: reply, follow_up_suggestions: [], confidence: 1.0 });
       originalResponseRef.current = { text: reply, lang: 'en' };
-      setSessionLogs(prev => [...prev, { role: 'user', content: queryText, timestamp: ts() }]);
       setSessionLogs(prev => [...prev, { role: 'assistant', content: reply, timestamp: ts() }]);
       setOrbState('speaking');
       setStateOverrideLabel('Speaking');
