@@ -94,9 +94,9 @@ const getRiskLabel = (score: number) => {
 };
 
 const getRiskDescription = (score: number) => {
-  if (score > 70) return "Subject exhibits elevated threat indicators. Immediate monitoring and containment protocols recommended. Prior criminal history and behavioral patterns suggest a high probability of re-offence.";
-  if (score > 40) return "Subject presents moderate risk factors. Regular surveillance and periodic check-ins recommended. Behavioral indicators warrant continued monitoring by assigned investigation officer.";
-  return "Subject currently assessed at low threat level. Standard monitoring protocols apply. No immediate escalation required, but periodic reassessment recommended during investigation.";
+  if (score > 70) return "High Risk Person: This person has a high chance of committing crime again. Officers should monitor their location closely, check their daily routine, and coordinate with local police stations immediately.";
+  if (score > 40) return "Medium Risk Person: This person shows moderate warning signs. Officers should conduct regular weekly check-ins, keep track of their contacts, and review their recent activities.";
+  return "Low Risk Person: This person currently shows low threat level. Follow normal police checking procedures during the investigation.";
 };
 
 const nameToSlug = (name: string) =>
@@ -109,17 +109,17 @@ const getVulnerabilityColor = (score: number) => {
 };
 
 const getVulnerabilityLabel = (score: number) => {
-  if (score > 70) return "HIGH VULNERABILITY";
-  if (score > 40) return "MODERATE";
-  return "LOW";
+  if (score > 70) return "HIGH RISK VICTIM";
+  if (score > 40) return "MEDIUM RISK VICTIM";
+  return "LOW RISK VICTIM";
 };
 
 const getStatusLabel = (status: string) => {
   const norm = (status || "").toLowerCase();
   if (norm.includes("close")) return "CASE CLOSED";
-  if (norm.includes("charge") || norm.includes("sheet")) return "CHARGESHEET FILED";
-  if (norm.includes("investig")) return "UNDER INVESTIGATION";
-  return "FIR REGISTERED";
+  if (norm.includes("charge") || norm.includes("sheet")) return "CHARGESHEET FILED IN COURT";
+  if (norm.includes("investig")) return "UNDER ACTIVE INVESTIGATION";
+  return "NEW FIR REGISTERED";
 };
 
 const getStatusColor = (status: string) => {
@@ -417,8 +417,8 @@ export default function InvestigatorWall({
                       <path fillRule="evenodd" d="M6.701 2.25c.577-1 2.02-1 2.598 0l5.196 9a1.5 1.5 0 0 1-1.299 2.25H2.804a1.5 1.5 0 0 1-1.3-2.25l5.197-9ZM8 4a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 4Zm0 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z" clipRule="evenodd" />
                     </svg>
                     <div>
-                      <span className="font-bold block">⚠ Criminal History Alert — {item.prior_convictions} Prior Conviction(s)</span>
-                      <span className="text-[10px] text-red-600">Subject has been previously convicted. Records indicate a pattern of involvement in criminal activity. IO should exercise heightened caution and request historical case files from CCRB.</span>
+                      <span className="font-bold block">⚠ Past Crime Record Alert — {item.prior_convictions} Previous Arrest(s)</span>
+                      <span className="text-[10px] text-red-600">This person has been arrested before. Police records show a repeated habit of committing crime. The Investigating Officer (IO) should take extra care and get complete old records from the Crime Records Bureau.</span>
                     </div>
                   </div>
                 )}
@@ -426,12 +426,12 @@ export default function InvestigatorWall({
                 {/* Modus Operandi */}
                 {item.modus_operandi && (
                   <div className="mb-4 pt-3 border-t border-slate-200">
-                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest block font-sans mb-1">Modus Operandi / Criminal Methodology</span>
+                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest block font-sans mb-1">Method of Crime (How the Crime Was Done)</span>
                     <p className="text-xs text-slate-700 leading-relaxed font-serif italic bg-[#FAF7F2] rounded-lg p-3 border border-slate-100">
                       &quot;{item.modus_operandi}&quot;
                     </p>
                     <p className="text-[10px] text-slate-400 font-sans mt-1 italic">
-                      MO analysis indicates the above pattern should be cross-referenced with district-level crime pattern databases for serial offender identification.
+                      Note for Officers: Check if this same method was used in other recent crimes in nearby police station areas.
                     </p>
                   </div>
                 )}
@@ -443,7 +443,7 @@ export default function InvestigatorWall({
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
                     <path fillRule="evenodd" d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0Zm-5-1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0ZM8 12a4 4 0 0 0 3.193-1.603.75.75 0 1 0-1.186-.918A2.5 2.5 0 0 1 8 10.5a2.5 2.5 0 0 1-2.007-1.021.75.75 0 1 0-1.186.918A4 4 0 0 0 8 12Z" clipRule="evenodd" />
                   </svg>
-                  View Complete Suspect Profile & Criminal History
+                  View Complete Suspect Profile & Full History
                 </Link>
               </motion.div>
             ))}
@@ -456,13 +456,13 @@ export default function InvestigatorWall({
         <div className="flex items-center gap-3 mb-4">
           <span className="text-[10px] font-sans font-black text-slate-500 uppercase tracking-[0.3em]">Section III</span>
           <div className="h-px bg-slate-300 flex-grow" />
-          <span className="text-[10px] font-sans font-black text-rose-700 uppercase tracking-[0.3em]">Victim / Complainant Details ({victims.length})</span>
+          <span className="text-[10px] font-sans font-black text-rose-700 uppercase tracking-[0.3em]">Victim & Complainant Details ({victims.length})</span>
           <div className="h-px bg-slate-300 flex-grow" />
         </div>
 
         {victims.length === 0 ? (
           <div className="rounded-xl border border-dashed border-slate-300 bg-white/50 p-8 text-center text-sm text-slate-400 font-sans">
-            No victim information has been recorded in this FIR. Complainant details are being verified by the assigned Investigation Officer.
+            No victim details recorded yet. Investigating Officer is gathering victim information.
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -510,7 +510,7 @@ export default function InvestigatorWall({
                 {/* Vulnerability Bar */}
                 <div className="mt-3 pt-3 border-t border-slate-100">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[9px] text-slate-400 uppercase tracking-widest font-sans font-bold">Vulnerability Index</span>
+                    <span className="text-[9px] text-slate-400 uppercase tracking-widest font-sans font-bold">Safety & Protection Level Needed</span>
                     <span className="text-xs font-mono font-bold text-slate-700">{item.vulnerability_score}/100</span>
                   </div>
                   <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
@@ -521,10 +521,10 @@ export default function InvestigatorWall({
                   </div>
                   <p className="text-[10px] text-slate-400 font-sans mt-1 italic">
                     {item.vulnerability_score > 70 
-                      ? "High vulnerability score indicates the victim may require special protection measures, witness protection, or counseling services."
+                      ? "High Risk: Victim needs immediate police protection, regular patrols near house, and witness support."
                       : item.vulnerability_score > 40
-                      ? "Moderate vulnerability. Victim support services and periodic welfare checks recommended."
-                      : "Low vulnerability index. Standard victim support protocols apply."}
+                      ? "Medium Risk: Provide phone support number and schedule weekly officer visit."
+                      : "Low Risk: Standard police help available whenever requested."}
                   </p>
                 </div>
               </motion.div>
@@ -538,7 +538,7 @@ export default function InvestigatorWall({
         <div className="flex items-center gap-3 mb-4">
           <span className="text-[10px] font-sans font-black text-slate-500 uppercase tracking-[0.3em]">Section IV</span>
           <div className="h-px bg-slate-300 flex-grow" />
-          <span className="text-[10px] font-sans font-black text-emerald-700 uppercase tracking-[0.3em]">DRISHTI AI Intelligence Analysis</span>
+          <span className="text-[10px] font-sans font-black text-emerald-700 uppercase tracking-[0.3em]">DRISHTI AI Case Investigation Summary</span>
           <div className="h-px bg-slate-300 flex-grow" />
         </div>
 
@@ -550,30 +550,30 @@ export default function InvestigatorWall({
               </svg>
             </div>
             <h4 className="text-sm font-bold text-emerald-800 uppercase tracking-widest font-sans">
-              AI-Generated Case Summary & Threat Intelligence Report
+              DRISHTI AI Police Assistant Report
             </h4>
           </div>
           <div className="bg-emerald-50/50 rounded-lg p-4 border border-emerald-100 mb-4">
             <p className="text-sm text-slate-800 leading-relaxed font-sans">
-              {case_summary || "DRISHTI AI Co-Pilot is currently processing digital background checks, forensic cross-references, and criminal pattern analysis. This report will be updated once the analysis pipeline completes its automated intelligence gathering across connected databases including CCTNS, ICJS, and local district crime pattern databases."}
+              {case_summary || "DRISHTI AI is currently checking background records, matching old FIRs, and analyzing crime patterns. This summary will update as soon as new information is verified across police databases."}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-[10px] font-sans text-slate-500">
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-emerald-400" />
-              <span>Criminal Network Analysis — Complete</span>
+              <span>Criminal Network Check — Done</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-emerald-400" />
-              <span>Background Verification — Complete</span>
+              <span>Background Record Check — Done</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-amber-400" />
-              <span>Forensic Cross-Reference — In Progress</span>
+              <span>Evidence Matching — In Progress</span>
             </div>
           </div>
           <p className="text-[9px] text-slate-400 font-sans mt-3 italic border-t border-emerald-100 pt-3">
-            Disclaimer: This AI-generated analysis is intended to assist the Investigation Officer and should not be considered as conclusive evidence. All findings must be independently verified through proper investigative channels and due process of law as per CrPC guidelines.
+            Note for Police Officers: This AI report helps you investigate faster. Always verify all details directly before taking legal action.
           </p>
         </motion.div>
       </div>
