@@ -171,8 +171,10 @@ export default function DrishtiPanel({
             >
               {/* Left Brand Identity */}
               <div className="flex items-center gap-2.5">
-                <div className={`w-2.5 h-2.5 rounded-full transition-all duration-500 ${stateColor} ${orbState !== 'idle' ? 'animate-pulse' : ''}`} />
-                <div>
+                {!orbPinned && (
+                  <div className={`w-2.5 h-2.5 rounded-full transition-all duration-500 ${stateColor} ${orbState !== 'idle' ? 'animate-pulse' : ''}`} />
+                )}
+                <div className={orbPinned ? 'pl-11' : ''}>
                   <div className="flex items-center gap-1.5">
                     <span className={`text-xs font-black tracking-widest uppercase font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       DRISHTI

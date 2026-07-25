@@ -666,7 +666,7 @@ export default function DashboardLayout({ children }) {
       {/* ── DRISHTI ORB (Change 1) ── */}
       {/* When panel is open and orb is pinned, render compact orb anchored to top-right of panel */}
       {isPanelOpen && orbPinned && (
-        <div className="fixed top-2 right-[408px] z-[9996]">
+        <div className="fixed top-[5px] right-[382px] z-[9996]">
           <DrishtiOrb
             state={orbState}
             onClick={closePanel}
