@@ -277,7 +277,7 @@ const DrishtiOrb = ({
 
   // Full mode: fixed bottom-right with label
   return (
-    <div className="fixed bottom-4 right-4 z-[9999] flex flex-col items-center select-none gap-2">
+    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end select-none gap-3">
 
       {/* ── TRANSCRIPT / RESPONSE BUBBLE — appears above orb ── */}
       {(liveTranscript || pendingTranscript || orbResponse) && (
@@ -402,274 +402,11 @@ const DrishtiOrb = ({
         </div>
       )}
 
-      {/* ── ORB — with alive halo + state rings ── */}
-      <div className="relative flex items-center justify-center">
-
-        {/* Outer ambient glow halo — the heartbeat */}
-        <div
-          className="absolute rounded-full pointer-events-none"
-          style={{
-            inset: state === 'idle' ? '-24px' : '-16px',
-            background: `radial-gradient(circle, ${currentConfig.glowColor || 'rgba(99,102,241,0.15)'} 0%, transparent 68%)`,
-            animation: state === 'idle'
-              ? 'orbHaloBreath 2.5s ease-in-out infinite'
-              : state === 'listening'
-              ? 'orbHaloBreath 0.85s ease-in-out infinite'
-              : state === 'speaking'
-              ? 'orbHaloBreath 1.4s ease-in-out infinite'
-              : 'orbHaloBreath 1.8s ease-in-out infinite alternate',
-            opacity: state === 'idle' ? 0.8 : 1,
-          }}
-        />
-
-        {/* 3 fast-ping listening rings */}
-        {state === 'listening' && (
-          <>
-            <div className="absolute inset-0 rounded-full border-2 border-emerald-400/80"
-              style={{ animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite' }} />
-            <div className="absolute rounded-full border-2 border-emerald-400/50"
-              style={{ inset: '-9px', animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite', animationDelay: '0.28s' }} />
-            <div className="absolute rounded-full border border-emerald-300/25"
-              style={{ inset: '-18px', animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite', animationDelay: '0.56s' }} />
-          </>
-        )}
-
-        {/* Thinking — spinning orbit ring */}
-        {state === 'thinking' && (
-          <div className="absolute rounded-full border-2 border-amber-400/30 border-t-amber-400"
-            style={{ inset: '-8px', animation: 'spin 1.1s linear infinite' }} />
-        )}
-        <div
-          data-state={state}
-          onClick={onClick}
-          onMouseDown={onMouseDown}
-          onMouseUp={onMouseUp}
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
-          className={cn(
-            "siri-orb cursor-pointer transition-all duration-500 hover:scale-105 active:scale-95 relative shadow-2xl shadow-black/40",
-            className
-          )}
-          style={{
-            /* Change 1: boosted size and speed from audioLevel */
-            width: boostedSize,
-            height: boostedSize,
-            "--bg": colors.bg,
-            "--c1": colors.c1,
-            "--c2": colors.c2,
-            "--c3": colors.c3,
-            "--animation-duration": `${boostedDuration}s`,
-            "--blur-amount": `${blurAmount}px`,
-            "--contrast-amount": finalContrast,
-            "--dot-size": `${dotSize}px`,
-            "--shadow-spread": `${shadowSpread}px`,
-            "--mask-radius": maskRadius,
-          }}
-        >
-          <style>{`
-            /* Registering custom properties to allow smooth transitions */
-            @property --angle {
-              syntax: "<angle>";
-              inherits: false;
-              initial-value: 0deg;
-            }
-
-            @property --c1 {
-              syntax: "<color>";
-              inherits: true;
-              initial-value: oklch(60% 0.22 260);
-            }
-
-            @property --c2 {
-              syntax: "<color>";
-              inherits: true;
-              initial-value: oklch(55% 0.2 295);
-            }
-
-            @property --c3 {
-              syntax: "<color>";
-              inherits: true;
-              initial-value: oklch(50% 0.18 325);
-            }
-
-            @property --bg {
-              syntax: "<color>";
-              inherits: true;
-              initial-value: #040817;
-            }
-
-            .siri-orb {
-              display: grid;
-              grid-template-areas: "stack";
-              overflow: hidden;
-              border-radius: 50%;
-              position: relative;
-              background: var(--bg);
-              /* Change 1: fast size transition for audio reactivity */
-              transition:
-                --c1 0.8s ease-in-out,
-                --c2 0.8s ease-in-out,
-                --c3 0.8s ease-in-out,
-                --bg 0.8s ease-in-out,
-                width 0.08s ease-out,
-                height 0.08s ease-out;
-            }
-
-            .siri-orb::before,
-            .siri-orb::after {
-              content: "";
-              display: block;
-              grid-area: stack;
-              width: 100%;
-              height: 100%;
-              border-radius: 50%;
-            }
-
-            .siri-orb::before {
-              background:
-                conic-gradient(
-                  from calc(var(--angle) * 2) at 25% 70%,
-                  var(--c3),
-                  transparent 20% 80%,
-                  var(--c3)
-                ),
-                conic-gradient(
-                  from calc(var(--angle) * 2) at 45% 75%,
-                  var(--c2),
-                  transparent 30% 60%,
-                  var(--c2)
-                ),
-                conic-gradient(
-                  from calc(var(--angle) * -3) at 80% 20%,
-                  var(--c1),
-                  transparent 40% 60%,
-                  var(--c1)
-                ),
-                conic-gradient(
-                  from calc(var(--angle) * 2) at 15% 5%,
-                  var(--c2),
-                  transparent 10% 90%,
-                  var(--c2)
-                ),
-                conic-gradient(
-                  from calc(var(--angle) * 1) at 20% 80%,
-                  var(--c1),
-                  transparent 10% 90%,
-                  var(--c1)
-                ),
-                conic-gradient(
-                  from calc(var(--angle) * -2) at 85% 10%,
-                  var(--c3),
-                  transparent 20% 80%,
-                  var(--c3)
-                );
-              box-shadow: inset var(--bg) 0 0 var(--shadow-spread)
-                calc(var(--shadow-spread) * 0.2);
-              filter: blur(var(--blur-amount)) contrast(var(--contrast-amount));
-              animation: rotate var(--animation-duration) linear infinite;
-            }
-
-            /* Breathing animation only on idle state — faster, more visible */
-            .siri-orb[data-state="idle"]::before {
-              animation:
-                rotate var(--animation-duration) linear infinite,
-                breathe 2.5s ease-in-out infinite;
-            }
-
-            .siri-orb::after {
-              background-image: radial-gradient(
-                circle at center,
-                rgba(255, 255, 255, 0.35) var(--dot-size),
-                transparent var(--dot-size)
-              );
-              background-size: calc(var(--dot-size) * 2.5) calc(var(--dot-size) * 2.5);
-              backdrop-filter: blur(calc(var(--blur-amount) * 1.5))
-                contrast(calc(var(--contrast-amount) * 1.5));
-              mix-blend-mode: overlay;
-            }
-
-            .siri-orb[style*="--mask-radius: 0%"]::after {
-              mask-image: none;
-            }
-
-            .siri-orb:not([style*="--mask-radius: 0%"])::after {
-              mask-image: radial-gradient(
-                black var(--mask-radius),
-                transparent 75%
-              );
-            }
-
-            @keyframes rotate {
-              to { --angle: 360deg; }
-            }
-
-            /* More dramatic breathe: scale 0.94→1.06 over 2.5s */
-            @keyframes breathe {
-              0%, 100% { opacity: 0.7; transform: scale(0.94); }
-              50%       { opacity: 1;  transform: scale(1.06); }
-            }
-
-            /* Outer halo glow breath */
-            @keyframes orbHaloBreath {
-              0%, 100% { opacity: 0.35; transform: scale(0.85); }
-              50%       { opacity: 1;   transform: scale(1.16); }
-            }
-
-            /* Fast expand-fade for listening rings */
-            @keyframes fastPing {
-              0%   { transform: scale(1);   opacity: 0.9; }
-              100% { transform: scale(2.6); opacity: 0;   }
-            }
-
-            /* Thinking orbit ring spin */
-            @keyframes spin { to { transform: rotate(360deg); } }
-
-            @media (prefers-reduced-motion: reduce) {
-              .siri-orb::before {
-                animation: none;
-              }
-            }
-          `}</style>
-        </div>
-      </div>
-
-      {/* ── SOUND WAVE BARS — reactive to audioLevel ── */}
-      {state === 'speaking' && (
-        <div className="flex items-center justify-center gap-[3px] h-6">
-          {[0.4, 0.7, 1.0, 0.85, 0.6, 0.9, 0.5, 0.75, 0.45, 0.8].map((h, i) => (
-            <div
-              key={i}
-              style={{
-                width: '3px',
-                height: `${(h + audioLevel * 0.5) * 20}px`,
-                borderRadius: '2px',
-                background: `rgba(6, 182, 212, ${0.5 + audioLevel * 0.5})`,
-                animation: `soundBar 0.${4 + (i % 4)}s ease-in-out infinite alternate`,
-                animationDelay: `${i * 0.07}s`,
-                transition: 'height 0.08s ease-out',
-              }}
-            />
-          ))}
-          <style>{`
-            @keyframes soundBar {
-              from { transform: scaleY(0.3); opacity: 0.5; }
-              to   { transform: scaleY(1.0); opacity: 1.0; }
-            }
-          `}</style>
-        </div>
-      )}
-
-      {/* ── CONTROLS & LABELS ── */}
-      <div className="flex flex-col items-center gap-3 mt-4">
-        {/* DRISHTI LABELS */}
-        <div className="text-center flex flex-col items-center mb-1">
-          <div className="text-[10px] font-mono tracking-[0.4em] text-paper-100/50 uppercase">
-            DRISHTI <span className="opacity-40 ml-1">ದೃಷ್ಟಿ</span>
-          </div>
-        </div>
-
-        {/* BUTTONS */}
-        <div className="flex items-center gap-2.5">
+      {/* ── FLOATING ROW: CONTROLS PILL + ORB CONTAINER ── */}
+      <div className="flex items-center gap-3.5">
+        
+        {/* Distinct Floating Controls Pill */}
+        <div className="flex items-center gap-2 bg-[#050914]/85 backdrop-blur-xl border border-white/10 px-3 py-2 rounded-full shadow-2xl animate-fade-in">
           {/* PTT BUTTON */}
           <button
             onMouseDown={(e) => { e.preventDefault(); onPttStart?.(); }}
@@ -677,10 +414,10 @@ const DrishtiOrb = ({
             onMouseLeave={isListening ? (e) => { e.preventDefault(); onPttEnd?.(); } : undefined}
             onTouchStart={(e) => { e.preventDefault(); onPttStart?.(); }}
             onTouchEnd={(e) => { e.preventDefault(); onPttEnd?.(); }}
-            className={`px-5 py-2.5 rounded-full text-[9px] uppercase font-bold tracking-[0.2em] select-none transition-all duration-300 backdrop-blur-md flex items-center gap-2
+            className={`px-4 py-2 rounded-full text-[9px] uppercase font-bold tracking-[0.2em] select-none transition-all duration-300 flex items-center gap-1.5 h-9
               ${isListening
-                ? 'bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.5)] scale-105'
-                : 'bg-steel-600/10 border border-steel-600/20 text-paper-100/70 hover:text-paper-100 hover:bg-steel-600/20 hover:border-steel-600/40'}`}
+                ? 'bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.4)] scale-105'
+                : 'bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/15'}`}
           >
             {isListening && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
             {isListening ? 'LISTENING…' : 'HOLD TO TALK'}
@@ -689,10 +426,10 @@ const DrishtiOrb = ({
           {/* TYPE INSTEAD BUTTON */}
           <button
             onClick={onToggleTyping}
-            className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all duration-300 backdrop-blur-md
+            className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all duration-300
               ${showTypingInput
-                ? 'bg-paper-100 text-void-000 border-transparent shadow-[0_0_15px_rgba(255,255,255,0.2)]'
-                : 'bg-steel-600/10 border-steel-600/20 text-paper-100/40 hover:text-paper-100 hover:bg-steel-600/20 hover:border-steel-600/40'}`}
+                ? 'bg-white text-black border-transparent shadow-[0_0_12px_rgba(255,255,255,0.2)]'
+                : 'bg-white/5 border-white/10 text-white/50 hover:text-white hover:bg-white/15'}`}
             title="Type text message"
           >
             {showTypingInput ? (
@@ -705,14 +442,127 @@ const DrishtiOrb = ({
           {/* PERMANENT MUTE BUTTON */}
           <button
             onClick={onToggleMute}
-            className={`w-9 h-9 rounded-full border flex items-center justify-center text-xs transition-all duration-300 backdrop-blur-md
+            className={`w-9 h-9 rounded-full border flex items-center justify-center text-xs transition-all duration-300
               ${isMuted
-                ? 'bg-red-500/20 text-red-400 border-red-500/40 shadow-[0_0_12px_rgba(239,68,68,0.3)]'
-                : 'bg-steel-600/10 border-steel-600/20 text-paper-100/50 hover:text-paper-100 hover:bg-steel-600/20 hover:border-steel-600/40'}`}
+                ? 'bg-red-500/20 text-red-400 border-red-500/40 shadow-[0_0_10px_rgba(239,68,68,0.25)]'
+                : 'bg-white/5 border-white/10 text-white/50 hover:text-white hover:bg-white/15'}`}
             title={isMuted ? "Unmute Spoken Audio (Alt+M)" : "Permanently Mute Spoken Audio (Alt+M)"}
           >
             {isMuted ? '🔇' : '🔊'}
           </button>
+        </div>
+
+        {/* Orb Container */}
+        <div className="relative flex flex-col items-center justify-center">
+          {/* Outer ambient glow halo — the heartbeat */}
+          <div
+            className="absolute rounded-full pointer-events-none"
+            style={{
+              inset: state === 'idle' ? '-24px' : '-16px',
+              background: `radial-gradient(circle, ${currentConfig.glowColor || 'rgba(99,102,241,0.15)'} 0%, transparent 68%)`,
+              animation: state === 'idle'
+                ? 'orbHaloBreath 2.5s ease-in-out infinite'
+                : state === 'listening'
+                ? 'orbHaloBreath 0.85s ease-in-out infinite'
+                : state === 'speaking'
+                ? 'orbHaloBreath 1.4s ease-in-out infinite'
+                : 'orbHaloBreath 1.8s ease-in-out infinite alternate',
+              opacity: state === 'idle' ? 0.8 : 1,
+            }}
+          />
+
+          {/* 3 fast-ping listening rings */}
+          {state === 'listening' && (
+            <>
+              <div className="absolute inset-0 rounded-full border-2 border-emerald-400/80"
+                style={{ animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite' }} />
+              <div className="absolute rounded-full border-2 border-emerald-400/50"
+                style={{ inset: '-9px', animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite', animationDelay: '0.28s' }} />
+              <div className="absolute rounded-full border border-emerald-300/25"
+                style={{ inset: '-18px', animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite', animationDelay: '0.56s' }} />
+            </>
+          )}
+
+          {/* Thinking — spinning orbit ring */}
+          {state === 'thinking' && (
+            <div className="absolute rounded-full border-2 border-amber-400/30 border-t-amber-400"
+              style={{ inset: '-8px', animation: 'spin 1.1s linear infinite' }} />
+          )}
+
+          {/* The Actual Orb */}
+          <div
+            data-state={state}
+            onClick={onClick}
+            onMouseDown={onMouseDown}
+            onMouseUp={onMouseUp}
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
+            className={cn(
+              "siri-orb cursor-pointer transition-all duration-500 hover:scale-105 active:scale-95 relative shadow-2xl shadow-black/40",
+              className
+            )}
+            style={{
+              width: boostedSize,
+              height: boostedSize,
+              "--bg": colors.bg,
+              "--c1": colors.c1,
+              "--c2": colors.c2,
+              "--c3": colors.c3,
+              "--animation-duration": `${boostedDuration}s`,
+              "--blur-amount": `${blurAmount}px`,
+              "--contrast-amount": finalContrast,
+              "--dot-size": `${dotSize}px`,
+              "--shadow-spread": `${shadowSpread}px`,
+              "--mask-radius": maskRadius,
+            }}
+          >
+            <style>{`
+              @property --angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+              @property --c1 { syntax: "<color>"; inherits: true; initial-value: oklch(60% 0.22 260); }
+              @property --c2 { syntax: "<color>"; inherits: true; initial-value: oklch(55% 0.2 295); }
+              @property --c3 { syntax: "<color>"; inherits: true; initial-value: oklch(50% 0.18 325); }
+              @property --bg { syntax: "<color>"; inherits: true; initial-value: #040817; }
+              .siri-orb { display:grid; grid-template-areas:"stack"; overflow:hidden; border-radius:50%; position:relative; background:var(--bg); transition:--c1 0.8s ease-in-out,--c2 0.8s ease-in-out,--c3 0.8s ease-in-out,--bg 0.8s ease-in-out,width 0.08s ease-out,height 0.08s ease-out; }
+              .siri-orb::before,.siri-orb::after { content:""; display:block; grid-area:stack; width:100%; height:100%; border-radius:50%; }
+              .siri-orb::before { background: conic-gradient(from calc(var(--angle)*2) at 25% 70%,var(--c3),transparent 20% 80%,var(--c3)),conic-gradient(from calc(var(--angle)*2) at 45% 75%,var(--c2),transparent 30% 60%,var(--c2)),conic-gradient(from calc(var(--angle)*-3) at 80% 20%,var(--c1),transparent 40% 60%,var(--c1)),conic-gradient(from calc(var(--angle)*2) at 15% 5%,var(--c2),transparent 10% 90%,var(--c2)),conic-gradient(from calc(var(--angle)*1) at 20% 80%,var(--c1),transparent 10% 90%,var(--c1)),conic-gradient(from calc(var(--angle)*-2) at 85% 10%,var(--c3),transparent 20% 80%,var(--c3)); box-shadow:inset var(--bg) 0 0 var(--shadow-spread) calc(var(--shadow-spread)*0.2); filter:blur(var(--blur-amount)) contrast(var(--contrast-amount)); animation:rotate var(--animation-duration) linear infinite; }
+              .siri-orb[data-state="idle"]::before { animation:rotate var(--animation-duration) linear infinite,breathe 2.5s ease-in-out infinite; }
+              .siri-orb::after { background-image:radial-gradient(circle at center,rgba(255,255,255,0.35) var(--dot-size),transparent var(--dot-size)); background-size:calc(var(--dot-size)*2.5) calc(var(--dot-size)*2.5); backdrop-filter:blur(calc(var(--blur-amount)*1.5)) contrast(calc(var(--contrast-amount)*1.5)); mix-blend-mode:overlay; }
+              .siri-orb[style*="--mask-radius: 0%"]::after { mask-image:none; }
+              .siri-orb:not([style*="--mask-radius: 0%"])::after { mask-image:radial-gradient(black var(--mask-radius),transparent 75%); }
+              @keyframes rotate { to { --angle:360deg; } }
+              @keyframes breathe { 0%,100% { opacity:0.7; transform:scale(0.94); } 50% { opacity:1; transform:scale(1.06); } }
+              @keyframes orbHaloBreath { 0%,100% { opacity:0.35; transform:scale(0.85); } 50% { opacity:1; transform:scale(1.16); } }
+              @keyframes fastPing { 0% { transform:scale(1); opacity:0.9; } 100% { transform:scale(2.6); opacity:0; } }
+              @keyframes spin { to { transform:rotate(360deg); } }
+              @media (prefers-reduced-motion:reduce) { .siri-orb::before { animation:none; } }
+            `}</style>
+          </div>
+
+          {/* ── SOUND WAVE BARS — reactive to audioLevel ── */}
+          {state === 'speaking' && (
+            <div className="absolute top-[calc(100%+8px)] flex items-center justify-center gap-[3px] h-6">
+              {[0.4, 0.7, 1.0, 0.85, 0.6, 0.9, 0.5, 0.75, 0.45, 0.8].map((h, i) => (
+                <div
+                  key={i}
+                  style={{
+                    width: '3px',
+                    height: `${(h + audioLevel * 0.5) * 16}px`,
+                    borderRadius: '2px',
+                    background: `rgba(6, 182, 212, ${0.5 + audioLevel * 0.5})`,
+                    animation: `soundBar 0.${4 + (i % 4)}s ease-in-out infinite alternate`,
+                    animationDelay: `${i * 0.07}s`,
+                    transition: 'height 0.08s ease-out',
+                  }}
+                />
+              ))}
+              <style>{`
+                @keyframes soundBar {
+                  from { transform: scaleY(0.3); opacity: 0.5; }
+                  to   { transform: scaleY(1.0); opacity: 1.0; }
+                }
+              `}</style>
+            </div>
+          )}
         </div>
       </div>
     </div>
