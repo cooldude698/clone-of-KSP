@@ -184,6 +184,46 @@ const TYPE_BADGES = {
   cctv:             { label: 'CCTV',    className: 'bg-steel-600/60 text-paper-100/60 border-steel-600/50' },
 };
 
+// ─── Live Incident Ticker ────────────────────────────────────────────────────
+const LIVE_INCIDENTS = [
+  "🔴 CAM-BLR-0012 · FACE MATCH ALERT — Ramesh Kumar (SUS-8842) spotted MG Road 14:32:07",
+  "🟡 CAM-BLR-0015 · ANPR TRIGGERED — KA-05-NB-1102 matches stolen vehicle watchlist",
+  "🔵 CAM-BLR-0010 · PLATE READ — KA-01-MJ-8821 · Owner: Suresh K · Status: FLAGGED",
+  "🔴 CAM-BLR-0042 · FACE MATCH — Suresh Naidu (SUS-7104) co-accused Koramangala 14:28:51",
+  "🟢 CAM-BLR-0035 · Patrol unit KSP-04 confirmed en route Silk Board junction",
+  "🟡 CAM-BLR-0010 · Suspicious stationary vehicle >8 min · Initiating extended scan",
+];
+
+function LiveIncidentTicker() {
+  return (
+    <div className="w-full overflow-hidden bg-critical-500/10 border border-critical-500/30 rounded-xl py-2 mb-4">
+      <div style={{ display: 'flex', animation: 'tickerScroll 28s linear infinite', whiteSpace: 'nowrap' }}>
+        {[...LIVE_INCIDENTS, ...LIVE_INCIDENTS].map((item, i) => (
+          <span key={i} className="inline-block px-10 text-xs font-mono text-critical-500 font-bold border-r border-critical-500/20">
+            {item}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Detection Event Log data ────────────────────────────────────────────────
+const INITIAL_EVENTS = [
+  { time: '14:32:07', cam: 'CAM-BLR-0012', type: 'FACE',   severity: 'critical', desc: 'Ramesh Kumar (SUS-8842) — Conf: 96.1%' },
+  { time: '14:29:44', cam: 'CAM-BLR-0015', type: 'ANPR',   severity: 'warn',     desc: 'KA-05-NB-1102 · Stolen Motorbike Match' },
+  { time: '14:28:51', cam: 'CAM-BLR-0042', type: 'FACE',   severity: 'critical', desc: 'Suresh Naidu (SUS-7104) — Conf: 92.8%' },
+  { time: '14:25:13', cam: 'CAM-BLR-0010', type: 'ANPR',   severity: 'warn',     desc: 'KA-01-MJ-8821 · Active Watchlist Flag' },
+  { time: '14:21:03', cam: 'CAM-BLR-0035', type: 'PATROL', severity: 'info',     desc: 'Patrol Unit KSP-04 Check-in · Silk Board' },
+];
+
+const AUTO_EVENTS = [
+  { cam: 'CAM-BLR-0015', type: 'ANPR',   severity: 'info', desc: 'KA-03-AB-2291 · Clear — No alerts' },
+  { cam: 'CAM-BLR-0010', type: 'ANPR',   severity: 'warn', desc: 'KA-01-XY-9981 · Secondary watchlist match' },
+  { cam: 'CAM-BLR-0042', type: 'FACE',   severity: 'info', desc: 'Unknown subject scanned — No DB match' },
+  { cam: 'CAM-BLR-0035', type: 'PATROL', severity: 'info', desc: 'Patrol sector sweep complete — No incidents' },
+];
+
 
 // ─── ANPR Canvas: top-down road, vehicles moving, plate-reader flash ──────────
 function ANPRCanvas() {
@@ -657,6 +697,10 @@ function CameraCard({ cam, onInspect }) {
 export default function SurveillancePage() {
   const [filter, setFilter] = useState('all');
   const [activeCamModal, setActiveCamModal] = useState(null);
+  const [snapshotResult, setSnapshotResult] = useState(null);
+
+  // ── Detection Event Log state ───────────────────────────────────────────────
+  const [detectionLog, setDetectionLog] = useState(INITIAL_EVENTS);
 
   // ── ANPR Plate Search state ─────────────────────────────────────────────────
   const [plateInput, setPlateInput]   = useState('');
@@ -698,6 +742,19 @@ export default function SurveillancePage() {
     }
   };
 
+  // ── Auto-append detection events ────────────────────────────────────────────
+  useEffect(() => {
+    let idx = 0;
+    const id = setInterval(() => {
+      const evt = AUTO_EVENTS[idx % AUTO_EVENTS.length];
+      const now = new Date();
+      const time = now.toTimeString().split(' ')[0];
+      setDetectionLog(prev => [{ ...evt, time }, ...prev].slice(0, 20));
+      idx++;
+    }, 18000 + Math.random() * 12000);
+    return () => clearInterval(id);
+  }, []);
+
   const filtered = MOCK_CAMERAS.filter((c) => {
     if (filter === 'active') return c.is_active;
     if (filter === 'anpr') return c.has_anpr;
@@ -720,6 +777,10 @@ export default function SurveillancePage() {
             rgba(0, 0, 0, 0.4)
           );
           background-size: 100% 4px;
+        }
+        @keyframes tickerScroll {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
         }
       `}</style>
 
@@ -744,6 +805,9 @@ export default function SurveillancePage() {
           </div>
         </div>
       </div>
+
+      {/* ── LIVE INCIDENT TICKER ──────────────────────────────────────────────── */}
+      <LiveIncidentTicker />
 
       {/* ── ANPR PLATE SEARCH WIDGET ─────────────────────────────────────────── */}
       <div className="glass-card rounded-2xl border border-steel-600/50 bg-steel-700/60 overflow-hidden">
@@ -957,6 +1021,71 @@ export default function SurveillancePage() {
         ))}
       </div>
 
+      {/* ── DETECTION EVENT LOG ───────────────────────────────────────────────── */}
+      <div className="glass-card rounded-2xl border border-steel-600/50 bg-steel-700/60 overflow-hidden">
+        {/* Log Header */}
+        <div className="flex items-center justify-between px-5 py-3 border-b border-steel-600/40 bg-void-000/20">
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-lg bg-critical-500/15 flex items-center justify-center border border-critical-500/30">
+              <ShieldAlert className="w-3.5 h-3.5 text-critical-500" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-paper-100 font-mono uppercase tracking-widest">Detection Event Log</h3>
+              <p className="text-[10px] text-paper-100/40">Live AI detections · Face match · ANPR · Patrol check-in</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-critical-500 animate-ping" />
+            <span className="text-[10px] font-mono font-bold text-critical-500 uppercase">LIVE FEED</span>
+          </div>
+        </div>
+
+        {/* Log Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs font-mono">
+            <thead>
+              <tr className="border-b border-steel-600/30 text-paper-100/40 text-[10px] uppercase tracking-widest">
+                <th className="px-5 py-2.5 text-left font-bold">Time</th>
+                <th className="px-3 py-2.5 text-left font-bold">Camera</th>
+                <th className="px-3 py-2.5 text-left font-bold">Type</th>
+                <th className="px-3 py-2.5 text-left font-bold">Severity</th>
+                <th className="px-3 py-2.5 text-left font-bold flex-1">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {detectionLog.map((evt, i) => {
+                const sevCfg = {
+                  critical: { dot: 'bg-critical-500',  text: 'text-critical-500',  badge: 'bg-critical-500/15 text-critical-500 border-critical-500/30', row: 'bg-critical-500/5 hover:bg-critical-500/10' },
+                  warn:     { dot: 'bg-warn-500',      text: 'text-warn-500',      badge: 'bg-warn-500/15 text-warn-500 border-warn-500/30',             row: 'bg-warn-500/5 hover:bg-warn-500/10' },
+                  info:     { dot: 'bg-phosphor-500',  text: 'text-phosphor-500',  badge: 'bg-phosphor-500/15 text-phosphor-500 border-phosphor-500/30', row: 'hover:bg-steel-600/20' },
+                }[evt.severity] || {};
+                const typeCfg = {
+                  FACE:   'text-warn-500 bg-warn-500/10 border-warn-500/30',
+                  ANPR:   'text-phosphor-500 bg-phosphor-500/10 border-phosphor-500/30',
+                  PATROL: 'text-paper-100/60 bg-steel-600/40 border-steel-600/40',
+                }[evt.type] || 'text-paper-100/50 bg-steel-700 border-steel-600';
+                return (
+                  <tr key={i} className={`border-b border-steel-600/20 transition-colors ${sevCfg.row} ${i === 0 ? 'animate-fade-in' : ''}`}>
+                    <td className="px-5 py-2.5 font-bold text-paper-100/80">{evt.time}</td>
+                    <td className="px-3 py-2.5 text-paper-100/60">{evt.cam}</td>
+                    <td className="px-3 py-2.5">
+                      <span className={`px-2 py-0.5 rounded border text-[9px] font-bold uppercase ${typeCfg}`}>{evt.type}</span>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <span className={`flex items-center gap-1.5 ${sevCfg.text}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${sevCfg.dot} ${evt.severity === 'critical' ? 'animate-ping' : ''}`} />
+                        {evt.severity.toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5 text-paper-100/70">{evt.desc}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       {/* Fullscreen Camera Inspection Modal */}
       {activeCamModal && (
         <>
@@ -1027,13 +1156,55 @@ export default function SurveillancePage() {
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => alert(`Snapshot captured for ${activeCamModal.id}`)}
+                  onClick={() => {
+                    if (!activeCamModal) return;
+                    const suspects = {
+                      'CAM-BLR-0012': { name: 'RAMESH KUMAR',  id: 'SUS-8842', risk: 94, match: 96.1, ipc: 'IPC §379 §34' },
+                      'CAM-BLR-0042': { name: 'SURESH NAIDU',  id: 'SUS-7104', risk: 88, match: 92.8, ipc: 'IPC §392 §34' },
+                    };
+                    const result = suspects[activeCamModal.id] || {
+                      name: 'UNKNOWN SUBJECT',
+                      id: 'UNIDENTIFIED',
+                      risk: 0,
+                      match: 0,
+                      ipc: 'N/A',
+                    };
+                    setSnapshotResult({ ...result, cam: activeCamModal.id, time: new Date().toTimeString().split(' ')[0] });
+                  }}
                   className="px-3 py-1.5 rounded-lg bg-steel-600 hover:bg-steel-600/80 text-paper-100 font-bold transition-all"
                 >
-                  📸 Take Snapshot
+                  📸 Snapshot + Analyse
                 </button>
               </div>
             </div>
+
+            {/* Snapshot Result Panel */}
+            {snapshotResult && (
+              <div className="px-6 py-4 bg-void-000 border-t border-steel-600 font-mono text-xs">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-lg bg-steel-700 border-2 border-critical-500/60 flex items-center justify-center shrink-0">
+                    <span className="text-2xl">👤</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-critical-500 font-bold text-sm">{snapshotResult.name}</div>
+                    <div className="text-paper-100/50 mt-0.5">ID: {snapshotResult.id} · Cam: {snapshotResult.cam} · Captured: {snapshotResult.time}</div>
+                    {snapshotResult.risk > 0 && (
+                      <>
+                        <div className="text-warn-500 mt-1">Risk Score: {snapshotResult.risk}/100 · Face Match: {snapshotResult.match}%</div>
+                        <div className="text-phosphor-500">Charges: {snapshotResult.ipc}</div>
+                      </>
+                    )}
+                    {snapshotResult.risk === 0 && (
+                      <div className="text-paper-100/40 mt-1">No match found in biometric database</div>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setSnapshotResult(null)}
+                    className="text-paper-100/30 hover:text-paper-100 transition-colors text-lg leading-none shrink-0"
+                  >✕</button>
+                </div>
+              </div>
+            )}
 
           </div>
         </>
