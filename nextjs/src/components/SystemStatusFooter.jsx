@@ -80,10 +80,10 @@ export default function SystemStatusFooter() {
   }, [checkStatus]);
 
   return (
-    <footer className="w-full bg-[#0a0c0a] border-t border-steel-600/40 px-6 py-2 flex flex-col md:flex-row items-center justify-between text-[11px] font-mono text-paper-100/60 gap-3">
+    <footer className="w-full bg-slate-50 dark:bg-[#0a0c0a] border-t border-slate-200 dark:border-steel-600/40 px-6 py-2 flex flex-col md:flex-row items-center justify-between text-[11px] font-mono text-slate-500 dark:text-paper-100/60 gap-3">
       <div className="flex items-center gap-2">
         <Activity className="w-3.5 h-3.5 text-phosphor-500 animate-pulse" />
-        <span className="font-bold tracking-wider uppercase text-paper-100/90">System Status:</span>
+        <span className="font-bold tracking-wider uppercase text-slate-800 dark:text-paper-100/90">System Status:</span>
         {!initialized ? (
           <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-steel-600/40 text-paper-100/40 border border-steel-600/60 uppercase">
             Checking…
@@ -97,8 +97,8 @@ export default function SystemStatusFooter() {
             LIVE MATRIX
           </span>
         )}
-        <span className="text-paper-100/30">|</span>
-        <span className="text-paper-100/50">Karnataka State Police Command Grid</span>
+        <span className="text-slate-300 dark:text-paper-100/30">|</span>
+        <span className="text-slate-500 dark:text-paper-100/50">Karnataka State Police Command Grid</span>
       </div>
 
       <div className="flex items-center flex-wrap gap-4">
@@ -109,14 +109,14 @@ export default function SystemStatusFooter() {
             <div key={key} className="flex items-center gap-1.5">
               <span className={`w-1.5 h-1.5 rounded-full ${
                 !initialized
-                  ? 'bg-paper-100/20'
+                  ? 'bg-slate-300 dark:bg-paper-100/20'
                   : isDemo
                   ? 'bg-warn-500 animate-pulse'
                   : 'bg-success-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]'
               }`} />
-              <span className="text-paper-100/80">{service.name}:</span>
+              <span className="text-slate-600 dark:text-paper-100/80">{service.name}:</span>
               <span className={`font-semibold ${
-                !initialized ? 'text-paper-100/30' : isDemo ? 'text-warn-500' : 'text-success-500'
+                !initialized ? 'text-slate-400 dark:text-paper-100/30' : isDemo ? 'text-warn-500' : 'text-success-500'
               }`}>
                 {initialized ? service.mode : '…'}
               </span>
@@ -125,7 +125,7 @@ export default function SystemStatusFooter() {
         })}
         <button
           onClick={checkStatus}
-          className="p-1 hover:text-paper-100 transition-colors ml-1"
+          className="p-1 text-slate-400 hover:text-slate-900 dark:text-paper-100/40 dark:hover:text-paper-100 transition-colors ml-1"
           title="Refresh Services Status"
         >
           <RefreshCw className="w-3 h-3" />
