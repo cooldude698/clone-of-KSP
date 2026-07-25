@@ -42,8 +42,8 @@ const CONTRAST_MIN_FINAL = 1.5;
 // Deep space background with high-vibrancy neon colors for maximum color fusion
 const STATE_MAPPING = {
   idle: {
-    size: "140px",
-    compactSize: "60px",
+    size: "105px",
+    compactSize: "45px",
     colors: {
       bg: "#040817",
       c1: "oklch(60% 0.22 260)",
@@ -54,8 +54,8 @@ const STATE_MAPPING = {
     glowColor: 'rgba(99, 102, 241, 0.22)',
   },
   listening: {
-    size: "185px",
-    compactSize: "60px",
+    size: "138px",
+    compactSize: "45px",
     colors: {
       bg: "#020f13",
       c1: "oklch(70% 0.25 140)",
@@ -66,8 +66,8 @@ const STATE_MAPPING = {
     glowColor: 'rgba(16, 185, 129, 0.32)',
   },
   thinking: {
-    size: "160px",
-    compactSize: "60px",
+    size: "120px",
+    compactSize: "45px",
     colors: {
       bg: "#0d0a08",
       c1: "oklch(68% 0.25 45)",
@@ -78,8 +78,8 @@ const STATE_MAPPING = {
     glowColor: 'rgba(251, 191, 36, 0.24)',
   },
   speaking: {
-    size: "165px",
-    compactSize: "60px",
+    size: "124px",
+    compactSize: "45px",
     colors: {
       bg: "#050718",
       c1: "oklch(70% 0.22 215)",
@@ -277,11 +277,11 @@ const DrishtiOrb = ({
 
   // Full mode: fixed bottom-right with label
   return (
-    <div className="fixed bottom-8 right-8 z-[9999] flex flex-col items-center select-none gap-3">
+    <div className="fixed bottom-4 right-4 z-[9999] flex flex-col items-center select-none gap-2">
 
       {/* ── TRANSCRIPT / RESPONSE BUBBLE — appears above orb ── */}
       {(liveTranscript || pendingTranscript || orbResponse) && (
-        <div className="w-80 rounded-2xl overflow-hidden mb-2 animate-fade-in shadow-2xl relative">
+        <div className="w-64 rounded-2xl overflow-hidden mb-1.5 animate-fade-in shadow-2xl relative">
           {/* subtle glow behind bubble */}
           <div className="absolute inset-0 bg-white/5 blur-xl pointer-events-none" />
           <div
@@ -373,7 +373,7 @@ const DrishtiOrb = ({
             background: 'rgba(5, 5, 5, 0.7)',
             backdropFilter: 'blur(24px)',
           }}
-          className="w-80 rounded-2xl border border-white/10 shadow-2xl px-4 py-3 flex items-center gap-3 mb-2 animate-fade-in"
+          className="w-64 rounded-2xl border border-white/10 shadow-2xl px-3 py-2 flex items-center gap-2 mb-1.5 animate-fade-in"
         >
           <input
             autoFocus
@@ -409,7 +409,7 @@ const DrishtiOrb = ({
         <div
           className="absolute rounded-full pointer-events-none"
           style={{
-            inset: state === 'idle' ? '-32px' : '-22px',
+            inset: state === 'idle' ? '-24px' : '-16px',
             background: `radial-gradient(circle, ${currentConfig.glowColor || 'rgba(99,102,241,0.15)'} 0%, transparent 68%)`,
             animation: state === 'idle'
               ? 'orbHaloBreath 2.5s ease-in-out infinite'
@@ -428,16 +428,16 @@ const DrishtiOrb = ({
             <div className="absolute inset-0 rounded-full border-2 border-emerald-400/80"
               style={{ animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite' }} />
             <div className="absolute rounded-full border-2 border-emerald-400/50"
-              style={{ inset: '-12px', animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite', animationDelay: '0.28s' }} />
+              style={{ inset: '-9px', animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite', animationDelay: '0.28s' }} />
             <div className="absolute rounded-full border border-emerald-300/25"
-              style={{ inset: '-24px', animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite', animationDelay: '0.56s' }} />
+              style={{ inset: '-18px', animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite', animationDelay: '0.56s' }} />
           </>
         )}
 
         {/* Thinking — spinning orbit ring */}
         {state === 'thinking' && (
           <div className="absolute rounded-full border-2 border-amber-400/30 border-t-amber-400"
-            style={{ inset: '-10px', animation: 'spin 1.1s linear infinite' }} />
+            style={{ inset: '-8px', animation: 'spin 1.1s linear infinite' }} />
         )}
         <div
           data-state={state}
