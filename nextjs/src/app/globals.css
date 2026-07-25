@@ -1,58 +1,30 @@
 /* ═══════════════════════════════════════════════════════
-   DRISHTI — "Graphite & Oxblood" Design System
-   Fonts: Manrope (UI) · JetBrains Mono (data) · Noto Sans Kannada
+   DRISHTI — Tactical AI Co-Pilot Design System
+   Fonts: Montserrat (Headlines) · Google Sans / Plus Jakarta Sans (Body) · JetBrains Mono (Data) · Noto Sans Kannada
    ═══════════════════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Kannada:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ─── LIGHT MODE (default) ──────────────────────────────── */
+/* ─── LIGHT MODE ────────────────────────────────────────── */
 :root {
-  --surface-0:        #F4F3F0;
+  --surface-0:        #F4F5F8;
   --surface-1:        #FFFFFF;
-  --border:           #DEDBD4;
-  --text-primary:     #1A1A1A;
-  --text-secondary:   #5C5A54;
-  --accent:           #6E2029;
-  --accent-warm:      #6B6142;
-  --status-critical:  #A33F36;
-  --status-warning:   #8F7430;
-  --status-success:   #3F6B45;
-
-  /* ── Legacy aliases (keeps existing Tailwind classes working) ── */
-  --color-void-000:       var(--surface-0);
-  --color-steel-700:      var(--surface-1);
-  --color-steel-600:      var(--border);
-  --color-phosphor-500:   var(--accent);
-  --color-warn-500:       var(--status-warning);
-  --color-critical-500:   var(--status-critical);
-  --color-stamp-red-500:  var(--status-critical);
-  --color-success-500:    var(--status-success);
-  --color-paper-100:      var(--text-primary);
-
-  --scroll-track: #ECEAE5;
-  --scroll-thumb: #C4C1B8;
-
-  /* ── Design tokens ── */
-  --radius-sm:   4px;
-  --radius-md:   6px;
-  --radius-lg:   8px;
-}
-
-/* ─── DARK MODE ──────────────────────────────────────────── */
-.dark, [data-theme="dark"] {
-  --surface-0:        #15161A;
-  --surface-1:        #1E2024;
-  --border:           #2E3036;
-  --text-primary:     #F1EFEA;
-  --text-secondary:   #9B9994;
-  --accent:           #8C2F39;
-  --accent-warm:      #8A7F5C;
-  --status-critical:  #B84C42;
-  --status-warning:   #B5923F;
-  --status-success:   #5E8A63;
+  --surface-2:        #EAECEF;
+  --border:           #D5D9E2;
+  --border-subtle:    #E2E6EE;
+  --text-primary:     #0F172A;
+  --text-secondary:   #475569;
+  --accent:           #7C2D37;
+  --accent-light:     #9E3A47;
+  --accent-glow:      rgba(124, 45, 55, 0.25);
+  --cyan-accent:      #0284C7;
+  --cyan-glow:        rgba(2, 132, 199, 0.2);
+  --status-critical:  #DC2626;
+  --status-warning:   #D97706;
+  --status-success:   #16A34A;
 
   /* ── Legacy aliases ── */
   --color-void-000:       var(--surface-0);
@@ -65,8 +37,45 @@
   --color-success-500:    var(--status-success);
   --color-paper-100:      var(--text-primary);
 
-  --scroll-track: #15161A;
-  --scroll-thumb: #2E3036;
+  --scroll-track: #EAECEF;
+  --scroll-thumb: #CBD5E1;
+
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+}
+
+/* ─── DARK MODE (DEFAULT HIGH-TECH SURVEILLANCE) ────────── */
+.dark, [data-theme="dark"] {
+  --surface-0:        #0A0D12;
+  --surface-1:        #121620;
+  --surface-2:        #1A202C;
+  --border:           #242B3B;
+  --border-subtle:    #1B2232;
+  --text-primary:     #F8FAFC;
+  --text-secondary:   #94A3B8;
+  --accent:           #9E2A38;
+  --accent-light:     #BE3849;
+  --accent-glow:      rgba(158, 42, 56, 0.35);
+  --cyan-accent:      #38BDF8;
+  --cyan-glow:        rgba(56, 189, 248, 0.25);
+  --status-critical:  #EF4444;
+  --status-warning:   #F59E0B;
+  --status-success:   #22C55E;
+
+  /* ── Legacy aliases ── */
+  --color-void-000:       var(--surface-0);
+  --color-steel-700:      var(--surface-1);
+  --color-steel-600:      var(--border);
+  --color-phosphor-500:   var(--accent);
+  --color-warn-500:       var(--status-warning);
+  --color-critical-500:   var(--status-critical);
+  --color-stamp-red-500:  var(--status-critical);
+  --color-success-500:    var(--status-success);
+  --color-paper-100:      var(--text-primary);
+
+  --scroll-track: #0A0D12;
+  --scroll-thumb: #242B3B;
 }
 
 * {
@@ -75,73 +84,215 @@
   margin: 0;
 }
 
+/* ═══════════════════════════════════════════════════════
+   STRICT DUAL-FONT REWIRING (MONTSERRAT & GOOGLE SANS ONLY)
+   ═══════════════════════════════════════════════════════ */
+
+/* 1. Universal Body, Text, Controls, Forms, Navigation & Badges (Google Sans) */
+*,
+*::before,
+*::after,
+html,
+body,
+p,
+span,
+a,
+input,
+select,
+textarea,
+option,
+label,
+li,
+td,
+th,
+div,
+form,
+button,
+nav,
+aside,
+main,
+section,
+header,
+footer,
+.font-sans,
+.font-mono,
+.font-data,
+.badge,
+.btn-primary,
+.btn-secondary {
+  font-family: var(--font-google-sans), 'Google Sans', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* 2. All Headlines, Section Titles, Brand Logo & Card Headers (Montserrat ONLY) */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+h1 *,
+h2 *,
+h3 *,
+h4 *,
+h5 *,
+h6 *,
+.font-headline,
+.font-heading,
+.font-title,
+.heading-text,
+.case-stamp,
+.brand-title,
+.card-header,
+.modal-header {
+  font-family: var(--font-montserrat), 'Montserrat', 'Google Sans', sans-serif !important;
+  letter-spacing: -0.015em;
+}
+
+/* Code block exemption */
+code,
+pre {
+  font-family: 'JetBrains Mono', 'Courier New', monospace !important;
+}
+
+/* Kannada font exemption */
+.font-kannada {
+  font-family: 'Noto Sans Kannada', var(--font-google-sans), sans-serif !important;
+}
+
 html,
 body {
   max-width: 100vw;
   background-color: var(--surface-0);
   color: var(--text-primary);
-  /* Manrope for all UI text. JetBrains Mono only via .font-data utility. */
-  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-feature-settings: 'cv01', 'cv02', 'cv03', 'cv04';
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+
+
 /* Scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: var(--scroll-track);
 }
 ::-webkit-scrollbar-thumb {
   background: var(--scroll-thumb);
-  border-radius: 4px;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent);
 }
 
 /* ═══════════════════════════════════════════════════════
-   TYPOGRAPHY UTILITIES
+   ADVANCED TACTICAL & GLASS UTILITIES
    ═══════════════════════════════════════════════════════ */
 
-/* JetBrains Mono — data only: FIR numbers, timestamps, coords, camera IDs */
+/* High-tech glass card */
+.glass-panel {
+  background: rgba(18, 22, 32, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+:root:not(.dark) .glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.08);
+}
+
+/* Glow Border & Accents */
+.glow-card {
+  position: relative;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glow-card:hover {
+  border-color: var(--cyan-accent);
+  box-shadow: 0 0 20px -3px var(--cyan-glow);
+}
+
+.glow-accent {
+  box-shadow: 0 0 25px -4px var(--accent-glow);
+}
+
+/* Tactical scan grid */
+.cyber-grid-bg {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+:root:not(.dark) .cyber-grid-bg {
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+}
+
+/* Pulse beacon indicator */
+.beacon-dot {
+  position: relative;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--status-critical);
+}
+.beacon-dot::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--status-critical);
+  animation: beaconPulse 1.8s infinite cubic-bezier(0, 0.2, 0.8, 1);
+}
+
+@keyframes beaconPulse {
+  0% { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* JetBrains Mono — data only */
 .font-data,
 .font-mono {
   font-family: 'JetBrains Mono', 'Courier New', monospace;
   font-variant-numeric: tabular-nums;
 }
 
-/* Noto Sans Kannada — Kannada UI strings only */
+/* Noto Sans Kannada */
 .font-kannada {
   font-family: 'Noto Sans Kannada', 'Manrope', sans-serif;
 }
 
-/* ═══════════════════════════════════════════════════════
-   SURFACE & CARD UTILITIES
-   ═══════════════════════════════════════════════════════ */
-
-/* Standard card: surface-1 bg, hairline border, no shadow */
-.card {
+/* Standard card */
+.card, .glass-card {
   background: var(--surface-1);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Legacy alias — keeps existing components working */
-.glass-card {
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+.card:hover, .glass-card:hover {
+  border-color: rgba(56, 189, 248, 0.3);
 }
 
 /* ═══════════════════════════════════════════════════════
    STATUS BADGE UTILITIES
-   Status colors are ONLY for badges/tags — never card bg
    ═══════════════════════════════════════════════════════ */
+
 
 .badge {
   display: inline-flex;
