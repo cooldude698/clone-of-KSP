@@ -561,3 +561,13 @@ body {
   transform-origin: left center;
   backface-visibility: hidden;
 }
+
+/* Fix high-contrast text on primary backgrounds in light mode */
+.bg-phosphor-500.text-paper-100,
+.bg-phosphor-500 .text-paper-100,
+.bg-critical-500.text-paper-100,
+.bg-critical-500 .text-paper-100,
+.bg-success-500.text-paper-100,
+.bg-success-500 .text-paper-100 {
+  color: #FAF6F0 !important;
+}
