@@ -520,21 +520,26 @@ body {
 /* 3D Newspaper Opening & Unfolding Animations */
 @keyframes newspaperSpin {
   0% {
-    transform: translate(-50%, -50%) scale(0.05) rotate(-1440deg);
+    transform: scale(0.05) rotate(-720deg);
     opacity: 0;
     filter: blur(8px);
   }
   60% {
-    transform: translate(-50%, -50%) scale(1.05) rotate(0deg);
+    transform: scale(1.02) rotate(0deg);
     opacity: 1;
     filter: blur(0px);
   }
   80% {
-    transform: translate(-50%, -50%) scale(0.98);
+    transform: scale(0.99);
   }
   100% {
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1);
   }
+}
+
+.animate-newspaper-spin {
+  animation: newspaperSpin 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: center center;
 }
 
 @keyframes pageUnfold {
@@ -551,10 +556,8 @@ body {
   }
 }
 
-.animate-newspaper-spin {
-  animation: newspaperSpin 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  transform-origin: center center;
-}
+
+
 
 .animate-page-unfold {
   animation: pageUnfold 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both;
