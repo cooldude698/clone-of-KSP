@@ -243,7 +243,11 @@ export default function DashboardLayout({ children }) {
       setSessionLogs(prev => [...prev, { role: 'assistant', content: reply, timestamp: ts() }]);
       setOrbState('speaking');
       setStateOverrideLabel('Speaking');
-      speak(reply, language === 'en' ? 'en-IN' : language === 'kn' ? 'kn-IN' : 'hi-IN');
+      setOrbResponse(reply);
+
+      const ttsLang = targetLang === 'kn' ? 'kn-IN' : targetLang === 'hi' ? 'hi-IN' : 'en-IN';
+      const clean = reply.replace(/[|*#`]/g, ' ').replace(/\s+/g, ' ').trim();
+      safeSpeak(clean, ttsLang);
 
       // After 1.8s, automatically fire a follow-up intel query for this page
       if (localResult.followUpQuery) {
@@ -444,6 +448,19 @@ export default function DashboardLayout({ children }) {
   const safeSpeak = useCallback((text, lang) => {
     if (isMutedRef.current) return;
     speak(text, lang);
+
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      try {
+        window.speechSynthesis.cancel();
+        const utt = new SpeechSynthesisUtterance(text);
+        utt.lang = lang || 'en-IN';
+        utt.rate = 0.95;
+        utt.pitch = 1.0;
+        window.speechSynthesis.speak(utt);
+      } catch (e) {
+        console.warn('TTS speech trigger warning:', e);
+      }
+    }
   }, [speak]);
 
   const shouldSpeakOnLangChangeRef = useRef(false);
