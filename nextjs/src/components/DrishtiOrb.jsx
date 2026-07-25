@@ -126,6 +126,7 @@ const DrishtiOrb = ({
   const isDragging = React.useRef(false);
   const dragStart = React.useRef({ x: 0, y: 0 });
   const activePosition = React.useRef({ x: 0, y: 0 });
+  const currentPos = React.useRef({ x: 0, y: 0 });
   const hasMoved = React.useRef(false);
 
   // Mouse drag handlers
@@ -155,17 +156,21 @@ const DrishtiOrb = ({
     if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
       hasMoved.current = true;
     }
-    setPosition({
+    currentPos.current = {
       x: activePosition.current.x + dx,
       y: activePosition.current.y + dy
-    });
+    };
+    setPosition(currentPos.current);
   };
 
   const handleMouseUp = () => {
     if (isDragging.current) {
-      activePosition.current = { x: position.x, y: position.y };
+      activePosition.current = currentPos.current;
       isDragging.current = false;
       setPosition({ ...activePosition.current });
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('drishti_orb_position', JSON.stringify(activePosition.current));
+      }
     }
     window.removeEventListener('mousemove', handleMouseMove);
     window.removeEventListener('mouseup', handleMouseUp);
@@ -199,17 +204,21 @@ const DrishtiOrb = ({
     if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
       hasMoved.current = true;
     }
-    setPosition({
+    currentPos.current = {
       x: activePosition.current.x + dx,
       y: activePosition.current.y + dy
-    });
+    };
+    setPosition(currentPos.current);
   };
 
   const handleTouchEnd = () => {
     if (isDragging.current) {
-      activePosition.current = { x: position.x, y: position.y };
+      activePosition.current = currentPos.current;
       isDragging.current = false;
       setPosition({ ...activePosition.current });
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('drishti_orb_position', JSON.stringify(activePosition.current));
+      }
     }
     window.removeEventListener('touchmove', handleTouchMove);
     window.removeEventListener('touchend', handleTouchEnd);
@@ -226,13 +235,26 @@ const DrishtiOrb = ({
 
   useEffect(() => {
     setIsClient(true);
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem('drishti_orb_position');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setPosition(parsed);
+          activePosition.current = parsed;
+          currentPos.current = parsed;
+        } catch (err) {
+          // ignore
+        }
+      }
+    }
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [position]);
+  }, []);
 
   if (!isClient) return null;
 
