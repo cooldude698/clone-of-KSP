@@ -167,7 +167,7 @@ export default function InvestigatorWall({
           ) : (
             accused.map((item, idx) => (
               <motion.div
-                key={item.full_name}
+                key={`${item.full_name}-${idx}`}
                 variants={cardVariants}
                 className="group relative rounded-2xl bg-void-000/40 border border-steel-600/40 p-4 hover:border-critical-500/20 hover:bg-void-000/80 transition-all duration-200"
               >
@@ -377,9 +377,9 @@ export default function InvestigatorWall({
                   No victim information.
                 </div>
               ) : (
-                victims.map((item) => (
+                victims.map((item, idx) => (
                   <motion.div
-                    key={item.full_name}
+                    key={`${item.full_name}-${idx}`}
                     variants={cardVariants}
                     className="group rounded-2xl bg-void-000/40 border border-steel-600/40 p-4 hover:border-rose-500/20 hover:bg-void-000/80 transition-all duration-200"
                   >
@@ -426,9 +426,9 @@ export default function InvestigatorWall({
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
-                {related_firs.map((refFir) => (
+                {related_firs.map((refFir, idx) => (
                   <Link
-                    key={refFir.case_number}
+                    key={`${refFir.case_number}-${idx}`}
                     href={`/dashboard/fir/${refFir.case_number}`}
                     className="group rounded-2xl bg-void-000 border border-steel-600/40 p-4 hover:border-critical-500/35 hover:bg-void-000/20 transition-all duration-200 shadow-lg relative overflow-hidden block"
                   >
