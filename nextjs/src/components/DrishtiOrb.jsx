@@ -277,7 +277,7 @@ const DrishtiOrb = ({
 
   // Full mode: fixed bottom-right with label
   return (
-    <div className="fixed bottom-8 right-8 z-[9999] flex flex-col items-center select-none gap-2.5">
+    <div className="fixed bottom-16 right-8 z-[9999] flex flex-col items-center select-none gap-2.5">
 
       {/* ── TRANSCRIPT / RESPONSE BUBBLE — appears above orb ── */}
       {(liveTranscript || pendingTranscript || orbResponse) && (
