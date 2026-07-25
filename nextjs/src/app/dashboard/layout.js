@@ -34,23 +34,44 @@ const NAV_ITEMS = [
   { href: '/dashboard/trail',        icon: Navigation,      label: 'Geo Trail',      id: 'nav-trail' },
 ];
 
-// ─── Change 5: Local intent detector ─────────────────────────────────────────
+// ─── Local intent detector (expanded) ───────────────────────────────────────
 function detectLocalIntent(query) {
   const q = query.toLowerCase().trim();
-  if (q.includes('go to') || q.includes('open') || q.includes('show me')) {
-    if (q.includes('map') || q.includes('crime map'))
-      return { type: 'navigate', path: '/dashboard/map',          reply: 'Opening the Crime Map for you, Sir.' };
-    if (q.includes('analytic') || q.includes('trend'))
-      return { type: 'navigate', path: '/dashboard/analytics',    reply: 'Opening Analytics now.' };
-    if (q.includes('surveillance') || q.includes('camera'))
-      return { type: 'navigate', path: '/dashboard/surveillance', reply: 'Switching to Surveillance.' };
-    if (q.includes('network') || q.includes('graph'))
-      return { type: 'navigate', path: '/dashboard/network',      reply: 'Opening the Network Graph.' };
-    if (q.includes('chat') || q.includes('co-pilot'))
-      return { type: 'navigate', path: '/dashboard/chat',         reply: 'Opening Co-Pilot Chat.' };
-  }
-  if (['yes', 'yeah', 'sure', 'okay', 'ok'].includes(q))
+
+  // Navigation — many natural phrasings
+  const nav = (path, reply) => ({ type: 'navigate', path, reply });
+
+  if (/\b(map|crime map|hotspot|heatmap|location|where.*crime|crime.*where)\b/.test(q))
+    return nav('/dashboard/map', 'Opening the Crime Map, Sir.');
+
+  if (/\b(analytic|trend|graph|statistic|report|monthly|data)\b/.test(q))
+    return nav('/dashboard/analytics', 'Pulling up Analytics, Sir.');
+
+  if (/\b(camera|surveillance|cctv|feed|anpr|plate|video|watch)\b/.test(q))
+    return nav('/dashboard/surveillance', 'Switching to Surveillance, Sir.');
+
+  if (/\b(network|gang|connection|link|associate|syndicate|relation)\b/.test(q))
+    return nav('/dashboard/network', 'Opening the Network Graph, Sir.');
+
+  if (/\b(chat|copilot|co-pilot|assistant|ask|query|intelligence)\b/.test(q))
+    return nav('/dashboard/chat', 'Opening Co-Pilot Chat, Sir.');
+
+  if (/\b(fir|case|complaint|file|report)\b/.test(q) && /\b(list|show|all|recent|open)\b/.test(q))
+    return nav('/dashboard', 'Showing FIR overview, Sir.');
+
+  if (/\b(trail|track|route|vehicle route|geo trail)\b/.test(q))
+    return nav('/dashboard/trail', 'Opening Geo Trail Tracker, Sir.');
+
+  if (/\b(log|activity|audit|history)\b/.test(q))
+    return nav('/dashboard/logs', 'Opening Activity Logs, Sir.');
+
+  if (/\b(overview|home|dashboard|main|summary)\b/.test(q))
+    return nav('/dashboard', 'Going to Overview, Sir.');
+
+  // Confirmations
+  if (/^(yes|yeah|sure|okay|ok|do it|go ahead|proceed|affirmative)$/.test(q))
     return { type: 'confirm', reply: 'On it, Sir.' };
+
   return null;
 }
 
@@ -138,7 +159,7 @@ export default function DashboardLayout({ children }) {
     setStateOverrideLabel('Thinking…');
     setSessionLogs(prev => [...prev, { role: 'user', content: queryText, timestamp: ts() }]);
 
-    // ── Local intent check (Change 5) ──
+    // ── Local intent check ──
     const localResult = detectLocalIntent(queryText);
     if (localResult) {
       if (localResult.type === 'navigate') router.push(localResult.path);
@@ -155,6 +176,19 @@ export default function DashboardLayout({ children }) {
     const isKannadaInput = /[\u0C80-\u0CFF]/.test(queryText);
     const targetLang = isKannadaInput ? 'kn' : language;
 
+    // ── Jarvis-style cycling thinking labels ──
+    const thinkingLabels = [
+      'Scanning FIR database…',
+      'Cross-referencing ANPR…',
+      'Checking repeat offenders…',
+      'Building intelligence…',
+    ];
+    let labelIdx = 0;
+    const thinkingInterval = setInterval(() => {
+      labelIdx = (labelIdx + 1) % thinkingLabels.length;
+      setStateOverrideLabel(thinkingLabels[labelIdx]);
+    }, 1200);
+
     try {
       // ── Call askDrishtiAI (QuickML RAG primary, Gemini fallback, rawData last-resort) ──
       const res = await fetch('/server/askDrishtiAI/', {
@@ -163,8 +197,10 @@ export default function DashboardLayout({ children }) {
         body: JSON.stringify({
           question: queryText,
           lang: targetLang,
+          sessionHistory: sessionLogs.slice(-6).map(l => ({ role: l.role, content: l.content })),
         }),
       });
+      clearInterval(thinkingInterval);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
 
@@ -203,6 +239,7 @@ export default function DashboardLayout({ children }) {
         setStateOverrideLabel('');
       }
     } catch {
+      clearInterval(thinkingInterval);
       setOrbState('idle');
       setStateOverrideLabel('');
       const fallback = "I'm having trouble reaching the network right now, Sir. Please try again.";

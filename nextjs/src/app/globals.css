@@ -380,3 +380,8 @@ body {
   0%, 100% { top: 0%; opacity: 0.3; }
   50% { top: 92%; opacity: 1; }
 }
+
+@keyframes scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}

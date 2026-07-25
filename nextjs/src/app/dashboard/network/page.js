@@ -35,8 +35,10 @@ const MOCK_EDGES = DEMO_NETWORK_GRAPH.edges.map((e, i) => ({
   id: `e${i}`,
   source: e.source,
   target: e.target,
-  fir_case_number: e.target.startsWith('FIR') ? e.target : 'FIR-2026-BL-4921',
-  weight: 3
+  fir_case_number: e.target?.startsWith?.('FIR') ? e.target : 'FIR-2026-BL-4921',
+  label: e.relation || '',
+  weight: e.weight || 2,
+  crime_type: e.crime_type || undefined,
 }));
 
 export default function NetworkPage() {
@@ -67,7 +69,16 @@ export default function NetworkPage() {
           color: n.color || (n.type === 'case' || n.type === 'fir' ? '#2d83d9' : '#c8372d')
         }));
         setNodes(parsedNodes);
-        setEdges(data.edges || MOCK_EDGES);
+        const parsedEdges = (data.edges || MOCK_EDGES).map((e, i) => ({
+          id: `e${i}`,
+          source: e.source,
+          target: e.target,
+          fir_case_number: e.target?.startsWith?.('FIR') ? e.target : 'FIR-2026-BL-4921',
+          label: e.relation || e.label || '',
+          weight: e.weight || 2,
+          crime_type: e.crime_type || undefined,
+        }));
+        setEdges(parsedEdges);
       } else {
         setNodes(MOCK_NODES);
         setEdges(MOCK_EDGES);

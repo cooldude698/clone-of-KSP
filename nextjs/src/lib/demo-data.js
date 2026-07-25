@@ -275,19 +275,33 @@ export const DEMO_REPEAT_OFFENDERS = {
 
 export const DEMO_NETWORK_GRAPH = {
   nodes: [
-    { id: "SUS-8842", label: "Ramesh Kumar (SUS-8842)", type: "suspect", risk: 94, role: "Gang Leader" },
-    { id: "SUS-7104", label: "Suresh Naidu (SUS-7104)", type: "suspect", risk: 88, role: "Co-Accused" },
-    { id: "SUS-5921", label: "Imran Khan (SUS-5921)", type: "suspect", risk: 76, role: "Snatcher" },
-    { id: "FIR-2026-BL-4921", label: "FIR-2026-BL-4921", type: "fir", crime: "Vehicle Theft" },
-    { id: "FIR-2026-MY-1103", label: "FIR-2026-MY-1103", type: "fir", crime: "Armed Robbery" },
-    { id: "FIR-2026-BL-4920", label: "FIR-2026-BL-4920", type: "fir", crime: "Chain Snatching" }
+    { id: "SUS-8842", label: "Ramesh Kumar", type: "suspect", risk: 94, role: "Gang Leader", crime: "vehicle_theft", district: "South Bengaluru" },
+    { id: "SUS-7104", label: "Suresh Naidu", type: "suspect", risk: 88, role: "Co-Accused", crime: "robbery", district: "Mysuru" },
+    { id: "SUS-5921", label: "Imran Khan", type: "suspect", risk: 76, role: "Snatcher", crime: "chain_snatching", district: "Whitefield" },
+    { id: "SUS-4401", label: "Deepak Shetty", type: "suspect", risk: 71, role: "Vehicle Fence", crime: "vehicle_theft", district: "Yelahanka" },
+    { id: "SUS-3302", label: "Arun Gowda", type: "suspect", risk: 65, role: "Lookout", crime: "robbery", district: "Tumkur" },
+    { id: "SUS-2211", label: "Farid Mirza", type: "suspect", risk: 82, role: "Weapons Source", crime: "assault", district: "Central Bengaluru" },
+    { id: "SUS-1190", label: "Manoj Reddy", type: "suspect", risk: 59, role: "Driver", crime: "vehicle_theft", district: "Electronic City" },
+    { id: "FIR-2026-BL-4921", label: "FIR-4921\nVehicle Theft", type: "fir", crime: "vehicle_theft" },
+    { id: "FIR-2026-MY-1103", label: "FIR-1103\nArmed Robbery", type: "fir", crime: "robbery" },
+    { id: "FIR-2026-BL-4920", label: "FIR-4920\nChain Snatching", type: "fir", crime: "chain_snatching" },
+    { id: "FIR-2026-BL-5001", label: "FIR-5001\nAssault", type: "fir", crime: "assault" },
+    { id: "FIR-2026-YL-0234", label: "FIR-0234\nStolen Parts", type: "fir", crime: "vehicle_theft" },
   ],
   edges: [
-    { source: "SUS-8842", target: "FIR-2026-BL-4921", relation: "Primary Accused" },
-    { source: "SUS-8842", target: "SUS-7104", relation: "Co-Accused associate" },
-    { source: "SUS-7104", target: "FIR-2026-MY-1103", relation: "Primary Accused" },
-    { source: "SUS-7104", target: "SUS-5921", relation: "Fence Contact" },
-    { source: "SUS-5921", target: "FIR-2026-BL-4920", relation: "Primary Accused" }
+    { source: "SUS-8842", target: "FIR-2026-BL-4921", relation: "Primary Accused", weight: 5 },
+    { source: "SUS-8842", target: "SUS-7104", relation: "Gang Associate", weight: 4 },
+    { source: "SUS-8842", target: "SUS-4401", relation: "Sells stolen vehicles to", weight: 3 },
+    { source: "SUS-8842", target: "SUS-2211", relation: "Procures weapons from", weight: 4 },
+    { source: "SUS-7104", target: "FIR-2026-MY-1103", relation: "Primary Accused", weight: 5 },
+    { source: "SUS-7104", target: "SUS-5921", relation: "Operational Partner", weight: 4 },
+    { source: "SUS-7104", target: "SUS-3302", relation: "Uses as Lookout", weight: 2 },
+    { source: "SUS-5921", target: "FIR-2026-BL-4920", relation: "Primary Accused", weight: 5 },
+    { source: "SUS-5921", target: "SUS-1190", relation: "Getaway Driver", weight: 3 },
+    { source: "SUS-4401", target: "FIR-2026-YL-0234", relation: "Receiver of Stolen Goods", weight: 4 },
+    { source: "SUS-2211", target: "FIR-2026-BL-5001", relation: "Co-Accused", weight: 3 },
+    { source: "SUS-3302", target: "FIR-2026-MY-1103", relation: "Accessory", weight: 2 },
+    { source: "SUS-1190", target: "FIR-2026-BL-4921", relation: "Accessory (Driver)", weight: 2 },
   ]
 };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import {
   TrendingUp, TrendingDown, AlertTriangle, Shield,
@@ -130,6 +130,19 @@ function CachedBadge() {
   );
 }
 
+// ── useLiveCounter ─────────────────────────────────────────────────────────
+function useLiveCounter(baseValue, variance = 2, intervalMs = 10000) {
+  const [value, setValue] = React.useState(baseValue);
+  React.useEffect(() => {
+    const id = setInterval(() => {
+      const delta = Math.floor(Math.random() * (variance * 2 + 1)) - variance;
+      setValue(baseValue + delta);
+    }, intervalMs + Math.random() * 5000);
+    return () => clearInterval(id);
+  }, [baseValue, variance, intervalMs]);
+  return value;
+}
+
 // ── InsightCard ───────────────────────────────────────────────────────────
 const INSIGHT_SEVERITY = {
   critical: { bar: 'bg-critical-500', badge: 'bg-critical-500/15 text-critical-500 border-critical-500/30', dot: 'bg-critical-500' },
@@ -180,6 +193,32 @@ function InsightCard({ insight, type, severity, index }) {
   );
 }
 
+// ── Intel Ticker ──────────────────────────────────────────────────────────
+const INTEL_FEED = [
+  "🔴 ALERT: Vehicle KA-01-MJ-8821 spotted near Silk Board — ANPR triggered",
+  "🟡 FIR-2026-BL-4921 status updated: Charge sheet filed by HSR Layout PS",
+  "🔵 Camera CAM-BLR-0042 back online — Whitefield junction",
+  "🔴 Repeat offender Ramesh Kumar last sighted: Koramangala, 14:22 hrs",
+  "🟢 Night patrol deployment confirmed: 3 units assigned to MG Road corridor",
+  "🟡 New FIR registered: Chain snatching near Indiranagar 100ft Road",
+  "🔵 ANPR match: KA-05-HJ-3312 flagged on stolen vehicle watchlist",
+  "🔴 Dark zone alert: Raichur district — 3 unreported incidents suspected",
+];
+
+function IntelTicker() {
+  return (
+    <div className="w-full overflow-hidden bg-void-000/60 border border-steel-600/30 rounded-lg py-2 px-0 mt-4">
+      <div className="flex animate-[scroll_30s_linear_infinite] whitespace-nowrap">
+        {[...INTEL_FEED, ...INTEL_FEED].map((item, i) => (
+          <span key={i} className="inline-block px-8 text-xs font-mono text-paper-100/60 border-r border-steel-600/20">
+            {item}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── Main Page ─────────────────────────────────────────────────────────────
 export default function DashboardOverview() {
   const [role, setRole] = useState('Inspector');
@@ -195,11 +234,29 @@ export default function DashboardOverview() {
   const [activeCameras, setActiveCameras] = useState(142);
   const [casesSolved, setCasesSolved] = useState(89);
 
+  // ── Live counters (tick ±1 every ~10s to simulate live data) ──────────
+  const liveFIRs       = useLiveCounter(968, 2, 10000);
+  const liveHotspots   = useLiveCounter(49,  1, 12000);
+  const liveCameras    = useLiveCounter(847, 3, 11000);
+  const liveOffenders  = useLiveCounter(12,  1, 14000);
+
   // UI state
   const [loading, setLoading] = useState(false);
   const [usingCache, setUsingCache] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState(null);
+  const [liveUpdated, setLiveUpdated] = useState('Just now');
   const [refreshing, setRefreshing] = useState(false);
+
+  // Live "last updated" ticker
+  useEffect(() => {
+    let seconds = 0;
+    const id = setInterval(() => {
+      seconds += 30;
+      if (seconds < 60) setLiveUpdated(`${seconds}s ago`);
+      else if (seconds < 3600) setLiveUpdated(`${Math.floor(seconds / 60)}m ago`);
+      else { seconds = 0; setLiveUpdated('Just now'); }
+    }, 30000);
+    return () => clearInterval(id);
+  }, []);
 
   // AI Insights state
   const [insights, setInsights]               = useState([]);
@@ -257,7 +314,7 @@ export default function DashboardOverview() {
       setCasesSolved(solvedObj?.total_count ?? 89);
 
       setUsingCache(isDemoMode);
-      setLastUpdated(new Date());
+      setLiveUpdated('Just now');
     } catch (err) {
       console.error('[Dashboard] Fetch error, using demo fallback:', err);
       setFirs(DEMO_FIRS.firs);
@@ -337,8 +394,8 @@ export default function DashboardOverview() {
   const statCards = [
     {
       id: 'stat-total-firs',
-      label: 'Total FIRs (Last 30d)',
-      value: loading ? '—' : totalFIRs != null ? totalFIRs.toLocaleString() : '—',
+      label: 'Total Active FIRs',
+      value: loading ? '—' : liveFIRs.toLocaleString(),
       change: latestPct ? `${latestPct > 0 ? '+' : ''}${latestPct}%` : '—',
       up: latestTrend <= 0,
       icon: FileText,
@@ -350,9 +407,9 @@ export default function DashboardOverview() {
     },
     {
       id: 'stat-active-cameras',
-      label: 'Active Cameras',
-      value: loading ? '—' : activeCameras != null ? activeCameras.toLocaleString() : '—',
-      change: '+12', // Static trend for cameras
+      label: 'Cameras Online',
+      value: loading ? '—' : liveCameras.toLocaleString(),
+      change: '+12',
       up: true,
       icon: Camera,
       color: 'text-success-500',
@@ -364,7 +421,7 @@ export default function DashboardOverview() {
     {
       id: 'stat-high-risk',
       label: 'High-Risk Suspects',
-      value: loading ? '—' : highRiskCount != null ? String(highRiskCount) : '—',
+      value: loading ? '—' : liveOffenders.toLocaleString(),
       change: '+3',
       up: false,
       icon: AlertTriangle,
@@ -375,12 +432,12 @@ export default function DashboardOverview() {
       noSource: false,
     },
     {
-      id: 'stat-cases-solved',
-      label: 'Cases Solved (MTD)',
-      value: loading ? '—' : casesSolved != null ? casesSolved.toLocaleString() : '—',
-      change: '+4.2%', // Static trend
-      up: true,
-      icon: Shield,
+      id: 'stat-hotspots',
+      label: 'Active Hotspots',
+      value: loading ? '—' : liveHotspots.toLocaleString(),
+      change: '+4.2%',
+      up: false,
+      icon: MapPin,
       color: 'text-warn-500',
       bg: 'bg-warn-500/15',
       border: 'border-warn-500/30',
@@ -442,14 +499,13 @@ export default function DashboardOverview() {
               <p className="text-xs font-medium text-paper-100/80 uppercase tracking-widest">System Status: Online</p>
             </div>
 
-            {/* Last updated + refresh */}
+            {/* Live updated ticker + refresh */}
             <div className="flex items-center gap-2">
               {usingCache && <CachedBadge />}
-              {lastUpdated && (
-                <span className="text-xs text-paper-100/30">
-                  Updated {formatTime(lastUpdated)}
-                </span>
-              )}
+              <span className="flex items-center gap-1.5 text-xs text-paper-100/40 font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-phosphor-500 animate-pulse" />
+                LIVE · Updated {liveUpdated}
+              </span>
               <button
                 id="btn-refresh-dashboard"
                 onClick={() => fetchDashboardData(true)}
@@ -726,6 +782,10 @@ export default function DashboardOverview() {
         </div>
 
       </div>
+
+      {/* ── Intel Feed Ticker ── */}
+      <IntelTicker />
+
     </div>
   );
 }

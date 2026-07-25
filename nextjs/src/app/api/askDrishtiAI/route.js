@@ -206,6 +206,18 @@ async function translateText(text, sourceLang, targetLang) {
   return await translateWithGemini(text, sourceLang, targetLang);
 }
 
+const DRISHTI_SYSTEM_PROMPT =
+  'You are DRISHTI (ದೃಷ್ಟಿ), an elite AI crime intelligence officer embedded in the Karnataka State Police command system. You think fast, speak like a seasoned cop, and respect the officer\'s time.\n\n' +
+  'STRICT RULES:\n' +
+  '1. Keep answers SHORT — 2 to 4 sentences maximum unless the officer asks for detail.\n' +
+  '2. Lead with the most critical fact first. No preamble, no "certainly", no "of course".\n' +
+  '3. Always address the officer as "Sir".\n' +
+  '4. Quote IPC/BNS section numbers when relevant but don\'t explain them unless asked.\n' +
+  '5. If you can predict what the officer needs next, end with ONE proactive suggestion like: "Shall I pull up the suspect profile, Sir?"\n' +
+  '6. Never use bullet points or numbered lists unless explicitly asked.\n' +
+  '7. Never repeat information already discussed in this session.\n' +
+  '8. If something is unknown or unavailable, say so in one sentence.';
+
 async function callQuickML(question, knowledgeContext = '') {
   const token = process.env.QUICKML_OAUTH_TOKEN;
   const orgId = process.env.CATALYST_ORG_ID || '60073715607';
@@ -216,9 +228,10 @@ async function callQuickML(question, knowledgeContext = '') {
     ? token
     : `Zoho-oauthtoken ${token}`;
 
+  const systemPrefix = '[SYSTEM: You are DRISHTI, KSP\'s AI intelligence officer. Respond in 2-4 sentences max. Be direct. Address officer as Sir.]\n\n';
   const promptContent = knowledgeContext
-    ? `POLICE OFFICER QUERY: ${question}\n\nRELEVANT LIVE DATASTORE & POLICE KNOWLEDGE CONTEXT:\n${knowledgeContext}`
-    : question;
+    ? `${systemPrefix}POLICE OFFICER QUERY: ${question}\n\nRELEVANT LIVE DATASTORE & POLICE KNOWLEDGE CONTEXT:\n${knowledgeContext}`
+    : `${systemPrefix}${question}`;
 
   // Try QuickML endpoints & models sequentially
   const targets = [
@@ -266,25 +279,24 @@ async function callQuickML(question, knowledgeContext = '') {
 }
 
 // ── Groq fallback (fast, reliable, free tier) ─────────────────────────────
-async function callGroq(question, knowledgeContext = '') {
+async function callGroq(question, knowledgeContext = '', sessionHistory = []) {
   const token = process.env.GROQ_API_KEY;
   if (!token) throw new Error('GROQ_API_KEY not set');
-
-  const systemPrompt =
-    'You are DRISHTI (ದೃಷ್ಟಿ), the AI crime-intelligence assistant for the Karnataka State Police. ' +
-    'Answer factually, clearly, and concisely. Quote specific legal sections (IPC/BNS/IT Act) and SOPs when applicable. ' +
-    'Do NOT use Markdown. Speak directly as if reporting to a senior police officer.';
 
   const userContent = knowledgeContext
     ? `OFFICER QUERY: ${question}\n\nRELEVANT CONTEXT:\n${knowledgeContext}`
     : question;
+
+  // Cap session history at last 6 messages and insert before the current user message
+  const historyMessages = sessionHistory.slice(-6).map(h => ({ role: h.role, content: h.content }));
 
   const response = await axios.post(
     'https://api.groq.com/openai/v1/chat/completions',
     {
       model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
       messages: [
-        { role: 'system', content: systemPrompt },
+        { role: 'system', content: DRISHTI_SYSTEM_PROMPT },
+        ...historyMessages,
         { role: 'user', content: userContent },
       ],
       max_tokens: 800,
@@ -311,11 +323,17 @@ const GEMINI_KEYS = [
   'AIzaSyCZKZBcVvz5sVokO8ei__6plJBeqO2JWpU', // last-resort bundled key
 ].filter(Boolean);
 
-async function callGemini(question, knowledgeContext = '') {
+async function callGemini(question, knowledgeContext = '', sessionHistory = []) {
   const models = Array.from(new Set([process.env.GEMINI_MODEL, 'gemini-flash-latest', 'gemini-2.0-flash'])).filter(Boolean);
   const fullPrompt = knowledgeContext
     ? `${question}\n\n${knowledgeContext}`
     : question;
+
+  // Build Gemini contents array: history turns + current user message
+  const historyContents = sessionHistory.slice(-6).map(h => ({
+    role: h.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: h.content }],
+  }));
 
   let lastErr = null;
 
@@ -327,9 +345,12 @@ async function callGemini(question, knowledgeContext = '') {
           url,
           {
             system_instruction: {
-              parts: [{ text: 'You are DRISHTI (ದೃಷ್ಟಿ), the AI crime-intelligence assistant for the Karnataka State Police. Answer factually, clearly, and thoroughly with specific legal sections (IPC/BNS/IT Act) and SOP steps when applicable. Speak directly and concisely without Markdown formatting.' }],
+              parts: [{ text: DRISHTI_SYSTEM_PROMPT }],
             },
-            contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
+            contents: [
+              ...historyContents,
+              { role: 'user', parts: [{ text: fullPrompt }] },
+            ],
             generationConfig: { maxOutputTokens: 800, temperature: 0.3 },
           },
           { headers: { 'Content-Type': 'application/json' }, timeout: 10000 }
@@ -441,7 +462,7 @@ ${text}`,
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { question, lang = 'en', rawData } = body;
+    const { question, lang = 'en', rawData, sessionHistory = [] } = body;
 
     if (!question?.trim()) {
       return NextResponse.json(
@@ -476,14 +497,14 @@ export async function POST(req) {
 
       // Step 3: Groq (fast free-tier fallback — llama-3.3-70b)
       try {
-        finalAnswer = await callGroq(workingQuestion, knowledgeContext);
+        finalAnswer = await callGroq(workingQuestion, knowledgeContext, sessionHistory);
         source = 'groq';
       } catch (groqErr) {
         console.error('[askDrishtiAI] Groq failed:', groqErr.message);
 
         // Step 4: Gemini (key rotation fallback)
         try {
-          finalAnswer = await callGemini(workingQuestion, knowledgeContext);
+          finalAnswer = await callGemini(workingQuestion, knowledgeContext, sessionHistory);
           source = 'gemini';
         } catch (geminiErr) {
           console.error('[askDrishtiAI] Gemini failed:', geminiErr.message);
