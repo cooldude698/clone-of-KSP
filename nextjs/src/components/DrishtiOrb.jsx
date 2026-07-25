@@ -671,7 +671,7 @@ const DrishtiOrb = ({
       )}
 
       {/* ── DISTINCT FLOATING CONTROLS PILL — stacked vertically below orb ── */}
-      <div className="flex items-center gap-2 bg-[#FAF6F0]/95 backdrop-blur-xl border border-[#7A90A8]/30 px-3 py-1.5 rounded-full shadow-xl animate-fade-in mt-1.5">
+      <div className="flex items-center gap-2 bg-white/95 backdrop-blur-xl border border-slate-200 px-3 py-1.5 rounded-full shadow-xl animate-fade-in mt-1.5">
         {/* PTT BUTTON */}
         <button
           onMouseDown={(e) => { e.preventDefault(); onPttStart?.(); }}
@@ -682,7 +682,7 @@ const DrishtiOrb = ({
           className={`px-4 py-2 rounded-full text-[9px] uppercase font-bold tracking-[0.2em] select-none transition-all duration-300 flex items-center gap-1.5 h-8
             ${isListening
               ? 'bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)] scale-105'
-              : 'bg-[#E2D8CC]/45 border border-[#7A90A8]/10 text-[#1E2733]/80 hover:text-[#1E2733] hover:bg-[#E2D8CC]/80'}`}
+              : 'bg-slate-100 hover:bg-slate-200 border border-slate-200 text-[#1E2733]/85 hover:text-[#1E2733]'}`}
         >
           {isListening && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
           {isListening ? 'LISTENING…' : 'HOLD TO TALK'}
@@ -694,7 +694,7 @@ const DrishtiOrb = ({
           className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-300
             ${showTypingInput
               ? 'bg-[#1E2733] text-white border-transparent shadow-md'
-              : 'bg-[#E2D8CC]/45 border-transparent text-[#1E2733]/60 hover:text-[#1E2733] hover:bg-[#E2D8CC]/80'}`}
+              : 'bg-slate-100 hover:bg-slate-200 border border-transparent text-[#1E2733]/60 hover:text-[#1E2733]'}`}
           title="Type text message"
         >
           {showTypingInput ? (
@@ -710,7 +710,7 @@ const DrishtiOrb = ({
           className={`w-8 h-8 rounded-full border flex items-center justify-center text-xs transition-all duration-300
             ${isMuted
               ? 'bg-red-500 text-white border-transparent shadow-md'
-              : 'bg-[#E2D8CC]/45 border-transparent text-[#1E2733]/60 hover:text-[#1E2733] hover:bg-[#E2D8CC]/80'}`}
+              : 'bg-slate-100 hover:bg-slate-200 border border-transparent text-[#1E2733]/60 hover:text-[#1E2733]'}`}
           title={isMuted ? "Unmute Spoken Audio (Alt+M)" : "Permanently Mute Spoken Audio (Alt+M)"}
         >
           {isMuted ? '🔇' : '🔊'}
