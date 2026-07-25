@@ -96,6 +96,13 @@ export default function DrishtiPanel({
   const latestResponseText = response?.response_text || greetingText || '';
   const { displayed, done, skip } = useTypewriter(latestResponseText, 14);
 
+  // Synchronize live transcript to the text input field ("writing plate")
+  useEffect(() => {
+    if (isListening && liveTranscript) {
+      setInputText(liveTranscript);
+    }
+  }, [liveTranscript, isListening]);
+
   // Auto-scroll on new message
   useEffect(() => {
     if (scrollRef.current) {
