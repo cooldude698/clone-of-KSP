@@ -409,14 +409,10 @@ export default function DashboardLayout({ children }) {
     const locale = targetLang === 'kn' ? 'kn-IN' : targetLang === 'hi' ? 'hi-IN' : 'en-IN';
 
     if (targetLang === sourceLang) {
-      if (response) {
-        if (response.response_text !== sourceText) {
-          setResponse(prev => prev ? { ...prev, response_text: sourceText } : null);
-        }
-      } else {
-        if (greetingText !== sourceText) {
-          setGreetingText(sourceText);
-        }
+      if (response && response.response_text !== sourceText) {
+        setResponse(prev => prev ? { ...prev, response_text: sourceText } : null);
+      } else if (!response && greetingText !== sourceText) {
+        setGreetingText(sourceText);
       }
       if (shouldSpeakOnLangChangeRef.current) {
         shouldSpeakOnLangChangeRef.current = false;
@@ -442,14 +438,10 @@ export default function DashboardLayout({ children }) {
             const data = await res.json();
             if (data.text) {
               const translatedText = data.text;
-              if (response) {
-                if (response.response_text !== translatedText) {
-                  setResponse(prev => prev ? { ...prev, response_text: translatedText } : null);
-                }
-              } else {
-                if (greetingText !== translatedText) {
-                  setGreetingText(translatedText);
-                }
+              if (response && response.response_text !== translatedText) {
+                setResponse(prev => prev ? { ...prev, response_text: translatedText } : null);
+              } else if (!response && greetingText !== translatedText) {
+                setGreetingText(translatedText);
               }
               setOrbState('idle');
               setStateOverrideLabel('');
