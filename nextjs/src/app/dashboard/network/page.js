@@ -346,15 +346,15 @@ export default function NetworkPage() {
         </div>
       </div>
 
-      {/* Slide-in panel (Investigator Wall) */}
+      {/* Center Modal (Investigator Wall) */}
       {panelOpen && activeCaseData && (
         <>
           <div
             onClick={() => setPanelOpen(false)}
-            className="fixed inset-0 bg-void-000/60 backdrop-blur-sm z-[99998] animate-fade-in"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[99998] animate-fade-in"
           />
-          <div className="fixed inset-y-0 right-0 w-full md:w-[600px] lg:w-[750px] border-l border-steel-600 bg-steel-700 flex flex-col animate-slide-in z-[99999] shadow-2xl overflow-y-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-steel-600 shrink-0 bg-steel-700/80 sticky top-0 z-30 backdrop-blur-md">
+          <div className="fixed top-1/2 left-[50%] md:left-[calc(50%+130px)] -translate-x-1/2 -translate-y-1/2 w-[95%] md:w-[760px] lg:w-[950px] max-h-[92vh] border border-steel-600 bg-steel-700 flex flex-col animate-newspaper-spin z-[99999] shadow-2xl overflow-y-auto rounded-3xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-steel-600 shrink-0 bg-steel-700/80 sticky top-0 z-30 backdrop-blur-md rounded-t-3xl">
               <div className="flex items-center gap-2 text-critical-500">
                 <ShieldAlert className="w-5 h-5" />
                 <h3 className="text-sm font-bold font-mono tracking-widest uppercase">Investigator Wall</h3>

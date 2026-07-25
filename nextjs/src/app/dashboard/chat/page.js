@@ -760,14 +760,15 @@ export default function ChatPage() {
         </div>
       </div>
 
+      {/* Center Modal (Investigator Wall) */}
       {rightPanelOpen && activeCaseDetails && (
         <>
           <div
             onClick={() => setRightPanelOpen(false)}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[99998] transition-opacity"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[99998] transition-opacity animate-fade-in"
           />
-          <div className="fixed inset-y-0 right-0 w-full md:w-[650px] lg:w-[750px] border-l border-[var(--border)] bg-[var(--surface-1)] flex flex-col z-[99999] shadow-2xl overflow-y-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0 bg-[var(--surface-1)] sticky top-0 z-30 backdrop-blur-md">
+          <div className="fixed top-1/2 left-[50%] md:left-[calc(50%+130px)] -translate-x-1/2 -translate-y-1/2 w-[95%] md:w-[760px] lg:w-[950px] max-h-[92vh] border border-[var(--border)] bg-[var(--surface-1)] flex flex-col animate-newspaper-spin z-[99999] shadow-2xl overflow-y-auto rounded-3xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0 bg-[var(--surface-1)] sticky top-0 z-30 backdrop-blur-md rounded-t-3xl">
               <div className="flex items-center gap-2 text-[var(--status-critical)]">
                 <ShieldAlert className="w-5 h-5" />
                 <h3 className="text-sm font-bold font-mono tracking-widest uppercase">Investigator Wall</h3>
@@ -788,7 +789,8 @@ export default function ChatPage() {
                       <FileText className="w-3.5 h-3.5" />
                       Export PDF
                     </>
-                  )}
+                  )
+                  }
                 </button>
                 <button
                   onClick={() => setRightPanelOpen(false)}

@@ -516,3 +516,48 @@ body {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
+
+/* 3D Newspaper Opening & Unfolding Animations */
+@keyframes newspaperSpin {
+  0% {
+    transform: translate(-50%, -50%) scale(0.05) rotate(-1440deg);
+    opacity: 0;
+    filter: blur(8px);
+  }
+  60% {
+    transform: translate(-50%, -50%) scale(1.05) rotate(0deg);
+    opacity: 1;
+    filter: blur(0px);
+  }
+  80% {
+    transform: translate(-50%, -50%) scale(0.98);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes pageUnfold {
+  0% {
+    transform: perspective(2000px) rotateY(-95deg);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: perspective(2000px) rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+.animate-newspaper-spin {
+  animation: newspaperSpin 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: center center;
+}
+
+.animate-page-unfold {
+  animation: pageUnfold 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both;
+  transform-origin: left center;
+  backface-visibility: hidden;
+}
