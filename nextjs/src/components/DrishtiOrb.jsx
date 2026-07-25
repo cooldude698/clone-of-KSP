@@ -122,10 +122,117 @@ const DrishtiOrb = ({
   onToggleMute,
 }) => {
   const [isClient, setIsClient] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const isDragging = React.useRef(false);
+  const dragStart = React.useRef({ x: 0, y: 0 });
+  const activePosition = React.useRef({ x: 0, y: 0 });
+  const hasMoved = React.useRef(false);
+
+  // Mouse drag handlers
+  const handleMouseDown = (e) => {
+    if (
+      e.target.tagName === 'INPUT' ||
+      e.target.tagName === 'BUTTON' ||
+      e.target.closest('button')
+    ) {
+      return;
+    }
+    isDragging.current = true;
+    hasMoved.current = false;
+    dragStart.current = {
+      x: e.clientX,
+      y: e.clientY
+    };
+    
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging.current) return;
+    const dx = e.clientX - dragStart.current.x;
+    const dy = e.clientY - dragStart.current.y;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+      hasMoved.current = true;
+    }
+    setPosition({
+      x: activePosition.current.x + dx,
+      y: activePosition.current.y + dy
+    });
+  };
+
+  const handleMouseUp = () => {
+    if (isDragging.current) {
+      activePosition.current = { x: position.x, y: position.y };
+      isDragging.current = false;
+      setPosition({ ...activePosition.current });
+    }
+    window.removeEventListener('mousemove', handleMouseMove);
+    window.removeEventListener('mouseup', handleMouseUp);
+  };
+
+  // Touch drag handlers
+  const handleTouchStart = (e) => {
+    if (
+      e.target.tagName === 'INPUT' ||
+      e.target.tagName === 'BUTTON' ||
+      e.target.closest('button')
+    ) {
+      return;
+    }
+    isDragging.current = true;
+    hasMoved.current = false;
+    dragStart.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY
+    };
+
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging.current) return;
+    e.preventDefault();
+    const dx = e.touches[0].clientX - dragStart.current.x;
+    const dy = e.touches[0].clientY - dragStart.current.y;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+      hasMoved.current = true;
+    }
+    setPosition({
+      x: activePosition.current.x + dx,
+      y: activePosition.current.y + dy
+    });
+  };
+
+  const handleTouchEnd = () => {
+    if (isDragging.current) {
+      activePosition.current = { x: position.x, y: position.y };
+      isDragging.current = false;
+      setPosition({ ...activePosition.current });
+    }
+    window.removeEventListener('touchmove', handleTouchMove);
+    window.removeEventListener('touchend', handleTouchEnd);
+  };
+
+  const handleOrbClick = (e) => {
+    if (hasMoved.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    onClick?.(e);
+  };
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [position]);
 
   if (!isClient) return null;
 
@@ -277,7 +384,18 @@ const DrishtiOrb = ({
 
   // Full mode: fixed bottom-right with label
   return (
-    <div className="fixed bottom-16 right-8 z-[9999] flex flex-col items-center select-none gap-2.5">
+    <div
+      onMouseDown={handleMouseDown}
+      onTouchStart={handleTouchStart}
+      className={cn(
+        "fixed bottom-16 right-8 z-[9999] flex flex-col items-center select-none gap-2.5 cursor-grab",
+        isDragging.current && "cursor-grabbing"
+      )}
+      style={{
+        transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
+        touchAction: 'none'
+      }}
+    >
 
       {/* ── TRANSCRIPT / RESPONSE BUBBLE — appears above orb ── */}
       {(liveTranscript || pendingTranscript || orbResponse) && (
@@ -442,7 +560,7 @@ const DrishtiOrb = ({
         {/* The Actual Orb */}
         <div
           data-state={state}
-          onClick={onClick}
+          onClick={handleOrbClick}
           onMouseDown={onMouseDown}
           onMouseUp={onMouseUp}
           onTouchStart={onTouchStart}
