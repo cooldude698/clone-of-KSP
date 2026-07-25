@@ -404,9 +404,13 @@ export default function DashboardLayout({ children }) {
 
     if (targetLang === sourceLang) {
       if (response) {
-        setResponse(prev => prev ? { ...prev, response_text: sourceText } : null);
+        if (response.response_text !== sourceText) {
+          setResponse(prev => prev ? { ...prev, response_text: sourceText } : null);
+        }
       } else {
-        setGreetingText(sourceText);
+        if (greetingText !== sourceText) {
+          setGreetingText(sourceText);
+        }
       }
       if (shouldSpeakOnLangChangeRef.current) {
         shouldSpeakOnLangChangeRef.current = false;
@@ -433,9 +437,13 @@ export default function DashboardLayout({ children }) {
             if (data.text) {
               const translatedText = data.text;
               if (response) {
-                setResponse(prev => prev ? { ...prev, response_text: translatedText } : null);
+                if (response.response_text !== translatedText) {
+                  setResponse(prev => prev ? { ...prev, response_text: translatedText } : null);
+                }
               } else {
-                setGreetingText(translatedText);
+                if (greetingText !== translatedText) {
+                  setGreetingText(translatedText);
+                }
               }
               setOrbState('idle');
               setStateOverrideLabel('');
@@ -456,7 +464,7 @@ export default function DashboardLayout({ children }) {
         }
       })();
     }
-  }, [language, speak, response]);
+  }, [language, speak]);
 
   // ─── Keyboard Shortcuts (Alt+O: Toggle Panel, Alt+M: Toggle Mute, Enter: confirm pending) ───
   useEffect(() => {
