@@ -472,8 +472,6 @@ export default function ChatPage() {
         targetRoute = '/dashboard/fir/FIR-2026-BL-4000';
       } else if (qLower.includes('112') || qLower.includes('mys')) {
         targetRoute = '/dashboard/fir/FIR-2026-MYS-0112';
-      } else if (qLower.includes('case file') || qLower.includes('this case') || qLower.includes('fir') || qLower.includes('case')) {
-        targetRoute = '/dashboard/fir/FIR-2026-BL-4000';
       }
 
       if (targetRoute) {
@@ -482,6 +480,24 @@ export default function ChatPage() {
             window.location.href = targetRoute;
           }
         }, 800);
+      } else {
+        // Extract requested target name
+        let targetName = text
+          .replace(/\b(can you|please|hey|hi|drishti|could you|would you)\b/gi, '')
+          .replace(/\b(open|show|view|bring up|pull up|check|get|find|search)\b/gi, '')
+          .replace(/\b(suspect|person|person's|persons|case|file|profile|record|fir|details|this)\b/gi, '')
+          .trim();
+        targetName = targetName ? targetName.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'the requested query';
+
+        const notFoundMsg = `Sir, no suspect profile or case file found for "${targetName}" in the Karnataka Police database. Please verify the name or FIR number.`;
+
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: notFoundMsg, timestamp: timestamp() },
+        ]);
+        speakText(notFoundMsg, messages.length + 1);
+        setLoading(false);
+        return;
       }
     }
 

@@ -32,6 +32,20 @@ const NAV_ITEMS = [
   { href: '/dashboard/trail',        icon: Navigation,      label: 'Geo Trail',      id: 'nav-trail' },
 ];
 
+function extractRequestedName(queryText) {
+  let cleaned = queryText
+    .replace(/\b(can you|please|hey|hi|drishti|could you|would you)\b/gi, '')
+    .replace(/\b(open|show|view|bring up|pull up|check|get|find|search)\b/gi, '')
+    .replace(/\b(suspect|person|person's|persons|case|file|profile|record|fir|details|this)\b/gi, '')
+    .trim();
+
+  if (!cleaned) return 'the requested query';
+  return cleaned
+    .split(/\s+/)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
+
 // ─── Local intent detector (expanded) ───────────────────────────────────────
 function detectLocalIntent(query) {
   const q = query.toLowerCase().trim();
@@ -66,9 +80,13 @@ function detectLocalIntent(query) {
     if (q.includes('112') || q.includes('mys')) {
       return nav('/dashboard/fir/FIR-2026-MYS-0112', 'Opening case file FIR-2026-MYS-0112, Sir.', null);
     }
-    if (q.includes('case file') || q.includes('this case') || q.includes('fir') || q.includes('case')) {
-      return nav('/dashboard/fir/FIR-2026-BL-4000', 'Opening active case file FIR-2026-BL-4000, Sir.', null);
-    }
+
+    // No matching registered suspect or FIR found in datastore
+    const targetName = extractRequestedName(query);
+    return {
+      type: 'not_found',
+      reply: `Sir, no suspect profile or case file found for "${targetName}" in the Karnataka Police database. Please verify the name or FIR number.`
+    };
   }
 
   // Navigation — many natural phrasings
