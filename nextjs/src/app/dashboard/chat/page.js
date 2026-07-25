@@ -213,6 +213,8 @@ function TypingIndicator() {
   );
 }
 
+const CHAT_STORAGE_KEY = 'drishti_chat_history_v2';
+
 export default function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -240,13 +242,46 @@ export default function ChatPage() {
   const [isLoadingCase, setIsLoadingCase] = useState(false);
   const [downloadLoading, setDownloadLoading] = useState(false);
 
+  // Load chat history from localStorage on mount
   useEffect(() => {
     setConversationId(`CONV-${Date.now().toString(36).toUpperCase()}`);
     if (typeof window !== 'undefined') {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       setSpeechSupported(!!SpeechRecognition);
+
+      try {
+        const saved = localStorage.getItem(CHAT_STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setMessages(parsed);
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to load chat history:', e);
+      }
     }
   }, []);
+
+  // Save chat history to localStorage on update
+  useEffect(() => {
+    if (typeof window !== 'undefined' && messages.length > 0) {
+      try {
+        localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
+      } catch (e) {
+        console.warn('Failed to save chat history:', e);
+      }
+    }
+  }, [messages]);
+
+  const clearChatHistory = () => {
+    setMessages([]);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(CHAT_STORAGE_KEY);
+      } catch (_) {}
+    }
+  };
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -583,24 +618,35 @@ export default function ChatPage() {
             )}
           </div>
 
-          {/* Voice Profile Selector Pills */}
-          <div className="flex items-center gap-1.5 p-1.5 rounded-xl bg-[var(--surface-1)] overflow-x-auto shadow-inner">
-            {VOICE_PROFILES.map((profile) => {
-              const active = voiceProfile === profile.id;
-              return (
-                <button
-                  key={profile.id}
-                  onClick={() => setVoiceProfile(profile.id)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all whitespace-nowrap cursor-pointer ${
-                    active
-                      ? 'bg-[var(--accent)] text-white shadow-md'
-                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-2)]'
-                  }`}
-                >
-                  {profile.label}
-                </button>
-              );
-            })}
+          {/* Voice Profile Selector Pills & Clear Chat */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 p-1.5 rounded-xl bg-[var(--surface-1)] overflow-x-auto shadow-inner">
+              {VOICE_PROFILES.map((profile) => {
+                const active = voiceProfile === profile.id;
+                return (
+                  <button
+                    key={profile.id}
+                    onClick={() => setVoiceProfile(profile.id)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all whitespace-nowrap cursor-pointer ${
+                      active
+                        ? 'bg-[var(--accent)] text-white shadow-md'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-2)]'
+                    }`}
+                  >
+                    {profile.label}
+                  </button>
+                );
+              })}
+            </div>
+            {messages.length > 0 && (
+              <button
+                onClick={clearChatHistory}
+                className="px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-mono font-bold uppercase transition-all cursor-pointer shadow-sm shrink-0"
+                title="Clear conversation history"
+              >
+                Clear Chat
+              </button>
+            )}
           </div>
         </div>
 

@@ -4,21 +4,57 @@
  * HOW TO TRAIN DRISHTI AI:
  * You can easily add custom questions, crime statistics, suspect records, or police SOPs
  * to this file. DRISHTI will automatically use these training rules to answer queries
- * in simple, detailed English (or Kannada/Hindi).
+ * in simple, detailed English, Kannada, or Hindi.
  *
  * TO ADD A NEW TRAINING RULE:
  * Simply add an object to DRISHTI_CUSTOM_TRAINING:
  * {
  *   keywords: ['your', 'search', 'keywords'],
  *   englishAnswer: "Clear, detailed response for officers in simple English...",
- *   kannadaAnswer: "ಸ್ಪಷ್ಟ ಮತ್ತು ವಿವರವಾದ ಉತ್ತರ..."
+ *   kannadaAnswer: "ಸ್ಪಷ್ಟ ಮತ್ತು ವಿವರವಾದ ಉತ್ತರ...",
+ *   hindiAnswer: "स्पष्ट और विस्तृत उत्तर..."
  * }
  */
 
 export const DRISHTI_CUSTOM_TRAINING = [
   {
+    id: 'indiranagar_crime_report',
+    keywords: ['indiranagar', 'indira nagar', 'ಇಂದಿರಾನಗರ', 'इंदिरानगर'],
+    englishAnswer: `INDIRANAGAR POLICE JURISDICTION CRIME REPORT & INTELLIGENCE:
+
+1. Jurisdiction Overview:
+   - Police Station: Indiranagar Police Station (East Zone, Bengaluru).
+   - Total Registered Cases (2026): 38 active FIRs.
+   - Primary Offenses: Night-time Mobile & Chain Snatching (42%), Vehicle Theft near Pubs/Restaurants (35%), Commercial Burglaries (23%).
+
+2. Specific Crime Hotspots in Indiranagar:
+   - 100 Feet Road & 12th Main Junction: High risk for mobile snatching between 10:00 PM and 2:00 AM.
+   - 80 Feet Road & HAL 2nd Stage: Vehicle theft target zone for parked 2-wheelers.
+
+3. Active Suspect Under Watch:
+   - Anand Gowda (Alias "Speedy Anand"): Wanted in 3 chain snatching cases on 100 Feet Road. Drives black KTM Duke motorcycle. Risk Score: 76/100 (HIGH).
+
+4. Recommended Police Actions:
+   - Deploy 2 Hoysala patrol vans on 100 Feet Road during weekend evening hours (8 PM - 2 AM).
+   - Verify CCTV feeds from commercial establishments on 12th Main Road.`,
+    kannadaAnswer: `ಇಂದಿರಾನಗರ ಪೋಲಿಸ್ ಠಾಣೆ ಅಪರಾಧ ವರದಿ:
+
+೧. ಒಟ್ಟು ಸಕ್ರಿಯ ಪ್ರಕರಣಗಳು: ೩೮ ಎಫ್.ಐ.ಆರ್ నమోదు ಆಗಿವೆ.
+೨. ಪ್ರಮುಖ ಅಪರಾಧಗಳು: ರಾತ್ರಿ ವೇಳೆ ಮೊಬೈಲ್ ಹಾಗೂ ಸರಗಳ್ಳತನ (೪೨%), ವಾಹನ ಕಳವು (೩೫%).
+೩. ಪ್ರಮುಖ ಪ್ರದೇಶ: ೧೦೦ ಫೀಟ್ ರಸ್ತೆ ಮತ್ತು ೧೨ನೇ ಮೇನ್ ಜಂಕ್ಷನ್ (ರಾತ್ರಿ ೧೦ ರಿಂದ ೨ ಗಂಟೆ).
+೪. ಪ್ರಮುಖ ಶಂಕಿತ: ಆನಂದ್ ಗೌಡ (೩ ಸರಗಳ್ಳತನ ಪ್ರಕರಣಗಳು).
+೫. ಕೈಗೊಳ್ಳಬೇಕಾದ ಕ್ರಮ: ೧೦೦ ಫೀಟ್ ರಸ್ತೆಯಲ್ಲಿ ಹೊಯ್ಸಳ ಗಸ್ತು ವಾಹನ ಹೆಚ್ಚಿಸಬೇಕು.`,
+    hindiAnswer: `इंदिरानगर पुलिस स्टेशन अपराध रिपोर्ट:
+
+1. कुल सक्रिय मामले: 38 एफ.आई.आर दर्ज हैं।
+2. मुख्य अपराध: रात के समय मोबाइल और चेन स्नैचिंग (42%), वाहन चोरी (35%)।
+3. मुख्य हॉटस्पॉट: 100 फीट रोड और 12वीं मेन जंक्शन (रात 10 बजे से 2 बजे तक)।
+4. प्रमुख संदिग्ध: आनंद गौड़ा (3 चेन स्नैचिंग मामले)।
+5. पुलिस कार्रवाई: 100 फीट रोड पर रात की गश्त बढ़ाएं और सीसीटीवी फुटेज की जांच करें।`
+  },
+  {
     id: 'bengaluru_crime_report',
-    keywords: ['ಬೆಂಗಳೂರಿನ ಅಪರಾಧ', 'ಅಪರಾಧ ವರದಿ', 'bengaluru crime', 'bangalore crime', 'crime report bengaluru', 'bengaluru report', 'city crime'],
+    keywords: ['ಬೆಂಗಳೂರಿನ ಅಪರಾಧ', 'ಅಪರಾಧ ವರದಿ', 'bengaluru crime', 'bangalore crime', 'crime report bengaluru', 'bengaluru report', 'city crime', 'बेंगलुरु'],
     englishAnswer: `BENGALURU CITY CRIME & INTELLIGENCE REPORT:
 
 1. Overview:
@@ -52,11 +88,20 @@ export const DRISHTI_CUSTOM_TRAINING = [
 
 ೪. ಪೋಲಿಸ್ ಅಧಿಕಾರಿಗಳು ತಕ್ಷಣ ತೆಗೆದುಕೊಳ್ಳಬೇಕಾದ ಕ್ರಮಗಳು:
    - ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಮತ್ತು ಕೊರಮಂಗಲ ಪ್ರದೇಶದಲ್ಲಿ ರಾತ್ರಿ ಗಸ್ತು ಹೆಚ್ಚಿಸಬೇಕು.
-   - ANPR ಕ್ಯಾಮೆರಾಗಳ ಮೂಲಕ ಕೆ.ಎ-೦೧-ಇಎ-೪೯೨೧ (ಬ್ಲ್ಯಾಕ್ ಆಕ್ಟಿವಾ) ವಾಹನವನ್ನು ಪತ್ತೆಹಚ್ಚಬೇಕು.`
+   - ANPR ಕ್ಯಾಮೆರಾಗಳ ಮೂಲಕ ಕೆ.ಎ-೦೧-ಇಎ-೪೯೨೧ (ಬ್ಲ್ಯಾಕ್ ಆಕ್ಟಿವಾ) ವಾಹನವನ್ನು ಪತ್ತೆಹಚ್ಚಬೇಕು.`,
+    hindiAnswer: `बेंगलुरु शहर अपराध और खुफिया रिपोर्ट:
+
+1. कुल सक्रिय मामले: बेंगलुरु शहरी जिले में 489 एफ.आई.आर दर्ज हैं।
+2. मुख्य अपराध श्रेणी: वाहन चोरी (38%), डकैती और चेन स्नैचिंग (24%), साइबर धोखाधड़ी (22%)।
+3. प्रमुख हॉटस्पॉट:
+   - दक्षिण बेंगलुरु (कोरमंगला, सिल्क बोर्ड): वाहन चोरी के 47 मामले। (रात 10 बजे से सुबह 4 बजे तक)।
+   - मध्य बेंगलुरु (एमजी रोड, मैजेस्टिक): चेन स्नैचिंग के 31 मामले। (शाम 6 बजे से रात 10 बजे तक)।
+4. मुख्य संदिग्ध: रमेश कुमार (7 मामले, जोखिम स्कोर: 85/100)।
+5. आवश्यक पुलिस कार्रवाई: सिल्क बोर्ड और कोरमंगला में रात की गश्त बढ़ाएं।`
   },
   {
     id: 'mysuru_crime_report',
-    keywords: ['mysuru', 'mysore', 'mysuru crime', 'mysore report', 'ಮೈಸೂರು'],
+    keywords: ['mysuru', 'mysore', 'mysuru crime', 'mysore report', 'ಮೈಸೂರು', 'मैसूर'],
     englishAnswer: `MYSURU DISTRICT CRIME & INTELLIGENCE REPORT:
 
 1. Overview:
@@ -78,11 +123,17 @@ export const DRISHTI_CUSTOM_TRAINING = [
 ೧. ಒಟ್ಟು ಪ್ರಕರಣಗಳು: ೧೪೨ ಸಕ್ರಿಯ ಎಫ್.ಐ.ಆರ್.
 ೨. ಪ್ರಮುಖ ಅಪರಾಧಗಳು: ಸೈಬರ್ ವಂಚನೆ (೪೦%), ಮನೆಗಳ್ಳತನ (೩೦%).
 ೩. ಪ್ರಮುಖ ಶಂಕಿತ: ಸುರೇಶ್ ನಾಯ್ಡು (೫ ಪ್ರಕರಣಗಳು).
-೪. ಕೈಗೊಳ್ಳಬೇಕಾದ ಕ್ರಮ: ದೇವರಾಜ ಮಾರ್ಕೆಟ್ ಪ್ರದೇಶದಲ್ಲಿ ಬಿಗಿ ಪೋಲಿಸ್ ಕಾವಲು ನಿಯೋಜಿಸುವುದು.`
+೪. ಕೈಗೊಳ್ಳಬೇಕಾದ ಕ್ರಮ: ದೇವರಾಜ ಮಾರ್ಕೆಟ್ ಪ್ರದೇಶದಲ್ಲಿ ಬಿಗಿ ಪೋಲಿಸ್ ಕಾವಲು ನಿಯೋಜಿಸುವುದು.`,
+    hindiAnswer: `मैसूर जिला अपराध रिपोर्ट:
+
+1. कुल मामले: मैसूर जिले में 142 सक्रिय एफ.आई.आर।
+2. मुख्य अपराध: साइबर धोखाधड़ी (40%), घर की चोरी (30%)।
+3. मुख्य संदिग्ध: सुरेश नायडू (5 मामले)।
+4. कार्रवाई: सेंट्रल मार्केट के आसपास सादे कपड़ों में पुलिस तैनात करें।`
   },
   {
     id: 'repeat_offenders',
-    keywords: ['repeat', 'offender', 'accused', 'suspect', 'gang', 'habitual', 'ಶಂಕಿತರು', 'ಅಪರಾಧಿಗಳು'],
+    keywords: ['repeat', 'offender', 'accused', 'suspect', 'gang', 'habitual', 'ಶಂಕಿತರು', 'ಅಪರಾಧಿಗಳು', 'अपराधी'],
     englishAnswer: `HIGH-RISK REPEAT OFFENDERS LIST (KSP DATABASE):
 
 1. Ramesh Kumar (Alias: "Bullet Ramesh")
@@ -106,11 +157,16 @@ export const DRISHTI_CUSTOM_TRAINING = [
 
 ೧. ರಮೇಶ್ ಕುಮಾರ್ (ಅಲಿಯಾಸ್: ಬುಲೆಟ್ ರಮೇಶ್): ೭ ಎಫ್.ಐ.ಆರ್ (ವಾಹನ ಕಳವು). ಅಪಾಯದ ಮಟ್ಟ: ೮೫/೧೦೦.
 ೨. ಸುರೇಶ್ ನಾಯ್ಡು: ೫ ಎಫ್.ಐ.ಆರ್ (ಮನೆಗಳ್ಳತನ). ಅಪಾಯದ ಮಟ್ಟ: ೭೮/೧೦೦.
-೩. ಆನಂದ್ ಗೌಡ: ೪ ಎಫ್.ಐ.ಆರ್ (ಸರಗಳ್ಳತನ). ಅಪಾಯದ ಮಟ್ಟ: ೭೨/೧೦೦.`
+೩. ಆನಂದ್ ಗೌಡ: ೪ ಎಫ್.ಐ.ಆರ್ (ಸರಗಳ್ಳತನ). ಅಪಾಯದ ಮಟ್ಟ: ೭೨/೧೦೦.`,
+    hindiAnswer: `उच्च जोखिम वाले आदतन अपराधियों की सूची:
+
+1. रमेश कुमार (उपनाम: बुलेट रमेश): 7 मामले (वाहन चोरी)। जोखिम स्कोर: 85/100 (उच्च)।
+2. सुरेश नायडू: 5 मामले (घर की चोरी)। जोखिम स्कोर: 78/100 (उच्च)।
+3. आनंद गौड़ा: 4 मामले (चेन स्नैचिंग)। जोखिम स्कोर: 72/100 (उच्च)।`
   },
   {
     id: 'vehicle_theft_sop',
-    keywords: ['vehicle', 'theft', 'stolen', 'bike', 'car', 'auto', '379', 'ಕಳವು', 'ವಾಹನ'],
+    keywords: ['vehicle', 'theft', 'stolen', 'bike', 'car', 'auto', '379', 'ಕಳವು', 'ವಾಹನ', 'चोरी'],
     englishAnswer: `VEHICLE THEFT INVESTIGATION INSTRUCTIONS (SECTION 379 IPC):
 
 Step 1: Immediately file FIR under Section 379 IPC and enter full vehicle details (Registration No, Engine No, Chassis No, Color) into CCTNS within 2 hours.
@@ -127,11 +183,17 @@ Step 5: Provide official FIR copy to complainant for insurance claim process and
 ೧. ಎಫ್.ಐ.ಆರ್ ದಾಖಲಿಸಿ ೨ ಗಂಟೆಯೊಳಗೆ CCTNS ತಂತ್ರಾಂಶದಲ್ಲಿ ವಾಹನದ ವಿವರಗಳನ್ನು నమోదు ಮಾಡಿ.
 ೨. ANPR ಕ್ಯಾಮೆರಾ ವ್ಯವಸ್ಥೆಯಲ್ಲಿ ವಾಹನ ಸಂಖ್ಯೆಯನ್ನು ಸೇರಿಸಿ.
 ೩. ೧೫ ಕಿ.ಮೀ ವ್ಯಾಪ್ತಿಯಲ್ಲಿ ಚೆಕ್‌ಪೋಸ್ಟ್ ಹಾಕಿ ತಪಾಸಣೆ ನಡೆಸಿ.
-೪. ಸುತ್ತಮುತ್ತಲಿನ ಸಿಸಿಟಿವಿ ದೃಶ್ಯಾವಳಿಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.`
+೪. ಸುತ್ತಮುತ್ತಲಿನ ಸಿಸಿಟಿವಿ ದೃಶ್ಯಾವಳಿಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.`,
+    hindiAnswer: `वाहन चोरी जांच निर्देश (धारा 379 आईपीसी):
+
+1. धारा 379 आईपीसी के तहत एफआईआर दर्ज करें और 2 घंटे के भीतर CCTNS में वाहन विवरण दर्ज करें।
+2. ANPR कैमरा वॉचलिस्ट में वाहन नंबर जोड़ें।
+3. 15 किमी के दायरे में जांच चौकियां (चेकपॉइंट) स्थापित करें।
+4. 2 किमी के भीतर सीसीटीवी फुटेज की जांच करें।`
   },
   {
     id: 'cyber_fraud_sop',
-    keywords: ['cyber', 'online', 'fraud', 'bank', 'upi', '1930', 'scam', 'money', 'ಸೈಬರ್', 'ವಂಚನೆ'],
+    keywords: ['cyber', 'online', 'fraud', 'bank', 'upi', '1930', 'scam', 'money', 'ಸೈಬರ್', 'ವಂಚನೆ', 'साइबर'],
     englishAnswer: `CYBER CRIME & FINANCIAL FRAUD INSTRUCTIONS (IT ACT SEC 66D / 1930 HELPLINE):
 
 Step 1: Ask the victim to immediately call National Cyber Crime Helpline 1930 or log onto cybercrime.gov.in.
@@ -147,7 +209,12 @@ Step 5: Track the IP address, mobile number, and WhatsApp details used by the fr
 
 ೧. ಸಂತ್ರಸ್ತರಿಗೆ ತಕ್ಷಣ ೧೯೩೦ ಸಹಾಯವಾಣಿಗೆ ಕರೆ ಮಾಡಲು ತಿಳಿಸಿ.
 ೨. ವಂಚಕನ ಬ್ಯಾಂಕ್ ಖಾತೆ ಮತ್ತು ಯು.ಪಿ.ಐ ವಿವರಗಳನ್ನು ಪಡೆದುಕೊಳ್ಳಿ.
-೩. ೩೦ ನಿಮಿಷಗಳ ಒಳಗೆ ಬ್ಯಾಂಕ್ ಅಧಿಕಾರಿಗಳನ್ನು ಸಂಪರ್ಕಿಸಿ ವಂಚಕನ ಖಾತೆಯನ್ನು ಫ್ರೀಜ್ ಮಾಡಿ.`
+೩. ೩೦ ನಿಮಿಷಗಳ ಒಳಗೆ ಬ್ಯಾಂಕ್ ಅಧಿಕಾರಿಗಳನ್ನು ಸಂಪರ್ಕಿಸಿ ವಂಚಕನ ಖಾತೆಯನ್ನು ಫ್ರೀಜ್ ಮಾಡಿ.`,
+    hindiAnswer: `साइबर अपराध और वित्तीय धोखाधड़ी निर्देश (1930 हेल्पलाइन):
+
+1. पीड़ित को तुरंत राष्ट्रीय साइबर हेल्पलाइन 1930 पर कॉल करने के लिए कहें।
+2. बैंक खाता, यूपीआई आईडी और यूटीआर नंबर नोट करें।
+3. बैंक नोडल अधिकारी से संपर्क करके धोखाधड़ी करने वाले के खाते में पैसे तुरंत फ्रीज करें।`
   }
 ];
 
@@ -161,7 +228,8 @@ export function getTrainedResponse(queryText, lang = 'en') {
   for (const item of DRISHTI_CUSTOM_TRAINING) {
     const match = item.keywords.some(kw => q.includes(kw.toLowerCase()));
     if (match) {
-      if (lang === 'kn') return item.kannadaAnswer;
+      if (lang === 'kn') return item.kannadaAnswer || item.englishAnswer;
+      if (lang === 'hi') return item.hindiAnswer || item.englishAnswer;
       return item.englishAnswer;
     }
   }
