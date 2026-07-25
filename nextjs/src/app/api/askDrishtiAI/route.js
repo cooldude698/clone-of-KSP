@@ -171,23 +171,28 @@ async function translateWithZia(text, sourceLang, targetLang) {
 }
 
 async function translateWithGemini(text, sourceLang, targetLang) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return text;
   const targetName = targetLang === 'kn' ? 'Kannada' : targetLang === 'hi' ? 'Hindi' : 'English';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-  try {
-    const response = await axios.post(
-      url,
-      {
-        contents: [{ role: 'user', parts: [{ text: `Translate the following text to ${targetName}. Return ONLY the translated text without explanations or quotes:\n\n${text}` }] }],
-        generationConfig: { maxOutputTokens: 512, temperature: 0.1 },
-      },
-      { headers: { 'Content-Type': 'application/json' }, timeout: 5000 }
-    );
-    return response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || text;
-  } catch {
-    return text;
+  for (const apiKey of [
+    process.env.GEMINI_API_KEY,
+    ...Array.from({ length: 13 }, (_, i) => process.env[`GEMINI_API_KEY_${i + 1}`]),
+  ].filter(Boolean)) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+      const response = await axios.post(
+        url,
+        {
+          contents: [{ role: 'user', parts: [{ text: `Translate the following text to ${targetName}. Return ONLY the translated text without explanations or quotes:\n\n${text}` }] }],
+          generationConfig: { maxOutputTokens: 512, temperature: 0.1 },
+        },
+        { headers: { 'Content-Type': 'application/json' }, timeout: 5000 }
+      );
+      const result = response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      if (result) return result;
+    } catch (e) {
+      if (e?.response?.status !== 429) break;
+    }
   }
+  return text;
 }
 
 async function translateText(text, sourceLang, targetLang) {
@@ -260,38 +265,85 @@ async function callQuickML(question, knowledgeContext = '') {
   throw new Error(`QuickML endpoints failed: ${lastErr?.message}`);
 }
 
-const DEFAULT_GEMINI_KEY = 'AIzaSyCZKZBcVvz5sVokO8ei__6plJBeqO2JWpU';
+// ── Groq fallback (fast, reliable, free tier) ─────────────────────────────
+async function callGroq(question, knowledgeContext = '') {
+  const token = process.env.GROQ_API_KEY;
+  if (!token) throw new Error('GROQ_API_KEY not set');
 
-async function callGemini(question, knowledgeContext = '') {
-  const apiKey = process.env.GEMINI_API_KEY || DEFAULT_GEMINI_KEY;
-  const model = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+  const systemPrompt =
+    'You are DRISHTI (ದೃಷ್ಟಿ), the AI crime-intelligence assistant for the Karnataka State Police. ' +
+    'Answer factually, clearly, and concisely. Quote specific legal sections (IPC/BNS/IT Act) and SOPs when applicable. ' +
+    'Do NOT use Markdown. Speak directly as if reporting to a senior police officer.';
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-
-  const fullPrompt = knowledgeContext
-    ? `${question}${knowledgeContext}`
+  const userContent = knowledgeContext
+    ? `OFFICER QUERY: ${question}\n\nRELEVANT CONTEXT:\n${knowledgeContext}`
     : question;
 
   const response = await axios.post(
-    url,
+    'https://api.groq.com/openai/v1/chat/completions',
     {
-      system_instruction: {
-        parts: [
-          {
-            text: 'You are DRISHTI (ದೃಷ್ಟಿ), the AI crime-intelligence assistant for the Karnataka State Police. Answer factually, clearly, and thoroughly with specific legal sections (IPC/BNS/IT Act) and SOP steps when applicable. Speak directly and concisely without Markdown formatting.',
-          },
-        ],
-      },
-      contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
-      generationConfig: { maxOutputTokens: 800, temperature: 0.3 },
+      model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userContent },
+      ],
+      max_tokens: 800,
+      temperature: 0.3,
     },
-    { headers: { 'Content-Type': 'application/json' }, timeout: 10000 }
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      timeout: 12000,
+    }
   );
 
-  const answer =
-    response.data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  if (!answer) throw new Error('Gemini returned empty answer');
-  return answer;
+  const answer = response.data?.choices?.[0]?.message?.content;
+  if (!answer?.trim()) throw new Error('Groq returned empty answer');
+  return answer.trim();
+}
+// ── Gemini last-resort fallback ──────────────────────────────────────────────
+// Picks keys from GEMINI_API_KEY_1..N in sequence; falls back to a bundled key.
+const GEMINI_KEYS = [
+  process.env.GEMINI_API_KEY,
+  ...Array.from({ length: 13 }, (_, i) => process.env[`GEMINI_API_KEY_${i + 1}`]),
+  'AIzaSyCZKZBcVvz5sVokO8ei__6plJBeqO2JWpU', // last-resort bundled key
+].filter(Boolean);
+
+async function callGemini(question, knowledgeContext = '') {
+  const models = Array.from(new Set([process.env.GEMINI_MODEL, 'gemini-flash-latest', 'gemini-2.0-flash'])).filter(Boolean);
+  const fullPrompt = knowledgeContext
+    ? `${question}\n\n${knowledgeContext}`
+    : question;
+
+  let lastErr = null;
+
+  for (const model of models) {
+    for (const apiKey of GEMINI_KEYS) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const response = await axios.post(
+          url,
+          {
+            system_instruction: {
+              parts: [{ text: 'You are DRISHTI (ದೃಷ್ಟಿ), the AI crime-intelligence assistant for the Karnataka State Police. Answer factually, clearly, and thoroughly with specific legal sections (IPC/BNS/IT Act) and SOP steps when applicable. Speak directly and concisely without Markdown formatting.' }],
+            },
+            contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
+            generationConfig: { maxOutputTokens: 800, temperature: 0.3 },
+          },
+          { headers: { 'Content-Type': 'application/json' }, timeout: 10000 }
+        );
+
+        const answer = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        if (answer.trim()) return answer.trim();
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+  }
+
+  throw new Error(`All Gemini keys/models failed: ${lastErr?.message}`);
 }
 
 function buildFallbackAnswer(rawData) {
@@ -422,16 +474,24 @@ export async function POST(req) {
     } catch (quickmlErr) {
       console.error('[askDrishtiAI] QuickML RAG failed:', quickmlErr.message);
 
-      // Step 3: Gemini (fallback with RAG context)
+      // Step 3: Groq (fast free-tier fallback — llama-3.3-70b)
       try {
-        finalAnswer = await callGemini(workingQuestion, knowledgeContext);
-        source = 'gemini';
-      } catch (geminiErr) {
-        console.error('[askDrishtiAI] Gemini failed:', geminiErr.message);
+        finalAnswer = await callGroq(workingQuestion, knowledgeContext);
+        source = 'groq';
+      } catch (groqErr) {
+        console.error('[askDrishtiAI] Groq failed:', groqErr.message);
 
-        // Step 4: Last-resort fallback
-        finalAnswer = buildFallbackAnswer(rawData);
-        source = 'raw_fallback';
+        // Step 4: Gemini (key rotation fallback)
+        try {
+          finalAnswer = await callGemini(workingQuestion, knowledgeContext);
+          source = 'gemini';
+        } catch (geminiErr) {
+          console.error('[askDrishtiAI] Gemini failed:', geminiErr.message);
+
+          // Step 5: Last-resort raw data fallback
+          finalAnswer = buildFallbackAnswer(rawData);
+          source = 'raw_fallback';
+        }
       }
     }
 

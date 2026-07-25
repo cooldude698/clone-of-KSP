@@ -45,45 +45,49 @@ const STATE_MAPPING = {
     size: "140px",
     compactSize: "60px",
     colors: {
-      bg: "#040817", // Deep space navy
-      c1: "oklch(60% 0.22 260)", // Vibrant royal blue
-      c2: "oklch(55% 0.2 295)",  // Indigo
-      c3: "oklch(50% 0.18 325)"  // Deep violet
+      bg: "#040817",
+      c1: "oklch(60% 0.22 260)",
+      c2: "oklch(55% 0.2 295)",
+      c3: "oklch(50% 0.18 325)"
     },
-    animationDuration: 12
+    animationDuration: 12,
+    glowColor: 'rgba(99, 102, 241, 0.22)',
   },
   listening: {
     size: "185px",
     compactSize: "60px",
     colors: {
-      bg: "#020f13", // Very dark emerald undertone
-      c1: "oklch(70% 0.25 140)", // Neon green
-      c2: "oklch(76% 0.22 175)", // Glowing mint/emerald
-      c3: "oklch(65% 0.2 205)"   // Electric teal
+      bg: "#020f13",
+      c1: "oklch(70% 0.25 140)",
+      c2: "oklch(76% 0.22 175)",
+      c3: "oklch(65% 0.2 205)"
     },
-    animationDuration: 4.0
+    animationDuration: 4.0,
+    glowColor: 'rgba(16, 185, 129, 0.32)',
   },
   thinking: {
     size: "160px",
     compactSize: "60px",
     colors: {
-      bg: "#0d0a08", // Very dark amber undertone
-      c1: "oklch(68% 0.25 45)",  // Neon orange
-      c2: "oklch(74% 0.26 75)",  // Bright gold/amber
-      c3: "oklch(78% 0.22 95)"   // Bright yellow
+      bg: "#0d0a08",
+      c1: "oklch(68% 0.25 45)",
+      c2: "oklch(74% 0.26 75)",
+      c3: "oklch(78% 0.22 95)"
     },
-    animationDuration: 2.8
+    animationDuration: 2.8,
+    glowColor: 'rgba(251, 191, 36, 0.24)',
   },
   speaking: {
     size: "165px",
     compactSize: "60px",
     colors: {
-      bg: "#050718", // Dark navy
-      c1: "oklch(70% 0.22 215)", // Electric cyan
-      c2: "oklch(62% 0.25 260)", // Ocean blue
-      c3: "oklch(68% 0.26 320)"  // Hot magenta/pink
+      bg: "#050718",
+      c1: "oklch(70% 0.22 215)",
+      c2: "oklch(62% 0.25 260)",
+      c3: "oklch(68% 0.26 320)"
     },
-    animationDuration: 5.0
+    animationDuration: 5.0,
+    glowColor: 'rgba(34, 211, 238, 0.26)',
   }
 };
 
@@ -184,16 +188,42 @@ const DrishtiOrb = ({
   if (compact) {
     return (
       <div className={cn("flex flex-col items-center select-none", className)}>
-        {/* Pulse rings for listening state */}
         <div className="relative flex items-center justify-center">
+
+          {/* Outer ambient glow halo */}
+          <div
+            className="absolute rounded-full pointer-events-none"
+            style={{
+              inset: '-14px',
+              background: `radial-gradient(circle, ${currentConfig.glowColor || 'rgba(99,102,241,0.15)'} 0%, transparent 72%)`,
+              animation: state === 'idle'
+                ? 'orbHaloBreath 2.5s ease-in-out infinite'
+                : state === 'listening'
+                ? 'orbHaloBreath 0.85s ease-in-out infinite'
+                : state === 'speaking'
+                ? 'orbHaloBreath 1.4s ease-in-out infinite'
+                : 'orbHaloBreath 1.8s ease-in-out infinite alternate',
+            }}
+          />
+
+          {/* 3 fast listening rings */}
           {state === 'listening' && (
             <>
-              <div className="absolute inset-0 rounded-full border-2 border-emerald-400/60 animate-ping" />
-              <div className="absolute rounded-full border border-emerald-400/30 animate-ping"
-                style={{ inset: '-8px', animationDelay: '0.3s' }} />
+              <div className="absolute inset-0 rounded-full border-2 border-emerald-400/70"
+                style={{ animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite' }} />
+              <div className="absolute rounded-full border border-emerald-400/40"
+                style={{ inset: '-8px', animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite', animationDelay: '0.28s' }} />
+              <div className="absolute rounded-full border border-emerald-300/20"
+                style={{ inset: '-16px', animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite', animationDelay: '0.56s' }} />
             </>
           )}
-          {/* Change 4: data-state for breathing animation */}
+
+          {/* Thinking — rotating orbit ring */}
+          {state === 'thinking' && (
+            <div className="absolute rounded-full border-2 border-amber-400/30 border-t-amber-400"
+              style={{ inset: '-6px', animation: 'spin 1.1s linear infinite' }} />
+          )}
+
           <div
             data-state={state}
             onClick={onClick}
@@ -228,12 +258,15 @@ const DrishtiOrb = ({
               .siri-orb { display:grid; grid-template-areas:"stack"; overflow:hidden; border-radius:50%; position:relative; background:var(--bg); transition:--c1 0.8s ease-in-out,--c2 0.8s ease-in-out,--c3 0.8s ease-in-out,--bg 0.8s ease-in-out,width 0.08s ease-out,height 0.08s ease-out; }
               .siri-orb::before,.siri-orb::after { content:""; display:block; grid-area:stack; width:100%; height:100%; border-radius:50%; }
               .siri-orb::before { background: conic-gradient(from calc(var(--angle)*2) at 25% 70%,var(--c3),transparent 20% 80%,var(--c3)),conic-gradient(from calc(var(--angle)*2) at 45% 75%,var(--c2),transparent 30% 60%,var(--c2)),conic-gradient(from calc(var(--angle)*-3) at 80% 20%,var(--c1),transparent 40% 60%,var(--c1)),conic-gradient(from calc(var(--angle)*2) at 15% 5%,var(--c2),transparent 10% 90%,var(--c2)),conic-gradient(from calc(var(--angle)*1) at 20% 80%,var(--c1),transparent 10% 90%,var(--c1)),conic-gradient(from calc(var(--angle)*-2) at 85% 10%,var(--c3),transparent 20% 80%,var(--c3)); box-shadow:inset var(--bg) 0 0 var(--shadow-spread) calc(var(--shadow-spread)*0.2); filter:blur(var(--blur-amount)) contrast(var(--contrast-amount)); animation:rotate var(--animation-duration) linear infinite; }
-              .siri-orb[data-state="idle"]::before { animation:rotate var(--animation-duration) linear infinite,breathe 4s ease-in-out infinite; }
+              .siri-orb[data-state="idle"]::before { animation:rotate var(--animation-duration) linear infinite,breathe 2.5s ease-in-out infinite; }
               .siri-orb::after { background-image:radial-gradient(circle at center,rgba(255,255,255,0.35) var(--dot-size),transparent var(--dot-size)); background-size:calc(var(--dot-size)*2.5) calc(var(--dot-size)*2.5); backdrop-filter:blur(calc(var(--blur-amount)*1.5)) contrast(calc(var(--contrast-amount)*1.5)); mix-blend-mode:overlay; }
               .siri-orb[style*="--mask-radius: 0%"]::after { mask-image:none; }
               .siri-orb:not([style*="--mask-radius: 0%"])::after { mask-image:radial-gradient(black var(--mask-radius),transparent 75%); }
               @keyframes rotate { to { --angle:360deg; } }
-              @keyframes breathe { 0%,100% { opacity:0.75; transform:scale(0.97); } 50% { opacity:1; transform:scale(1.03); } }
+              @keyframes breathe { 0%,100% { opacity:0.7; transform:scale(0.94); } 50% { opacity:1; transform:scale(1.06); } }
+              @keyframes orbHaloBreath { 0%,100% { opacity:0.35; transform:scale(0.85); } 50% { opacity:1; transform:scale(1.15); } }
+              @keyframes fastPing { 0% { transform:scale(1); opacity:0.9; } 100% { transform:scale(2.6); opacity:0; } }
+              @keyframes spin { to { transform:rotate(360deg); } }
               @media (prefers-reduced-motion:reduce) { .siri-orb::before { animation:none; } }
             `}</style>
           </div>
@@ -369,14 +402,42 @@ const DrishtiOrb = ({
         </div>
       )}
 
-      {/* ── EXISTING ORB — keep exactly as is ── */}
+      {/* ── ORB — with alive halo + state rings ── */}
       <div className="relative flex items-center justify-center">
+
+        {/* Outer ambient glow halo — the heartbeat */}
+        <div
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            inset: state === 'idle' ? '-32px' : '-22px',
+            background: `radial-gradient(circle, ${currentConfig.glowColor || 'rgba(99,102,241,0.15)'} 0%, transparent 68%)`,
+            animation: state === 'idle'
+              ? 'orbHaloBreath 2.5s ease-in-out infinite'
+              : state === 'listening'
+              ? 'orbHaloBreath 0.85s ease-in-out infinite'
+              : state === 'speaking'
+              ? 'orbHaloBreath 1.4s ease-in-out infinite'
+              : 'orbHaloBreath 1.8s ease-in-out infinite alternate',
+            opacity: state === 'idle' ? 0.8 : 1,
+          }}
+        />
+
+        {/* 3 fast-ping listening rings */}
         {state === 'listening' && (
           <>
-            <div className="absolute inset-0 rounded-full border-2 border-emerald-400/60 animate-ping" />
-            <div className="absolute rounded-full border border-emerald-400/30 animate-ping"
-              style={{ inset: '-8px', animationDelay: '0.3s' }} />
+            <div className="absolute inset-0 rounded-full border-2 border-emerald-400/80"
+              style={{ animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite' }} />
+            <div className="absolute rounded-full border-2 border-emerald-400/50"
+              style={{ inset: '-12px', animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite', animationDelay: '0.28s' }} />
+            <div className="absolute rounded-full border border-emerald-300/25"
+              style={{ inset: '-24px', animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite', animationDelay: '0.56s' }} />
           </>
+        )}
+
+        {/* Thinking — spinning orbit ring */}
+        {state === 'thinking' && (
+          <div className="absolute rounded-full border-2 border-amber-400/30 border-t-amber-400"
+            style={{ inset: '-10px', animation: 'spin 1.1s linear infinite' }} />
         )}
         <div
           data-state={state}
@@ -508,11 +569,11 @@ const DrishtiOrb = ({
               animation: rotate var(--animation-duration) linear infinite;
             }
 
-            /* Change 4: Breathing animation only on idle state */
+            /* Breathing animation only on idle state — faster, more visible */
             .siri-orb[data-state="idle"]::before {
               animation:
                 rotate var(--animation-duration) linear infinite,
-                breathe 4s ease-in-out infinite;
+                breathe 2.5s ease-in-out infinite;
             }
 
             .siri-orb::after {
@@ -542,11 +603,26 @@ const DrishtiOrb = ({
               to { --angle: 360deg; }
             }
 
-            /* Change 4: breathe keyframe */
+            /* More dramatic breathe: scale 0.94→1.06 over 2.5s */
             @keyframes breathe {
-              0%, 100% { opacity: 0.75; transform: scale(0.97); }
-              50%       { opacity: 1;   transform: scale(1.03); }
+              0%, 100% { opacity: 0.7; transform: scale(0.94); }
+              50%       { opacity: 1;  transform: scale(1.06); }
             }
+
+            /* Outer halo glow breath */
+            @keyframes orbHaloBreath {
+              0%, 100% { opacity: 0.35; transform: scale(0.85); }
+              50%       { opacity: 1;   transform: scale(1.16); }
+            }
+
+            /* Fast expand-fade for listening rings */
+            @keyframes fastPing {
+              0%   { transform: scale(1);   opacity: 0.9; }
+              100% { transform: scale(2.6); opacity: 0;   }
+            }
+
+            /* Thinking orbit ring spin */
+            @keyframes spin { to { transform: rotate(360deg); } }
 
             @media (prefers-reduced-motion: reduce) {
               .siri-orb::before {
@@ -557,7 +633,7 @@ const DrishtiOrb = ({
         </div>
       </div>
 
-      {/* ── SOUND WAVE BARS — keep exactly as is ── */}
+      {/* ── SOUND WAVE BARS — reactive to audioLevel ── */}
       {state === 'speaking' && (
         <div className="flex items-center justify-center gap-[3px] h-6">
           {[0.4, 0.7, 1.0, 0.85, 0.6, 0.9, 0.5, 0.75, 0.45, 0.8].map((h, i) => (
@@ -565,11 +641,12 @@ const DrishtiOrb = ({
               key={i}
               style={{
                 width: '3px',
-                height: `${h * 20}px`,
+                height: `${(h + audioLevel * 0.5) * 20}px`,
                 borderRadius: '2px',
-                background: 'rgba(6, 182, 212, 0.7)',
+                background: `rgba(6, 182, 212, ${0.5 + audioLevel * 0.5})`,
                 animation: `soundBar 0.${4 + (i % 4)}s ease-in-out infinite alternate`,
                 animationDelay: `${i * 0.07}s`,
+                transition: 'height 0.08s ease-out',
               }}
             />
           ))}

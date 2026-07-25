@@ -34,6 +34,7 @@ const useDrishtiVoice = ({
   });
 
   const recognitionRef = useRef(null);
+  const isRecognitionRunningRef = useRef(false);
   const voicesCacheRef = useRef([]);
   const langRef = useRef('en-IN');
 
@@ -53,12 +54,11 @@ const useDrishtiVoice = ({
   const animFrameRef = useRef(null);
   const clapStateRef = useRef({ lastClapTime: 0, count: 0, isSpiking: false, spikeStart: 0, history: [] });
 
-  // Volume detection refs (separate stream from clap detection)
-  const volumeAnalyserRef = useRef(null);
-  const volumeContextRef = useRef(null);
-  const volumeStreamRef = useRef(null);
-  const volumeFrameRef = useRef(null);
-  const volumeSourceRef = useRef(null);
+  // Smoothed audio level — driven by transcript activity, NO second mic stream
+  const smoothedLevelRef = useRef(0);
+  const audioLevelFrameRef = useRef(null);
+  const lastTranscriptLenRef = useRef(0);
+  const audioLevelLastUpdateRef = useRef(0);
 
   // Check mic permission
   useEffect(() => {
@@ -89,6 +89,8 @@ const useDrishtiVoice = ({
     rec.interimResults = true;   // Show live transcript
     rec.maxAlternatives = 3;     // Try more alternatives for better accuracy
 
+    rec.onstart = () => { isRecognitionRunningRef.current = true; };
+
     rec.onresult = (event) => {
       setError(null);
       consecutiveErrorsRef.current = 0;
@@ -115,15 +117,16 @@ const useDrishtiVoice = ({
       }
       if (err === 'aborted') return;
       if (err === 'no-speech') {
-        if (isPttPressedRef.current) {
+        if (isPttPressedRef.current && !isRecognitionRunningRef.current) {
           try { rec.start(); } catch (_) {}
-          return;
+        } else if (!isPttPressedRef.current) {
+          setIsListening(false);
         }
-        setIsListening(false);
         return;
       }
       if (err === 'language-not-supported' || (err === 'network' && langRef.current?.startsWith('kn'))) {
         console.warn('[Drishti] kn-IN not supported by browser speech engine, falling back to en-IN preview');
+        langRef.current = 'en-IN';
         try {
           rec.lang = 'en-IN';
           rec.start();
@@ -156,6 +159,7 @@ const useDrishtiVoice = ({
     };
 
     rec.onend = () => {
+      isRecognitionRunningRef.current = false;
       if (isPttPressedRef.current) {
         // User wants mic to STAY ON continuously — restart recognition!
         try {
@@ -163,10 +167,10 @@ const useDrishtiVoice = ({
         } catch (_) {
           // If start fails, retry after brief tick
           setTimeout(() => {
-            if (isPttPressedRef.current) {
+            if (isPttPressedRef.current && !isRecognitionRunningRef.current) {
               try { rec.start(); } catch (_) {}
             }
-          }, 100);
+          }, 150);
         }
       } else {
         setIsListening(false);
@@ -177,46 +181,41 @@ const useDrishtiVoice = ({
     return () => { try { rec.abort(); } catch (_) {} };
   }, []);
 
-  // Change 2: volume detection — runs while listening (separate from clap stream)
-  const startVolumeDetection = useCallback(async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const Ctx = window.AudioContext || window.webkitAudioContext;
-      if (!Ctx) return;
-      const ctx = new Ctx();
-      const analyser = ctx.createAnalyser();
-      analyser.fftSize = 256;
-      analyser.smoothingTimeConstant = 0.8;
-      const source = ctx.createMediaStreamSource(stream);
-      source.connect(analyser);
+  // Smoothed audio level — driven by transcript character change rate
+  // NO second getUserMedia stream — avoids the double-mic conflict that caused cutoffs.
+  // The level rises when new speech is being transcribed, decays smoothly when silent.
+  const startVolumeDetection = useCallback(() => {
+    lastTranscriptLenRef.current = 0;
+    const DECAY   = 0.88;  // exponential decay per tick (~20fps)
+    const ATTACK  = 0.55;  // how fast level rises when new text arrives
+    const FPS     = 50;    // ms per tick ~20fps
 
-      volumeContextRef.current = ctx;
-      volumeAnalyserRef.current = analyser;
-      volumeStreamRef.current = stream;
-      volumeSourceRef.current = source;
+    const tick = () => {
+      const currentLen = liveTranscriptRef.current?.length || 0;
+      const delta = Math.max(0, currentLen - lastTranscriptLenRef.current);
+      lastTranscriptLenRef.current = currentLen;
 
-      const buf = new Uint8Array(analyser.frequencyBinCount);
-      const tick = () => {
-        analyser.getByteFrequencyData(buf);
-        let sum = 0;
-        for (let i = 0; i < 30; i++) sum += buf[i];
-        const avg = sum / 30;
-        const level = Math.min(1, Math.max(0, (avg - 10) / 80));
-        setAudioLevel(level);
-        volumeFrameRef.current = requestAnimationFrame(tick);
-      };
-      tick();
-    } catch (e) {
-      console.warn('[Drishti] Volume detection failed:', e.message);
-    }
+      // Map new characters → target level (1 char = 0.12, capped at 1.0)
+      const target = delta > 0 ? Math.min(1, delta * 0.18) : 0;
+      smoothedLevelRef.current = smoothedLevelRef.current * DECAY + target * (1 - DECAY) * (1 / ATTACK);
+      smoothedLevelRef.current = Math.min(1, Math.max(0, smoothedLevelRef.current));
+
+      // Throttle React state updates to ~20fps
+      const now = Date.now();
+      if (now - audioLevelLastUpdateRef.current >= FPS) {
+        audioLevelLastUpdateRef.current = now;
+        setAudioLevel(Math.round(smoothedLevelRef.current * 100) / 100);
+      }
+
+      audioLevelFrameRef.current = requestAnimationFrame(tick);
+    };
+    audioLevelFrameRef.current = requestAnimationFrame(tick);
   }, []);
 
   const stopVolumeDetection = useCallback(() => {
-    if (volumeFrameRef.current) cancelAnimationFrame(volumeFrameRef.current);
-    volumeStreamRef.current?.getTracks().forEach(t => t.stop());
-    if (volumeContextRef.current?.state !== 'closed') {
-      try { volumeContextRef.current?.close(); } catch (_) {}
-    }
+    if (audioLevelFrameRef.current) cancelAnimationFrame(audioLevelFrameRef.current);
+    audioLevelFrameRef.current = null;
+    smoothedLevelRef.current = 0;
     setAudioLevel(0);
   }, []);
 
@@ -257,24 +256,22 @@ const useDrishtiVoice = ({
     }
 
     if (recognitionRef.current) {
+      // Try the requested language first; fall back to en-IN if unsupported
+      const preferredLang = lang || 'en-IN';
+      recognitionRef.current.lang = preferredLang;
       try {
-        // Enforce 'en-IN' for browser Web Speech API because Chrome 'kn-IN' hangs without onresult events
-        recognitionRef.current.lang = 'en-IN';
         recognitionRef.current.start();
       } catch (e) {
-        if (e.name === 'InvalidStateError') {
-          // Already running
-        } else {
-          try {
-            recognitionRef.current.lang = 'en-US';
-            recognitionRef.current.start();
-          } catch (_) {}
+        if (e.name !== 'InvalidStateError') {
+          // Language failed — fall back to en-IN
+          recognitionRef.current.lang = 'en-IN';
+          try { recognitionRef.current.start(); } catch (_) {}
         }
       }
     }
 
     startVolumeDetection();
-  }, [micPermission, requestMicPermission, startVolumeDetection]);
+  }, [micPermission, requestMicPermission, startVolumeDetection]); // startVolumeDetection is now conflict-free
 
   // Stop PTT session — returns whatever was captured
   const stopListeningAndGetTranscript = useCallback(() => {
@@ -289,6 +286,7 @@ const useDrishtiVoice = ({
     accumulatedFinalRef.current = '';
     lastInterimRef.current = '';
     liveTranscriptRef.current = '';
+    setLiveTranscript(''); // clear React state so the live bubble disappears cleanly
     return captured;
   }, [stopVolumeDetection]);
 
@@ -304,7 +302,7 @@ const useDrishtiVoice = ({
       const knVoice = voices.find(v => v.lang === 'kn-IN' || v.lang.startsWith('kn') || v.name.toLowerCase().includes('kannada'));
       if (knVoice) return knVoice;
 
-      const inVoice = voices.find(v => v.lang === 'en-IN' || v.name.toLowerCase().includes('india') || v.name.toLowerCase().includes('heera') || v.name.toLowerCase().includes('kalpana'));
+      const inVoice = voices.find(v => v.lang === 'en-IN' || v.name.toLowerCase().includes('india') || v.name.toLowerCase().includes('ravi') || v.name.toLowerCase().includes('heera') || v.name.toLowerCase().includes('kalpana'));
       if (inVoice) return inVoice;
     }
 
@@ -332,7 +330,7 @@ const useDrishtiVoice = ({
            null;
   }, []);
 
-  // Fix 2: race-condition-safe speak() — attempts Catalyst Zia TTS primary, falls back to Web Speech API
+  // Fix 2: race-condition-safe speak() — Neural TTS primary, Zia fallback, then Web Speech API
   const audioRef = useRef(null);
 
   const speak = useCallback(async (text, lang = 'en-IN') => {
@@ -344,9 +342,40 @@ const useDrishtiVoice = ({
       window.speechSynthesis.cancel();
     }
     if (audioRef.current) {
-      audioRef.current.pause();
+      try { audioRef.current.pause(); } catch (_) {}
       audioRef.current = null;
     }
+
+    // Helper: play a base64 audio string
+    const playBase64Audio = (audioBase64, mimeType, source) => {
+      return new Promise((resolve, reject) => {
+        try {
+          const audio = new Audio();
+          audioRef.current = audio;
+
+          audio.oncanplaythrough = () => {
+            setIsSpeaking(true);
+            callbacksRef.current.onSpeakStart?.();
+            audio.play().catch(reject);
+          };
+          audio.onended = () => {
+            setIsSpeaking(false);
+            callbacksRef.current.onSpeakEnd?.();
+            resolve();
+          };
+          audio.onerror = (e) => {
+            setIsSpeaking(false);
+            reject(new Error(`Audio element error: ${e.type}`));
+          };
+
+          // Set source AFTER attaching events
+          audio.src = `data:${mimeType || 'audio/mpeg'};base64,${audioBase64}`;
+          audio.load();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    };
 
     // Helper for browser Web Speech API fallback
     const fallbackToBrowserSpeech = () => {
@@ -355,17 +384,42 @@ const useDrishtiVoice = ({
 
       const doSpeak = () => {
         const utt = new SpeechSynthesisUtterance(text);
-        utt.lang = lang;
-        utt.rate = 0.92;
-        utt.pitch = 1.05;
-        utt.volume = 1.0;
-
         const voices = window.speechSynthesis.getVoices();
         voicesCacheRef.current = voices;
 
-        if (voices.length > 0) {
+        const isKannada = lang.startsWith('kn');
+
+        if (isKannada) {
+          const indiaVoice = voices.find(v =>
+            v.lang === 'en-IN' ||
+            v.name.toLowerCase().includes('india') ||
+            v.name.toLowerCase().includes('ravi') ||
+            v.name.toLowerCase().includes('heera')
+          ) || voices.find(v => v.lang.startsWith('en')) || null;
+
+          utt.lang = indiaVoice ? indiaVoice.lang : 'en-IN';
+          if (indiaVoice) utt.voice = indiaVoice;
+          utt.rate = 0.88;
+          utt.pitch = 1.0;
+          utt.volume = 1.0;
+        } else {
           const v = findBestVoice(lang);
           if (v) utt.voice = v;
+          utt.lang = lang;
+
+          const isGoogle = utt.voice?.name?.toLowerCase().includes('google');
+          const isMicrosoft = utt.voice?.name?.toLowerCase().includes('microsoft');
+          if (isGoogle) {
+            utt.rate = 0.95;
+            utt.pitch = 1.0;
+          } else if (isMicrosoft) {
+            utt.rate = 0.9;
+            utt.pitch = 1.05;
+          } else {
+            utt.rate = 0.88;
+            utt.pitch = 1.08;
+          }
+          utt.volume = 1.0;
         }
 
         utt.onstart = () => {
@@ -406,10 +460,10 @@ const useDrishtiVoice = ({
       }, 50);
     };
 
-    // Primary path: Catalyst Zia TTS
+    // Primary path: Neural TTS / Zia via API
     try {
-      console.log('[DRISHTI VOICE] Requesting Catalyst Zia TTS (Primary)...');
-      const res = await fetch('/server/drishtiVoice/', {
+      console.log('[DRISHTI VOICE] Requesting Neural TTS...');
+      const res = await fetch('/api/drishtiVoice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode: 'tts', text, lang: languageCode }),
@@ -418,34 +472,23 @@ const useDrishtiVoice = ({
       if (!res.ok) throw new Error(`TTS HTTP error ${res.status}`);
       const data = await res.json();
 
-      if (data.audioBase64 && data.source === 'zia') {
-        console.log('[DRISHTI VOICE] ✅ Playing Audio via Catalyst Zia TTS!');
-
-        const audio = new Audio(`data:${data.mimeType || 'audio/wav'};base64,${data.audioBase64}`);
-        audioRef.current = audio;
-
-        audio.onplay = () => {
-          setIsSpeaking(true);
-          callbacksRef.current.onSpeakStart?.();
-        };
-        audio.onended = () => {
+      if (data.audioBase64 && (data.source === 'zia' || data.source === 'neural_tts')) {
+        console.log(`[DRISHTI VOICE] ✅ Got audio from ${data.source}, playing...`);
+        try {
+          await playBase64Audio(data.audioBase64, data.mimeType || 'audio/mpeg', data.source);
+          return; // success — done
+        } catch (playErr) {
+          console.warn('[DRISHTI VOICE] Audio playback failed, falling back to Web Speech:', playErr.message);
           setIsSpeaking(false);
-          callbacksRef.current.onSpeakEnd?.();
-        };
-        audio.onerror = (e) => {
-          console.warn('[DRISHTI VOICE] Audio playback error, falling back to Web Speech:', e);
-          setIsSpeaking(false);
-          fallbackToBrowserSpeech();
-        };
-
-        await audio.play();
-        return;
+        }
+      } else {
+        console.warn('[DRISHTI VOICE] API returned browser_fallback or empty audio, using Web Speech');
       }
     } catch (err) {
-      console.warn('[DRISHTI VOICE] Primary Zia TTS failed, falling back to Web Speech API:', err.message);
+      console.warn('[DRISHTI VOICE] TTS API call failed, falling back to Web Speech API:', err.message);
     }
 
-    // Fallback path if Zia fails or returns browser_fallback
+    // Final fallback: browser Web Speech API
     fallbackToBrowserSpeech();
   }, [findBestVoice]);
 

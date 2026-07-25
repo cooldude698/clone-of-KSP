@@ -80,6 +80,8 @@ export default function DashboardLayout({ children }) {
 
   // ─── Orb interaction state ───────────────────────────────────────
   const [pendingTranscript, setPendingTranscript] = useState('');  // words captured, not yet sent
+  const pendingTranscriptRef = useRef(''); // mirror for Enter-key handler (avoids stale closure)
+  useEffect(() => { pendingTranscriptRef.current = pendingTranscript; }, [pendingTranscript]);
   const [orbResponse,       setOrbResponse]       = useState('');  // last AI response text for bubble
   const [showTypingInput,   setShowTypingInput]   = useState(false); // type-instead input visible
   const [typingText,        setTypingText]        = useState('');  // text in the typing input
@@ -176,12 +178,13 @@ export default function DashboardLayout({ children }) {
       const compatResponse = {
         response_text: text,
         visualization: { type: 'none', title: '', data: {} },
-        follow_up_suggestions: [],
+        follow_up_suggestions: data.follow_up_suggestions || [],
         confidence: source === 'quickml' ? 0.9 : 0.6,
         language_detected: data.language || language,
         emotion: 'calm',
         urgency: 'low',
         source,
+        stats: data.stats || null,
       };
       setResponse(compatResponse);
 
@@ -236,20 +239,20 @@ export default function DashboardLayout({ children }) {
     if (!pttActiveRef.current) return;
     pttActiveRef.current = false;
 
-    // Flush final speech events
-    await new Promise(r => setTimeout(r, 150));
+    // Give the recognition engine 300ms to finalize its last speech event
+    await new Promise(r => setTimeout(r, 300));
 
-    const browserCaptured = stopListeningAndGetTranscript();
+    // stopListeningAndGetTranscript reads directly from refs (never stale)
+    const finalQuery = stopListeningAndGetTranscript().trim();
     setOrbState('idle');
 
-    const finalQuery = (browserCaptured || liveTranscript || pendingTranscript || '').trim();
-    if (!finalQuery) {
-      return;
-    }
+    if (!finalQuery) return;
 
-    // Auto-send captured voice query immediately
-    handleQuery(finalQuery);
-  }, [stopListeningAndGetTranscript, liveTranscript, pendingTranscript, handleQuery]);
+    // ── CONFIRM-TO-SEND: show the transcript in the bubble ──
+    // The user must press Enter / click Send to dispatch the query.
+    // This replaces the old auto-send behaviour.
+    setPendingTranscript(finalQuery);
+  }, [stopListeningAndGetTranscript]);
 
   const handleConfirmSend = useCallback(() => {
     if (!pendingTranscript.trim()) return;
@@ -325,7 +328,7 @@ export default function DashboardLayout({ children }) {
     speak(text, lang);
   }, [speak]);
 
-  // ─── Keyboard Shortcuts (Alt+O: Toggle Panel, Alt+M: Toggle Mute) ───
+  // ─── Keyboard Shortcuts (Alt+O: Toggle Panel, Alt+M: Toggle Mute, Enter: confirm pending) ───
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.altKey && (e.key === 'o' || e.key === 'O')) {
@@ -336,10 +339,24 @@ export default function DashboardLayout({ children }) {
         e.preventDefault();
         handleToggleMute();
       }
+      // Enter to confirm the pending voice transcript bubble
+      if (e.key === 'Enter' && !e.shiftKey) {
+        const activeTag = document.activeElement?.tagName;
+        // Only fire if focus is NOT inside a text input / textarea
+        if (activeTag !== 'INPUT' && activeTag !== 'TEXTAREA') {
+          // Use the ref so we always read fresh value, not a closure-captured one
+          const pending = pendingTranscriptRef.current?.trim();
+          if (pending) {
+            e.preventDefault();
+            setPendingTranscript('');
+            handleQuery(pending);
+          }
+        }
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleToggleMute]);
+  }, [handleToggleMute, handleQuery]);
 
   // ─── Change 6: Orb pin — load/save localStorage ──────────────────
   useEffect(() => {

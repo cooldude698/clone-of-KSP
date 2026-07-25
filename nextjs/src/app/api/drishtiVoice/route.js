@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
 import FormData from 'form-data';
+import { EdgeTTS } from '@seepine/edge-tts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -113,7 +114,51 @@ async function callZiaTTS(text, lang) {
     }
   }
 
+  if (lastError?.response) {
+    console.error('[Zia TTS] HTTP Status:', lastError.response.status);
+    console.error('[Zia TTS] Response body:', JSON.stringify(lastError.response.data)?.slice(0, 300));
+  }
   throw new Error(`Zia TTS failed: ${lastError?.message}`);
+}
+
+async function callNeuralTTS(text, lang) {
+  const cleanText = text.replace(/[|*#`]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 800);
+  const voice = lang?.startsWith('kn') ? 'kn-IN-SapnaNeural' : 'en-IN-NeerjaNeural';
+
+  // EdgeTTS WebSockets hang inside Next.js's runtime — run it in a child process instead
+  const { execFile } = await import('child_process');
+  const { promisify } = await import('util');
+  const execFileAsync = promisify(execFile);
+
+  const nodeScript = `
+const { EdgeTTS } = require('@seepine/edge-tts');
+(async () => {
+  try {
+    const tts = new EdgeTTS({ voice: '${voice}' });
+    const result = await tts.call(${JSON.stringify(cleanText)});
+    if (result && result.data && result.data.length > 100) {
+      process.stdout.write(result.data.toString('base64'));
+    } else {
+      process.exit(1);
+    }
+  } catch (e) {
+    process.stderr.write(e.message);
+    process.exit(1);
+  }
+})();
+`;
+
+  const { stdout } = await execFileAsync(process.execPath, ['-e', nodeScript], {
+    timeout: 12000,
+    maxBuffer: 10 * 1024 * 1024, // 10MB
+    cwd: process.cwd(),
+    env: { ...process.env, NODE_PATH: `${process.cwd()}/node_modules` },
+  });
+
+  if (stdout && stdout.length > 100) {
+    return { audioBase64: stdout, mimeType: 'audio/mpeg' };
+  }
+  throw new Error('EdgeTTS child process returned empty audio');
 }
 
 export async function POST(req) {
@@ -140,6 +185,15 @@ export async function POST(req) {
       if (!text || !text.trim()) {
         return NextResponse.json({ audioBase64: '', source: 'browser_fallback' }, { status: 200, headers: CORS });
       }
+      // 1. Try Microsoft Neural TTS (Human-like voice profile with natural pauses)
+      try {
+        const { audioBase64, mimeType } = await callNeuralTTS(text.trim(), lang);
+        return NextResponse.json({ audioBase64, mimeType, source: 'neural_tts' }, { status: 200, headers: CORS });
+      } catch (neuralErr) {
+        console.warn('[drishtiVoice TTS] Neural TTS failed, trying Zia:', neuralErr.message);
+      }
+
+      // 2. Fall back to Zia TTS
       try {
         const { audioBase64, mimeType } = await callZiaTTS(text.trim(), lang);
         return NextResponse.json({ audioBase64, mimeType, source: 'zia' }, { status: 200, headers: CORS });

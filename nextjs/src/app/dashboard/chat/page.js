@@ -184,6 +184,7 @@ export default function ChatPage() {
   const recognitionRef = useRef(null);
   const pttStartTimeRef = useRef(0);
   const isHoldingRef = useRef(false);
+  const shouldRestartRef = useRef(false); // tracks user intent: true = keep mic on
 
   // Investigator Wall states
   const [selectedFIR, setSelectedFIR] = useState(null);
@@ -542,50 +543,95 @@ export default function ChatPage() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) return;
     stopSpeech();
+
+    // Stop any existing instance cleanly before creating a new one
+    if (recognitionRef.current) {
+      shouldRestartRef.current = false;
+      try { recognitionRef.current.abort(); } catch (_) {}
+      recognitionRef.current = null;
+    }
+
     const rec = new SpeechRecognition();
     recognitionRef.current = rec;
     rec.lang = language === 'en' ? 'en-IN' : 'kn-IN';
     rec.continuous = true;
     rec.interimResults = true;
-    let currentTranscript = '';
+    // Use a stable accumulated transcript across results
+    let finalTranscript = '';
 
     rec.onresult = (e) => {
       setError(null);
       consecutiveErrorsRef.current = 0;
-      currentTranscript = '';
-      for (let i = 0; i < e.results.length; i++) {
-        currentTranscript += e.results[i][0].transcript;
+      // Only process new results from resultIndex to avoid re-concatenating old ones
+      let interimTranscript = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) {
+          finalTranscript += t + ' ';
+        } else {
+          interimTranscript += t;
+        }
       }
-      setInput(currentTranscript);
+      setInput((finalTranscript + interimTranscript).trim());
     };
 
     rec.onerror = (e) => {
-       const err = e.error;
-       setError(err);
-       if (err !== 'no-speech') consecutiveErrorsRef.current += 1;
-       setIsRecording(false);
-    };
-    rec.onend = () => {
+      const err = e.error;
+      setError(err);
+      // Non-fatal errors — don't kill the mic UI state
+      if (err === 'no-speech' || err === 'network') return;
+      // Fatal errors: aborted by user or hardware issue
+      consecutiveErrorsRef.current += 1;
+      shouldRestartRef.current = false;
       setIsRecording(false);
-      if (currentTranscript.trim()) {
-        sendMessage(currentTranscript);
+    };
+
+    rec.onend = () => {
+      // If user didn't explicitly stop, auto-restart to keep mic active
+      if (shouldRestartRef.current) {
+        const pendingFinal = finalTranscript.trim();
+        // Reset for next segment but keep accumulated text in input
+        finalTranscript = '';
+        try {
+          const newRec = new SpeechRecognition();
+          recognitionRef.current = newRec;
+          newRec.lang = rec.lang;
+          newRec.continuous = true;
+          newRec.interimResults = true;
+          newRec.onresult = rec.onresult;
+          newRec.onerror = rec.onerror;
+          newRec.onend = rec.onend;
+          newRec.start();
+          return; // stay recording, don't flip isRecording off
+        } catch (_) {
+          shouldRestartRef.current = false;
+        }
+      }
+      // User explicitly stopped or fatal error — finalize
+      setIsRecording(false);
+      const finalText = finalTranscript.trim();
+      finalTranscript = '';
+      if (finalText) {
+        sendMessage(finalText);
         setInput('');
       }
     };
+
     try {
+      shouldRestartRef.current = true;
       rec.start();
       setIsRecording(true);
     } catch (error) {
-      if (error.name === 'InvalidStateError') {
-        return;
-      }
+      shouldRestartRef.current = false;
+      if (error.name === 'InvalidStateError') return;
       console.error('Failed to start voice:', error);
       setIsRecording(false);
     }
   };
 
   const stopVoice = () => {
-    recognitionRef.current?.stop();
+    shouldRestartRef.current = false; // signal onend NOT to auto-restart
+    try { recognitionRef.current?.stop(); } catch (_) {}
     setIsRecording(false);
   };
 

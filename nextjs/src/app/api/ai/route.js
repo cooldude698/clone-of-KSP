@@ -66,8 +66,10 @@ async function callGemini(messages, geminiKey) {
   const userMessage = messages[messages.length - 1].content;
   const history = messages.slice(1, -1); // skip system message
 
+  const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -147,7 +149,7 @@ export async function POST(req) {
       for (let i = 0; i < geminiKeys.length; i++) {
         try {
           rawText = await callGemini(messages, geminiKeys[i]);
-          modelUsed = `gemini-1.5-flash (key ${i + 1})`;
+          modelUsed = `${process.env.GEMINI_MODEL || 'gemini-2.5-flash'} (key ${i + 1})`;
           break; // Success! Break out of the loop
         } catch (e) {
           console.warn(`[DRISHTI AI] Gemini key ${i + 1} failed:`, e.message);
