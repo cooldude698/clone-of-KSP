@@ -82,6 +82,14 @@ export default function DashboardLayout({ children }) {
   const [role,         setRole]         = useState('Inspector');
   const [employeeId,   setEmployeeId]   = useState('KSP-0000');
   const [currentTime,  setCurrentTime]  = useState('');
+  const mainContentRef = useRef(null);
+
+  // Auto-scroll main content area to top on page navigation
+  useEffect(() => {
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollTop = 0;
+    }
+  }, [pathname]);
 
   // ─── Drishti state ───────────────────────────────────────────────
   const [orbState,         setOrbState]         = useState('idle');
@@ -745,7 +753,7 @@ export default function DashboardLayout({ children }) {
             </div>
           </div>
         </header>
-        <main className="flex-1 overflow-auto bg-void-000">{children}</main>
+        <main ref={mainContentRef} className="flex-1 overflow-auto bg-void-000">{children}</main>
         <SystemStatusFooter />
       </div>
 
