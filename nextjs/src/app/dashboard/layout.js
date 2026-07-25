@@ -754,7 +754,7 @@ export default function DashboardLayout({ children }) {
           </div>
         </header>
         <main ref={mainContentRef} className="flex-1 overflow-auto bg-void-000">{children}</main>
-        <SystemStatusFooter />
+        {pathname !== '/dashboard/chat' && <SystemStatusFooter />}
       </div>
 
       {/* ── DRISHTI SIDE PANEL ── */}
