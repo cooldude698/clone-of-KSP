@@ -274,18 +274,7 @@ export default function DrishtiPanel({
               </div>
             </div>
 
-            {/* ─── Mic Permission Banner ─── */}
-            {micPermission !== 'granted' && (
-              <div className="px-3.5 py-2 bg-blue-600/15 border-b border-blue-500/30 flex items-center justify-between gap-2">
-                <span className="text-xs text-blue-300 font-medium">Click to enable voice mic</span>
-                <button
-                  onClick={onRequestMicPermission}
-                  className="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold tracking-wider transition-all"
-                >
-                  ALLOW MIC
-                </button>
-              </div>
-            )}
+
 
             {/* ─── Main Chat Content Container ─── */}
             <div ref={scrollRef} className="flex-1 overflow-y-auto drishti-scrollbar px-4 py-4 space-y-4">
