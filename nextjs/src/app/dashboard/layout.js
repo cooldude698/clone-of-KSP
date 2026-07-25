@@ -116,6 +116,8 @@ export default function DashboardLayout({ children }) {
   const roleRef      = useRef(role);
   useEffect(() => { roleRef.current = role; }, [role]);
 
+  const originalResponseRef = useRef({ text: '', lang: 'en' });
+
   // ─── Voice hook ──────────────────────────────────────────────────
   const {
     startListening,
@@ -166,6 +168,7 @@ export default function DashboardLayout({ children }) {
       if (localResult.type === 'navigate') router.push(localResult.path);
       const reply = localResult.reply;
       setResponse({ response_text: reply, follow_up_suggestions: [], confidence: 1.0 });
+      originalResponseRef.current = { text: reply, lang: 'en' };
       setSessionLogs(prev => [...prev, { role: 'user', content: queryText, timestamp: ts() }]);
       setSessionLogs(prev => [...prev, { role: 'assistant', content: reply, timestamp: ts() }]);
       setOrbState('speaking');
@@ -228,6 +231,7 @@ export default function DashboardLayout({ children }) {
         stats: data.stats || null,
       };
       setResponse(compatResponse);
+      originalResponseRef.current = { text: text, lang: data.language || targetLang || 'en' };
 
       if (text) {
         setSessionLogs(prev => [...prev, { role: 'assistant', content: text, timestamp: ts() }]);
@@ -249,6 +253,7 @@ export default function DashboardLayout({ children }) {
       setStateOverrideLabel('');
       const fallback = "I'm having trouble reaching the network right now, Sir. Please try again.";
       setResponse({ response_text: fallback, follow_up_suggestions: [], urgency: 'low' });
+      originalResponseRef.current = { text: fallback, lang: 'en' };
       setSessionLogs(prev => [...prev, { role: 'assistant', content: fallback, timestamp: ts() }]);
       setOrbResponse("I'm having trouble reaching the network right now, Sir. Please try again.");
     }
@@ -329,6 +334,7 @@ export default function DashboardLayout({ children }) {
       : `Good evening, ${roleRef.current}. Night shift active. I'll keep watch. Just say the word if you need anything.`;
 
     setGreetingText(greeting);
+    originalResponseRef.current = { text: greeting, lang: 'en' };
     setOrbState('speaking');
     setSessionLogs(prev => [...prev, {
       role: 'assistant', content: greeting,
@@ -369,6 +375,64 @@ export default function DashboardLayout({ children }) {
     if (isMutedRef.current) return;
     speak(text, lang);
   }, [speak]);
+
+  const handleSpeakText = useCallback(async (text, locale) => {
+    if (isMutedRef.current) return;
+
+    const targetLang = locale.split('-')[0];
+    const sourceLang = originalResponseRef.current.lang || 'en';
+    const sourceText = originalResponseRef.current.text || text;
+
+    if (targetLang === sourceLang) {
+      // Revert back / use original language text
+      if (response) {
+        setResponse(prev => prev ? { ...prev, response_text: sourceText } : null);
+      } else {
+        setGreetingText(sourceText);
+      }
+      setLanguage(targetLang);
+      setOrbState('speaking');
+      speak(sourceText, locale);
+    } else {
+      // Translate first
+      try {
+        setOrbState('thinking');
+        setStateOverrideLabel('Translating…');
+        const res = await fetch('/server/askDrishtiAI/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            mode: 'translate',
+            text: sourceText,
+            sourceLang,
+            targetLang,
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.text) {
+            const translatedText = data.text;
+            if (response) {
+              setResponse(prev => prev ? { ...prev, response_text: translatedText } : null);
+            } else {
+              setGreetingText(translatedText);
+            }
+            setLanguage(targetLang);
+            setOrbState('speaking');
+            setStateOverrideLabel('Speaking');
+            speak(data.spokenText || translatedText, locale);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('[DRISHTI] Translation failed:', err.message);
+      }
+      // Fallback
+      setOrbState('speaking');
+      setStateOverrideLabel('Speaking');
+      speak(text, locale);
+    }
+  }, [response, speak]);
 
   // ─── Keyboard Shortcuts (Alt+O: Toggle Panel, Alt+M: Toggle Mute, Enter: confirm pending) ───
   useEffect(() => {
@@ -658,7 +722,7 @@ export default function DashboardLayout({ children }) {
         onRequestMicPermission={requestMicPermission}
         orbPinned={orbPinned}
         onToggleOrbPin={handleToggleOrbPin}
-        onSpeakText={safeSpeak}
+        onSpeakText={handleSpeakText}
         isMuted={isMuted}
         onToggleMute={handleToggleMute}
       />

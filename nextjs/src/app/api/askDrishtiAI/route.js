@@ -490,6 +490,19 @@ async function translateToTargetLang(text, targetLang) {
 export async function POST(req) {
   try {
     const body = await req.json();
+
+    if (body.mode === 'translate') {
+      const { text, sourceLang = 'en', targetLang } = body;
+      if (!text || !text.trim()) {
+        return NextResponse.json({ text: '', spokenText: '' }, { status: 200, headers: CORS });
+      }
+      const translated = await translateText(text.trim(), sourceLang, targetLang);
+      return NextResponse.json(
+        { text: translated, spokenText: translated },
+        { status: 200, headers: CORS }
+      );
+    }
+
     const { question, lang = 'en', rawData, sessionHistory = [] } = body;
 
     if (!question?.trim()) {
