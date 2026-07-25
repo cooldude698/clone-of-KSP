@@ -54,38 +54,7 @@
   --radius-lg:   14px;
 }
 
-/* ─── DARK MODE (DEFAULT HIGH-TECH SURVEILLANCE) ────────── */
-.dark, [data-theme="dark"] {
-  --surface-0:        #0A0D12;
-  --surface-1:        #121620;
-  --surface-2:        #1A202C;
-  --border:           #242B3B;
-  --border-subtle:    #1B2232;
-  --text-primary:     #F8FAFC;
-  --text-secondary:   #94A3B8;
-  --accent:           #9E2A38;
-  --accent-light:     #BE3849;
-  --accent-glow:      rgba(158, 42, 56, 0.35);
-  --cyan-accent:      #38BDF8;
-  --cyan-glow:        rgba(56, 189, 248, 0.25);
-  --status-critical:  #EF4444;
-  --status-warning:   #F59E0B;
-  --status-success:   #22C55E;
 
-  /* ── Legacy aliases ── */
-  --color-void-000:       var(--surface-0);
-  --color-steel-700:      var(--surface-1);
-  --color-steel-600:      var(--border);
-  --color-phosphor-500:   var(--accent);
-  --color-warn-500:       var(--status-warning);
-  --color-critical-500:   var(--status-critical);
-  --color-stamp-red-500:  var(--status-critical);
-  --color-success-500:    var(--status-success);
-  --color-paper-100:      var(--text-primary);
-
-  --scroll-track: #0A0D12;
-  --scroll-thumb: #242B3B;
-}
 
 * {
   box-sizing: border-box;

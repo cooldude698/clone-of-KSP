@@ -26,15 +26,9 @@ export const metadata = {
 const themeScript = `
 (function() {
   try {
-    var t = localStorage.getItem('theme');
-    if (t === 'light') {
-      document.documentElement.classList.remove('dark');
-    } else {
-      document.documentElement.classList.add('dark');
-    }
-  } catch(e) {
-    document.documentElement.classList.add('dark');
-  }
+    localStorage.setItem('theme', 'light');
+    document.documentElement.classList.remove('dark');
+  } catch(e) {}
 })();
 `;
 
@@ -51,7 +45,8 @@ export default function RootLayout({ children }) {
       <body className="bg-void-000 text-paper-100 font-sans antialiased transition-colors duration-200">
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
+          forcedTheme="light"
           enableSystem={false}
         >
           {children}
