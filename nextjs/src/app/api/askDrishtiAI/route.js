@@ -12,6 +12,12 @@ export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: CORS });
 }
 
+const GEMINI_KEYS = [
+  process.env.GEMINI_API_KEY,
+  ...Array.from({ length: 13 }, (_, i) => process.env[`GEMINI_API_KEY_${i + 1}`]),
+  'AIzaSyCZKZBcVvz5sVokO8ei__6plJBeqO2JWpU', // last-resort bundled key
+].filter(Boolean);
+
 // --- Helpers -----------------------------------------------------------------
 
 const CRIME_DATABASE_SUMMARY = `
@@ -172,10 +178,7 @@ async function translateWithZia(text, sourceLang, targetLang) {
 
 async function translateWithGemini(text, sourceLang, targetLang) {
   const targetName = targetLang === 'kn' ? 'Kannada' : targetLang === 'hi' ? 'Hindi' : 'English';
-  for (const apiKey of [
-    process.env.GEMINI_API_KEY,
-    ...Array.from({ length: 13 }, (_, i) => process.env[`GEMINI_API_KEY_${i + 1}`]),
-  ].filter(Boolean)) {
+  for (const apiKey of GEMINI_KEYS) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
       const response = await axios.post(
@@ -189,7 +192,7 @@ async function translateWithGemini(text, sourceLang, targetLang) {
       const result = response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
       if (result) return result;
     } catch (e) {
-      if (e?.response?.status !== 429) break;
+      console.warn(`[DRISHTI] translateWithGemini failed with key ${apiKey?.slice(0, 6)}...:`, e.message);
     }
   }
   return text;
@@ -364,11 +367,6 @@ async function callGroq(question, knowledgeContext = '', sessionHistory = []) {
 }
 // ── Gemini last-resort fallback ──────────────────────────────────────────────
 // Picks keys from GEMINI_API_KEY_1..N in sequence; falls back to a bundled key.
-const GEMINI_KEYS = [
-  process.env.GEMINI_API_KEY,
-  ...Array.from({ length: 13 }, (_, i) => process.env[`GEMINI_API_KEY_${i + 1}`]),
-  'AIzaSyCZKZBcVvz5sVokO8ei__6plJBeqO2JWpU', // last-resort bundled key
-].filter(Boolean);
 
 async function callGemini(question, knowledgeContext = '', sessionHistory = []) {
   const models = Array.from(new Set([process.env.GEMINI_MODEL, 'gemini-flash-latest', 'gemini-2.0-flash'])).filter(Boolean);
