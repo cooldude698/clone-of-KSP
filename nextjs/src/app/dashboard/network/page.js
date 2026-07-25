@@ -158,14 +158,32 @@ export default function NetworkPage() {
         victims: [
           { full_name: 'K. Venkatesh', age: 41, gender: 'Male', occupation: 'Store Owner', district_name: 'Bengaluru Urban', vulnerability_score: 65 }
         ],
-        related_firs: edges
-          .filter(e => e.source === nodeId || e.target === nodeId)
-          .map(e => ({
-            case_number: e.fir_case_number || 'FIR-2026-BL-0492',
-            crime_type: e.crime_type || 'robbery',
-            date_filed: e.date || '2026-06-02',
-            link_reason: 'Co-accused accomplice listing'
-          })),
+        related_firs: (() => {
+          const rels = [];
+          const seen = new Set();
+          const connected = edges.filter(e => e.source === nodeId || e.target === nodeId);
+          connected.forEach((e, idx) => {
+            let caseNum = e.fir_case_number;
+            if (!caseNum) {
+              if (typeof e.target === 'string' && e.target.startsWith('FIR-')) caseNum = e.target;
+              else if (typeof e.source === 'string' && e.source.startsWith('FIR-')) caseNum = e.source;
+              else {
+                const available = ['FIR-2026-BL-4921', 'FIR-2026-MY-1103', 'FIR-2026-BL-4920', 'FIR-2026-BL-5001'];
+                caseNum = available[idx % available.length];
+              }
+            }
+            if (!seen.has(caseNum)) {
+              seen.add(caseNum);
+              rels.push({
+                case_number: caseNum,
+                crime_type: e.crime_type || 'robbery',
+                date_filed: e.date || '2026-06-02',
+                link_reason: e.relation || 'Co-accused accomplice listing'
+              });
+            }
+          });
+          return rels;
+        })(),
         case_summary: `DRISHTI AI Co-Pilot identified accomplice links for ${labelName} across ${clickedNode?.crime_types?.length || 1} crime categories. Analysis suggests high repetition probability during festival seasons.`
       });
     } finally {

@@ -593,9 +593,9 @@ export default function InvestigatorWall({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {related_firs.map((refFir) => (
+            {related_firs.map((refFir, idx) => (
               <Link
-                key={refFir.case_number}
+                key={`${refFir.case_number}-${idx}`}
                 href={`/dashboard/fir/${refFir.case_number}`}
                 className="group rounded-xl bg-white border border-slate-200 p-5 hover:border-red-300 hover:shadow-md transition-all duration-200 shadow-sm block"
               >
