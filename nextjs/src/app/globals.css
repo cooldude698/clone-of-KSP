@@ -8,23 +8,32 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── LIGHT MODE ────────────────────────────────────────── */
+/* ─── LIGHT MODE (COASTAL OASIS REVAMP PALETTE) ────────── */
 :root {
-  --surface-0:        #F4F5F8;
-  --surface-1:        #FFFFFF;
-  --surface-2:        #EAECEF;
-  --border:           #D5D9E2;
-  --border-subtle:    #E2E6EE;
-  --text-primary:     #0F172A;
-  --text-secondary:   #475569;
-  --accent:           #7C2D37;
-  --accent-light:     #9E3A47;
-  --accent-glow:      rgba(124, 45, 55, 0.25);
-  --cyan-accent:      #0284C7;
-  --cyan-glow:        rgba(2, 132, 199, 0.2);
-  --status-critical:  #DC2626;
-  --status-warning:   #D97706;
-  --status-success:   #16A34A;
+  /* Exact Coastal Revamp Palette Tokens */
+  --coastal-sand:      #EFEAE4;
+  --earthy-gold:       #A68A69;
+  --sky-oasis-blue:    #AECAE8;
+  --coastal-slate:     #7A90A8;
+  --deep-ocean-navy:   #1E2733;
+
+  /* Dynamic Light Surface & UI Mapping */
+  --surface-0:        #EFEAE4; /* Coastal Sand base canvas */
+  --surface-1:        #FAF6F0; /* Soft warm ivory card background */
+  --surface-2:        #E2D8CC; /* Elevated subtle sand container & hover highlight */
+  --border:           #7A90A8; /* Coastal Slate Blue border definition */
+  --border-subtle:    #D5DDE6;
+  --text-primary:     #1E2733; /* Deep Ocean Navy ultra-readable text */
+  --text-secondary:   #48596D; /* Coastal Slate secondary text */
+  --text-muted:       #A68A69; /* Earthy Gold muted text & accents */
+  --accent:           #1E2733; /* Deep Ocean Navy primary accent */
+  --accent-light:     #7A90A8; /* Coastal Slate highlight */
+  --accent-glow:      rgba(122, 144, 168, 0.25);
+  --cyan-accent:      #7A90A8;
+  --cyan-glow:        rgba(122, 144, 168, 0.2);
+  --status-critical:  #DC2626; /* Alert red */
+  --status-warning:   #A68A69; /* Earthy gold warning */
+  --status-success:   #16A34A; /* Emerald success */
 
   /* ── Legacy aliases ── */
   --color-void-000:       var(--surface-0);
@@ -37,8 +46,8 @@
   --color-success-500:    var(--status-success);
   --color-paper-100:      var(--text-primary);
 
-  --scroll-track: #EAECEF;
-  --scroll-thumb: #CBD5E1;
+  --scroll-track: #EFEAE4;
+  --scroll-thumb: #7A90A8;
 
   --radius-sm:   6px;
   --radius-md:   10px;
@@ -203,8 +212,9 @@ body {
 }
 
 :root:not(.dark) .glass-panel {
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.08);
+  background: rgba(250, 246, 240, 0.94);
+  box-shadow: 0 12px 36px -4px rgba(30, 39, 51, 0.12), 0 2px 8px 0 rgba(30, 39, 51, 0.05);
+  border: 1px solid #7A90A8;
 }
 
 /* Glow Border & Accents */
@@ -217,8 +227,8 @@ body {
 }
 
 .glow-card:hover {
-  border-color: var(--cyan-accent);
-  box-shadow: 0 0 20px -3px var(--cyan-glow);
+  border-color: var(--accent);
+  box-shadow: 0 6px 20px -3px var(--accent-glow);
 }
 
 .glow-accent {
@@ -337,14 +347,15 @@ body {
   gap: 6px;
   padding: 8px 16px;
   background: var(--accent);
-  color: #F1EFEA;
+  color: #FFFFFF;
   border: 1px solid var(--accent);
   border-radius: var(--radius-sm);
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-google-sans), sans-serif;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.15s ease;
+  box-shadow: 0 4px 14px -2px var(--accent-glow);
+  transition: all 0.15s ease;
 }
 
 .btn-primary:hover  { opacity: 0.88; }

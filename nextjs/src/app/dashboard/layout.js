@@ -634,44 +634,57 @@ export default function DashboardLayout({ children }) {
     <div className="flex h-screen bg-void-000 overflow-hidden">
 
       {/* ── SIDEBAR ── */}
-      <aside className={`flex flex-col transition-all duration-300 ease-in-out bg-void-000 relative z-20 ${collapsed ? 'w-16' : 'w-64'}`}>
-        <div className={`flex items-center gap-3 px-6 py-6 ${collapsed ? 'justify-center px-4' : ''}`}>
-          <div className="relative w-8 h-8 rounded bg-accent text-white flex items-center justify-center flex-shrink-0 group/logo overflow-hidden border border-accent/20">
-            {/* Cool cybernetic scanning line */}
-            <div className="absolute inset-x-0 h-0.5 bg-status-success/80 top-0 animate-[scan_2s_ease-in-out_infinite]" />
-            <Eye className="w-4 h-4 text-white z-10 transition-transform duration-300 group-hover/logo:scale-110" />
+      <aside className={`flex flex-col transition-all duration-300 ease-in-out bg-[var(--surface-1)] border-r border-[var(--border)] relative z-20 shadow-2xl ${collapsed ? 'w-16' : 'w-64'}`}>
+        {/* Brand Header */}
+        <div className={`flex items-center gap-3 px-5 py-5 border-b border-[var(--border-subtle)] ${collapsed ? 'justify-center px-2' : ''}`}>
+          <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[#1E2733] text-white flex items-center justify-center flex-shrink-0 group/logo overflow-hidden border border-[var(--accent)]/40 shadow-lg">
+            {/* Cybernetic scanning line */}
+            <div className="absolute inset-x-0 h-0.5 bg-emerald-400/80 top-0 animate-[scan_2s_ease-in-out_infinite]" />
+            <Eye className="w-5 h-5 text-white z-10 transition-transform duration-300 group-hover/logo:scale-110" />
             
             {/* Corner brackets */}
-            <span className="absolute top-0.5 left-0.5 w-1.5 h-1.5 border-t border-l border-white/40" />
-            <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 border-t border-r border-white/40" />
-            <span className="absolute bottom-0.5 left-0.5 w-1.5 h-1.5 border-b border-l border-white/40" />
-            <span className="absolute bottom-0.5 right-0.5 w-1.5 h-1.5 border-b border-r border-white/40" />
+            <span className="absolute top-0.5 left-0.5 w-1.5 h-1.5 border-t border-l border-white/50" />
+            <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 border-t border-r border-white/50" />
+            <span className="absolute bottom-0.5 left-0.5 w-1.5 h-1.5 border-b border-l border-white/50" />
+            <span className="absolute bottom-0.5 right-0.5 w-1.5 h-1.5 border-b border-r border-white/50" />
           </div>
           {!collapsed && (
             <div className="relative">
               <div className="flex items-center gap-1.5">
-                <span className="text-paper-100 font-bold tracking-widest text-sm font-sans">DRISHTI</span>
-                {/* Active scan status blinker */}
-                <span className="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse" />
+                <span className="text-[var(--text-primary)] font-black tracking-widest text-base font-headline">DRISHTI</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500/50" />
               </div>
-              <p className="text-paper-100/40 text-[9px] font-kannada tracking-wide uppercase mt-0.5">ದೃಷ್ಟಿ · matrix active</p>
+              <p className="text-[var(--text-secondary)] text-[10px] font-mono tracking-wider uppercase">KSP TACTICAL AI</p>
             </div>
           )}
         </div>
 
-        <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+        {/* Navigation Items */}
+        <nav className="flex-1 px-2 py-5 space-y-2 overflow-y-auto">
           {NAV_ITEMS.map(({ href, icon: Icon, label, id }) => {
             const active = isActive(href);
             return (
               <Link key={href} href={href} id={id}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group relative
-                  ${active ? 'bg-black/5 dark:bg-white/10 text-paper-100 font-semibold' : 'text-paper-100/60 hover:text-paper-100 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                className={`flex items-center transition-all group relative font-mono text-xs font-bold
+                  ${collapsed 
+                    ? 'w-10 h-10 justify-center mx-auto rounded-xl' 
+                    : 'gap-3 px-3.5 py-3 rounded-xl'
+                  }
+                  ${active 
+                    ? 'bg-[var(--accent)] text-white shadow-lg shadow-[var(--accent-glow)]' 
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-2)]'}`}
                 title={collapsed ? label : undefined}
               >
-                <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-phosphor-500' : 'text-paper-100/40 group-hover:text-paper-100'}`} />
-                {!collapsed && <span className="text-sm tracking-wide">{label}</span>}
+                {!collapsed && active && (
+                  <motion.div
+                    layoutId="activeNavHighlight"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-white rounded-r-full shadow-sm"
+                  />
+                )}
+                <Icon className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110 ${active ? 'text-white' : 'text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]'}`} />
+                {!collapsed && <span className="tracking-wide text-xs">{label}</span>}
                 {collapsed && (
-                  <div className="absolute left-full ml-2 px-3 py-1.5 rounded-lg bg-void-000 shadow-xl text-xs text-paper-100/90 whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 border border-steel-600/30">
+                  <div className="absolute left-full ml-3 px-3 py-1.5 rounded-lg bg-[var(--surface-1)] border border-[var(--border)] shadow-2xl text-xs font-mono font-bold text-[var(--text-primary)] whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50">
                     {label}
                   </div>
                 )}
@@ -680,15 +693,19 @@ export default function DashboardLayout({ children }) {
           })}
         </nav>
 
-        <div className={`px-4 py-4 ${collapsed ? 'flex justify-center' : ''}`}>
+        {/* User Profile Footer */}
+        <div className={`p-4 border-t border-[var(--border-subtle)] bg-[var(--surface-0)]/50 ${collapsed ? 'flex flex-col items-center gap-2' : ''}`}>
           {!collapsed && (
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-transparent mb-3">
-              <div className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
-                <User className="w-4 h-4 text-paper-100/70" />
+            <div className="flex items-center gap-3 p-2.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] mb-3 shadow-sm">
+              <div className="w-8 h-8 rounded-lg bg-[var(--surface-2)] flex items-center justify-center flex-shrink-0 border border-[var(--border)]">
+                <User className="w-4 h-4 text-[var(--text-primary)]" />
               </div>
-              <div className="min-w-0">
-                <p className="text-xs font-semibold text-paper-100/90 truncate tracking-wide">{employeeId}</p>
-                <p className="text-[10px] text-paper-100/40 uppercase tracking-widest mt-0.5">{role}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-extrabold font-mono text-[var(--text-primary)] truncate">{employeeId}</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <span className="text-[9px] font-mono font-bold text-[var(--text-secondary)] uppercase tracking-widest">{role}</span>
+                </div>
               </div>
             </div>
           )}
@@ -759,10 +776,10 @@ export default function DashboardLayout({ children }) {
         onToggleMute={handleToggleMute}
       />
 
-      {/* ── DRISHTI ORB (Change 1) ── */}
-      {/* When panel is open and orb is pinned, render compact orb anchored to top-right of panel */}
-      {isPanelOpen && orbPinned && (
-        <div className="fixed top-[5px] right-[382px] z-[9996]">
+      {/* ── DRISHTI ORB ── */}
+      {/* When panel is open, render compact orb anchored to panel header */}
+      {isPanelOpen && (
+        <div className="fixed top-[12px] right-[382px] z-[9996]">
           <DrishtiOrb
             state={orbState}
             onClick={closePanel}
@@ -773,8 +790,8 @@ export default function DashboardLayout({ children }) {
           />
         </div>
       )}
-      {/* Full orb when panel is closed (or orbPinned off + panel closed) */}
-      {!isPanelOpen && showOrb && (
+      {/* Full floating orb when panel is closed */}
+      {!isPanelOpen && (
         <DrishtiOrb
           state={orbState}
           onClick={openPanel}
