@@ -666,7 +666,7 @@ export default function DashboardPage() {
               <div>
                 <h4 className="text-xs font-bold text-[var(--text-primary)] font-mono mb-1">VOICE CO-PILOT COMMANDS</h4>
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed font-sans">
-                  Click the floating Orb or press <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-1)] border border-[var(--border)] font-mono text-[10px]">Space</kbd> to launch Drishti AI. Speak queries in English or Kannada.
+                  Click the floating Orb or press <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-1)] border border-[var(--border)] font-mono text-[10px] font-bold text-[var(--text-primary)]">Ctrl+Alt</kbd> <span className="text-[10px]">(Win/Linux)</span> / <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-1)] border border-[var(--border)] font-mono text-[10px] font-bold text-[var(--text-primary)]">⌘+Shift</kbd> <span className="text-[10px]">(Mac)</span> to activate Voice Push-to-Talk.
                 </p>
               </div>
             </div>

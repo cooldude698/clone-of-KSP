@@ -509,12 +509,11 @@ export default function DashboardLayout({ children }) {
     });
   }, []);
 
-  // ─── Change 3: Space bar hotkey ──────────────────────────────────
+  // ─── Keyboard Shortcuts: Ctrl+Alt (Win/Linux) or Cmd+Shift (Mac) ───────────────
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const mac = /Mac|iPhone|iPod|iPad/i.test(navigator.userAgent);
     const held = { ctrl: false, alt: false, meta: false, shift: false };
-    let spacePttActive = false;
     let modifierPttActive = false;
 
     const isInputFocused = () => {
@@ -530,26 +529,14 @@ export default function DashboardLayout({ children }) {
       if (e.key === 'Meta')    held.meta = true;
       if (e.key === 'Shift')   held.shift = true;
 
-      // Original Ctrl+Alt / Cmd+Shift PTT
+      // Strict Ctrl+Alt (Win/Linux) or Cmd+Shift (Mac) PTT
       const trigger = mac ? (held.meta && held.shift) : (held.ctrl && held.alt);
-      if (trigger && !modifierPttActive && !spacePttActive) {
+      if (trigger && !modifierPttActive) {
         modifierPttActive = true;
         hasInteractedRef.current = true;
         setProactiveSuggestion(null);
         if (!hasGreeted) { triggerGreeting(); setTimeout(handlePttStart, 500); }
         else             { handlePttStart(); }
-      }
-
-      // Space bar shortcut (Change 3)
-      if (e.key === ' ' && !isInputFocused() && !e.repeat) {
-        e.preventDefault();
-        if (!modifierPttActive && !spacePttActive) {
-          spacePttActive = true;
-          hasInteractedRef.current = true;
-          setProactiveSuggestion(null);
-          if (!hasGreeted) { triggerGreeting(); setTimeout(handlePttStart, 500); }
-          else             { handlePttStart(); }
-        }
       }
 
       // Enter to confirm pending voice transcript
@@ -570,10 +557,6 @@ export default function DashboardLayout({ children }) {
       if (e.key === 'Meta')    held.meta = false;
       if (e.key === 'Shift')   held.shift = false;
       
-      if (spacePttActive && e.key === ' ') {
-        spacePttActive = false;
-        handlePttEnd();
-      }
 
       const released = mac ? (!held.meta || !held.shift) : (!held.ctrl || !held.alt);
       if (modifierPttActive && released) {
@@ -584,8 +567,7 @@ export default function DashboardLayout({ children }) {
 
     const blur = () => {
       held.ctrl = held.alt = held.meta = held.shift = false;
-      if (spacePttActive || modifierPttActive) {
-        spacePttActive = false;
+      if (modifierPttActive) {
         modifierPttActive = false;
         handlePttEnd();
       }
