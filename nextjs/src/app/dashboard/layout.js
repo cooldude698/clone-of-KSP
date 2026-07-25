@@ -20,8 +20,6 @@ const AlertNotification  = dynamic(() => import('@/components/AlertNotification'
 const DrishtiOrb         = dynamic(() => import('@/components/DrishtiOrb'),          { ssr: false });
 const DrishtiPanel       = dynamic(() => import('@/components/DrishtiPanel'),         { ssr: false });
 
-const SystemStatusFooter = dynamic(() => import('@/components/SystemStatusFooter'),  { ssr: false });
-
 
 const NAV_ITEMS = [
   { href: '/dashboard',              icon: LayoutDashboard, label: 'Overview',       id: 'nav-overview' },
@@ -754,7 +752,6 @@ export default function DashboardLayout({ children }) {
           </div>
         </header>
         <main ref={mainContentRef} className="flex-1 overflow-auto bg-void-000">{children}</main>
-        {pathname !== '/dashboard/chat' && <SystemStatusFooter />}
       </div>
 
       {/* ── DRISHTI SIDE PANEL ── */}
