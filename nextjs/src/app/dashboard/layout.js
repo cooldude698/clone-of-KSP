@@ -39,34 +39,28 @@ function detectLocalIntent(query) {
   const q = query.toLowerCase().trim();
 
   // Navigation — many natural phrasings
-  const nav = (path, reply) => ({ type: 'navigate', path, reply });
+  const nav = (path, reply, followUpQuery) => ({ type: 'navigate', path, reply, followUpQuery });
 
-  if (/\b(map|crime map|hotspot|heatmap|location|where.*crime|crime.*where)\b/.test(q))
-    return nav('/dashboard/map', 'Opening the Crime Map, Sir.');
+  if (/\b(map|crime map|hotspot|heatmap|location|where.*crime)\b/.test(q))
+    return nav('/dashboard/map', 'Opening the Crime Map, Sir.', 'Give me a quick briefing on the current hotspots.');
 
-  if (/\b(analytic|trend|graph|statistic|report|monthly|data)\b/.test(q))
-    return nav('/dashboard/analytics', 'Pulling up Analytics, Sir.');
+  if (/\b(analytic|trend|statistic|report|monthly)\b/.test(q))
+    return nav('/dashboard/analytics', 'Pulling up Analytics, Sir.', 'Summarize the crime trend for this month.');
 
-  if (/\b(camera|surveillance|cctv|feed|anpr|plate|video|watch)\b/.test(q))
-    return nav('/dashboard/surveillance', 'Switching to Surveillance, Sir.');
+  if (/\b(camera|surveillance|cctv|feed|anpr|watch)\b/.test(q))
+    return nav('/dashboard/surveillance', 'Switching to Surveillance, Sir.', 'How many cameras are online and any active ANPR alerts?');
 
-  if (/\b(network|gang|connection|link|associate|syndicate|relation)\b/.test(q))
-    return nav('/dashboard/network', 'Opening the Network Graph, Sir.');
+  if (/\b(network|gang|connection|syndicate)\b/.test(q))
+    return nav('/dashboard/network', 'Opening the Network Graph, Sir.', 'Who are the key suspects in the current network?');
 
-  if (/\b(chat|copilot|co-pilot|assistant|ask|query|intelligence)\b/.test(q))
-    return nav('/dashboard/chat', 'Opening Co-Pilot Chat, Sir.');
+  if (/\b(trail|track|route|vehicle route)\b/.test(q))
+    return nav('/dashboard/trail', 'Opening Geo Trail Tracker, Sir.', 'Any active vehicle trails being tracked?');
 
-  if (/\b(fir|case|complaint|file|report)\b/.test(q) && /\b(list|show|all|recent|open)\b/.test(q))
-    return nav('/dashboard', 'Showing FIR overview, Sir.');
+  if (/\b(chat|copilot|co-pilot|assistant)\b/.test(q))
+    return nav('/dashboard/chat', 'Opening Co-Pilot Chat, Sir.', null);
 
-  if (/\b(trail|track|route|vehicle route|geo trail)\b/.test(q))
-    return nav('/dashboard/trail', 'Opening Geo Trail Tracker, Sir.');
-
-  if (/\b(log|activity|audit|history)\b/.test(q))
-    return nav('/dashboard/logs', 'Opening Activity Logs, Sir.');
-
-  if (/\b(overview|home|dashboard|main|summary)\b/.test(q))
-    return nav('/dashboard', 'Going to Overview, Sir.');
+  if (/\b(overview|home|dashboard|summary)\b/.test(q))
+    return nav('/dashboard', 'Going to Overview, Sir.', 'Give me a status summary of active cases.');
 
   // Confirmations
   if (/^(yes|yeah|sure|okay|ok|do it|go ahead|proceed|affirmative)$/.test(q))
@@ -74,6 +68,8 @@ function detectLocalIntent(query) {
 
   return null;
 }
+
+const getLocale = (l) => (l === 'kn' ? 'kn-IN' : l === 'hi' ? 'hi-IN' : 'en-IN');
 
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
@@ -159,22 +155,31 @@ export default function DashboardLayout({ children }) {
     setStateOverrideLabel('Thinking…');
     setSessionLogs(prev => [...prev, { role: 'user', content: queryText, timestamp: ts() }]);
 
+    // Auto-detect if input contains Kannada or Hindi script
+    const isKannadaInput = /[\u0C80-\u0CFF]/.test(queryText);
+    const isHindiInput = /[\u0900-\u097F]/.test(queryText);
+    const targetLang = isKannadaInput ? 'kn' : isHindiInput ? 'hi' : language;
+
     // ── Local intent check ──
     const localResult = detectLocalIntent(queryText);
     if (localResult) {
       if (localResult.type === 'navigate') router.push(localResult.path);
       const reply = localResult.reply;
       setResponse({ response_text: reply, follow_up_suggestions: [], confidence: 1.0 });
+      setSessionLogs(prev => [...prev, { role: 'user', content: queryText, timestamp: ts() }]);
       setSessionLogs(prev => [...prev, { role: 'assistant', content: reply, timestamp: ts() }]);
       setOrbState('speaking');
       setStateOverrideLabel('Speaking');
-      speak(reply, language === 'en' ? 'en-IN' : 'kn-IN');
+      speak(reply, language === 'en' ? 'en-IN' : language === 'kn' ? 'kn-IN' : 'hi-IN');
+
+      // After 1.8s, automatically fire a follow-up intel query for this page
+      if (localResult.followUpQuery) {
+        setTimeout(() => {
+          handleQuery(localResult.followUpQuery);
+        }, 1800);
+      }
       return; // skip API call
     }
-
-    // Auto-detect if input contains Kannada script
-    const isKannadaInput = /[\u0C80-\u0CFF]/.test(queryText);
-    const targetLang = isKannadaInput ? 'kn' : language;
 
     // ── Jarvis-style cycling thinking labels ──
     const thinkingLabels = [
@@ -230,7 +235,7 @@ export default function DashboardLayout({ children }) {
         setStateOverrideLabel(speakingLabel);
         if (text) setOrbResponse(text);
         // Pass data.language so TTS uses the correct locale
-        const ttsLang = (data.language || language) === 'kn' ? 'kn-IN' : 'en-IN';
+        const ttsLang = (data.language || targetLang) === 'kn' ? 'kn-IN' : (data.language || targetLang) === 'hi' ? 'hi-IN' : 'en-IN';
         const spokenText = data.spokenAnswer || text;
         const clean = spokenText.replace(/[|*#`]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 800);
         safeSpeak(clean, ttsLang);
@@ -269,7 +274,7 @@ export default function DashboardLayout({ children }) {
 
     if (isSpeaking) stopSpeaking();
     setOrbState('listening');
-    startListening(language === 'en' ? 'en-IN' : 'kn-IN');
+    startListening(getLocale(language));
   }, [isSpeaking, stopSpeaking, startListening, language]);
 
   const handlePttEnd = useCallback(async () => {
@@ -329,7 +334,7 @@ export default function DashboardLayout({ children }) {
       role: 'assistant', content: greeting,
       timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
     }]);
-    setTimeout(() => speak(greeting, language === 'en' ? 'en-IN' : 'kn-IN'), 400);
+    setTimeout(() => speak(greeting, getLocale(language)), 400);
   }, [hasGreeted, language, speak]);
 
   const openPanel = useCallback(() => {
@@ -700,7 +705,7 @@ export default function DashboardLayout({ children }) {
           onToggleMute={handleToggleMute}
           onReadAloud={() => {
             setOrbState('speaking');
-            safeSpeak(orbResponse, language === 'en' ? 'en-IN' : 'kn-IN');
+            safeSpeak(orbResponse, getLocale(language));
           }}
         />
       )}
@@ -737,7 +742,7 @@ export default function DashboardLayout({ children }) {
                 <button
                   onClick={() => {
                     setOrbState('speaking');
-                    speak(proactiveSuggestion.text, language === 'en' ? 'en-IN' : 'kn-IN');
+                    speak(proactiveSuggestion.text, getLocale(language));
                   }}
                   className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all border border-white/10"
                   title="Read Aloud"
@@ -783,7 +788,7 @@ export default function DashboardLayout({ children }) {
         consecutiveErrors={consecutiveErrors}
         onTryAgain={() => {
           if (!isListening) {
-             startListening(language === 'en' ? 'en-IN' : 'kn-IN');
+             startListening(getLocale(language));
           }
         }}
         onUseText={() => {

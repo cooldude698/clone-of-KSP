@@ -15,6 +15,14 @@ const SUGGESTIONS = [
   'Show details for case FIR-2026-BL-4921',
 ];
 
+const VOICE_PROFILES = [
+  { id: 'en-NeerjaNeural',  label: 'EN · Neerja',   lang: 'en', ttsLang: 'en-IN', neural: 'en-IN-NeerjaNeural'  },
+  { id: 'en-PrabhatNeural', label: 'EN · Prabhat',  lang: 'en', ttsLang: 'en-IN', neural: 'en-IN-PrabhatNeural' },
+  { id: 'en-RaviNeural',    label: 'EN · Ravi',     lang: 'en', ttsLang: 'en-IN', neural: 'en-IN-RaviNeural'    },
+  { id: 'kn-SapnaNeural',   label: 'ಕನ್ನಡ · Sapna', lang: 'kn', ttsLang: 'kn-IN', neural: 'kn-IN-SapnaNeural'  },
+  { id: 'hi-SwaraNeural',   label: 'हिंदी · Swara', lang: 'hi', ttsLang: 'hi-IN', neural: 'hi-IN-SwaraNeural'  },
+];
+
 function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
   const [copied, setCopied] = useState(false);
   const isUser = msg.role === 'user';
@@ -170,7 +178,7 @@ export default function ChatPage() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [language, setLanguage] = useState('en');
+  const [voiceProfile, setVoiceProfile] = useState('en-NeerjaNeural'); // default
   const [speechSupported, setSpeechSupported] = useState(false);
   const [micPermission, setMicPermission] = useState('prompt');
   const [error, setError] = useState(null);
@@ -282,7 +290,7 @@ export default function ChatPage() {
           <div><span class="print-label">Generated</span><br/><span class="print-mono">${dateStr}, ${timeStr}</span></div>
           <div><span class="print-label">Case Reference</span><br/><span class="print-mono" style="font-weight:700">${caseRef}</span></div>
           <div><span class="print-label">Session ID</span><br/><span class="print-mono">${conversationId}</span></div>
-          <div><span class="print-label">Language</span><br/><span class="print-value">${language === 'en' ? 'English (en-IN)' : 'Kannada (ಕನ್ನಡ)'}</span></div>
+          <div><span class="print-label">Voice Profile</span><br/><span class="print-value">${(VOICE_PROFILES.find(p => p.id === voiceProfile) || VOICE_PROFILES[0]).label}</span></div>
         </div>
 
         ${firBlock}
@@ -350,9 +358,10 @@ export default function ChatPage() {
     }
     stopSpeech();
     try {
+      const profile = VOICE_PROFILES.find(p => p.id === voiceProfile) || VOICE_PROFILES[0];
       const cleanText = text.replace(/[|*#`\-]/g, ' ').substring(0, 600);
       const utterance = new SpeechSynthesisUtterance(cleanText);
-      utterance.lang = language === 'en' ? 'en-IN' : 'kn-IN';
+      utterance.lang = profile.ttsLang;
       utterance.rate = 0.95;
       utterance.onstart = () => { setIsSpeaking(true); setSpeakingMsgIdx(msgIdx); };
       utterance.onend = () => { setIsSpeaking(false); setSpeakingMsgIdx(null); };
@@ -489,7 +498,7 @@ export default function ChatPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             question: text,
-            lang: language,
+            lang: (VOICE_PROFILES.find(p => p.id === voiceProfile) || VOICE_PROFILES[0]).lang,
           }),
         });
         if (res.ok) {
@@ -553,7 +562,7 @@ export default function ChatPage() {
 
     const rec = new SpeechRecognition();
     recognitionRef.current = rec;
-    rec.lang = language === 'en' ? 'en-IN' : 'kn-IN';
+    rec.lang = (VOICE_PROFILES.find(p => p.id === voiceProfile) || VOICE_PROFILES[0]).ttsLang;
     rec.continuous = true;
     rec.interimResults = true;
     // Use a stable accumulated transcript across results
@@ -695,19 +704,19 @@ export default function ChatPage() {
               </button>
             )}
           </div>
-          {/* Language toggle */}
-          <div className="flex items-center gap-1 p-1 rounded-lg bg-steel-700 border border-steel-600/40">
-            {['en', 'kn'].map((lang) => (
+          {/* Voice profile selector */}
+          <div className="flex items-center gap-1 p-1 rounded-lg bg-steel-700 border border-steel-600/40 flex-wrap">
+            {VOICE_PROFILES.map((profile) => (
               <button
-                key={lang}
-                onClick={() => setLanguage(lang)}
-                id={`lang-${lang}`}
-                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all
-                  ${language === lang
+                key={profile.id}
+                onClick={() => setVoiceProfile(profile.id)}
+                id={`voice-${profile.id}`}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all whitespace-nowrap
+                  ${voiceProfile === profile.id
                     ? 'bg-phosphor-500 text-paper-100'
                     : 'text-paper-100/60 hover:text-paper-100'}`}
               >
-                {lang === 'en' ? 'EN' : 'ಕನ್ನಡ'}
+                {profile.label}
               </button>
             ))}
           </div>
@@ -812,10 +821,12 @@ export default function ChatPage() {
                     sendMessage(input);
                   }
                 }}
-                placeholder={language === 'en'
-                  ? 'Ask about crimes, suspects, or case files…'
-                  : 'ಅಪರಾಧ, ಶಂಕಿತರು ಅಥವಾ ಪ್ರಕರಣಗಳ ಬಗ್ಗೆ ಕೇಳಿ…'
-                }
+                placeholder={(() => {
+                  const profile = VOICE_PROFILES.find(p => p.id === voiceProfile) || VOICE_PROFILES[0];
+                  if (profile.lang === 'kn') return 'ಅಪರಾಧ, ಶಂಕಿತರು ಅಥವಾ ಪ್ರಕರಣಗಳ ಬಗ್ಗೆ ಕೇಳಿ…';
+                  if (profile.lang === 'hi') return 'अपराध, संदिग्ध या मामलों के बारे में पूछें…';
+                  return 'Ask about crimes, suspects, or case files…';
+                })()}
                 rows={1}
                 style={{ resize: 'none', overflowY: 'hidden' }}
                 className="w-full px-4 py-2.5 rounded-xl bg-steel-700 border border-steel-600/40 text-paper-100 text-sm

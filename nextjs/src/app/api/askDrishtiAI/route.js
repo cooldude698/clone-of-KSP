@@ -209,17 +209,62 @@ async function translateText(text, sourceLang, targetLang) {
 const DRISHTI_SYSTEM_PROMPT =
   'You are DRISHTI (ದೃಷ್ಟಿ), an elite AI crime intelligence officer embedded in the Karnataka State Police command system. You think fast, speak like a seasoned cop, and respect the officer\'s time.\n\n' +
   'STRICT RULES:\n' +
-  '1. Keep answers SHORT — 2 to 4 sentences maximum unless the officer asks for detail.\n' +
+  '1. Match answer length to the question — brief questions get brief answers (1-2 sentences), investigative questions get full detail. Never pad or repeat. Never explain what you\'re about to say.\n' +
   '2. Lead with the most critical fact first. No preamble, no "certainly", no "of course".\n' +
   '3. Always address the officer as "Sir".\n' +
   '4. Quote IPC/BNS section numbers when relevant but don\'t explain them unless asked.\n' +
   '5. If you can predict what the officer needs next, end with ONE proactive suggestion like: "Shall I pull up the suspect profile, Sir?"\n' +
   '6. Never use bullet points or numbered lists unless explicitly asked.\n' +
   '7. Never repeat information already discussed in this session.\n' +
-  '8. If something is unknown or unavailable, say so in one sentence.';
+  '8. If something is unknown or unavailable, say so in one sentence.\n' +
+  '9. When the officer gives a one-word reply like "yes", "do it", "go ahead" — execute the last suggested action and report back immediately.\n' +
+  '10. You have access to live FIR records, ANPR alerts, repeat offenders, and hotspot data. Reference specific case numbers and suspect names when relevant.\n' +
+  '11. Never make up data. If you don\'t have it, say: "Sir, that data isn\'t in my current feed."';
+
+let cachedCatalystToken = process.env.QUICKML_OAUTH_TOKEN || '';
+let tokenFetchedAt = Date.now();
+
+async function getCatalystAccessToken() {
+  const now = Date.now();
+  if (cachedCatalystToken && (now - tokenFetchedAt) < 50 * 60 * 1000) {
+    return cachedCatalystToken;
+  }
+
+  const clientId = process.env.CATALYST_CLIENT_ID;
+  const clientSecret = process.env.CATALYST_CLIENT_SECRET;
+  const refreshToken = process.env.CATALYST_REFRESH_TOKEN;
+
+  if (clientId && clientSecret && refreshToken) {
+    try {
+      const res = await axios.post(
+        'https://accounts.zoho.in/oauth/v2/token',
+        null,
+        {
+          params: {
+            refresh_token: refreshToken,
+            client_id: clientId,
+            client_secret: clientSecret,
+            grant_type: 'refresh_token',
+          },
+          timeout: 4000,
+        }
+      );
+      if (res.data?.access_token) {
+        cachedCatalystToken = res.data.access_token;
+        tokenFetchedAt = Date.now();
+        console.log('[DRISHTI] Successfully refreshed Catalyst OAuth Access Token!');
+        return cachedCatalystToken;
+      }
+    } catch (err) {
+      console.warn('[DRISHTI] Catalyst OAuth auto-refresh warning:', err.message);
+    }
+  }
+
+  return process.env.QUICKML_OAUTH_TOKEN || cachedCatalystToken;
+}
 
 async function callQuickML(question, knowledgeContext = '') {
-  const token = process.env.QUICKML_OAUTH_TOKEN;
+  const token = await getCatalystAccessToken();
   const orgId = process.env.CATALYST_ORG_ID || '60073715607';
 
   if (!token) throw new Error('QuickML OAuth token not configured');
@@ -257,7 +302,7 @@ async function callQuickML(question, knowledgeContext = '') {
             Authorization: authHeader,
             'CATALYST-ORG': orgId,
           },
-          timeout: 7000,
+          timeout: 4000,
         }
       );
 
@@ -287,33 +332,35 @@ async function callGroq(question, knowledgeContext = '', sessionHistory = []) {
     ? `OFFICER QUERY: ${question}\n\nRELEVANT CONTEXT:\n${knowledgeContext}`
     : question;
 
-  // Cap session history at last 6 messages and insert before the current user message
-  const historyMessages = sessionHistory.slice(-6).map(h => ({ role: h.role, content: h.content }));
+  const GROQ_MODELS = [
+    process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+    'llama-3.1-8b-instant',
+    'gemma2-9b-it',
+  ];
 
-  const response = await axios.post(
-    'https://api.groq.com/openai/v1/chat/completions',
-    {
-      model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
-      messages: [
-        { role: 'system', content: DRISHTI_SYSTEM_PROMPT },
-        ...historyMessages,
-        { role: 'user', content: userContent },
-      ],
-      max_tokens: 800,
-      temperature: 0.3,
-    },
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      timeout: 12000,
+  for (const model of GROQ_MODELS) {
+    try {
+      const response = await axios.post(
+        'https://api.groq.com/openai/v1/chat/completions',
+        {
+          model,
+          messages: [
+            { role: 'system', content: DRISHTI_SYSTEM_PROMPT },
+            ...sessionHistory.slice(-6).map(h => ({ role: h.role, content: h.content })),
+            { role: 'user', content: userContent },
+          ],
+          max_tokens: 400,
+          temperature: 0.3,
+        },
+        { headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, timeout: 10000 }
+      );
+      const answer = response.data?.choices?.[0]?.message?.content;
+      if (answer?.trim()) return answer.trim();
+    } catch (e) {
+      console.warn(`[DRISHTI] Groq model ${model} failed:`, e.message);
     }
-  );
-
-  const answer = response.data?.choices?.[0]?.message?.content;
-  if (!answer?.trim()) throw new Error('Groq returned empty answer');
-  return answer.trim();
+  }
+  throw new Error('All Groq models failed');
 }
 // ── Gemini last-resort fallback ──────────────────────────────────────────────
 // Picks keys from GEMINI_API_KEY_1..N in sequence; falls back to a bundled key.
@@ -351,7 +398,7 @@ async function callGemini(question, knowledgeContext = '', sessionHistory = []) 
               ...historyContents,
               { role: 'user', parts: [{ text: fullPrompt }] },
             ],
-            generationConfig: { maxOutputTokens: 800, temperature: 0.3 },
+            generationConfig: { maxOutputTokens: 400, temperature: 0.3 },
           },
           { headers: { 'Content-Type': 'application/json' }, timeout: 10000 }
         );
@@ -403,11 +450,10 @@ async function translateToTargetLang(text, targetLang) {
     console.warn(`[DRISHTI] Zia ${targetName} translation failed:`, e.message);
   }
 
-  // 2. Try Gemini Translation with JSON structure
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (apiKey) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  // 2. Try Gemini Translation iterating over GEMINI_KEYS
+  for (const apiKey of GEMINI_KEYS) {
     try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
       const response = await axios.post(
         url,
         {
@@ -416,44 +462,26 @@ async function translateToTargetLang(text, targetLang) {
               role: 'user',
               parts: [
                 {
-                  text: `Translate the following police intelligence response into ${targetName} script.
-Return a JSON object with two properties:
-1. "text": ${targetName} script text for screen display.
-2. "spokenText": Phonetic Romanized transliteration of the ${targetName} translation for spoken TTS.
-
-Text to translate:
-${text}`,
+                  text: `Translate the following police intelligence response into natural ${targetName} script. Address the officer respectfully. Return ONLY the translated text in ${targetName} script without any markdown code blocks, quotes, or explanations:\n\n${text}`,
                 },
               ],
             },
           ],
-          generationConfig: { responseMimeType: 'application/json', temperature: 0.1 },
+          generationConfig: { maxOutputTokens: 1024, temperature: 0.1 },
         },
         { headers: { 'Content-Type': 'application/json' }, timeout: 7000 }
       );
 
-      const raw = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (raw) {
-        const clean = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
-        const parsed = JSON.parse(clean);
-        if (parsed.text) {
-          return {
-            text: parsed.text,
-            spokenText: parsed.spokenText || parsed.text,
-          };
-        }
+      const translatedText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      if (translatedText) {
+        // Clean any residual code block markup
+        const clean = translatedText.replace(/^```[a-z]*\s*/i, '').replace(/```\s*$/i, '').trim();
+        return { text: clean, spokenText: clean };
       }
     } catch (e) {
-      console.warn(`[DRISHTI] Gemini ${targetName} JSON translation failed:`, e.message);
+      if (e?.response?.status === 429) continue; // Try next key on rate limit
+      console.warn(`[DRISHTI] Gemini ${targetName} translation error:`, e.message);
     }
-
-    // 3. Fallback Gemini plain text
-    try {
-      const plainText = await translateWithGemini(text, 'en', targetLang);
-      if (plainText && plainText !== text) {
-        return { text: plainText, spokenText: plainText };
-      }
-    } catch (_) {}
   }
 
   return { text, spokenText: text };
@@ -487,6 +515,12 @@ export async function POST(req) {
 
     // Lookup matching police manual SOP / legal context & live database records
     const knowledgeContext = await findKnowledgeContext(workingQuestion);
+
+    // Log which AI source will be attempted
+    const hasQuickML = !!(process.env.QUICKML_OAUTH_TOKEN && !process.env.QUICKML_OAUTH_TOKEN.startsWith('your_'));
+    const hasGroq = !!process.env.GROQ_API_KEY;
+    const geminiKeyCount = GEMINI_KEYS.length;
+    console.log(`[DRISHTI] Sources available — QuickML: ${hasQuickML}, Groq: ${hasGroq}, Gemini keys: ${geminiKeyCount}`);
 
     // Step 2: QuickML RAG (primary)
     try {

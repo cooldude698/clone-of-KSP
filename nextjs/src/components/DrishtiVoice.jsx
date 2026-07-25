@@ -335,7 +335,7 @@ const useDrishtiVoice = ({
 
   const speak = useCallback(async (text, lang = 'en-IN') => {
     if (!text || !text.trim()) return;
-    const languageCode = lang.startsWith('kn') ? 'kn' : 'en';
+    const languageCode = lang.startsWith('kn') ? 'kn' : lang.startsWith('hi') ? 'hi' : 'en';
 
     // ALWAYS stop any playing audio or speech synthesis FIRST to prevent audio collision
     if (typeof window !== 'undefined' && window.speechSynthesis) {
@@ -388,19 +388,23 @@ const useDrishtiVoice = ({
         voicesCacheRef.current = voices;
 
         const isKannada = lang.startsWith('kn');
+        const isHindi = lang.startsWith('hi');
 
-        if (isKannada) {
+        if (isKannada || isHindi) {
+          const targetLang = isHindi ? 'hi-IN' : 'en-IN';
           const indiaVoice = voices.find(v =>
+            v.lang === targetLang ||
+            (isHindi && v.name.toLowerCase().includes('hindi')) ||
+            (isHindi && v.name.toLowerCase().includes('hemant')) ||
+            (isHindi && v.name.toLowerCase().includes('kalpana')) ||
             v.lang === 'en-IN' ||
-            v.name.toLowerCase().includes('india') ||
-            v.name.toLowerCase().includes('ravi') ||
-            v.name.toLowerCase().includes('heera')
-          ) || voices.find(v => v.lang.startsWith('en')) || null;
+            v.name.toLowerCase().includes('india')
+          ) || voices.find(v => v.lang.startsWith(isHindi ? 'hi' : 'en')) || null;
 
-          utt.lang = indiaVoice ? indiaVoice.lang : 'en-IN';
+          utt.lang = indiaVoice?.lang || targetLang;
           if (indiaVoice) utt.voice = indiaVoice;
           utt.rate = 0.88;
-          utt.pitch = 1.0;
+          utt.pitch = isHindi ? 1.1 : 1.0;
           utt.volume = 1.0;
         } else {
           const v = findBestVoice(lang);

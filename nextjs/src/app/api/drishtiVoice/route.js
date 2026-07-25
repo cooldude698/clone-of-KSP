@@ -41,7 +41,7 @@ async function callZiaSTT(audioBase64, mimeType, lang) {
     contentType: mimeType || 'audio/webm',
   });
 
-  const locale = lang === 'kn' ? 'kn-IN' : 'en-IN';
+  const locale = lang === 'kn' ? 'kn-IN' : lang === 'hi' ? 'hi-IN' : 'en-IN';
   form.append('language', locale);
 
   const response = await axios.post(url, form, {
@@ -70,13 +70,14 @@ async function callZiaTTS(text, lang) {
 
   if (!token) throw new Error('QUICKML_OAUTH_TOKEN not configured');
 
-  const langCode = lang?.startsWith('kn') ? 'kn' : 'en';
+  const langCode = lang?.startsWith('kn') ? 'kn' : lang?.startsWith('hi') ? 'hi' : 'en';
+  const speaker = langCode === 'kn' ? 'Vidya' : langCode === 'hi' ? 'Kajal' : 'Anna';
   const cleanText = text.replace(/[|*#`]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 500);
 
   const payloads = [
-    { text: cleanText, language: langCode, speaker: langCode === 'kn' ? 'Vidya' : 'Anna', pitch: 'moderate', speed: 'moderate', emotion: 'neutral' },
+    { text: cleanText, language: langCode, speaker, pitch: 'moderate', speed: 'moderate', emotion: 'neutral' },
     { text: cleanText, language: langCode },
-    { text: cleanText, language: langCode === 'kn' ? 'kn-IN' : 'en-IN' },
+    { text: cleanText, language: langCode === 'kn' ? 'kn-IN' : langCode === 'hi' ? 'hi-IN' : 'en-IN' },
   ];
 
   const authHeaders = [
@@ -123,7 +124,11 @@ async function callZiaTTS(text, lang) {
 
 async function callNeuralTTS(text, lang) {
   const cleanText = text.replace(/[|*#`]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 800);
-  const voice = lang?.startsWith('kn') ? 'kn-IN-SapnaNeural' : 'en-IN-NeerjaNeural';
+  const voice = lang?.startsWith('kn')
+    ? 'kn-IN-SapnaNeural'
+    : lang?.startsWith('hi')
+    ? 'hi-IN-SwaraNeural'
+    : 'en-IN-NeerjaNeural';
 
   // EdgeTTS WebSockets hang inside Next.js's runtime — run it in a child process instead
   const { execFile } = await import('child_process');
