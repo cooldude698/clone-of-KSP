@@ -13,7 +13,13 @@ function useTypewriter(text, speed = 14) {
   const timerRef = useRef(null);
 
   useEffect(() => {
-    if (!text || text === prevRef.current) return;
+    if (!text) {
+      if (displayed !== '') setDisplayed('');
+      if (!done) setDone(true);
+      prevRef.current = '';
+      return;
+    }
+    if (text === prevRef.current) return;
     prevRef.current = text;
     let i = 0;
     setDisplayed('');
@@ -22,7 +28,10 @@ function useTypewriter(text, speed = 14) {
     timerRef.current = setInterval(() => {
       i++;
       setDisplayed(text.slice(0, i));
-      if (i >= text.length) { clearInterval(timerRef.current); setDone(true); }
+      if (i >= text.length) {
+        clearInterval(timerRef.current);
+        setDone(true);
+      }
     }, speed);
     return () => clearInterval(timerRef.current);
   }, [text, speed]);
