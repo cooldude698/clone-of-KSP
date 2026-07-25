@@ -19,7 +19,7 @@ import useDrishtiVoice from '@/components/DrishtiVoice'; // hook — must be sta
 const AlertNotification  = dynamic(() => import('@/components/AlertNotification'),  { ssr: false });
 const DrishtiOrb         = dynamic(() => import('@/components/DrishtiOrb'),          { ssr: false });
 const DrishtiPanel       = dynamic(() => import('@/components/DrishtiPanel'),         { ssr: false });
-const VoiceDebugStatus   = dynamic(() => import('@/components/VoiceDebugStatus'),    { ssr: false });
+
 const SystemStatusFooter = dynamic(() => import('@/components/SystemStatusFooter'),  { ssr: false });
 
 
@@ -780,22 +780,7 @@ export default function DashboardLayout({ children }) {
         )}
       </AnimatePresence>
 
-      <VoiceDebugStatus 
-        micPermission={micPermission}
-        isListening={isListening}
-        error={error}
-        lastTranscript={liveTranscript || pendingTranscript}
-        consecutiveErrors={consecutiveErrors}
-        onTryAgain={() => {
-          if (!isListening) {
-             startListening(getLocale(language));
-          }
-        }}
-        onUseText={() => {
-           if (!isPanelOpen) openPanel();
-           setShowTypingInput(true);
-        }}
-      />
+
     </div>
   );
 }
