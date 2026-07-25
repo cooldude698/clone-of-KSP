@@ -20,7 +20,7 @@ export default function VoiceDebugStatus({
   // If no issues and not listening and not asking for prompt, don't clutter the UI
   // But wait, the prompt says "judges see mic permission status, listening state, and any errors". 
   // Let's always show it if the user just interacted or if there is an error.
-  if (micPermission === 'granted' && !isListening && !error && consecutiveErrors < 2) return null;
+  if ((micPermission === 'granted' || micPermission === 'prompt') && !isListening && !error && consecutiveErrors < 2) return null;
 
   let stateLabel = 'Ready';
   let stateColor = 'text-success-500';
