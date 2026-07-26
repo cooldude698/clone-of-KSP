@@ -112,71 +112,121 @@ export default function LogsPage() {
   // Load user localStorage chat history and segment into cards
   useEffect(() => {
     setMounted(true);
-    try {
-      const rawUserChat = localStorage.getItem('drishti_chat_history_v2') || localStorage.getItem('drishti_session_logs');
-      let parsedUserMessages = [];
-      if (rawUserChat) {
-        parsedUserMessages = JSON.parse(rawUserChat);
-      }
 
-      if (parsedUserMessages && parsedUserMessages.length > 0) {
-        // Segment user messages into distinct subject cards
-        const userCards = segmentMessagesIntoCards(parsedUserMessages);
-        setSessionCards([...userCards, ...DEFAULT_SESSION_CARDS]);
-      } else {
+    const loadSessionLogs = () => {
+      try {
+        const rawUserChat = localStorage.getItem('drishti_chat_history_v2');
+        const rawSessionLogs = localStorage.getItem('drishti_session_logs');
+        
+        let allMessages = [];
+        if (rawUserChat) {
+          try {
+            const parsed = JSON.parse(rawUserChat);
+            if (Array.isArray(parsed)) allMessages.push(...parsed);
+          } catch (_) {}
+        }
+        if (rawSessionLogs) {
+          try {
+            const parsed = JSON.parse(rawSessionLogs);
+            if (Array.isArray(parsed)) allMessages.push(...parsed);
+          } catch (_) {}
+        }
+
+        // Deduplicate messages by role, content snippet and timestamp
+        const uniqueMessages = [];
+        const seen = new Set();
+        allMessages.forEach(msg => {
+          const key = `${msg.role}:${(msg.content || '').slice(0, 60)}:${msg.timestamp || ''}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            uniqueMessages.push(msg);
+          }
+        });
+
+        if (uniqueMessages.length > 0) {
+          // Segment user messages into distinct subject cards
+          const userCards = segmentMessagesIntoCards(uniqueMessages);
+          setSessionCards([...userCards, ...DEFAULT_SESSION_CARDS]);
+        } else {
+          setSessionCards(DEFAULT_SESSION_CARDS);
+        }
+      } catch (e) {
+        console.error('Error parsing session logs:', e);
         setSessionCards(DEFAULT_SESSION_CARDS);
       }
-    } catch (e) {
-      console.error('Error parsing session logs:', e);
-      setSessionCards(DEFAULT_SESSION_CARDS);
+    };
+
+    loadSessionLogs();
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', loadSessionLogs);
     }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('storage', loadSessionLogs);
+      }
+    };
   }, []);
 
   // Algorithm to segment chat messages by person / subject
   function segmentMessagesIntoCards(messages) {
     const cards = [];
-    let currentSubject = null;
-    let currentMessages = [];
+    const groups = new Map();
 
-    messages.forEach((msg, idx) => {
+    messages.forEach((msg) => {
       const text = msg.content || '';
-      const subjectName = extractSubjectFromText(text);
+      const subject = extractSubjectFromText(text) || 'Active Shift Session';
 
-      if (subjectName && subjectName !== currentSubject) {
-        if (currentMessages.length > 0) {
-          cards.push(buildCardObject(currentSubject || 'General Inquiry', currentMessages, cards.length));
-        }
-        currentSubject = subjectName;
-        currentMessages = [msg];
-      } else {
-        currentMessages.push(msg);
+      if (!groups.has(subject)) {
+        groups.set(subject, []);
       }
+      groups.get(subject).push(msg);
     });
 
-    if (currentMessages.length > 0) {
-      cards.push(buildCardObject(currentSubject || 'Current Shift Session', currentMessages, cards.length));
-    }
+    let idx = 0;
+    groups.forEach((msgs, subject) => {
+      cards.push(buildCardObject(subject, msgs, idx++));
+    });
 
     return cards;
   }
 
   function extractSubjectFromText(text) {
+    if (!text) return null;
     const q = text.toLowerCase();
+    
+    // Check for explicit FIR case number
+    const firMatch = text.match(/(KAR\/[A-Z]+\/\d+\/\d+|FIR-\d{4}-[A-Z]+-\d+)/i);
+    if (firMatch) return `Case ${firMatch[0].toUpperCase()}`;
+
+    if (q.includes('vikram') || q.includes('malhotra') || q.includes('9104')) return 'Vikram Malhotra (Cyber Fraud)';
     if (q.includes('anand') || q.includes('gowda') || q.includes('buda')) return 'Anand Gowda';
     if (q.includes('zakir') || q.includes('hussain')) return 'Zakir Hussain';
     if (q.includes('ramesh') || q.includes('bullet ramesh')) return 'Ramesh Kumar';
     if (q.includes('suresh') || q.includes('naidu')) return 'Suresh Naidu';
     if (q.includes('imran') || q.includes('khan')) return 'Imran Khan';
     if (q.includes('farid') || q.includes('mirza')) return 'Farid Mirza';
+    if (q.includes('silk board') || q.includes('anpr') || q.includes('camera')) return 'Silk Board & ANPR Surveillance';
+    if (q.includes('repeat') || q.includes('offender')) return 'Repeat Offenders Intel';
+    if (q.includes('cyber') || q.includes('1930') || q.includes('helpline')) return 'Cyber Fraud 1930 Helpline SOP';
+    if (q.includes('ndps') || q.includes('drug') || q.includes('seizure')) return 'NDPS Drug Seizure SOP';
     if (q.includes('indiranagar')) return 'Indiranagar Area';
-    if (q.includes('vehicle') || q.includes('theft') || q.includes('4921')) return 'Vehicle Theft FIR-4921';
+    if (q.includes('vehicle') || q.includes('theft') || q.includes('4921')) return 'Vehicle Theft Analysis';
+
+    // Auto-extract dynamic subject title from user query
+    const clean = text.replace(/[*#\_|`]/g, ' ').replace(/^(can you|please|hey|hi|drishti|open|show|view|tell me|list|give me|find)\b/gi, '').trim();
+    const words = clean.split(/\s+/).slice(0, 4).join(' ');
+    if (words && words.length > 3) {
+      return words.charAt(0).toUpperCase() + words.slice(1);
+    }
+
     return null;
   }
 
   function buildCardObject(subject, messages, idx) {
     const isUnindexed = messages.some(m => m.content?.includes('no suspect profile') || m.content?.includes('no case file found'));
-    const isLocation = subject.toLowerCase().includes('indiranagar') || subject.toLowerCase().includes('area');
-    const isFir = subject.toLowerCase().includes('fir') || subject.toLowerCase().includes('theft');
+    const isLocation = subject.toLowerCase().includes('indiranagar') || subject.toLowerCase().includes('area') || subject.toLowerCase().includes('silk board') || subject.toLowerCase().includes('anpr');
+    const isFir = subject.toLowerCase().includes('fir') || subject.toLowerCase().includes('theft') || subject.toLowerCase().includes('case');
 
     const type = isUnindexed ? 'unindexed' : isLocation ? 'location' : isFir ? 'fir' : 'suspect';
     const badge = isUnindexed ? 'NO RECORD FOUND' : isLocation ? 'LOCATION BRIEF' : isFir ? 'FIR TRACKED' : 'SUSPECT INQUIRY';
@@ -190,7 +240,7 @@ export default function LogsPage() {
 
     const icon = isUnindexed ? AlertCircle : isLocation ? MapPin : isFir ? FileText : User;
     const firstMsgTime = messages[0]?.timestamp || 'Just now';
-    const firstUserQuery = messages.find(m => m.role === 'user')?.content || 'Session inquiry';
+    const firstUserQuery = messages.find(m => m.role === 'user')?.content || messages[0]?.content || 'Session inquiry';
 
     return {
       id: `user-session-${idx}-${Date.now()}`,
@@ -202,7 +252,7 @@ export default function LogsPage() {
       time: firstMsgTime,
       date: 'Active Session',
       msgCount: messages.length,
-      summary: firstUserQuery,
+      summary: firstUserQuery.slice(0, 180),
       messages,
     };
   }

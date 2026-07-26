@@ -374,6 +374,7 @@ export default function ChatPage() {
     if (typeof window !== 'undefined' && messages.length > 0) {
       try {
         localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
+        window.dispatchEvent(new Event('storage'));
       } catch (e) {
         console.warn('Failed to save chat history:', e);
       }
