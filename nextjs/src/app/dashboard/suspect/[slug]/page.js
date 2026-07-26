@@ -110,9 +110,31 @@ export default function SuspectProfilePage() {
     });
   }
 
-  // Tier 4: Fallback to first suspect in list
+  // Tier 4: Dynamically construct suspect object matching the exact requested name from the URL slug
   if (!suspect) {
-    suspect = suspectsList[0];
+    const displayName = slugToName(slug);
+    const firsList = DEMO_FIRS?.firs || [];
+    const matchedFir = firsList.find((f) => f && f.accused_name && f.accused_name.toLowerCase().includes(displayName.toLowerCase()));
+
+    suspect = {
+      suspect_id: `SUS-${Math.floor(7000 + Math.random() * 2000)}`,
+      name: displayName,
+      alias: matchedFir?.accused_alias || `${displayName.split(' ')[0]} Operative`,
+      age: 34,
+      gender: 'Male',
+      risk_score: matchedFir?.risk_score || matchedFir?.accused_risk || 78,
+      status: matchedFir?.status?.toUpperCase() || 'UNDER_INVESTIGATION',
+      phone: '+91 98451 44109',
+      district_name: matchedFir?.district_name || 'Bengaluru Urban',
+      primary_modus_operandi: matchedFir?.description || 'Active person of interest linked to CCTNS law enforcement files.',
+      last_known_location: matchedFir?.location_name || 'Bengaluru Urban PS Jurisdiction',
+      associated_firs: matchedFir ? [matchedFir.case_number] : ['FIR-2026-BL-9104'],
+      known_hangouts: [matchedFir?.location_name || 'Bengaluru Central'],
+      known_associates: ['Suresh Naidu (SUS-7104)', 'Ramesh Kumar (SUS-8842)'],
+      ipc_sections: ['IPC §323', 'IPC §379', 'IPC §34'],
+      anpr_hits: 4,
+      camera_sightings: ['CAM-BLR-0010', 'CAM-BLR-0012'],
+    };
   }
 
   // Get their FIRs
@@ -388,12 +410,12 @@ export default function SuspectProfilePage() {
                 <h2 className="font-semibold text-paper-100 text-sm tracking-wide">Network Links</h2>
               </div>
               {DEMO_REPEAT_OFFENDERS.suspects
-                .filter(s => s.suspect_id !== suspect.suspect_id)
-                .map((s) => {
+                .filter(s => s && s.name && s.suspect_id !== suspect.suspect_id)
+                .map((s, idx) => {
                   const sr = getRiskLevel(s.risk_score);
                   return (
                     <Link
-                      key={s.suspect_id}
+                      key={s.suspect_id ? `${s.suspect_id}-${idx}` : `net-${idx}`}
                       href={`/dashboard/suspect/${nameToSlug(s.name)}`}
                       className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-steel-600/20 transition-all group mb-2"
                     >
