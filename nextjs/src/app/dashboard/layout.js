@@ -344,7 +344,7 @@ export default function DashboardLayout({ children }) {
 
     try {
       // ── Call askDrishtiAI (QuickML RAG primary, Gemini fallback, rawData last-resort) ──
-      const res = await fetch('/server/askDrishtiAI/', {
+      let res = await fetch('/api/askDrishtiAI', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -353,6 +353,17 @@ export default function DashboardLayout({ children }) {
           sessionHistory: sessionLogs.slice(-6).map(l => ({ role: l.role, content: l.content })),
         }),
       });
+      if (!res.ok) {
+        res = await fetch('/server/askDrishtiAI/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            question: queryText,
+            lang: targetLang,
+            sessionHistory: sessionLogs.slice(-6).map(l => ({ role: l.role, content: l.content })),
+          }),
+        });
+      }
       clearInterval(thinkingInterval);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
@@ -668,7 +679,7 @@ export default function DashboardLayout({ children }) {
         try {
           setOrbState('thinking');
           setStateOverrideLabel('Translating…');
-          const res = await fetch('/server/askDrishtiAI/', {
+          let res = await fetch('/api/askDrishtiAI', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -678,6 +689,18 @@ export default function DashboardLayout({ children }) {
               targetLang,
             }),
           });
+          if (!res.ok) {
+            res = await fetch('/server/askDrishtiAI/', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                mode: 'translate',
+                text: sourceText,
+                sourceLang,
+                targetLang,
+              }),
+            });
+          }
           if (res.ok) {
             const data = await res.json();
             if (data.text) {
