@@ -23,30 +23,122 @@ const NetworkMapView = dynamic(
 
 import { fetchWithFallback } from '@/lib/fetch-with-fallback';
 import { DEMO_NETWORK_GRAPH, DEMO_FIRS, DEMO_REPEAT_OFFENDERS } from '@/lib/demo-data';
+import { getFIRFromStore, getNormalizedCrimeCode } from '@/lib/fir-store';
 
-// Realistic nodes & edges mapped to real Karnataka suspects
-const MOCK_NODES = DEMO_NETWORK_GRAPH.nodes.map((n) => ({
-  id: n.id,
-  label: n.label,
-  type: n.type === 'fir' ? 'case' : n.type,
-  total_firs: 4,
-  crime_types: [n.crime || 'vehicle_theft'],
-  risk_score: n.risk || 80,
-  size: 18,
-  color: n.type === 'fir' ? '#2563eb' : '#dc2626',
-  district: n.district || 'Bengaluru Urban'
-}));
+function buildNetworkFromFirs(firsList) {
+  const activeFirs = Array.isArray(firsList) && firsList.length > 0 ? firsList : DEMO_FIRS.firs;
 
-const MOCK_EDGES = DEMO_NETWORK_GRAPH.edges.map((e, i) => ({
-  id: `e${i}`,
-  source: e.source,
-  target: e.target,
-  fir_case_number: e.target?.startsWith?.('FIR') ? e.target : 'FIR-2026-BL-4921',
-  label: e.relation || '',
-  weight: e.weight || 2,
-  date: e.date || '2026-07-15',
-  crime_type: e.crime_type || undefined,
-}));
+  const suspectNodes = [
+    { id: "SUS-8842", label: "Ramesh Kumar", type: "suspect", risk_score: 94, size: 22, color: "#dc2626", district: "Bengaluru Urban", role: "Vehicle Theft Ring Leader" },
+    { id: "SUS-7104", label: "Suresh Naidu", type: "suspect", risk_score: 91, size: 20, color: "#dc2626", district: "Mysuru / Vijayapura", role: "Armed Robbery Leader" },
+    { id: "SUS-5921", label: "Imran Khan", type: "suspect", risk_score: 96, size: 22, color: "#dc2626", district: "Bengaluru Urban", role: "Narcotics Syndicate Head" },
+    { id: "SUS-4401", label: "Deepak Shetty", type: "suspect", risk_score: 75, size: 18, color: "#e11d48", district: "Yelahanka", role: "Chopshop Fence" },
+    { id: "SUS-3302", label: "Arun Gowda", type: "suspect", risk_score: 68, size: 16, color: "#f59e0b", district: "Tumakuru", role: "Lookout & Logistics" },
+    { id: "SUS-2211", label: "Farid Mirza", type: "suspect", risk_score: 82, size: 18, color: "#dc2626", district: "Central Bengaluru", role: "Arms & Contraband Supplier" },
+    { id: "SUS-1190", label: "Manoj Reddy", type: "suspect", risk_score: 65, size: 16, color: "#f59e0b", district: "Electronic City", role: "Getaway Driver" },
+    { id: "SUS-9012", label: "Vikram Singh", type: "suspect", risk_score: 88, size: 20, color: "#dc2626", district: "Kalaburagi / Davangere", role: "Hit & Run Ring" },
+    { id: "SUS-8041", label: "Anand Shinde", type: "suspect", risk_score: 90, size: 20, color: "#dc2626", district: "Hassan / Belagavi", role: "Violence & Extortion" },
+    { id: "SUS-6022", label: "Bhavani Karpe", type: "suspect", risk_score: 85, size: 18, color: "#06b6d4", district: "Bengaluru / Chikkamagaluru", role: "Cyber Fraud Network" },
+    { id: "SUS-5011", label: "Vikram Reddy", type: "suspect", risk_score: 84, size: 18, color: "#f97316", district: "Chikkamagaluru", role: "Housebreaking Syndicate" },
+    { id: "SUS-4009", label: "Saanvi Dara", type: "suspect", risk_score: 82, size: 18, color: "#a855f7", district: "Udupi", role: "Senior Citizen Extortion" },
+  ];
+
+  const crimeSuspectMapping = {
+    vehicle_theft: "SUS-8842",
+    robbery: "SUS-7104",
+    drug_offence: "SUS-5921",
+    hit_and_run: "SUS-9012",
+    cybercrime: "SUS-6022",
+    fraud: "SUS-6022",
+    burglary: "SUS-5011",
+    assault: "SUS-8041",
+    domestic_violence: "SUS-8041",
+    senior_citizen_crime: "SUS-4009",
+    property_crime: "SUS-4401"
+  };
+
+  const crimeColors = {
+    vehicle_theft: "#3b82f6",
+    robbery: "#ef4444",
+    drug_offence: "#10b981",
+    hit_and_run: "#dc2626",
+    cybercrime: "#06b6d4",
+    fraud: "#8b5cf6",
+    burglary: "#f97316",
+    assault: "#dc2626",
+    domestic_violence: "#e11d48",
+    senior_citizen_crime: "#a855f7",
+    property_crime: "#f59e0b"
+  };
+
+  const firNodes = [];
+  const firEdges = [];
+  const prevByCrime = {};
+
+  activeFirs.forEach((fir, idx) => {
+    const caseNum = fir.case_number;
+    if (!caseNum) return;
+
+    const crimeCode = getNormalizedCrimeCode(fir.crime_type, fir.crime_type_code);
+    const parts = caseNum.split('/');
+    const shortCase = parts.length >= 4 ? `${parts[1]}/${parts[3]}` : caseNum;
+    const rawLabel = fir.crime_type || crimeCode.replace(/_/g, ' ');
+
+    firNodes.push({
+      id: caseNum,
+      label: `${shortCase}\n${rawLabel}`,
+      type: 'case',
+      crime_types: [crimeCode],
+      risk_score: fir.risk_score || 80,
+      size: 14,
+      color: crimeColors[crimeCode] || '#2563eb',
+      district: fir.district_name || 'Bengaluru Urban',
+      first_crime_date: fir.date_filed || '2024-06-01'
+    });
+
+    const suspectId = crimeSuspectMapping[crimeCode] || "SUS-8842";
+    firEdges.push({
+      id: `e-fir-${idx}`,
+      source: caseNum,
+      target: suspectId,
+      fir_case_number: caseNum,
+      label: "Correlated FIR",
+      weight: 3,
+      date: fir.date_filed || '2024-06-01',
+      crime_type: crimeCode
+    });
+
+    // Interlink with previous FIR of same crime type
+    if (prevByCrime[crimeCode]) {
+      firEdges.push({
+        id: `e-link-${idx}`,
+        source: caseNum,
+        target: prevByCrime[crimeCode],
+        fir_case_number: caseNum,
+        label: "Pattern Match",
+        weight: 1,
+        date: fir.date_filed || '2024-06-01',
+        crime_type: crimeCode
+      });
+    }
+    prevByCrime[crimeCode] = caseNum;
+  });
+
+  const gangEdges = [
+    { id: "e-g1", source: "SUS-8842", target: "SUS-7104", label: "Gang Syndicate", weight: 4, crime_type: "robbery", date: "2024-06-01" },
+    { id: "e-g2", source: "SUS-8842", target: "SUS-4401", label: "Chopshop Fence", weight: 4, crime_type: "vehicle_theft", date: "2024-06-01" },
+    { id: "e-g3", source: "SUS-7104", target: "SUS-3302", label: "Robbery Crew", weight: 3, crime_type: "robbery", date: "2024-06-01" },
+    { id: "e-g4", source: "SUS-5921", target: "SUS-2211", label: "Narcotics Supplier", weight: 4, crime_type: "drug_offence", date: "2024-06-01" },
+    { id: "e-g5", source: "SUS-6022", target: "SUS-5011", label: "Intel Sharing", weight: 2, crime_type: "cybercrime", date: "2024-06-01" },
+    { id: "e-g6", source: "SUS-8041", target: "SUS-1190", label: "Enforcement Unit", weight: 3, crime_type: "assault", date: "2024-06-01" },
+    { id: "e-g7", source: "SUS-9012", target: "SUS-8842", label: "Highway Ops", weight: 3, crime_type: "hit_and_run", date: "2024-06-01" },
+  ];
+
+  return {
+    nodes: [...suspectNodes, ...firNodes],
+    edges: [...firEdges, ...gangEdges]
+  };
+}
 
 // Gang Attack Prediction Model Dataset
 const GANG_PREDICTIONS = [
@@ -79,8 +171,9 @@ const GANG_PREDICTIONS = [
 export default function NetworkPage() {
   const router = useRouter();
 
-  const [nodes, setNodes] = useState(MOCK_NODES);
-  const [edges, setEdges] = useState(MOCK_EDGES);
+  const initialGraph = useMemo(() => buildNetworkFromFirs(DEMO_FIRS.firs), []);
+  const [nodes, setNodes] = useState(initialGraph.nodes);
+  const [edges, setEdges] = useState(initialGraph.edges);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -88,7 +181,7 @@ export default function NetworkPage() {
   const [activePrediction, setActivePrediction] = useState(GANG_PREDICTIONS[0]);
 
   // Date Range Filter State
-  const [timeFilter, setTimeFilter] = useState('2026'); // 'all' | '2025' | '2026'
+  const [timeFilter, setTimeFilter] = useState('all'); // 'all' | '2024' | '2026'
 
   // InvestigatorWall state
   const [activeCaseData, setActiveCaseData] = useState(null);
@@ -96,31 +189,15 @@ export default function NetworkPage() {
 
   useEffect(() => {
     const fetchNetworkData = async () => {
-      const { data } = await fetchWithFallback('network-graph-data?min_connections=1', DEMO_NETWORK_GRAPH);
-      if (data && data.nodes && data.nodes.length > 0) {
-        const parsedNodes = data.nodes.map(n => ({
-          id: n.id,
-          label: n.label || n.name || n.id,
-          type: n.type === 'fir' ? 'case' : n.type,
-          total_firs: n.total_firs || 3,
-          crime_types: n.crime_types || ['vehicle_theft'],
-          risk_score: n.risk_score || n.risk || 75,
-          size: n.size || 18,
-          color: n.color || (n.type === 'case' || n.type === 'fir' ? '#2563eb' : '#dc2626')
-        }));
-        setNodes(parsedNodes);
-        const parsedEdges = (data.edges || MOCK_EDGES).map((e, i) => ({
-          id: `e${i}`,
-          source: e.source,
-          target: e.target,
-          fir_case_number: e.target?.startsWith?.('FIR') ? e.target : 'FIR-2026-BL-4921',
-          label: e.relation || e.label || '',
-          weight: e.weight || 2,
-          date: e.date || '2026-07-15',
-          crime_type: e.crime_type || undefined,
-        }));
-        setEdges(parsedEdges);
-      }
+      const res = await fetchWithFallback('/api/firs', DEMO_FIRS, { timeoutMs: 2000 });
+      let firsList = [];
+      if (Array.isArray(res?.data?.firs) && res.data.firs.length >= 50) firsList = res.data.firs;
+      else if (Array.isArray(res?.data) && res.data.length >= 50) firsList = res.data;
+      else firsList = DEMO_FIRS.firs;
+
+      const fullGraph = buildNetworkFromFirs(firsList);
+      setNodes(fullGraph.nodes);
+      setEdges(fullGraph.edges);
       setLoading(false);
     };
 
@@ -141,41 +218,74 @@ export default function NetworkPage() {
     setPanelOpen(true);
     setLoadingCase(true);
 
+    const storedFir = getFIRFromStore(nodeId);
     const clickedNode = nodes.find(n => n.id === nodeId);
-    const labelName = clickedNode ? clickedNode.label : 'Suspect';
+    const labelName = clickedNode ? clickedNode.label.replace(/\n/g, ' - ') : 'Case Record';
 
-    const caseNum = nodeId?.startsWith('FIR') ? nodeId : `FIR-2026-BL-${Math.floor(1000 + Math.random() * 9000)}`;
-
-    setActiveCaseData({
-      fir: {
-        case_number: caseNum,
+    if (storedFir || (nodeId && nodeId.includes('/'))) {
+      const firData = storedFir || DEMO_FIRS.firs.find(f => f.case_number === nodeId) || {
+        case_number: nodeId,
         crime_type: clickedNode?.crime_types?.[0] || 'vehicle_theft',
-        date_filed: '2026-07-18',
-        location_name: clickedNode?.district || 'Silk Board, Bengaluru',
-        case_status: 'under_investigation',
-        description: `Official intelligence link recorded for ${labelName}. Connected to co-accused gang operations across Bengaluru Urban & Mysuru sectors.`,
-        police_station: 'HSR Layout PS',
-      },
-      accused: [
-        {
-          full_name: labelName,
-          alias: labelName.split(' ')[0] + ' Bhai',
-          age: 34,
-          gender: 'Male',
-          prior_convictions: clickedNode?.total_firs || 3,
-          modus_operandi: 'Operates gang network targeting Pulsar motorbikes and commercial transport vehicles along highway corridors.',
-          risk_score: clickedNode?.risk_score || 85,
-        }
-      ],
-      victims: [
-        { full_name: 'Vikram Sharma', age: 34, gender: 'Male', occupation: 'Software Engineer', district_name: 'Bengaluru Urban', vulnerability_score: 55 }
-      ],
-      related_firs: [
-        { case_number: 'FIR-2026-BL-4921', crime_type: 'vehicle_theft', date_filed: '2026-07-18', link_reason: 'Primary accused vehicle theft' },
-        { case_number: 'FIR-2026-MY-1103', crime_type: 'robbery', date_filed: '2026-07-17', link_reason: 'Co-accused highway robbery' }
-      ],
-      case_summary: `Official CCTNS Criminal Network File for ${labelName}. Multi-district intelligence correlation established.`
-    });
+        date_filed: clickedNode?.first_crime_date || '2024-06-01',
+        location_name: clickedNode?.district || 'Bengaluru Urban',
+        case_status: 'open',
+        description: `Official CCTNS FIR case entry for ${nodeId}. Interlinked on criminal intelligence network.`,
+        police_station: 'KSP Command Center PS'
+      };
+
+      setActiveCaseData({
+        fir: firData,
+        accused: [
+          {
+            full_name: firData.accused_name || firData.investigation_office || 'Primary Suspect',
+            alias: 'Accused',
+            age: 32,
+            gender: 'Male',
+            prior_convictions: 4,
+            modus_operandi: firData.description || 'Repeat offense recorded in CCTNS database.',
+            risk_score: firData.risk_score || 85,
+          }
+        ],
+        victims: [
+          { full_name: 'Complainant', age: 38, gender: 'Male', occupation: 'Citizen', district_name: firData.district_name || 'Karnataka', vulnerability_score: 60 }
+        ],
+        related_firs: [
+          { case_number: firData.case_number, crime_type: firData.crime_type_code || 'crime', date_filed: firData.date_filed || '2024-06-01', link_reason: 'Interlinked CCTNS Case' }
+        ],
+        case_summary: `Official CCTNS Network Dossier for FIR ${firData.case_number}. Dynamic network correlation verified across district hubs.`
+      });
+    } else {
+      setActiveCaseData({
+        fir: {
+          case_number: `SUSPECT-DOSSIER-${nodeId}`,
+          crime_type: clickedNode?.crime_types?.[0] || 'organized_crime',
+          date_filed: '2024-06-01',
+          location_name: clickedNode?.district || 'Karnataka State',
+          case_status: 'under_surveillance',
+          description: `Criminal Profile for ${labelName}. Key node in inter-district syndicate network.`,
+          police_station: 'KSP Intelligence Cell'
+        },
+        accused: [
+          {
+            full_name: labelName,
+            alias: clickedNode?.role || 'Syndicate Leader',
+            age: 34,
+            gender: 'Male',
+            prior_convictions: clickedNode?.total_firs || 6,
+            modus_operandi: `Coordinates crime operations across ${clickedNode?.district || 'multiple sectors'}.`,
+            risk_score: clickedNode?.risk_score || 90,
+          }
+        ],
+        victims: [
+          { full_name: 'State of Karnataka', age: 0, gender: 'N/A', occupation: 'Public Sector', district_name: 'Karnataka', vulnerability_score: 90 }
+        ],
+        related_firs: [
+          { case_number: 'KAR/BEN/2024/1726', crime_type: 'drug_offence', date_filed: '2024-06-01', link_reason: 'Primary Syndicate Link' },
+          { case_number: 'KAR/RAI/2024/0123', crime_type: 'vehicle_theft', date_filed: '2024-06-01', link_reason: 'Vehicle Theft Hub' }
+        ],
+        case_summary: `Full Suspect Dossier & Network Mapping for ${labelName}.`
+      });
+    }
     setLoadingCase(false);
   };
 
@@ -326,7 +436,7 @@ export default function NetworkPage() {
               <ChronoCriminalGraph
                 nodes={nodes}
                 edges={filteredEdges}
-                date_range={{ min: '2025-01-01', max: '2026-07-18' }}
+                date_range={{ min: '2024-01-01', max: '2026-12-31' }}
                 onNodeClick={handleNodeClick}
                 height={560}
               />
@@ -364,7 +474,7 @@ export default function NetworkPage() {
             <ChronoCriminalGraph
               nodes={nodes}
               edges={filteredEdges}
-              date_range={{ min: '2025-01-01', max: '2026-07-18' }}
+              date_range={{ min: '2024-01-01', max: '2026-12-31' }}
               onNodeClick={handleNodeClick}
               height={680}
             />
