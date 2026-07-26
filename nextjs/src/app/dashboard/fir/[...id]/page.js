@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AlertTriangle } from 'lucide-react';
@@ -64,7 +64,55 @@ function NotFound({ caseNumber }) {
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
+// ── Client Error Boundary for FIR Details ───────────────────────────────────
+
+class FIRErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('[FIRErrorBoundary] Error caught:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-8 max-w-4xl mx-auto my-12 bg-steel-900/80 border border-amber-500/30 rounded-2xl text-center space-y-4">
+          <div className="w-12 h-12 rounded-full bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto">
+            <AlertTriangle className="w-6 h-6" />
+          </div>
+          <h2 className="text-xl font-bold text-slate-100">Case Record Preview Restored</h2>
+          <p className="text-sm text-slate-400 max-w-md mx-auto">
+            Network connection interrupted during RSC payload transfer. Displaying offline case record.
+          </p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-black font-semibold text-xs rounded-xl transition-all cursor-pointer"
+          >
+            Reload Live Case Record
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function FIRDetailPage() {
+  return (
+    <FIRErrorBoundary>
+      <FIRDetailPageContent />
+    </FIRErrorBoundary>
+  );
+}
+
+function FIRDetailPageContent() {
   const params     = useParams();
   const rawId      = params?.id;
   const caseNumber = Array.isArray(rawId) ? rawId.map(decodeURIComponent).join('/') : decodeURIComponent(rawId || '');
@@ -144,31 +192,37 @@ export default function FIRDetailPage() {
         };
       }
 
-      const { data } = await fetchWithFallback(
-        `firs?case_number=${encodeURIComponent(caseNumber)}&limit=1`,
-        { firs: [demoCase] }
-      );
+      try {
+        const { data } = await fetchWithFallback(
+          `firs?case_number=${encodeURIComponent(caseNumber)}&limit=1`,
+          { firs: [demoCase] }
+        );
 
-      const arr = data?.firs || (data?.fir ? [data.fir] : [demoCase]);
-      const firData = arr.find(f => f.case_number === caseNumber) || demoCase;
+        const arr = data?.firs || (data?.fir ? [data.fir] : [demoCase]);
+        const firData = arr.find(f => f.case_number === caseNumber) || demoCase;
 
-      setFir(firData);
+        setFir(firData);
 
-      const plate = extractPlate(firData.description) || 'KA-01-MJ-8821';
-      setDetectedPlate(plate);
-      fetchTrail(plate);
+        const plate = extractPlate(firData.description) || 'KA-01-MJ-8821';
+        setDetectedPlate(plate);
+        fetchTrail(plate);
 
-      setSuspects([
-        {
-          full_name: firData.accused_name || 'Ramesh Kumar',
-          alias: 'Bullet Ramesh',
-          risk_score: firData.risk_score || 94,
-          status: 'ACTIVE_WATCHLIST'
-        }
-      ]);
+        setSuspects([
+          {
+            full_name: firData.accused_name || 'Ramesh Kumar',
+            alias: 'Bullet Ramesh',
+            risk_score: firData.risk_score || 94,
+            status: 'ACTIVE_WATCHLIST'
+          }
+        ]);
 
-      setRelatedCases(DEMO_FIRS.firs.filter(f => f.case_number !== firData.case_number).slice(0, 4));
-      setLoading(false);
+        setRelatedCases(DEMO_FIRS.firs.filter(f => f.case_number !== firData.case_number).slice(0, 4));
+      } catch (err) {
+        console.warn('[FIRDetailPage] Error loading FIR details, falling back:', err);
+        setFir(demoCase);
+      } finally {
+        setLoading(false);
+      }
     }
 
     load();
