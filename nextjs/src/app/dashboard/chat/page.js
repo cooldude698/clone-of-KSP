@@ -69,21 +69,20 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
       const districtMatch = text.match(/- District:\s*([^\n]+)/i);
       const stationMatch = text.match(/- Police Station:\s*([^\n]+)/i);
       const statusMatch = text.match(/- Status:\s*([^\n]+)/i);
-      const dateMatch = text.match(/- Date Filed:\s*([^\n]+)/i);
 
       return (
-        <div className="my-2 rounded-2xl bg-slate-950/80 border border-cyan-500/40 overflow-hidden shadow-2xl shadow-cyan-950/50">
-          {/* Card Top Banner */}
-          <div className="bg-gradient-to-r from-cyan-950/90 via-slate-900 to-indigo-950/90 px-4 py-3 border-b border-cyan-500/30 flex items-center justify-between">
+        <div className="my-2 rounded-2xl bg-[#FAF6F0] border border-[#7A90A8]/40 overflow-hidden shadow-xl shadow-slate-300/40">
+          {/* Card Top Banner - Deep Ocean Navy */}
+          <div className="bg-[#1E2733] px-4 py-3 border-b border-[#7A90A8]/30 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 flex items-center justify-center shadow-md">
+              <div className="w-8 h-8 rounded-lg bg-[#AECAE8]/20 border border-[#AECAE8]/40 text-[#AECAE8] flex items-center justify-center shadow-sm">
                 <FileText className="w-4 h-4" />
               </div>
               <div>
-                <h4 className="text-xs font-mono font-extrabold text-cyan-300 uppercase tracking-wider">
+                <h4 className="text-xs font-mono font-extrabold text-white uppercase tracking-wider">
                   Automated FIR Entry Registered
                 </h4>
-                <p className="text-[10px] font-mono text-slate-400">
+                <p className="text-[10px] font-mono text-[#AECAE8]">
                   Karnataka State Police CCTNS Datastore
                 </p>
               </div>
@@ -91,39 +90,39 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
             {caseMatch && (
               <button
                 onClick={() => onCaseClick && onCaseClick(caseNum)}
-                className="px-3 py-1 rounded-lg bg-cyan-500/20 border border-cyan-400/50 text-cyan-200 font-mono font-extrabold text-xs shadow-lg shadow-cyan-500/20 hover:scale-105 hover:bg-cyan-500/30 transition-all cursor-pointer flex items-center gap-1.5"
+                className="px-3 py-1 rounded-lg bg-[#AECAE8]/20 border border-[#AECAE8]/40 text-[#AECAE8] font-mono font-extrabold text-xs shadow-md hover:scale-105 transition-all cursor-pointer flex items-center gap-1.5"
               >
-                <FileText className="w-3.5 h-3.5 text-cyan-400" />
+                <FileText className="w-3.5 h-3.5 text-[#AECAE8]" />
                 {caseNum}
               </button>
             )}
           </div>
 
-          {/* Data Grid Badges */}
+          {/* Data Grid Badges - Coastal Sand & Navy */}
           <div className="p-4 space-y-3">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
-                <span className="text-[10px] font-mono uppercase text-slate-400 block">Crime Type</span>
-                <span className="text-xs font-bold font-mono text-cyan-400 uppercase tracking-wide">
+              <div className="p-2.5 rounded-xl bg-[#EFEAE4] border border-[#7A90A8]/30">
+                <span className="text-[10px] font-mono uppercase text-[#48596D] block">Crime Type</span>
+                <span className="text-xs font-bold font-mono text-[#1E2733] uppercase tracking-wide">
                   {crimeTypeMatch ? crimeTypeMatch[1].trim().replace('_', ' ') : 'General Offence'}
                 </span>
               </div>
-              <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
-                <span className="text-[10px] font-mono uppercase text-slate-400 block">Police Station</span>
-                <span className="text-xs font-bold font-mono text-slate-200 truncate block">
+              <div className="p-2.5 rounded-xl bg-[#EFEAE4] border border-[#7A90A8]/30">
+                <span className="text-[10px] font-mono uppercase text-[#48596D] block">Police Station</span>
+                <span className="text-xs font-bold font-mono text-[#1E2733] truncate block">
                   {stationMatch ? stationMatch[1].trim() : 'Central Command'}
                 </span>
               </div>
-              <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
-                <span className="text-[10px] font-mono uppercase text-slate-400 block">District</span>
-                <span className="text-xs font-bold font-mono text-slate-200">
+              <div className="p-2.5 rounded-xl bg-[#EFEAE4] border border-[#7A90A8]/30">
+                <span className="text-[10px] font-mono uppercase text-[#48596D] block">District</span>
+                <span className="text-xs font-bold font-mono text-[#1E2733]">
                   {districtMatch ? districtMatch[1].trim() : 'Bengaluru Urban'}
                 </span>
               </div>
-              <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
-                <span className="text-[10px] font-mono uppercase text-slate-400 block">Status</span>
-                <span className="text-xs font-extrabold font-mono text-amber-400 inline-flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+              <div className="p-2.5 rounded-xl bg-[#EFEAE4] border border-[#7A90A8]/30">
+                <span className="text-[10px] font-mono uppercase text-[#48596D] block">Status</span>
+                <span className="text-xs font-extrabold font-mono text-[#A68A69] inline-flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#A68A69] animate-pulse" />
                   {statusMatch ? statusMatch[1].trim().toUpperCase() : 'UNDER INVESTIGATION'}
                 </span>
               </div>
@@ -131,17 +130,17 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
 
             {/* Document Content Box */}
             <div className="mt-2">
-              <span className="text-[10px] font-mono font-bold uppercase text-cyan-400 tracking-wider block mb-1">
+              <span className="text-[10px] font-mono font-bold uppercase text-[#1E2733] tracking-wider block mb-1">
                 Parsed Document Preview & Metadata:
               </span>
-              <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-300 font-mono max-h-48 overflow-y-auto leading-relaxed shadow-inner">
+              <div className="bg-[#EFEAE4] border border-[#7A90A8]/30 rounded-xl p-3 text-xs text-[#1E2733] font-mono max-h-48 overflow-y-auto leading-relaxed shadow-inner">
                 {text.replace(/AUTOMATED FIR ENTRY STORED IN DATASTORE[\s\S]*?Document Summary:\s*/i, '').replace(/✅[\s\S]*/i, '')}
               </div>
             </div>
 
             {/* Bottom Verification Tag */}
-            <div className="flex items-center gap-2 pt-2 border-t border-slate-800/80 text-[11px] font-mono text-emerald-400">
-              <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+            <div className="flex items-center gap-2 pt-2 border-t border-[#7A90A8]/20 text-[11px] font-mono text-emerald-700">
+              <Check className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>Document indexed into live RAG memory & ANPR surveillance watchlists.</span>
             </div>
           </div>
@@ -153,7 +152,7 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
     return lines.map((line, i) => {
       if (line.startsWith('|')) {
         return (
-          <div key={i} className="font-mono text-xs text-slate-200 border-b border-slate-800 py-1.5 grid grid-cols-4 gap-2">
+          <div key={i} className="font-mono text-xs text-[#1E2733] border-b border-[#7A90A8]/30 py-1.5 grid grid-cols-4 gap-2">
             {line.split('|').filter(Boolean).map((cell, j) => {
               const cellText = cell.trim();
               const caseRegex = /(KAR\/[A-Z]+\/\d+\/\d+|FIR-\d{4}-[A-Z]+-\d+)/;
@@ -162,13 +161,13 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
                   <button
                     key={j}
                     onClick={() => onCaseClick && onCaseClick(cellText)}
-                    className="text-left text-cyan-400 hover:text-cyan-300 font-bold transition-colors focus:outline-none cursor-pointer"
+                    className="text-left text-[#1E2733] hover:underline font-bold transition-colors focus:outline-none cursor-pointer"
                   >
                     {cellText}
                   </button>
                 );
               }
-              return <span key={j} className={j === 0 ? 'text-cyan-400 font-semibold' : ''}>{cellText}</span>;
+              return <span key={j} className={j === 0 ? 'text-[#1E2733] font-semibold' : ''}>{cellText}</span>;
             })}
           </div>
         );
@@ -176,7 +175,7 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
 
       const boldParts = line.split(/\*\*(.*?)\*\*/g);
       return (
-        <p key={i} className={`${line === '' ? 'mt-2' : ''} leading-relaxed font-sans text-sm text-slate-200`}>
+        <p key={i} className={`${line === '' ? 'mt-2' : ''} leading-relaxed font-sans text-sm text-[#1E2733]`}>
           {boldParts.map((part, j) => {
             const isBold = j % 2 === 1;
             const caseRegex = /(KAR\/[A-Z]+\/\d+\/\d+|FIR-\d{4}-[A-Z]+-\d+)/g;
@@ -188,9 +187,9 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
                   <button
                     key={k}
                     onClick={() => onCaseClick && onCaseClick(subPart)}
-                    className="text-cyan-300 hover:bg-cyan-500/30 font-mono font-bold border border-cyan-400/40 rounded-lg px-2 py-0.5 bg-cyan-500/15 transition-all mx-1 inline-flex items-center gap-1 focus:outline-none cursor-pointer shadow-md shadow-cyan-500/10"
+                    className="text-[#1E2733] hover:bg-[#1E2733]/20 font-mono font-bold border border-[#1E2733]/40 rounded-lg px-2 py-0.5 bg-[#1E2733]/10 transition-all mx-1 inline-flex items-center gap-1 focus:outline-none cursor-pointer shadow-sm"
                   >
-                    <FileText className="w-3 h-3 text-cyan-400" />
+                    <FileText className="w-3 h-3 text-[#1E2733]" />
                     {subPart}
                   </button>
                 );
@@ -199,7 +198,7 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
             });
 
             return isBold ? (
-              <strong key={j} className="text-cyan-300 font-extrabold">{renderedSubParts}</strong>
+              <strong key={j} className="text-[#1E2733] font-extrabold">{renderedSubParts}</strong>
             ) : (
               <span key={j}>{renderedSubParts}</span>
             );
@@ -216,30 +215,30 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
       transition={{ duration: 0.3 }}
       className={`flex gap-3.5 group ${isUser ? 'flex-row-reverse' : ''}`}
     >
-      <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg border
+      <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md border
         ${isUser 
-          ? 'bg-gradient-to-br from-blue-600 to-indigo-600 text-white border-blue-400/30 shadow-blue-600/30' 
-          : 'bg-slate-900 text-cyan-400 border-cyan-500/30 shadow-cyan-950/40'}`}>
+          ? 'bg-[#1E2733] text-white border-[#1E2733]/40 shadow-slate-400/30' 
+          : 'bg-[#FAF6F0] text-[#1E2733] border-[#7A90A8]/40 shadow-slate-300/40'}`}>
         {isUser
           ? <User className="w-4 h-4 text-white" />
-          : <Bot className="w-4 h-4 text-cyan-400 animate-pulse" />
+          : <Bot className="w-4 h-4 text-[#1E2733]" />
         }
       </div>
 
       <div className={`max-w-[85%] ${isUser ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
-        <div className="flex items-center gap-2 text-[10px] font-mono text-slate-400 px-1">
+        <div className="flex items-center gap-2 text-[10px] font-mono text-[#48596D] px-1">
           <span>{isUser ? 'INSPECTOR (YOU)' : 'DRISHTI INTELLIGENCE'}</span>
           <span>•</span>
           <span>{msg.timestamp || 'Just now'}</span>
         </div>
 
-        <div className={`rounded-2xl px-5 py-4 text-sm relative shadow-2xl border backdrop-blur-2xl
+        <div className={`rounded-2xl px-5 py-4 text-sm relative shadow-lg border backdrop-blur-md
           ${isUser
-            ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 text-white border-blue-400/30 rounded-tr-xs shadow-indigo-900/40'
-            : 'bg-slate-900/90 text-slate-100 border-cyan-500/20 rounded-tl-xs shadow-black/70'
+            ? 'bg-[#1E2733] text-white border-[#1E2733]/40 rounded-tr-xs shadow-slate-400/30'
+            : 'bg-[#FAF6F0] text-[#1E2733] border-[#7A90A8]/30 rounded-tl-xs shadow-slate-300/40'
           }`}>
           {isUser
-            ? <p className="font-sans leading-relaxed text-slate-100">{msg.content}</p>
+            ? <p className="font-sans leading-relaxed text-white">{msg.content}</p>
             : <div className="space-y-2">{renderContentWithCaseLinks(msg.content)}</div>
           }
         </div>
@@ -248,16 +247,16 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
           <div className="flex items-center gap-2 px-1 pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={handleCopy}
-              className="text-[10px] font-mono text-slate-400 hover:text-cyan-400 flex items-center gap-1 cursor-pointer transition-colors"
+              className="text-[10px] font-mono text-[#48596D] hover:text-[#1E2733] flex items-center gap-1 cursor-pointer transition-colors"
             >
-              {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+              {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
               {copied ? 'Copied' : 'Copy'}
             </button>
-            <span className="text-slate-700">•</span>
+            <span className="text-[#7A90A8]">•</span>
             <button
               onClick={() => onSpeak && onSpeak(msg.content)}
               className={`text-[10px] font-mono flex items-center gap-1 cursor-pointer transition-colors ${
-                isSpeakingThis ? 'text-rose-400 font-bold animate-pulse' : 'text-slate-400 hover:text-cyan-400'
+                isSpeakingThis ? 'text-rose-600 font-bold animate-pulse' : 'text-[#48596D] hover:text-[#1E2733]'
               }`}
             >
               <Volume2 className="w-3 h-3" />
@@ -769,29 +768,25 @@ export default function ChatPage() {
   const isEmpty = messages.length === 0;
 
   return (
-    <div className="flex h-full relative overflow-hidden bg-[#090D16] text-slate-100 font-sans">
-      {/* Background Ambient Glow Gradients */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-
+    <div className="flex h-full relative overflow-hidden bg-[var(--surface-0)] text-[var(--text-primary)] font-sans">
       <div className="flex-grow flex flex-col h-full min-w-0 transition-all duration-300 relative z-10">
         {/* Header Command Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-3.5 bg-slate-900/80 backdrop-blur-2xl border-b border-cyan-500/20 shadow-2xl z-20">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-3.5 bg-[var(--surface-1)]/90 backdrop-blur-md border-b border-[var(--border)]/30 shadow-sm z-20">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/40 text-cyan-400 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-              <Bot className="w-5 h-5 text-cyan-400 animate-pulse" />
+            <div className="w-10 h-10 rounded-xl bg-[#1E2733] text-white flex items-center justify-center shadow-md">
+              <Bot className="w-5 h-5 text-[#AECAE8] animate-pulse" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-extrabold font-mono bg-gradient-to-r from-cyan-300 via-indigo-200 to-white bg-clip-text text-transparent tracking-wide">
+                <h2 className="text-base font-extrabold font-mono text-[#1E2733] tracking-wide">
                   DRISHTI Co-Pilot
                 </h2>
-                <span className="inline-flex items-center gap-1 bg-emerald-950/60 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono px-2 py-0.5 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                <span className="inline-flex items-center gap-1 bg-[#16A34A]/10 text-emerald-700 border border-emerald-600/30 text-[10px] font-mono px-2 py-0.5 rounded-full font-bold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping" />
                   LIVE GRID SYNC
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400 font-mono uppercase tracking-widest">
+              <p className="text-[10px] text-[#48596D] font-mono uppercase tracking-widest">
                 Karnataka Police AI Intelligence & Multilingual RAG Engine
               </p>
             </div>
@@ -800,7 +795,7 @@ export default function ChatPage() {
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 onClick={stopSpeech}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-mono font-bold uppercase tracking-wider hover:bg-rose-500/30 transition-all cursor-pointer shadow-lg shadow-rose-950/40 animate-pulse"
+                className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-rose-100 border border-rose-300 text-rose-700 text-xs font-mono font-bold uppercase tracking-wider hover:bg-rose-200 transition-all cursor-pointer shadow-sm animate-pulse"
               >
                 <VolumeX className="w-3.5 h-3.5" />
                 Mute Audio
@@ -810,17 +805,17 @@ export default function ChatPage() {
 
           {/* Voice Profile Selector Pills & Clear Chat */}
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-950/80 border border-slate-800 overflow-x-auto shadow-inner">
+            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#EFEAE4] border border-[#7A90A8]/30 overflow-x-auto shadow-inner">
               {VOICE_PROFILES.map((profile) => {
                 const active = voiceProfile === profile.id;
                 return (
                   <button
                     key={profile.id}
                     onClick={() => setVoiceProfile(profile.id)}
-                    className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all whitespace-nowrap cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all whitespace-nowrap cursor-pointer ${
                       active
-                        ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white border border-cyan-400/40 shadow-lg shadow-cyan-500/25'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
+                        ? 'bg-[#1E2733] text-white shadow-md'
+                        : 'text-[#1E2733] hover:text-[#1E2733] hover:bg-[#E2D8CC]'
                     }`}
                   >
                     {profile.label}
@@ -831,7 +826,7 @@ export default function ChatPage() {
             {messages.length > 0 && (
               <button
                 onClick={clearChatHistory}
-                className="px-3 py-1.5 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-500/30 text-xs font-mono font-bold uppercase transition-all cursor-pointer shadow-md shrink-0"
+                className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-mono font-bold uppercase transition-all cursor-pointer shadow-sm shrink-0"
                 title="Clear conversation history"
               >
                 Clear Chat
@@ -845,23 +840,23 @@ export default function ChatPage() {
           {isEmpty ? (
             <div className="flex flex-col items-center justify-center min-h-[80%] space-y-8 max-w-3xl mx-auto py-8">
               
-              {/* Central Glowing AI Emblem */}
+              {/* Central AI Emblem */}
               <div className="relative">
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-cyan-500 to-indigo-600 blur-3xl opacity-40 animate-pulse" />
-                <div className="relative w-22 h-22 rounded-3xl bg-slate-900 border border-cyan-500/30 flex items-center justify-center shadow-2xl shadow-cyan-950/60">
-                  <Cpu className="w-11 h-11 text-cyan-400" />
+                <div className="absolute inset-0 rounded-3xl bg-[#7A90A8] blur-2xl opacity-20 animate-pulse" />
+                <div className="relative w-20 h-20 rounded-3xl bg-[#FAF6F0] border border-[#7A90A8]/40 flex items-center justify-center shadow-xl">
+                  <Cpu className="w-10 h-10 text-[#1E2733]" />
                 </div>
               </div>
 
               <div className="text-center space-y-2 max-w-lg">
-                <span className="text-[10px] font-mono font-extrabold text-cyan-400 bg-cyan-950/60 border border-cyan-500/30 px-3 py-1 rounded-full uppercase tracking-widest">
+                <span className="text-[10px] font-mono font-extrabold text-[#A68A69] bg-[#A68A69]/10 border border-[#A68A69]/30 px-3 py-1 rounded-full uppercase tracking-widest">
                   KARNATAKA POLICE AI COMMAND CENTER
                 </span>
-                <h3 className="text-3xl font-black bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent tracking-tight pt-1">
+                <h3 className="text-3xl font-black text-[#1E2733] tracking-tight pt-1">
                   Ask DRISHTI Co-Pilot
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-400 font-mono leading-relaxed">
-                  Query crime datastores, upload FIR documents, run ANPR watchlist lookups, or inspect suspect profiles in <span className="text-cyan-300 font-bold">English</span>, <span className="text-indigo-300 font-bold">Hindi</span>, or <span className="text-emerald-300 font-bold">Kannada</span>.
+                <p className="text-xs sm:text-sm text-[#48596D] font-mono leading-relaxed">
+                  Query crime datastores, upload FIR documents, run ANPR watchlist lookups, or inspect suspect profiles in <span className="text-[#1E2733] font-bold">English</span>, <span className="text-[#1E2733] font-bold">Hindi</span>, or <span className="text-[#1E2733] font-bold">Kannada</span>.
                 </p>
               </div>
 
@@ -875,21 +870,21 @@ export default function ChatPage() {
                       whileHover={{ y: -4, scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => sendMessage(s.text)}
-                      className="text-left p-4.5 rounded-2xl bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-cyan-500/40 transition-all shadow-xl hover:shadow-cyan-950/40 group cursor-pointer flex flex-col justify-between"
+                      className="text-left p-4.5 rounded-2xl bg-[#FAF6F0] hover:bg-[#FAF6F0]/90 border border-[#7A90A8]/40 hover:border-[#1E2733]/50 transition-all shadow-md hover:shadow-lg group cursor-pointer flex flex-col justify-between"
                     >
                       <div className="flex items-center justify-between mb-3">
-                        <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center group-hover:scale-110 group-hover:border-cyan-400 transition-transform">
-                          <Icon className="w-5 h-5" />
+                        <div className="w-10 h-10 rounded-xl bg-[#1E2733]/10 border border-[#1E2733]/20 text-[#1E2733] flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <Icon className="w-5 h-5 text-[#1E2733]" />
                         </div>
-                        <span className="text-[9px] font-mono font-bold text-cyan-400 bg-cyan-950/80 border border-cyan-500/30 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                        <span className="text-[9px] font-mono font-bold text-[#A68A69] bg-[#EFEAE4] border border-[#A68A69]/30 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                           {s.badge}
                         </span>
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-slate-100 font-mono mb-1 group-hover:text-cyan-300 transition-colors">
+                        <p className="text-xs font-bold text-[#1E2733] font-mono mb-1 group-hover:text-[#1E2733] transition-colors">
                           {s.title}
                         </p>
-                        <p className="text-xs text-slate-400 font-sans line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-[#48596D] font-sans line-clamp-2 leading-relaxed">
                           "{s.text}"
                         </p>
                       </div>
@@ -916,9 +911,9 @@ export default function ChatPage() {
         </div>
 
         {/* Input Floating Command Dock */}
-        <div className="p-4 sm:p-5 border-t border-slate-800/80 bg-slate-950/90 backdrop-blur-2xl relative z-20">
+        <div className="p-4 sm:p-5 border-t border-[#7A90A8]/30 bg-[#EFEAE4]/90 backdrop-blur-md relative z-20">
           <div className="max-w-4xl mx-auto space-y-2">
-            <div className="flex items-center gap-2.5 bg-slate-900/95 border border-cyan-500/30 rounded-2xl p-2 shadow-2xl shadow-cyan-950/30 focus-within:border-cyan-400 transition-all">
+            <div className="flex items-center gap-2.5 bg-[#FAF6F0] border border-[#7A90A8]/40 rounded-2xl p-2 shadow-xl shadow-slate-400/20 focus-within:border-[#1E2733] transition-all">
               <button
                 id="voice-btn"
                 onClick={handleMicClick}
@@ -930,8 +925,8 @@ export default function ChatPage() {
                 title={speechSupported ? (isRecording ? 'Release to send / Click to stop' : 'Hold to Talk / Click to toggle') : 'Voice input not supported'}
                 className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all cursor-pointer ${
                   isRecording
-                    ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-lg shadow-rose-500/50 animate-pulse border border-rose-400'
-                    : 'bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-cyan-400 hover:text-cyan-300'
+                    ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/40 animate-pulse'
+                    : 'bg-[#E2D8CC] hover:bg-[#D5C7B5] border border-[#7A90A8]/30 text-[#1E2733]'
                 }`}
               >
                 {isRecording ? <MicOff className="w-5 h-5 text-white" /> : <Mic className="w-5 h-5" />}
@@ -949,7 +944,7 @@ export default function ChatPage() {
                 onClick={() => fileInputRef.current?.click()}
                 disabled={loading}
                 title="Upload FIR document or case file"
-                className="w-11 h-11 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-cyan-400 hover:text-cyan-300 flex items-center justify-center flex-shrink-0 transition-all cursor-pointer shadow-sm hover:border-cyan-500/40"
+                className="w-11 h-11 rounded-xl bg-[#E2D8CC] hover:bg-[#D5C7B5] border border-[#7A90A8]/30 text-[#1E2733] flex items-center justify-center flex-shrink-0 transition-all cursor-pointer shadow-sm"
               >
                 <FileText className="w-5 h-5" />
               </button>
@@ -974,7 +969,7 @@ export default function ChatPage() {
                   })()}
                   rows={1}
                   style={{ resize: 'none', overflowY: 'hidden' }}
-                  className="w-full px-3 py-2 bg-transparent text-slate-100 text-sm placeholder-slate-500 focus:outline-none font-sans"
+                  className="w-full px-3 py-2 bg-transparent text-[#1E2733] text-sm placeholder-[#48596D]/60 focus:outline-none font-sans"
                 />
               </div>
 
@@ -984,17 +979,17 @@ export default function ChatPage() {
                 disabled={!input.trim() || loading}
                 className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all cursor-pointer ${
                   input.trim() && !loading
-                    ? 'bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 text-white shadow-lg shadow-cyan-500/30 hover:scale-105 border border-cyan-400/40'
-                    : 'bg-slate-800/50 text-slate-600 border border-slate-800 cursor-not-allowed'
+                    ? 'bg-[#1E2733] hover:bg-[#2B3848] text-white shadow-lg shadow-[#1E2733]/30 hover:scale-105'
+                    : 'bg-[#E2D8CC] text-[#48596D]/40 cursor-not-allowed'
                 }`}
               >
                 <Send className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 px-2">
-              <span>Press <kbd className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-700 text-cyan-300 font-bold">Enter</kbd> to send · <kbd className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-700 text-cyan-300 font-bold">Shift+Enter</kbd> for line break</span>
-              {isRecording && <span className="text-rose-400 font-bold animate-pulse">🔴 Recording Voice Input...</span>}
+            <div className="flex items-center justify-between text-[10px] font-mono text-[#48596D] px-2">
+              <span>Press <kbd className="px-1.5 py-0.5 rounded bg-[#FAF6F0] border border-[#7A90A8]/40 text-[#1E2733] font-bold">Enter</kbd> to send · <kbd className="px-1.5 py-0.5 rounded bg-[#FAF6F0] border border-[#7A90A8]/40 text-[#1E2733] font-bold">Shift+Enter</kbd> for line break</span>
+              {isRecording && <span className="text-rose-600 font-bold animate-pulse">🔴 Recording Voice Input...</span>}
             </div>
           </div>
         </div>
