@@ -873,6 +873,11 @@ export default function DashboardLayout({ children }) {
             setOrbState('speaking');
             safeSpeak(orbResponse, getLocale(language));
           }}
+          onDismissResponse={() => {
+            setOrbResponse('');
+            stopSpeaking();
+            setOrbState('idle');
+          }}
         />
       )}
 

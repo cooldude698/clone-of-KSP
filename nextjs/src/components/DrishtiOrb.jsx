@@ -118,6 +118,7 @@ const DrishtiOrb = ({
   isListening = false,
   liveTranscript = '',
   onReadAloud,
+  onDismissResponse,
   isMuted = false,
   onToggleMute,
 }) => {
@@ -502,15 +503,24 @@ const DrishtiOrb = ({
                       Drishti
                     </span>
                   </div>
-                  {onReadAloud && (
+                  <div className="flex items-center gap-1">
+                    {onReadAloud && (
+                      <button
+                        onClick={onReadAloud}
+                        className="text-white/40 hover:text-white transition-colors flex items-center justify-center p-1 rounded-full hover:bg-white/10"
+                        title="Read Aloud"
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                      </button>
+                    )}
                     <button
-                      onClick={onReadAloud}
-                      className="text-white/40 hover:text-white transition-colors flex items-center justify-center p-1 rounded-full hover:bg-white/10"
-                      title="Read Aloud"
+                      onClick={onDismissResponse}
+                      className="text-white/40 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center p-1 rounded-full cursor-pointer"
+                      title="Cancel / Close Speech Bubble"
                     >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
-                  )}
+                  </div>
                 </div>
                 <p className="text-white/80 text-sm leading-relaxed">
                   {orbResponse.length > 180 ? orbResponse.slice(0, 180) + '…' : orbResponse}
