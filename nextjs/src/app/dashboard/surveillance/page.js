@@ -93,16 +93,17 @@ function speakDrishtiAlert(text) {
   } catch (_) {}
 }
 
-// Local CCTV Video Mapping (Verified against actual downloaded video file content)
+// CCTV Video Mapping — served from GitHub raw CDN to avoid Catalyst build zip size limits
+const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/vedeshskhatri/kspdatathon2026/main/nextjs/public/videos';
 const CAMERA_SPECIFIC_VIDEOS = {
-  'CAM-BLR-0010': '/videos/traffic1.mp4', // Senior IPS Officer Press Conference at KSP HQ
-  'CAM-BLR-0012': '/videos/people1.mp4',  // Commercial Street Pedestrian Plaza Walkway
-  'CAM-BLR-0015': '/videos/traffic2.mp4',  // Chickpet Main Road Traffic Checkpoint (Silver Swift)
-  'CAM-BLR-0035': '/videos/people3.mp4',   // Karnataka Police Night Barricade Checkpost
-  'CAM-BLR-0042': '/videos/people2.mp4',   // Koramangala 5th Block Executive Portico
-  'CAM-BLR-0050': '/videos/traffic3.mp4',  // Silk Board Flyover Junction CCTV
-  'CAM-BLR-0055': '/videos/people4.mp4',   // Majestic Bus Stand Terminal 3 Crowd Cam (Red Shirt Subject)
-  'CAM-BLR-0060': '/videos/traffic4.mp4',  // Nelamangala Expressway Toll Plaza
+  'CAM-BLR-0010': `${GITHUB_RAW_BASE}/traffic1.mp4`, // Senior IPS Officer Press Conference at KSP HQ
+  'CAM-BLR-0012': `${GITHUB_RAW_BASE}/people1.mp4`,  // Commercial Street Pedestrian Plaza Walkway
+  'CAM-BLR-0015': `${GITHUB_RAW_BASE}/traffic2.mp4`, // Chickpet Main Road Traffic Checkpoint (Silver Swift)
+  'CAM-BLR-0035': `${GITHUB_RAW_BASE}/people3.mp4`,  // Karnataka Police Night Barricade Checkpost
+  'CAM-BLR-0042': `${GITHUB_RAW_BASE}/people2.mp4`,  // Koramangala 5th Block Executive Portico
+  'CAM-BLR-0050': `${GITHUB_RAW_BASE}/traffic3.mp4`, // Silk Board Flyover Junction CCTV
+  'CAM-BLR-0055': `${GITHUB_RAW_BASE}/people4.mp4`,  // Majestic Bus Stand Terminal 3 Crowd Cam (Red Shirt Subject)
+  'CAM-BLR-0060': `${GITHUB_RAW_BASE}/traffic4.mp4`, // Nelamangala Expressway Toll Plaza
 };
 
 // ── Pinpoint Biometric Data & Precise Face/Plate Box Framing ──
