@@ -388,16 +388,6 @@ export default function DashboardPage() {
             <motion.button
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
-              onClick={() => router.push('/dashboard/chat')}
-              className="btn-primary flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all cursor-pointer"
-            >
-              <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
-              <span>Launch Drishti Co-Pilot</span>
-            </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
               onClick={() => router.push('/dashboard/analytics')}
               className="btn-secondary flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all cursor-pointer"
             >
