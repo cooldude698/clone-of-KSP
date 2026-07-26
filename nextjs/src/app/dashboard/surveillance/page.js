@@ -93,17 +93,18 @@ function speakDrishtiAlert(text) {
   } catch (_) {}
 }
 
-// CCTV Video Mapping — served from GitHub raw CDN (pinned commit) to avoid Catalyst build zip size limits
+// CCTV Video Mapping — uses env var for local dev (/videos) and GitHub raw CDN for deployment
 const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/vedeshskhatri/kspdatathon2026/16f1396ac0487ce1792722f33acb279cee0ca4db/nextjs/public/videos';
+const VIDEO_BASE = process.env.NEXT_PUBLIC_VIDEO_BASE_URL || GITHUB_RAW_BASE;
 const CAMERA_SPECIFIC_VIDEOS = {
-  'CAM-BLR-0010': `${GITHUB_RAW_BASE}/traffic1.mp4`, // Senior IPS Officer Press Conference at KSP HQ
-  'CAM-BLR-0012': `${GITHUB_RAW_BASE}/people1.mp4`,  // Commercial Street Pedestrian Plaza Walkway
-  'CAM-BLR-0015': `${GITHUB_RAW_BASE}/traffic2.mp4`, // Chickpet Main Road Traffic Checkpoint (Silver Swift)
-  'CAM-BLR-0035': `${GITHUB_RAW_BASE}/people3.mp4`,  // Karnataka Police Night Barricade Checkpost
-  'CAM-BLR-0042': `${GITHUB_RAW_BASE}/people2.mp4`,  // Koramangala 5th Block Executive Portico
-  'CAM-BLR-0050': `${GITHUB_RAW_BASE}/traffic3.mp4`, // Silk Board Flyover Junction CCTV
-  'CAM-BLR-0055': `${GITHUB_RAW_BASE}/people4.mp4`,  // Majestic Bus Stand Terminal 3 Crowd Cam (Red Shirt Subject)
-  'CAM-BLR-0060': `${GITHUB_RAW_BASE}/traffic4.mp4`, // Nelamangala Expressway Toll Plaza
+  'CAM-BLR-0010': `${VIDEO_BASE}/traffic1.mp4`, // Senior IPS Officer Press Conference at KSP HQ
+  'CAM-BLR-0012': `${VIDEO_BASE}/people1.mp4`,  // Commercial Street Pedestrian Plaza Walkway
+  'CAM-BLR-0015': `${VIDEO_BASE}/traffic2.mp4`, // Chickpet Main Road Traffic Checkpoint (Silver Swift)
+  'CAM-BLR-0035': `${VIDEO_BASE}/people3.mp4`,  // Karnataka Police Night Barricade Checkpost
+  'CAM-BLR-0042': `${VIDEO_BASE}/people2.mp4`,  // Koramangala 5th Block Executive Portico
+  'CAM-BLR-0050': `${VIDEO_BASE}/traffic3.mp4`, // Silk Board Flyover Junction CCTV
+  'CAM-BLR-0055': `${VIDEO_BASE}/people4.mp4`,  // Majestic Bus Stand Terminal 3 Crowd Cam (Red Shirt Subject)
+  'CAM-BLR-0060': `${VIDEO_BASE}/traffic4.mp4`, // Nelamangala Expressway Toll Plaza
 };
 
 // ── Pinpoint Biometric Data & Precise Face/Plate Box Framing ──
