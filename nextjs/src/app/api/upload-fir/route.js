@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
+import { UPLOADED_FIRS } from '@/lib/uploadedFirsStore';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -12,7 +13,6 @@ export async function OPTIONS() {
 }
 
 // In-memory cache for uploaded FIRs so RAG can query them immediately
-const UPLOADED_FIRS = [];
 
 export async function POST(req) {
   try {

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
-import { UPLOADED_FIRS } from '@/app/api/upload-fir/route';
+import { UPLOADED_FIRS } from '@/lib/uploadedFirsStore';
 import { getTrainedResponse } from '@/lib/drishtiTrainingBase';
 
 const CORS = {
@@ -250,6 +250,8 @@ function generateSmartPoliceResponse(question, lang = 'en') {
    - Step 3: Contact Bank Nodal Officer immediately through Citizen Financial Cyber Fraud System to freeze the money in the fraudster's bank account before withdrawal.
    - Step 4: Trace IP address, SIM registration, and WhatsApp details used by the fraudster through Cyber Crime Cell.
 2. Active Case Record: FIR-2026-MYS-0112 (Financial Fraud of ₹1,45,000). Beneficiary bank accounts frozen within 45 minutes of report.`;
+  }
+
   // 5b. Binary / Check questions for missing or untracked data
   const isCheckQuestion = q.includes('do we') || q.includes('is there') || q.includes('have info') || q.includes('any info') || q.includes('check if') || q.includes('yes/no') || q.includes('yes or no') || q.includes('क्या') || q.includes('जानकारी') || q.includes('ಯಾವ');
   if (isCheckQuestion) {
