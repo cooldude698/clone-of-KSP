@@ -44,9 +44,9 @@ const MOCK_EDGES = DEMO_NETWORK_GRAPH.edges.map((e, i) => ({
 export default function NetworkPage() {
   const [nodes, setNodes] = useState(MOCK_NODES);
   const [edges, setEdges] = useState(MOCK_EDGES);
+  const [selectedNode, setSelectedNode] = useState(null);
+  const [selectedEdge, setSelectedEdge] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [selectedNodeId, setSelectedNodeId] = useState(null);
-  const [panelOpen, setPanelOpen] = useState(false);
   const [viewMode, setViewMode] = useState('split'); // 'graph' | 'map' | 'split'
 
   // InvestigatorWall props state
@@ -55,7 +55,6 @@ export default function NetworkPage() {
 
   useEffect(() => {
     const fetchNetworkData = async () => {
-      setLoading(true);
       const { data } = await fetchWithFallback('network-graph-data?min_connections=1', DEMO_NETWORK_GRAPH);
       if (data && data.nodes && data.nodes.length > 0) {
         const parsedNodes = data.nodes.map(n => ({

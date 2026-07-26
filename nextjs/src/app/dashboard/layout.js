@@ -718,7 +718,7 @@ export default function DashboardLayout({ children }) {
           {NAV_ITEMS.map(({ href, icon: Icon, label, id }) => {
             const active = isActive(href);
             return (
-              <Link key={href} href={href} id={id}
+              <Link key={href} href={href} prefetch={true} id={id}
                 className={`flex items-center transition-all group relative font-mono text-xs font-bold
                   ${collapsed 
                     ? 'w-10 h-10 justify-center mx-auto rounded-xl' 

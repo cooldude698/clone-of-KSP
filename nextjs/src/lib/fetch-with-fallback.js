@@ -14,11 +14,11 @@
 const _responseCache = new Map(); // key → { data, ts }
 const _deadEndpoints = new Map(); // key → ts (timestamp when it failed)
 
-const CACHE_TTL_MS    = 30_000; // Cache valid responses for 30 s
-const DEAD_TTL_MS     = 15_000; // Don't retry a dead endpoint for 15 s
+const CACHE_TTL_MS    = 60_000;  // Cache valid responses for 60 s
+const DEAD_TTL_MS     = 300_000; // Don't retry a dead/slow endpoint for 5 mins
 
 export async function fetchWithFallback(endpoint, demoData, options = {}) {
-  const timeoutMs     = options.timeoutMs || 2000; // ← was 6000
+  const timeoutMs     = options.timeoutMs || 300; // Fast 300ms timeout for instant fast navigation!
   const bypassCache   = options.bypassCache || false;
   const method        = (options.method || 'GET').toUpperCase();
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/api/${endpoint}`;
@@ -32,7 +32,7 @@ export async function fetchWithFallback(endpoint, demoData, options = {}) {
       return { data: cached.data, source: 'live' };
     }
 
-    // ── 2. Skip dead endpoints (avoid the full timeout wait) ────────────────
+    // ── 2. Skip dead endpoints (avoid the network wait entirely) ─────────────
     const deadTs = _deadEndpoints.get(cacheKey);
     if (deadTs && now - deadTs < DEAD_TTL_MS) {
       return { data: demoData, source: 'demo' };

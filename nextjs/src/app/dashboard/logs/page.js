@@ -101,11 +101,11 @@ const DEFAULT_SESSION_CARDS = [
 ];
 
 export default function LogsPage() {
-  const [sessionCards, setSessionCards] = useState([]);
+  const [sessionCards, setSessionCards] = useState(DEFAULT_SESSION_CARDS);
   const [search, setSearch]             = useState('');
   const [filterType, setFilterType]     = useState('all'); // all, suspect, unindexed, location, fir
   const [selectedCard, setSelectedCard] = useState(null);
-  const [mounted, setMounted]           = useState(false);
+  const [mounted, setMounted]           = useState(true);
   const [confirmClear, setConfirmClear] = useState(false);
 
   // Load user localStorage chat history and segment into cards

@@ -103,11 +103,11 @@ function useLiveCounter(baseValue, variance = 3, intervalMs = 10000) {
 export default function AnalyticsPage() {
   const [role, setRole] = useState('Analyst');
 
-  // Live state
-  const [trendData, setTrendData] = useState([]);
-  const [districtData, setDistrictData] = useState([]);
-  const [crimeTypes, setCrimeTypes] = useState([]);
-  const [darkZones, setDarkZones] = useState([]);
+  // Live state (pre-filled for instant 0ms mount)
+  const [trendData, setTrendData] = useState(MOCK_MONTHLY_DATA);
+  const [districtData, setDistrictData] = useState(MOCK_DISTRICT_DATA);
+  const [crimeTypes, setCrimeTypes] = useState(MOCK_CRIME_TYPES);
+  const [darkZones, setDarkZones] = useState(MOCK_DARK_ZONES_FALLBACK);
 
   // Live Counters (updates every 10s with increased fluctuation rate)
   const liveTotalFIRs = useLiveCounter(2445, 4, 10000);
@@ -142,7 +142,7 @@ export default function AnalyticsPage() {
   }, []);
 
   // UI state
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [usingCache, setUsingCache] = useState(false);

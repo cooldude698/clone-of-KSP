@@ -122,9 +122,9 @@ function CachedBadge() {
 export default function MapPage() {
   const [mounted, setMounted] = useState(false);
 
-  // Live data state
-  const [hotspots, setHotspots]       = useState([]);
-  const [loading, setLoading]         = useState(true);
+  // Live data state (pre-filled for instant 0ms mount)
+  const [hotspots, setHotspots]       = useState(MOCK_HOTSPOTS_FALLBACK);
+  const [loading, setLoading]         = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [error, setError]             = useState(null);
   const [usingCache, setUsingCache]   = useState(false);

@@ -240,7 +240,7 @@ export default function DashboardPage() {
   const [trendData, setTrendData] = useState(DEMO_TRENDS.trend_data.map(d => d.count || d.total || 0));
   const [repeatOffenders, setRepeatOffenders] = useState(DEMO_REPEAT_OFFENDERS);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const [role, setRole] = useState('Inspector');
