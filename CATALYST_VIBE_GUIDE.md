@@ -33,7 +33,7 @@ Catalyst API requests to QuickML and Zia models **MUST** include:
 ### Endpoint URLs (Configured in `.env` & `nextjs/.env`):
 ```env
 CATALYST_ORG_ID=60073715607
-QUICKML_OAUTH_TOKEN=m_1004.fd51fe8cfcc7779eaa6213c72a5d9914.4be5345c73e9634fe8e67aa887a195ea
+QUICKML_OAUTH_TOKEN=your_quickml_oauth_token_here
 QUICKML_RAG_ENDPOINT_URL=https://api.catalyst.zoho.in/quickml/v1/project/49149000000019001/rag/answer
 QUICKML_TTS_ENDPOINT_URL=https://api.catalyst.zoho.in/quickml/api/v1/models/zia/tts/synthesize
 QUICKML_TRANSLATE_ENDPOINT_URL=https://api.catalyst.zoho.in/quickml/api/v1/models/zia/translate
