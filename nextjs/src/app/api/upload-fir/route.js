@@ -12,7 +12,7 @@ export async function OPTIONS() {
 }
 
 // In-memory cache for uploaded FIRs so RAG can query them immediately
-export const UPLOADED_FIRS = [];
+const UPLOADED_FIRS = [];
 
 export async function POST(req) {
   try {

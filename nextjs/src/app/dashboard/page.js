@@ -55,9 +55,6 @@ const TABS = [
   { key: 'closed',            label: 'Closed' },
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
-// HELPER — Format date to "18 Jul" style
-// ─────────────────────────────────────────────────────────────────────────────
 function fmtDate(dateStr) {
   if (!dateStr) return '—';
   try {
@@ -71,9 +68,6 @@ function fmtTime(timeStr) {
   return timeStr.slice(0, 5);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPONENT — Status Pill
-// ─────────────────────────────────────────────────────────────────────────────
 function StatusPill({ status }) {
   const cfg = STATUS_CONFIG[status] || STATUS_CONFIG['open'];
   return (
@@ -84,12 +78,9 @@ function StatusPill({ status }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPONENT — Metric Card
-// ─────────────────────────────────────────────────────────────────────────────
 function MetricCard({ label, value, sub, subTrend, icon: Icon, iconColor, iconBg, loading }) {
   return (
-    <div className="p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 flex items-start gap-4">
+    <div className="p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 flex items-start gap-4 shadow-sm">
       <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}>
         <Icon className={`w-5 h-5 ${iconColor}`} />
       </div>
@@ -112,13 +103,10 @@ function MetricCard({ label, value, sub, subTrend, icon: Icon, iconColor, iconBg
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MAIN COMPONENT
-// ─────────────────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
   const router = useRouter();
 
-  // ── Data State ────────────────────────────────────────────────────────────
+  // Data State
   const [firs, setFirs] = useState([]);
   const [hotspots, setHotspots] = useState([]);
   const [suspects, setSuspects] = useState([]);
@@ -128,19 +116,22 @@ export default function DashboardPage() {
   const [dataSource, setDataSource] = useState('live');
   const [lastSynced, setLastSynced] = useState(null);
 
-  // ── UI State ──────────────────────────────────────────────────────────────
+  // UI State
   const [activeTab, setActiveTab] = useState('all');
   const [search, setSearch] = useState('');
   const [flagged, setFlagged] = useState(new Set());
   const [role, setRole] = useState('Inspector');
+  const [userName, setUserName] = useState('Officer V. Sharma');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setRole(localStorage.getItem('drishti_role') || localStorage.getItem('role') || 'Inspector');
+      const storedRole = localStorage.getItem('drishti_role') || localStorage.getItem('role') || 'Inspector';
+      const storedName = localStorage.getItem('userName') || localStorage.getItem('drishti_user_name') || 'V. Sharma';
+      setRole(storedRole);
+      setUserName(storedName.startsWith('Inspector') || storedName.startsWith('Officer') ? storedName : `Inspector ${storedName}`);
     }
   }, []);
 
-  // ── Fetch FIRs ────────────────────────────────────────────────────────────
   const fetchFirs = useCallback(async () => {
     const res = await fetchWithFallback('/api/firs', DEMO_FIRS, { timeoutMs: 2000 });
     let rows = [];
@@ -151,7 +142,6 @@ export default function DashboardPage() {
     setDataSource(res.source || 'demo');
   }, []);
 
-  // ── Fetch Hotspots ────────────────────────────────────────────────────────
   const fetchHotspots = useCallback(async () => {
     const res = await fetchWithFallback('/api/hotspots', DEMO_HOTSPOTS, { timeoutMs: 2000 });
     let rows = [];
@@ -162,14 +152,12 @@ export default function DashboardPage() {
     setHotspotLoading(false);
   }, []);
 
-  // ── Fetch Suspects ────────────────────────────────────────────────────────
   const fetchSuspects = useCallback(async () => {
     const res = await fetchWithFallback('/api/repeat-offenders', DEMO_REPEAT_OFFENDERS, { timeoutMs: 2000 });
     const rows = res?.data?.suspects || DEMO_REPEAT_OFFENDERS.suspects;
     setSuspects(rows.slice(0, 3));
   }, []);
 
-  // ── Load All ──────────────────────────────────────────────────────────────
   const loadAll = useCallback(async (manual = false) => {
     if (manual) {
       setRefreshing(true);
@@ -183,14 +171,12 @@ export default function DashboardPage() {
     setLastSynced(new Date());
   }, [fetchFirs, fetchHotspots, fetchSuspects]);
 
-  // ── Initial load + 30s polling ────────────────────────────────────────────
   useEffect(() => {
     loadAll();
     const id = setInterval(() => loadAll(), 30_000);
     return () => clearInterval(id);
   }, [loadAll]);
 
-  // ── Computed Metrics ──────────────────────────────────────────────────────
   const metrics = useMemo(() => {
     if (!firs.length) return { total: 0, open: 0, investigating: 0, closed: 0 };
     const total = firs.length;
@@ -200,7 +186,6 @@ export default function DashboardPage() {
     return { total, open, investigating, closed };
   }, [firs]);
 
-  // ── Filtered + Searched FIRs ──────────────────────────────────────────────
   const displayed = useMemo(() => {
     return firs
       .filter(f => {
@@ -232,42 +217,41 @@ export default function DashboardPage() {
     ? lastSynced.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
     : '—';
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // RENDER
-  // ─────────────────────────────────────────────────────────────────────────
   return (
     <div className="flex flex-col gap-6 p-5 sm:p-7 max-w-[1700px] mx-auto min-h-screen text-[var(--text-primary)]">
 
-      {/* ── PAGE HEADER ──────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* ── RESPECTFUL OFFICER GREETING BANNER (NO DUPLICATE OVERVIEW TITLE) ───────── */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-r from-[var(--surface-1)] via-[var(--surface-1)] to-[var(--surface-2)] border border-[var(--border)]/50 shadow-sm">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)] font-heading">
-            Overview
-          </h1>
-          <p className="text-[13px] text-[var(--text-secondary)] font-medium mt-0.5">
-            Karnataka State Police · CCTNS Live Feed · {role}
+          <div className="flex items-center gap-2">
+            <span className="text-xl">👋</span>
+            <h2 className="text-xl font-bold tracking-tight text-[var(--text-primary)] font-heading">
+              Welcome back, {userName}
+            </h2>
+          </div>
+          <p className="text-xs text-[var(--text-secondary)] font-medium mt-1">
+            Karnataka State Police CCTNS Command Center · Shift Status: <span className="font-semibold text-emerald-600 dark:text-emerald-400">ACTIVE & OPERATIONAL</span> · Sector 4 HQ
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Sync status badge */}
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--surface-1)] border border-[var(--border)]/50 text-[11px] font-semibold text-[var(--text-secondary)]">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--surface-0)] border border-[var(--border)]/50 text-[11px] font-semibold text-[var(--text-secondary)]">
             <span className={`w-2 h-2 rounded-full ${dataSource === 'live' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'}`} />
-            <span>{dataSource === 'live' ? 'Live' : 'Cached'} · {syncLabel}</span>
+            <span>{dataSource === 'live' ? 'Live CCTNS' : 'Cached Feed'} · {syncLabel}</span>
           </div>
 
           <button
             onClick={() => loadAll(true)}
             disabled={refreshing}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--surface-1)] border border-[var(--border)]/50 text-[13px] font-semibold text-[var(--text-primary)] hover:bg-[var(--surface-2)] transition-colors disabled:opacity-50 cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[var(--surface-0)] border border-[var(--border)]/50 text-xs font-semibold text-[var(--text-primary)] hover:bg-[var(--surface-2)] transition-colors disabled:opacity-50 cursor-pointer shadow-sm"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-            {refreshing ? 'Refreshing…' : 'Refresh'}
+            {refreshing ? 'Syncing...' : 'Sync Feed'}
           </button>
 
           <Link
             href="/dashboard/chat"
-            className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-[var(--text-primary)] text-[var(--surface-0)] text-[13px] font-semibold hover:opacity-90 transition-opacity"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--text-primary)] text-[var(--surface-0)] text-xs font-bold hover:opacity-90 transition-opacity shadow-sm"
           >
             Ask Drishti AI
             <ArrowRight className="w-3.5 h-3.5" />
@@ -321,7 +305,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-6">
 
         {/* LEFT: INCIDENT TABLE */}
-        <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 flex flex-col overflow-hidden">
+        <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 flex flex-col overflow-hidden shadow-sm">
 
           {/* Table Header */}
           <div className="px-5 pt-5 pb-0 space-y-4 border-b border-[var(--border)]/50">
@@ -493,8 +477,8 @@ export default function DashboardPage() {
         {/* RIGHT: SIDEBAR PANELS */}
         <div className="flex flex-col gap-4">
 
-          {/* ── CRIME HOTSPOTS ────────────────────────────────────────────── */}
-          <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden">
+          {/* CRIME HOTSPOTS */}
+          <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">
             <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-[var(--border)]/50">
               <div>
                 <h3 className="text-[13px] font-bold text-[var(--text-primary)] font-heading">Crime Hotspots</h3>
@@ -559,8 +543,8 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* ── HIGH-RISK SUSPECTS ────────────────────────────────────────── */}
-          <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden">
+          {/* HIGH-RISK SUSPECTS */}
+          <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">
             <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-[var(--border)]/50">
               <div>
                 <h3 className="text-[13px] font-bold text-[var(--text-primary)] font-heading">Watchlist</h3>
@@ -604,8 +588,8 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* ── INTELLIGENCE BRIEF ────────────────────────────────────────── */}
-          <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden">
+          {/* AI INTELLIGENCE BRIEF */}
+          <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">
             <div className="flex items-center gap-2 px-5 pt-4 pb-3 border-b border-[var(--border)]/50">
               <Shield className="w-3.5 h-3.5 text-[var(--text-secondary)]" />
               <h3 className="text-[13px] font-bold text-[var(--text-primary)] font-heading">AI Intelligence Brief</h3>
@@ -636,9 +620,7 @@ export default function DashboardPage() {
           </div>
 
         </div>
-        {/* end RIGHT sidebar */}
       </div>
-      {/* end main grid */}
     </div>
   );
 }

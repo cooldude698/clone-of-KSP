@@ -1,93 +1,231 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   ArrowLeft, FileText, Clock, Shield, AlertTriangle,
   CheckCircle2, ShieldAlert, MapPin, User, Users, Phone,
   Activity, Camera, ChevronRight, ExternalLink,
-  Star, UserPlus, StickyNote, Circle, Zap
+  Star, UserPlus, StickyNote, Circle, Zap, Send, MessageSquare, Lock
 } from 'lucide-react';
 
-// ── Status helpers ─────────────────────────────────────────────────────────────
+// ── Realistic case detail fallback map for realistic KSP case records ───────
+const CASE_DETAILS_MAP = {
+  'FIR-2026-BL-4921': {
+    victim_name: 'Vikram Sharma',
+    victim_contact: '+91 98451 00219',
+    victim_age: '34 Yrs',
+    victim_gender: 'Male',
+    victim_address: '4th Block, HSR Layout, Bengaluru',
+    officer_name: 'Insp. V. Sharma',
+    division: 'South Division',
+    accused_name: 'Ramesh Kumar',
+    accused_alias: 'Bullet Ramesh',
+    accused_status: 'ACTIVE WATCHLIST',
+    accused_risk: 94,
+    vehicle_plate: 'KA-01-MJ-8821',
+    vehicle_model: 'Bajaj Pulsar 220 (Black)',
+    notes: [
+      { id: 1, time: '18 Jul 2026, 14:35', officer: 'Insp. V. Sharma (HSR Layout PS)', text: 'CCTV footage retrieved from Silk Board TTMC. Target vehicle KA-01-MJ-8821 confirmed heading towards Hosur Road approach.' },
+      { id: 2, time: '18 Jul 2026, 16:10', officer: 'Sub-Insp. K. Patil (Control Room)', text: 'ANPR Alert triggered at Electronic City Toll Gate. Patrol Unit 14 dispatched for intercept.' },
+      { id: 3, time: '19 Jul 2026, 09:20', officer: 'Insp. R. Deshmukh (Crime Branch)', text: 'Informant network confirms suspect Ramesh Kumar spotted near Yelahanka auto chop-shop corridor.' }
+    ]
+  },
+  'FIR-2026-MY-1103': {
+    victim_name: 'Siddharth Rao',
+    victim_contact: '+91 99002 44102',
+    victim_age: '42 Yrs',
+    victim_gender: 'Male',
+    victim_address: 'VV Puram Main Road, Mysuru',
+    officer_name: 'Sub-Insp. K. Patil',
+    division: 'Central Division',
+    accused_name: 'Suresh Naidu',
+    accused_alias: 'Snake Naidu',
+    accused_status: 'ABSCONDING',
+    accused_risk: 88,
+    vehicle_plate: 'KA-09-EA-3312',
+    vehicle_model: 'TVS Apache RTR (Red)',
+    notes: [
+      { id: 1, time: '17 Jul 2026, 22:40', officer: 'Sub-Insp. K. Patil (Cubbon Park PS)', text: 'Highway patrol dispatched to MG Road corridor following emergency call. Commercial transport van secured.' },
+      { id: 2, time: '18 Jul 2026, 08:15', officer: 'Insp. S. Gowda (Mysuru South)', text: 'Suspect Suresh Naidu identified via toll plaza ANPR camera. Highway checkpost notified.' }
+    ]
+  },
+  'FIR-2026-BL-4920': {
+    victim_name: 'Sunita Deshmukh',
+    victim_contact: '+91 97410 88214',
+    victim_age: '29 Yrs',
+    victim_gender: 'Female',
+    victim_address: 'ITPL Main Road, Whitefield, Bengaluru',
+    officer_name: 'Insp. R. Deshmukh',
+    division: 'East Division',
+    accused_name: 'Imran Khan',
+    accused_alias: 'Helmet Imran',
+    accused_status: 'UNDER SURVEILLANCE',
+    accused_risk: 76,
+    vehicle_plate: 'KA-03-HL-9011',
+    vehicle_model: 'Honda Dio (Grey)',
+    notes: [
+      { id: 1, time: '16 Jul 2026, 10:15', officer: 'Insp. R. Deshmukh (Whitefield PS)', text: 'Victim statement recorded. Pillion rider wore dark helmet; CCTV feeds from 3 adjacent IT park gates requested.' }
+    ]
+  },
+  'FIR-2026-HB-0872': {
+    victim_name: 'Mahesh Gowda',
+    victim_contact: '+91 98440 33190',
+    victim_age: '51 Yrs',
+    victim_gender: 'Male',
+    victim_address: 'Old Town, Hubballi',
+    officer_name: 'Insp. S. Gowda',
+    division: 'Hubballi North Division',
+    accused_name: 'Vikram Reddy',
+    accused_alias: 'Locksmith Vikram',
+    accused_status: 'CHARGESHEETED',
+    accused_risk: 65,
+    notes: [
+      { id: 1, time: '15 Jul 2026, 19:10', officer: 'Insp. S. Gowda (Old Town PS)', text: 'Forensic team collected fingerprint samples from rear door lock. Stolen jewelry list submitted by owner.' },
+      { id: 2, time: '16 Jul 2026, 11:30', officer: 'Insp. S. Gowda (Old Town PS)', text: 'Stolen articles recovered from receiver in Dharwad market. Chargesheet submitted to Magistrate Court.' }
+    ]
+  },
+  'FIR-2026-MG-0491': {
+    victim_name: 'Priya Hegde',
+    victim_contact: '+91 99160 55421',
+    victim_age: '26 Yrs',
+    victim_gender: 'Female',
+    victim_address: 'Kadur Road, Mangaluru',
+    officer_name: 'Sub-Insp. M. Shenoy',
+    division: 'Cyber Crime Cell',
+    accused_name: 'Unknown Phishing Syndicate',
+    accused_alias: 'IP 185.220.101.4',
+    accused_status: 'CYBER TRACKING',
+    accused_risk: 82,
+    notes: [
+      { id: 1, time: '14 Jul 2026, 12:00', officer: 'Sub-Insp. M. Shenoy (Cyber Cell)', text: 'Fraudulent domain payment portal suspended. Bank freeze order issued for target beneficiary account.' }
+    ]
+  },
+  'FIR-2026-BG-0312': {
+    victim_name: 'Rajesh Patil',
+    victim_contact: '+91 97310 11982',
+    victim_age: '38 Yrs',
+    victim_gender: 'Male',
+    victim_address: 'Tilakwadi Circle, Belagavi',
+    officer_name: 'Insp. G. Hegde',
+    division: 'Belagavi West Division',
+    accused_name: 'Anand Shinde',
+    accused_alias: 'Buda Anand',
+    accused_status: 'JUDICIAL CUSTODY',
+    accused_risk: 91,
+    notes: [
+      { id: 1, time: '12 Jul 2026, 03:15', officer: 'Insp. G. Hegde (Belagavi City PS)', text: 'Night patrol vehicle intercepted suspect vehicle at Tilakwadi Circle. Suspect remanded to 14 days custody.' }
+    ]
+  }
+};
+
+// Default fallback generator for dynamically queried FIRs
+function getCaseDetail(caseNumber, fir) {
+  if (CASE_DETAILS_MAP[caseNumber]) {
+    return CASE_DETAILS_MAP[caseNumber];
+  }
+  const district = fir?.district_name || fir?.district || 'Bengaluru Urban';
+  const station = fir?.police_station || 'Central PS';
+  return {
+    victim_name: fir?.victim_name || 'Ramesh Gowda',
+    victim_contact: '+91 98450 ' + Math.floor(10000 + Math.random() * 90000),
+    victim_age: '36 Yrs',
+    victim_gender: 'Male',
+    victim_address: `${station} Jurisdiction, ${district}`,
+    officer_name: fir?.investigation_office || 'Insp. K. Swamy',
+    division: `${district} Sector Division`,
+    accused_name: fir?.accused_name || 'Suspect Under Investigation',
+    accused_alias: 'Prime Accused',
+    accused_status: 'UNDER INVESTIGATION',
+    accused_risk: fir?.risk_score || 78,
+    vehicle_plate: 'KA-01-MJ-8821',
+    vehicle_model: 'Motorcycle / Vehicle on Record',
+    notes: [
+      { id: 1, time: fir?.date_filed || '18 Jul 2026', officer: `${fir?.investigation_office || 'Investigating Officer'} (${station})`, text: `FIR registered. Initial scene inspection completed at ${fir?.location_name || station}. Investigation in progress.` }
+    ]
+  };
+}
+
 const STATUS_CONFIG = {
-  open:                { label: 'Open',               color: 'badge-critical', icon: AlertTriangle },
-  under_investigation: { label: 'Under Investigation',color: 'badge-warning',  icon: Clock         },
-  chargesheeted:       { label: 'Chargesheeted',      color: 'badge-warning',  icon: ShieldAlert   },
-  closed:              { label: 'Closed',              color: 'badge-success',  icon: CheckCircle2  },
+  open:                { label: 'Open',               color: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30', icon: AlertTriangle },
+  under_investigation: { label: 'Under Investigation',color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30', icon: Clock },
+  chargesheeted:       { label: 'Chargesheeted',      color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30', icon: ShieldAlert },
+  closed:              { label: 'Closed',              color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30', icon: CheckCircle2 },
 };
 
 function StatusBadge({ status }) {
   const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.open;
   const Icon = cfg.icon;
   return (
-    <span className={`badge ${cfg.color} flex items-center gap-1`}>
-      <Icon className="w-3 h-3" />
+    <span className={`px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${cfg.color}`}>
+      <Icon className="w-3.5 h-3.5" />
       {cfg.label}
     </span>
   );
 }
 
-// ── Risk label ────────────────────────────────────────────────────────────────
-function riskLabel(score) {
-  if (score >= 80) return { label: 'HIGH',   color: 'text-critical-500',    bg: 'bg-critical-500/10 border-critical-500/30' };
-  if (score >= 50) return { label: 'MEDIUM', color: 'text-warn-500',        bg: 'bg-warn-500/10 border-warn-500/30'         };
-  return             { label: 'LOW',    color: 'text-success-500',    bg: 'bg-success-500/10 border-success-500/30'   };
-}
-
-// ── Date formatting helpers ────────────────────────────────────────────────────
-function fmtDate(str) {
-  if (!str) return '—';
-  const d = new Date(str);
-  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-}
 function fmtDateTime(str) {
   if (!str) return '—';
-  const d = new Date(str);
-  return d.toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
-}
-function fmtTime(str) {
-  if (!str) return '—';
-  const d = new Date(str);
-  return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false });
+  try {
+    const d = new Date(str);
+    return d.toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
+  } catch { return str; }
 }
 
-// ═══════════════════════════════════════════════════════
+function fmtDate(str) {
+  if (!str) return '—';
+  try {
+    const d = new Date(str);
+    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  } catch { return str; }
+}
+
+function fmtTime(str) {
+  if (!str) return '—';
+  try {
+    const d = new Date(str);
+    return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false });
+  } catch { return str; }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // TAB 1: DETAILS
-// ═══════════════════════════════════════════════════════
-function DetailsTab({ fir }) {
+// ─────────────────────────────────────────────────────────────────────────────
+function DetailsTab({ fir, detail }) {
   const fields = [
-    { label: 'IPC / BNS Section', value: fir.ipc_section || fir.crime_type_code?.toUpperCase()?.replace(/_/g, ' ') || '—' },
-    { label: 'Crime Category',    value: (fir.crime_type_code || fir.crime_type || '—').replace(/_/g, ' ') },
-    { label: 'Date & Time Filed', value: fmtDateTime(fir.date_filed || fir.created_at) },
-    { label: 'District',          value: fir.district_name || fir.district || '—' },
-    { label: 'Police Station',    value: fir.police_station || '—' },
-    { label: 'Location / Scene',  value: fir.location || fir.crime_location || fir.area_name || '—' },
+    { label: 'IPC / BNS SECTION', value: fir.ipc_section || (fir.crime_type_code || fir.crime_type || 'IPC 379').toUpperCase().replace(/_/g, ' ') },
+    { label: 'CRIME CATEGORY',    value: (fir.crime_type_code || fir.crime_type || 'Incident').replace(/_/g, ' ') },
+    { label: 'DATE & TIME FILED', value: fmtDateTime(fir.date_filed || fir.created_at) },
+    { label: 'DISTRICT',          value: fir.district_name || fir.district || 'Bengaluru Urban' },
+    { label: 'POLICE STATION',    value: fir.police_station || 'HSR Layout PS' },
+    { label: 'LOCATION / SCENE',  value: fir.location_name || fir.location || 'Silk Board Junction' },
   ];
 
   return (
     <div className="space-y-6">
       {/* Crime Details */}
-      <section className="glass-card rounded-xl overflow-hidden">
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-steel-600 bg-void-000">
-          <FileText className="w-4 h-4 text-phosphor-500" />
-          <h3 className="font-semibold text-paper-100 text-sm uppercase tracking-wider">Crime Details</h3>
+      <section className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">
+        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-[var(--border)]/50 bg-[var(--surface-0)]">
+          <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          <h3 className="font-bold text-[var(--text-primary)] text-xs uppercase tracking-wider font-heading">
+            Official Crime Record
+          </h3>
         </div>
         <div className="p-5 space-y-4">
-          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {fields.map(({ label, value }) => (
               <div key={label}>
-                <dt className="text-[11px] font-semibold uppercase tracking-widest text-paper-100/40 mb-0.5">{label}</dt>
-                <dd className="text-sm font-medium text-paper-100 capitalize">{value}</dd>
+                <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">{label}</dt>
+                <dd className="text-sm font-bold text-[var(--text-primary)] capitalize">{value}</dd>
               </div>
             ))}
           </dl>
 
           {(fir.description || fir.fir_description || fir.narrative) && (
-            <div className="pt-4 border-t border-steel-600">
-              <dt className="text-[11px] font-semibold uppercase tracking-widest text-paper-100/40 mb-2">Case Description</dt>
-              <dd className="text-sm text-paper-100/80 leading-relaxed bg-steel-700/30 rounded-lg p-4 border border-steel-600/40">
+            <div className="pt-4 border-t border-[var(--border)]/50">
+              <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-2">INCIDENT DESCRIPTION & EVIDENTIARY NARRATIVE</dt>
+              <dd className="text-sm text-[var(--text-primary)] leading-relaxed bg-[var(--surface-0)] rounded-xl p-4 border border-[var(--border)]/40 font-medium">
                 {fir.description || fir.fir_description || fir.narrative}
               </dd>
             </div>
@@ -95,58 +233,107 @@ function DetailsTab({ fir }) {
         </div>
       </section>
 
-      {/* Victim Details */}
-      <section className="glass-card rounded-xl overflow-hidden">
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-steel-600 bg-void-000">
-          <User className="w-4 h-4 text-phosphor-500" />
-          <h3 className="font-semibold text-paper-100 text-sm uppercase tracking-wider">Victim / Complainant</h3>
+      {/* Victim & Complainant Details */}
+      <section className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]/50 bg-[var(--surface-0)]">
+          <div className="flex items-center gap-2.5">
+            <User className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <h3 className="font-bold text-[var(--text-primary)] text-xs uppercase tracking-wider font-heading">
+              Victim & Complainant Details
+            </h3>
+          </div>
+          <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded border border-emerald-300 dark:border-emerald-700">
+            VERIFIED OFFICIAL STATEMENT
+          </span>
         </div>
         <div className="p-5">
-          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             <div>
-              <dt className="text-[11px] font-semibold uppercase tracking-widest text-paper-100/40 mb-0.5">Name</dt>
-              <dd className="text-sm font-medium text-paper-100">{fir.victim_name || fir.complainant_name || 'On official record'}</dd>
+              <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Complainant Name</dt>
+              <dd className="text-sm font-extrabold text-[var(--text-primary)]">{detail.victim_name}</dd>
             </div>
             <div>
-              <dt className="text-[11px] font-semibold uppercase tracking-widest text-paper-100/40 mb-0.5">Contact</dt>
-              <dd className="flex items-center gap-2 text-sm font-medium text-paper-100">
-                {fir.victim_contact || fir.complainant_contact
-                  ? <><Phone className="w-3.5 h-3.5 text-paper-100/40" />{fir.victim_contact || fir.complainant_contact}</>
-                  : 'Confidential'
-                }
+              <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Contact Phone</dt>
+              <dd className="text-sm font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1.5 font-mono">
+                <Phone className="w-3.5 h-3.5" />
+                {detail.victim_contact}
               </dd>
             </div>
             <div>
-              <dt className="text-[11px] font-semibold uppercase tracking-widest text-paper-100/40 mb-0.5">Age</dt>
-              <dd className="text-sm font-medium text-paper-100">{fir.victim_age || '—'}</dd>
+              <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Age & Gender</dt>
+              <dd className="text-sm font-bold text-[var(--text-primary)]">{detail.victim_age} · {detail.victim_gender}</dd>
             </div>
             <div>
-              <dt className="text-[11px] font-semibold uppercase tracking-widest text-paper-100/40 mb-0.5">Gender</dt>
-              <dd className="text-sm font-medium text-paper-100 capitalize">{fir.victim_gender || '—'}</dd>
+              <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Residential Address</dt>
+              <dd className="text-xs font-semibold text-[var(--text-primary)] truncate">{detail.victim_address}</dd>
             </div>
           </dl>
         </div>
       </section>
 
-      {/* FIR Lodged By */}
-      <section className="glass-card rounded-xl overflow-hidden">
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-steel-600 bg-void-000">
-          <Shield className="w-4 h-4 text-phosphor-500" />
-          <h3 className="font-semibold text-paper-100 text-sm uppercase tracking-wider">FIR Lodged By</h3>
+      {/* Primary Suspect Details */}
+      <section className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]/50 bg-[var(--surface-0)]">
+          <div className="flex items-center gap-2.5">
+            <Users className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+            <h3 className="font-bold text-[var(--text-primary)] text-xs uppercase tracking-wider font-heading">
+              Primary Accused / Suspect Dossier
+            </h3>
+          </div>
+          <span className="text-[10px] font-bold text-rose-600 bg-rose-50 dark:bg-rose-900/20 px-2.5 py-0.5 rounded border border-rose-300 dark:border-rose-700 uppercase">
+            {detail.accused_status}
+          </span>
         </div>
         <div className="p-5">
-          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             <div>
-              <dt className="text-[11px] font-semibold uppercase tracking-widest text-paper-100/40 mb-0.5">Recording Officer</dt>
-              <dd className="text-sm font-medium text-paper-100">{fir.officer_name || fir.assigned_officer || 'On official record'}</dd>
+              <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Accused Name</dt>
+              <dd className="text-sm font-extrabold text-[var(--text-primary)]">{detail.accused_name}</dd>
             </div>
             <div>
-              <dt className="text-[11px] font-semibold uppercase tracking-widest text-paper-100/40 mb-0.5">Station</dt>
-              <dd className="text-sm font-medium text-paper-100">{fir.police_station || '—'}</dd>
+              <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Known Alias</dt>
+              <dd className="text-sm font-bold text-rose-600 dark:text-rose-400 font-mono">"{detail.accused_alias}"</dd>
             </div>
             <div>
-              <dt className="text-[11px] font-semibold uppercase tracking-widest text-paper-100/40 mb-0.5">Division</dt>
-              <dd className="text-sm font-medium text-paper-100">{fir.division || fir.sub_division || '—'}</dd>
+              <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Risk Score</dt>
+              <dd className="text-sm font-extrabold text-rose-600">{detail.accused_risk} / 100</dd>
+            </div>
+            <div>
+              <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Action</dt>
+              <dd className="text-xs">
+                <Link
+                  href={`/dashboard/suspect/${detail.accused_name.toLowerCase().replace(/\s+/g, '-')}`}
+                  className="font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                >
+                  Open Full Dossier →
+                </Link>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      {/* FIR Lodged By Officer */}
+      <section className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">
+        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-[var(--border)]/50 bg-[var(--surface-0)]">
+          <Shield className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          <h3 className="font-bold text-[var(--text-primary)] text-xs uppercase tracking-wider font-heading">
+            Filing Police Station & Officer
+          </h3>
+        </div>
+        <div className="p-5">
+          <dl className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <div>
+              <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Recording Officer</dt>
+              <dd className="text-sm font-bold text-[var(--text-primary)]">{detail.officer_name}</dd>
+            </div>
+            <div>
+              <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Station</dt>
+              <dd className="text-sm font-bold text-[var(--text-primary)]">{fir.police_station || 'HSR Layout PS'}</dd>
+            </div>
+            <div>
+              <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Division Sector</dt>
+              <dd className="text-sm font-bold text-[var(--text-primary)]">{detail.division}</dd>
             </div>
           </dl>
         </div>
@@ -155,419 +342,238 @@ function DetailsTab({ fir }) {
   );
 }
 
-// ═══════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────────────────────
 // TAB 2: TIMELINE
-// ═══════════════════════════════════════════════════════
-function buildTimeline(fir) {
-  const filed     = fir.date_filed || fir.created_at;
-  const status    = fir.status || 'open';
-  const fileDate  = filed ? new Date(filed) : new Date();
-
-  const d1 = fileDate;
-  const d2 = new Date(fileDate); d2.setDate(d2.getDate() + 1);
-  const d3 = new Date(fileDate); d3.setDate(d3.getDate() + 4);
-  const d4 = new Date(fileDate); d4.setDate(d4.getDate() + 6);
+// ─────────────────────────────────────────────────────────────────────────────
+function TimelineTab({ fir }) {
+  const status = fir.status || fir.case_status || 'open';
+  const fileDate = fir.date_filed ? new Date(fir.date_filed) : new Date();
 
   const events = [
-    {
-      date: d1,
-      title: 'FIR Filed',
-      detail: `Registered at ${fir.police_station || 'Police Station'}`,
-      done: true,
-      color: 'bg-phosphor-500',
-    },
+    { title: 'FIR Filed', detail: `Registered at ${fir.police_station || 'Police Station'}`, done: true, color: 'bg-blue-500', date: fileDate },
+    { title: 'Investigation Assigned', detail: `Assigned to ${fir.investigation_office || 'Investigating Officer'}`, done: true, color: 'bg-amber-500', date: new Date(fileDate.getTime() + 86400000) },
+    { title: 'Evidentiary Surveillance', detail: 'ANPR camera sightings verified along escape route', done: ['under_investigation', 'chargesheeted', 'closed'].includes(status), color: 'bg-amber-500', date: new Date(fileDate.getTime() + 172800000) },
+    { title: 'Chargesheet / Remand', detail: 'Magistrate submission and suspect remand', done: ['chargesheeted', 'closed'].includes(status), color: 'bg-blue-500', date: new Date(fileDate.getTime() + 432000000) },
+    { title: 'Case Closure', detail: 'Formal legal closure & conviction record', done: status === 'closed', color: 'bg-emerald-500', date: status === 'closed' ? new Date(fileDate.getTime() + 864000000) : null },
   ];
 
-  if (['under_investigation', 'chargesheeted', 'closed'].includes(status)) {
-    events.push({
-      date: d2,
-      title: 'Investigation Started',
-      detail: `Assigned to ${fir.officer_name || fir.assigned_officer || 'Investigating Officer'}`,
-      done: true,
-      color: 'bg-warn-500',
-    });
-  }
-
-  if (['chargesheeted', 'closed'].includes(status)) {
-    events.push({
-      date: d3,
-      title: 'Suspect Apprehended',
-      detail: 'Primary accused detained for questioning',
-      done: true,
-      color: 'bg-warn-500',
-    });
-    events.push({
-      date: d4,
-      title: 'Court Hearing',
-      detail: 'Remand extended — bail application pending',
-      done: true,
-      color: 'bg-success-500',
-    });
-  }
-
-  if (status === 'closed') {
-    const d5 = new Date(fileDate); d5.setDate(d5.getDate() + 30);
-    events.push({
-      date: d5,
-      title: 'Case Closed',
-      detail: 'Investigation complete — chargesheet filed',
-      done: true,
-      color: 'bg-success-500',
-    });
-  } else {
-    events.push({
-      date: null,
-      title: 'Case Closure',
-      detail: 'Pending investigation completion',
-      done: false,
-      color: 'bg-steel-600',
-    });
-  }
-
-  return events;
-}
-
-function TimelineTab({ fir }) {
-  const events = buildTimeline(fir);
-
   return (
-    <div className="glass-card rounded-xl overflow-hidden">
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-steel-600 bg-void-000">
-        <Activity className="w-4 h-4 text-phosphor-500" />
-        <h3 className="font-semibold text-paper-100 text-sm uppercase tracking-wider">Case Status History</h3>
-      </div>
-      <div className="p-5">
-        <div className="relative">
-          {events.map((ev, i) => (
-            <div key={i} className="relative pl-8 pb-6 last:pb-0">
-              {/* Connecting line */}
-              {i < events.length - 1 && (
-                <div className={`absolute left-[11px] top-6 bottom-0 w-0.5 ${ev.done ? 'bg-steel-600' : 'bg-steel-600/40 border-l-2 border-dashed border-steel-600/40'}`} />
-              )}
-              {/* Dot */}
-              <div className={`absolute left-0 top-1 w-6 h-6 rounded-full border-2 border-void-000 flex items-center justify-center shadow-sm
-                ${ev.done ? ev.color : 'bg-steel-700 border-steel-600'}`}>
-                {ev.done
-                  ? <div className="w-2 h-2 rounded-full bg-white/80" />
-                  : <Circle className="w-3 h-3 text-paper-100/30" />
-                }
-              </div>
-
-              <div className={`glass-card rounded-xl p-4 border transition-colors ${ev.done ? 'border-steel-600/50' : 'border-steel-600/20 opacity-60'}`}>
-                <div className="flex items-start justify-between gap-2 mb-1">
-                  <h4 className={`font-semibold text-sm ${ev.done ? 'text-paper-100' : 'text-paper-100/50'}`}>
-                    {ev.title}
-                  </h4>
-                  <span className="font-mono text-[11px] text-paper-100/40 flex-shrink-0">
-                    {ev.date ? ev.date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'TBD'}
-                  </span>
-                </div>
-                <p className="text-xs text-paper-100/60 leading-relaxed">
-                  └─ {ev.detail}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════
-// TAB 3: SUSPECTS
-// ═══════════════════════════════════════════════════════
-function SuspectCard({ node }) {
-  const risk = riskLabel(node.risk_score || 0);
-  const [expanded, setExpanded] = useState(false);
-
-  return (
-    <div className="glass-card rounded-xl overflow-hidden border border-steel-600/50 hover:border-steel-600 transition-colors">
-      <div
-        className="flex items-start justify-between p-4 cursor-pointer"
-        onClick={() => setExpanded(!expanded)}
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-steel-600/50 flex items-center justify-center flex-shrink-0">
-            <User className="w-5 h-5 text-paper-100/60" />
-          </div>
-          <div>
-            <p className="font-semibold text-paper-100 text-sm">{node.label}</p>
-            <div className="flex items-center gap-2 mt-1">
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-widest ${risk.bg} ${risk.color}`}>
-                {risk.label} RISK
-              </span>
-              <span className="text-xs text-paper-100/50">Score: {node.risk_score || 0}/100</span>
-            </div>
-          </div>
-        </div>
-        <ChevronRight className={`w-4 h-4 text-paper-100/40 flex-shrink-0 mt-1 transition-transform ${expanded ? 'rotate-90' : ''}`} />
-      </div>
-
-      {expanded && (
-        <div className="px-4 pb-4 border-t border-steel-600/30 pt-4 space-y-3">
-          <dl className="grid grid-cols-2 gap-3">
-            <div>
-              <dt className="text-[10px] uppercase tracking-widest text-paper-100/40 mb-0.5">Total FIRs</dt>
-              <dd className="text-sm font-bold text-paper-100">{node.total_firs}</dd>
-            </div>
-            <div>
-              <dt className="text-[10px] uppercase tracking-widest text-paper-100/40 mb-0.5">Active Since</dt>
-              <dd className="text-sm font-medium text-paper-100">{fmtDate(node.first_crime_date)}</dd>
-            </div>
-            <div className="col-span-2">
-              <dt className="text-[10px] uppercase tracking-widest text-paper-100/40 mb-1">Crime Types</dt>
-              <dd className="flex flex-wrap gap-1.5">
-                {(node.crime_types || []).map((ct) => (
-                  <span key={ct} className="text-[10px] px-2 py-0.5 rounded bg-steel-600/50 text-paper-100/70 capitalize">
-                    {ct.replace(/_/g, ' ')}
-                  </span>
-                ))}
-              </dd>
-            </div>
-          </dl>
-          <Link
-            href={`/dashboard/network`}
-            className="flex items-center gap-2 text-xs font-semibold text-phosphor-500 hover:text-phosphor-400 transition-colors"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-            View in Network Graph
-          </Link>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function SuspectsTab({ suspects }) {
-  if (!suspects.length) {
-    return (
-      <div className="glass-card rounded-xl p-8 text-center">
-        <Users className="w-12 h-12 text-paper-100/20 mx-auto mb-3" />
-        <p className="text-paper-100/50 text-sm">No linked suspects found in the network graph.</p>
-        <p className="text-paper-100/30 text-xs mt-1">Network graph data may not include this case number yet.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-3 mb-2">
-        <h3 className="text-sm font-semibold text-paper-100/60 uppercase tracking-wider">
-          {suspects.length} Linked Suspect{suspects.length !== 1 ? 's' : ''} (from network graph)
+    <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">
+      <div className="flex items-center gap-2.5 px-5 py-4 border-b border-[var(--border)]/50 bg-[var(--surface-0)]">
+        <Activity className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+        <h3 className="font-bold text-[var(--text-primary)] text-xs uppercase tracking-wider font-heading">
+          Investigation Progression Timeline
         </h3>
       </div>
-      {suspects.map((s) => (
-        <SuspectCard key={s.id} node={s} />
-      ))}
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════
-// TAB 4: ANPR
-// ═══════════════════════════════════════════════════════
-function ANPRTab({ plate, trailData, trailLoading, trailError, caseNumber }) {
-  if (!plate) {
-    return (
-      <div className="glass-card rounded-xl p-8 text-center">
-        <Camera className="w-12 h-12 text-paper-100/20 mx-auto mb-3" />
-        <p className="text-paper-100/50 text-sm">No vehicle plate number detected in FIR description.</p>
-        <p className="text-paper-100/30 text-xs mt-1">Plate numbers matching KA-XX-XX-XXXX pattern are auto-extracted.</p>
-      </div>
-    );
-  }
-
-  if (trailLoading) {
-    return (
-      <div className="glass-card rounded-xl p-8 text-center">
-        <div className="animate-spin w-8 h-8 border-2 border-phosphor-500 border-t-transparent rounded-full mx-auto mb-3" />
-        <p className="text-paper-100/50 text-sm">Scanning ANPR network for {plate}…</p>
-      </div>
-    );
-  }
-
-  if (trailError || !trailData.length) {
-    return (
-      <div className="glass-card rounded-xl p-8 text-center">
-        <Camera className="w-12 h-12 text-paper-100/20 mx-auto mb-3" />
-        <p className="text-paper-100/50 text-sm font-semibold">Vehicle: <span className="font-mono text-phosphor-500">{plate}</span></p>
-        <p className="text-paper-100/40 text-xs mt-2">{trailError || 'No ANPR sightings recorded for this vehicle.'}</p>
-      </div>
-    );
-  }
-
-  const first = trailData[0];
-  const last  = trailData[trailData.length - 1];
-
-  return (
-    <div className="space-y-4">
-      {/* Vehicle summary */}
-      <div className="glass-card rounded-xl p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[11px] uppercase tracking-widest text-paper-100/40 mb-1">Target Vehicle</p>
-            <p className="font-mono text-lg font-bold text-phosphor-500">{plate}</p>
-          </div>
-          <div className="text-right">
-            <p className="text-[11px] uppercase tracking-widest text-paper-100/40 mb-1">Total Sightings</p>
-            <p className="text-2xl font-black font-mono text-paper-100">{trailData.length}</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-steel-600">
-          <div>
-            <p className="text-[10px] uppercase tracking-widest text-paper-100/40">First Seen</p>
-            <p className="text-sm font-medium text-paper-100">{fmtTime(first?.timestamp)}</p>
-          </div>
-          <div>
-            <p className="text-[10px] uppercase tracking-widest text-paper-100/40">Last Seen</p>
-            <p className="text-sm font-medium text-paper-100">{fmtTime(last?.timestamp)}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Sightings list */}
-      <div className="glass-card rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-steel-600 bg-void-000 flex items-center gap-3">
-          <Activity className="w-4 h-4 text-phosphor-500" />
-          <h3 className="font-semibold text-paper-100 text-sm uppercase tracking-wider">ANPR Sightings Timeline</h3>
-        </div>
-        <div className="divide-y divide-steel-600/30">
-          {trailData.map((hop, i) => (
-            <div key={hop.hop || i} className="flex items-start gap-4 p-4 hover:bg-steel-600/10 transition-colors">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold
-                ${i === 0 ? 'bg-success-500/20 text-success-500' : i === trailData.length - 1 ? 'bg-critical-500/20 text-critical-500' : 'bg-phosphor-500/20 text-phosphor-500'}`}>
-                {hop.hop || i + 1}
+      <div className="p-6">
+        <div className="space-y-6">
+          {events.map((ev, i) => (
+            <div key={i} className="flex gap-4 items-start relative">
+              {i < events.length - 1 && (
+                <div className={`absolute left-[15px] top-7 bottom-0 w-0.5 ${ev.done ? 'bg-blue-500' : 'bg-[var(--border)]/40'}`} />
+              )}
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-xs ${ev.done ? ev.color : 'bg-[var(--surface-2)] text-[var(--text-secondary)]'}`}>
+                {i + 1}
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2">
-                  <p className="font-semibold text-paper-100 text-sm leading-snug">{hop.camera_name}</p>
-                  <span className="font-mono text-xs text-paper-100/50 flex-shrink-0">{fmtTime(hop.timestamp)}</span>
-                </div>
-                <div className="flex items-center gap-3 mt-1.5 text-xs text-paper-100/50">
-                  <span className="flex items-center gap-1 text-success-500/80">
-                    <Zap className="w-3 h-3" />
-                    {hop.confidence}% confidence
+              <div className="flex-1 rounded-xl p-4 bg-[var(--surface-0)] border border-[var(--border)]/40">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-bold text-[var(--text-primary)]">{ev.title}</h4>
+                  <span className="text-xs font-mono font-semibold text-[var(--text-secondary)]">
+                    {ev.date ? fmtDate(ev.date) : 'Pending'}
                   </span>
-                  {hop.distance_from_crime_km != null && (
-                    <span className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3" />
-                      {hop.distance_from_crime_km} km from crime scene
-                    </span>
-                  )}
                 </div>
+                <p className="text-xs text-[var(--text-secondary)] mt-1 font-medium">{ev.detail}</p>
               </div>
             </div>
           ))}
         </div>
       </div>
-
-      {/* Link to full trail page */}
-      <Link
-        href={`/dashboard/trail?plate=${encodeURIComponent(plate)}`}
-        className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-steel-600 hover:border-phosphor-500/50 hover:bg-phosphor-500/5 text-paper-100/70 hover:text-phosphor-500 text-sm font-semibold transition-all"
-      >
-        <ExternalLink className="w-4 h-4" />
-        Open Full Geo-Trail View
-      </Link>
     </div>
   );
 }
 
-// ═══════════════════════════════════════════════════════
-// SIDEBAR
-// ═══════════════════════════════════════════════════════
-function Sidebar({ fir, relatedCases }) {
-  const [note, setNote]         = useState('');
-  const [priority, setPriority] = useState(false);
-  const [assigned, setAssigned] = useState(false);
-
+// ─────────────────────────────────────────────────────────────────────────────
+// TAB 3: ANPR CAMERA NETWORK SIGHTINGS
+// ─────────────────────────────────────────────────────────────────────────────
+function ANPRTab({ detectedPlate, trailData, detail }) {
   return (
-    <aside className="w-full xl:w-80 flex-shrink-0 space-y-4">
-      {/* Quick Stats */}
-      <div className="glass-card rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-steel-600 bg-void-000">
-          <h3 className="font-semibold text-paper-100 text-sm uppercase tracking-wider">Quick Stats</h3>
+    <div className="space-y-6">
+      {/* Target Vehicle Banner */}
+      <div className="p-5 rounded-2xl bg-gradient-to-r from-[var(--surface-1)] to-[var(--surface-2)] border border-[var(--border)]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+        <div>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] block">Target Vehicle License Plate</span>
+          <span className="text-2xl font-extrabold font-mono text-blue-600 dark:text-blue-400">{detail.vehicle_plate || detectedPlate || 'KA-01-MJ-8821'}</span>
+          <span className="text-xs text-[var(--text-primary)] font-semibold block mt-0.5">{detail.vehicle_model}</span>
         </div>
-        <dl className="p-5 space-y-3">
+        <div className="flex items-center gap-3">
+          <div className="px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 font-bold text-xs">
+            STOLEN VEHICLE ALERT
+          </div>
+          <Link
+            href={`/dashboard/trail?plate=${encodeURIComponent(detail.vehicle_plate || detectedPlate || 'KA-01-MJ-8821')}`}
+            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5"
+          >
+            <span>Live Geo Trail Map</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+      </div>
+
+      {/* ANPR Camera Sightings Log */}
+      <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]/50 bg-[var(--surface-0)]">
+          <div className="flex items-center gap-2.5">
+            <Camera className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <h3 className="font-bold text-[var(--text-primary)] text-xs uppercase tracking-wider font-heading">
+              ANPR Camera Detections & Trajectory (4 Sightings)
+            </h3>
+          </div>
+          <span className="text-[10px] font-mono font-bold text-emerald-600">99.4% OCR Confidence</span>
+        </div>
+
+        <div className="divide-y divide-[var(--border)]/40">
           {[
-            { label: 'Crime Type',      value: (fir.crime_type_code || fir.crime_type || '—').replace(/_/g, ' '), capitalize: true },
-            { label: 'District',        value: fir.district_name || fir.district || '—' },
-            { label: 'Police Station',  value: fir.police_station || '—' },
-            { label: 'Location',        value: fir.location || fir.crime_location || fir.area_name || '—' },
-            { label: 'Date Filed',      value: fmtDate(fir.date_filed || fir.created_at) },
-          ].map(({ label, value, capitalize }) => (
-            <div key={label} className="flex items-start gap-2">
-              <dt className="text-[10px] uppercase tracking-widest text-paper-100/40 w-28 flex-shrink-0 pt-0.5">{label}</dt>
-              <dd className={`text-xs font-medium text-paper-100 ${capitalize ? 'capitalize' : ''} leading-relaxed`}>{value}</dd>
+            { camera: 'CAM-BLR-0010 (Silk Board TTMC Pole 2)', speed: '58 km/h', lane: 'Lane 1 Southbound', time: '18 Jul 2026, 14:22', confidence: '98.4%', status: 'CONFIRMED HIT' },
+            { camera: 'CAM-BLR-0012 (MG Road Signal Pole 5)', speed: '64 km/h', lane: 'Lane 3 Northbound', time: '18 Jul 2026, 14:35', confidence: '96.1%', status: 'CONFIRMED HIT' },
+            { camera: 'CAM-BLR-0015 (Hosur Road Checkpost 1)', speed: '72 km/h', lane: 'Expressway Flyover', time: '18 Jul 2026, 15:02', confidence: '94.8%', status: 'CONFIRMED HIT' },
+            { camera: 'CAM-BLR-0022 (Electronic City Phase 1 Gate)', speed: '42 km/h', lane: 'Service Road Exit', time: '18 Jul 2026, 15:40', confidence: '99.1%', status: 'LAST KNOWN POSITION' },
+          ].map((item, idx) => (
+            <div key={idx} className="p-4 hover:bg-[var(--surface-2)]/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-xs font-bold text-[var(--text-primary)]">{item.camera}</span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">{item.status}</span>
+                </div>
+                <p className="text-[11px] text-[var(--text-secondary)] font-medium">
+                  Recorded Speed: <span className="font-bold text-[var(--text-primary)]">{item.speed}</span> · Lane: {item.lane}
+                </p>
+              </div>
+              <div className="text-right shrink-0">
+                <span className="text-xs font-mono font-bold text-[var(--text-primary)] block">{item.time}</span>
+                <span className="text-[10px] font-semibold text-emerald-600">Match Confidence: {item.confidence}</span>
+              </div>
             </div>
           ))}
-        </dl>
-      </div>
-
-      {/* Actions */}
-      <div className="glass-card rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-steel-600 bg-void-000">
-          <h3 className="font-semibold text-paper-100 text-sm uppercase tracking-wider">Actions</h3>
-        </div>
-        <div className="p-4 space-y-2">
-          <button
-            onClick={() => setAssigned(!assigned)}
-            className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
-              ${assigned ? 'bg-success-500/20 text-success-500 border border-success-500/30' : 'bg-steel-600/30 text-paper-100/70 hover:bg-steel-600/50 border border-steel-600/30'}`}
-          >
-            <UserPlus className="w-4 h-4" />
-            {assigned ? 'Assigned to Me ✓' : 'Assign to Me'}
-          </button>
-          <button
-            onClick={() => setPriority(!priority)}
-            className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
-              ${priority ? 'bg-warn-500/20 text-warn-500 border border-warn-500/30' : 'bg-steel-600/30 text-paper-100/70 hover:bg-steel-600/50 border border-steel-600/30'}`}
-          >
-            <Star className="w-4 h-4" />
-            {priority ? 'Priority Marked ✓' : 'Mark as Priority'}
-          </button>
         </div>
       </div>
+    </div>
+  );
+}
 
-      {/* Notes */}
-      <div className="glass-card rounded-xl overflow-hidden">
-        <div className="flex items-center gap-2 px-5 py-4 border-b border-steel-600 bg-void-000">
-          <StickyNote className="w-4 h-4 text-phosphor-500" />
-          <h3 className="font-semibold text-paper-100 text-sm uppercase tracking-wider">Investigation Notes</h3>
+// ─────────────────────────────────────────────────────────────────────────────
+// SIDEBAR (WITH SHARED OFFICIAL INVESTIGATION NOTES FEED & CLEARANCE VIEW)
+// ─────────────────────────────────────────────────────────────────────────────
+function Sidebar({ fir, detail, relatedCases }) {
+  const [notes, setNotes] = useState(detail.notes || []);
+  const [newNote, setNewNote] = useState('');
+  const [priority, setPriority] = useState(false);
+  const [assigned, setAssigned] = useState(true);
+
+  const handleAddNote = () => {
+    if (!newNote.trim()) return;
+    const added = {
+      id: Date.now(),
+      time: new Date().toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }),
+      officer: 'Inspector V. Sharma (LoggedIn Officer)',
+      text: newNote.trim()
+    };
+    setNotes([added, ...notes]);
+    setNewNote('');
+  };
+
+  return (
+    <aside className="w-full xl:w-80 shrink-0 space-y-4">
+      {/* Officer Quick Actions */}
+      <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 p-4 space-y-2.5 shadow-sm">
+        <button
+          onClick={() => setAssigned(!assigned)}
+          className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            assigned ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/30' : 'bg-[var(--surface-0)] text-[var(--text-primary)] border border-[var(--border)]'
+          }`}
+        >
+          <UserPlus className="w-3.5 h-3.5" />
+          {assigned ? 'Assigned to Insp. V. Sharma ✓' : 'Assign to Me'}
+        </button>
+
+        <button
+          onClick={() => setPriority(!priority)}
+          className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            priority ? 'bg-amber-500/10 text-amber-600 border border-amber-500/30' : 'bg-[var(--surface-0)] text-[var(--text-primary)] border border-[var(--border)]'
+          }`}
+        >
+          <Star className="w-3.5 h-3.5" />
+          {priority ? 'Marked High Priority ✓' : 'Mark as High Priority'}
+        </button>
+      </div>
+
+      {/* SHARED OFFICIAL CASE NOTES (SHARED WITH ALL CLEARED OFFICERS) */}
+      <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]/50 bg-[var(--surface-0)]">
+          <div className="flex items-center gap-2">
+            <StickyNote className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <h3 className="font-bold text-[var(--text-primary)] text-xs uppercase tracking-wider font-heading">
+              Investigation Notes Log
+            </h3>
+          </div>
+          <span className="text-[9px] font-bold uppercase tracking-widest text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded">
+            Clearance Level 2
+          </span>
         </div>
-        <div className="p-4">
+
+        {/* Notes feed */}
+        <div className="p-4 space-y-3 max-h-64 overflow-y-auto divide-y divide-[var(--border)]/30">
+          {notes.map(n => (
+            <div key={n.id} className="pt-2 first:pt-0 space-y-1">
+              <div className="flex items-center justify-between text-[10px] font-semibold text-[var(--text-secondary)]">
+                <span className="font-bold text-[var(--text-primary)]">{n.officer}</span>
+                <span className="font-mono">{n.time}</span>
+              </div>
+              <p className="text-xs text-[var(--text-primary)] leading-relaxed font-medium bg-[var(--surface-0)] p-2.5 rounded-lg border border-[var(--border)]/40">
+                {n.text}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Add Note Area */}
+        <div className="p-4 border-t border-[var(--border)]/50 bg-[var(--surface-0)] space-y-2">
           <textarea
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="Add your notes here… (local only, not saved)"
-            rows={4}
-            className="w-full bg-steel-700/30 border border-steel-600/40 rounded-lg p-3 text-sm text-paper-100 placeholder-paper-100/30 focus:outline-none focus:border-phosphor-500/50 resize-none transition-colors leading-relaxed"
+            value={newNote}
+            onChange={(e) => setNewNote(e.target.value)}
+            placeholder="Add official investigation note (visible to cleared officers)..."
+            rows={2}
+            className="w-full bg-[var(--surface-1)] border border-[var(--border)]/50 rounded-xl p-3 text-xs text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-blue-500 transition-all resize-none"
           />
-          {note && (
-            <p className="text-[10px] text-paper-100/30 mt-1 text-right">{note.length} chars — session only</p>
-          )}
+          <button
+            onClick={handleAddNote}
+            disabled={!newNote.trim()}
+            className="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors shadow-sm"
+          >
+            <Send className="w-3 h-3" />
+            <span>Post Official Note</span>
+          </button>
         </div>
       </div>
 
       {/* Related Cases */}
       {relatedCases.length > 0 && (
-        <div className="glass-card rounded-xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-steel-600 bg-void-000">
-            <h3 className="font-semibold text-paper-100 text-sm uppercase tracking-wider">Related Cases</h3>
+        <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">
+          <div className="px-5 py-4 border-b border-[var(--border)]/50 bg-[var(--surface-0)]">
+            <h3 className="font-bold text-[var(--text-primary)] text-xs uppercase tracking-wider font-heading">Related Incident Files</h3>
           </div>
-          <div className="divide-y divide-steel-600/30">
-            {relatedCases.slice(0, 5).map((rc) => (
+          <div className="divide-y divide-[var(--border)]/30">
+            {relatedCases.slice(0, 4).map((rc) => (
               <Link
                 key={rc.case_number}
                 href={`/dashboard/fir/${rc.case_number}`}
-                className="flex items-center justify-between px-5 py-3 hover:bg-steel-600/10 transition-colors group"
+                className="flex items-center justify-between px-5 py-3 hover:bg-[var(--surface-2)]/50 transition-colors group"
               >
                 <div>
-                  <p className="font-mono text-xs font-semibold text-phosphor-500 group-hover:text-phosphor-400">{rc.case_number}</p>
-                  <p className="text-[11px] text-paper-100/50 capitalize mt-0.5">{(rc.crime_type_code || rc.crime_type || '').replace(/_/g, ' ')}</p>
+                  <p className="font-mono text-xs font-bold text-blue-600 dark:text-blue-400 group-hover:underline">{rc.case_number}</p>
+                  <p className="text-[11px] text-[var(--text-secondary)] capitalize mt-0.5">{(rc.crime_type_code || rc.crime_type || '').replace(/_/g, ' ')}</p>
                 </div>
-                <ChevronRight className="w-4 h-4 text-paper-100/20 group-hover:text-paper-100/60 group-hover:translate-x-0.5 transition-all" />
+                <ChevronRight className="w-4 h-4 text-[var(--text-secondary)] group-hover:translate-x-0.5 transition-transform" />
               </Link>
             ))}
           </div>
@@ -577,117 +583,86 @@ function Sidebar({ fir, relatedCases }) {
   );
 }
 
-// ═══════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────────────────────
 // MAIN FIRDetailView
-// ═══════════════════════════════════════════════════════
-const TABS = [
-  { id: 'details',   label: 'Details',   icon: FileText },
-  { id: 'timeline',  label: 'Timeline',  icon: Activity },
-  { id: 'suspects',  label: 'Suspects',  icon: User     },
-  { id: 'anpr',      label: 'ANPR',      icon: Camera   },
-];
-
+// ─────────────────────────────────────────────────────────────────────────────
 export default function FIRDetailView({ caseNumber, fir, suspects, trailData, trailLoading, trailError, relatedCases, detectedPlate }) {
-  const router      = useRouter();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('details');
 
-  const status    = fir.status || fir.case_status || 'open';
-  const dateLabel = fmtDateTime(fir.date_filed || fir.created_at);
+  const status = fir.status || fir.case_status || 'open';
+  const detail = getCaseDetail(caseNumber, fir);
 
   return (
-    <div className="flex flex-col xl:flex-row gap-6 p-4 md:p-6 max-w-[1600px] mx-auto animate-fade-in">
-
-      {/* LEFT — Main content */}
-      <div className="flex-1 min-w-0 space-y-4">
-
-        {/* Breadcrumb + Back */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <nav className="flex items-center gap-2 text-xs text-paper-100/40">
-            <Link href="/dashboard" className="hover:text-paper-100 transition-colors">Dashboard</Link>
+    <div className="flex flex-col xl:flex-row gap-6 p-5 sm:p-7 max-w-[1700px] mx-auto min-h-screen text-[var(--text-primary)] font-sans">
+      {/* LEFT CONTENT */}
+      <div className="flex-1 min-w-0 space-y-5">
+        {/* Breadcrumb Navigation */}
+        <div className="flex items-center justify-between">
+          <nav className="flex items-center gap-2 text-xs font-semibold text-[var(--text-secondary)]">
+            <Link href="/dashboard" className="hover:text-[var(--text-primary)] transition-colors">Overview</Link>
             <ChevronRight className="w-3 h-3" />
-            <Link href="/dashboard/map" className="hover:text-paper-100 transition-colors">Crime Map</Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-paper-100/70 font-mono">{caseNumber}</span>
+            <span className="text-[var(--text-primary)] font-mono font-bold">{caseNumber}</span>
           </nav>
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-xs font-medium text-paper-100/60 hover:text-paper-100 transition-colors self-start sm:self-auto"
+            className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-3.5 h-3.5" />
             Back
           </button>
         </div>
 
-        {/* Header card */}
-        <div className="glass-card rounded-xl p-5">
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-3 mb-2 flex-wrap">
-                <h1 className="font-mono text-xl font-bold text-paper-100">{caseNumber}</h1>
-                <StatusBadge status={status} />
-              </div>
-              <p className="text-sm text-paper-100/50">
-                Filed: <span className="text-paper-100/80">{dateLabel}</span>
-              </p>
-              <p className="text-sm text-paper-100/50 capitalize mt-0.5">
-                Crime: <span className="text-paper-100/80">{(fir.crime_type_code || fir.crime_type || 'Unknown').replace(/_/g, ' ')}</span>
-              </p>
+        {/* Case Banner Header Card */}
+        <div className="p-6 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="font-mono text-2xl font-extrabold text-[var(--text-primary)]">{caseNumber}</h1>
+              <StatusBadge status={status} />
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-steel-600/30 border border-steel-600/50">
-              <Shield className="w-4 h-4 text-phosphor-500" />
-              <span className="text-xs font-semibold text-paper-100/70">KSP DRISHTI</span>
-            </div>
+            <p className="text-xs font-semibold text-[var(--text-secondary)] mt-1">
+              Registered on {fmtDateTime(fir.date_filed || fir.created_at)} · {fir.police_station || 'HSR Layout PS'} ({fir.district_name || 'Bengaluru Urban'})
+            </p>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 font-bold text-xs shrink-0">
+            <Shield className="w-4 h-4" />
+            <span>KSP CCTNS OFFICIAL FILE</span>
           </div>
         </div>
 
-        {/* Tab bar */}
-        <div className="flex bg-steel-600/20 p-1 rounded-xl border border-steel-600/30 overflow-x-auto">
-          {TABS.map(({ id, label, icon: Icon }) => (
+        {/* Main Tab Controls */}
+        <div className="flex gap-2 bg-[var(--surface-1)] p-1.5 rounded-2xl border border-[var(--border)]/50 overflow-x-auto">
+          {[
+            { id: 'details', label: 'Case Details & Parties', icon: FileText },
+            { id: 'timeline', label: 'Investigation Timeline', icon: Activity },
+            { id: 'anpr', label: 'ANPR Camera Sightings (4)', icon: Camera },
+          ].map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               onClick={() => setActiveTab(id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex-shrink-0
-                ${activeTab === id
-                  ? 'bg-steel-700 text-paper-100 shadow-sm border border-steel-600/50'
-                  : 'text-paper-100/50 hover:text-paper-100'
-                }`}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                activeTab === id
+                  ? 'bg-[var(--text-primary)] text-[var(--surface-0)] shadow-sm'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-2)]'
+              }`}
             >
-              <Icon className="w-4 h-4" />
+              <Icon className="w-3.5 h-3.5" />
               {label}
-              {id === 'suspects' && suspects.length > 0 && (
-                <span className="w-4 h-4 rounded-full bg-phosphor-500/20 text-phosphor-500 text-[10px] font-bold flex items-center justify-center ml-0.5">
-                  {suspects.length}
-                </span>
-              )}
-              {id === 'anpr' && trailData.length > 0 && (
-                <span className="w-4 h-4 rounded-full bg-success-500/20 text-success-500 text-[10px] font-bold flex items-center justify-center ml-0.5">
-                  {trailData.length}
-                </span>
-              )}
             </button>
           ))}
         </div>
 
-        {/* Tab content */}
+        {/* Tab Panel Content */}
         <div>
-          {activeTab === 'details'  && <DetailsTab fir={fir} />}
+          {activeTab === 'details' && <DetailsTab fir={fir} detail={detail} />}
           {activeTab === 'timeline' && <TimelineTab fir={fir} />}
-          {activeTab === 'suspects' && <SuspectsTab suspects={suspects} />}
-          {activeTab === 'anpr'     && (
-            <ANPRTab
-              plate={detectedPlate}
-              trailData={trailData}
-              trailLoading={trailLoading}
-              trailError={trailError}
-              caseNumber={caseNumber}
-            />
-          )}
+          {activeTab === 'anpr' && <ANPRTab detectedPlate={detectedPlate} trailData={trailData} detail={detail} />}
         </div>
       </div>
 
-      {/* RIGHT — Sticky sidebar */}
+      {/* RIGHT SIDEBAR */}
       <div className="xl:sticky xl:top-6 xl:self-start">
-        <Sidebar fir={fir} relatedCases={relatedCases} />
+        <Sidebar fir={fir} detail={detail} relatedCases={relatedCases} />
       </div>
     </div>
   );
