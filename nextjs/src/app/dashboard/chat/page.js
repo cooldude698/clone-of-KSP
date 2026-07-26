@@ -71,18 +71,18 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
       const statusMatch = text.match(/- Status:\s*([^\n]+)/i);
 
       return (
-        <div className="my-2 rounded-2xl bg-[#FAF6F0] border border-[#7A90A8]/40 overflow-hidden shadow-xl shadow-slate-300/40">
+        <div className="my-2 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] overflow-hidden shadow-lg">
           {/* Card Top Banner - Deep Ocean Navy */}
-          <div className="bg-[#1E2733] px-4 py-3 border-b border-[#7A90A8]/30 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[#AECAE8]/20 border border-[#AECAE8]/40 text-[#AECAE8] flex items-center justify-center shadow-sm">
+          <div className="bg-slate-900 dark:bg-slate-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-400/30 text-blue-400 flex items-center justify-center shadow-sm">
                 <FileText className="w-4 h-4" />
               </div>
               <div>
                 <h4 className="text-xs font-mono font-extrabold text-white uppercase tracking-wider">
                   Automated FIR Entry Registered
                 </h4>
-                <p className="text-[10px] font-mono text-[#AECAE8]">
+                <p className="text-[10px] font-mono text-slate-400">
                   Karnataka State Police CCTNS Datastore
                 </p>
               </div>
@@ -90,39 +90,39 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
             {caseMatch && (
               <button
                 onClick={() => onCaseClick && onCaseClick(caseNum)}
-                className="px-3 py-1 rounded-lg bg-[#AECAE8]/20 border border-[#AECAE8]/40 text-[#AECAE8] font-mono font-extrabold text-xs shadow-md hover:scale-105 transition-all cursor-pointer flex items-center gap-1.5"
+                className="px-3 py-1 rounded-lg bg-blue-500/20 border border-blue-400/30 text-blue-300 font-mono font-extrabold text-xs shadow-md hover:bg-blue-500/30 transition-all cursor-pointer flex items-center gap-1.5"
               >
-                <FileText className="w-3.5 h-3.5 text-[#AECAE8]" />
+                <FileText className="w-3.5 h-3.5 text-blue-400" />
                 {caseNum}
               </button>
             )}
           </div>
 
-          {/* Data Grid Badges - Coastal Sand & Navy */}
+          {/* Data Grid Badges */}
           <div className="p-4 space-y-3">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <div className="p-2.5 rounded-xl bg-[#EFEAE4] border border-[#7A90A8]/30">
-                <span className="text-[10px] font-mono uppercase text-[#48596D] block">Crime Type</span>
-                <span className="text-xs font-bold font-mono text-[#1E2733] uppercase tracking-wide">
+              <div className="p-2.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]/50">
+                <span className="text-[10px] font-mono uppercase text-[var(--text-secondary)] block">Crime Type</span>
+                <span className="text-xs font-bold font-mono text-[var(--text-primary)] uppercase tracking-wide">
                   {crimeTypeMatch ? crimeTypeMatch[1].trim().replace('_', ' ') : 'General Offence'}
                 </span>
               </div>
-              <div className="p-2.5 rounded-xl bg-[#EFEAE4] border border-[#7A90A8]/30">
-                <span className="text-[10px] font-mono uppercase text-[#48596D] block">Police Station</span>
-                <span className="text-xs font-bold font-mono text-[#1E2733] truncate block">
+              <div className="p-2.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]/50">
+                <span className="text-[10px] font-mono uppercase text-[var(--text-secondary)] block">Police Station</span>
+                <span className="text-xs font-bold font-mono text-[var(--text-primary)] truncate block">
                   {stationMatch ? stationMatch[1].trim() : 'Central Command'}
                 </span>
               </div>
-              <div className="p-2.5 rounded-xl bg-[#EFEAE4] border border-[#7A90A8]/30">
-                <span className="text-[10px] font-mono uppercase text-[#48596D] block">District</span>
-                <span className="text-xs font-bold font-mono text-[#1E2733]">
+              <div className="p-2.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]/50">
+                <span className="text-[10px] font-mono uppercase text-[var(--text-secondary)] block">District</span>
+                <span className="text-xs font-bold font-mono text-[var(--text-primary)]">
                   {districtMatch ? districtMatch[1].trim() : 'Bengaluru Urban'}
                 </span>
               </div>
-              <div className="p-2.5 rounded-xl bg-[#EFEAE4] border border-[#7A90A8]/30">
-                <span className="text-[10px] font-mono uppercase text-[#48596D] block">Status</span>
-                <span className="text-xs font-extrabold font-mono text-[#A68A69] inline-flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#A68A69] animate-pulse" />
+              <div className="p-2.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]/50">
+                <span className="text-[10px] font-mono uppercase text-[var(--text-secondary)] block">Status</span>
+                <span className="text-xs font-extrabold font-mono text-amber-600 dark:text-amber-400 inline-flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
                   {statusMatch ? statusMatch[1].trim().toUpperCase() : 'UNDER INVESTIGATION'}
                 </span>
               </div>
@@ -130,17 +130,17 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
 
             {/* Document Content Box */}
             <div className="mt-2">
-              <span className="text-[10px] font-mono font-bold uppercase text-[#1E2733] tracking-wider block mb-1">
+              <span className="text-[10px] font-mono font-bold uppercase text-[var(--text-primary)] tracking-wider block mb-1">
                 Parsed Document Preview & Metadata:
               </span>
-              <div className="bg-[#EFEAE4] border border-[#7A90A8]/30 rounded-xl p-3 text-xs text-[#1E2733] font-mono max-h-48 overflow-y-auto leading-relaxed shadow-inner">
+              <div className="bg-[var(--surface-2)] border border-[var(--border)]/50 rounded-xl p-3 text-xs text-[var(--text-primary)] font-mono max-h-48 overflow-y-auto leading-relaxed shadow-inner">
                 {text.replace(/AUTOMATED FIR ENTRY STORED IN DATASTORE[\s\S]*?Document Summary:\s*/i, '').replace(/✅[\s\S]*/i, '')}
               </div>
             </div>
 
             {/* Bottom Verification Tag */}
-            <div className="flex items-center gap-2 pt-2 border-t border-[#7A90A8]/20 text-[11px] font-mono text-emerald-700">
-              <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+            <div className="flex items-center gap-2 pt-2 border-t border-[var(--border)]/30 text-[11px] font-mono text-emerald-600 dark:text-emerald-400">
+              <Check className="w-4 h-4 shrink-0" />
               <span>Document indexed into live RAG memory & ANPR surveillance watchlists.</span>
             </div>
           </div>
@@ -152,7 +152,7 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
     return lines.map((line, i) => {
       if (line.startsWith('|')) {
         return (
-          <div key={i} className="font-mono text-xs text-[#1E2733] border-b border-[#7A90A8]/30 py-1.5 grid grid-cols-4 gap-2">
+          <div key={i} className="font-mono text-xs text-[var(--text-primary)] border-b border-[var(--border)]/40 py-1.5 grid grid-cols-4 gap-2">
             {line.split('|').filter(Boolean).map((cell, j) => {
               const cellText = cell.trim();
               const caseRegex = /(KAR\/[A-Z]+\/\d+\/\d+|FIR-\d{4}-[A-Z]+-\d+)/;
@@ -161,13 +161,13 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
                   <button
                     key={j}
                     onClick={() => onCaseClick && onCaseClick(cellText)}
-                    className="text-left text-[#1E2733] hover:underline font-bold transition-colors focus:outline-none cursor-pointer"
+                    className="text-left text-blue-600 dark:text-blue-400 hover:underline font-bold transition-colors focus:outline-none cursor-pointer"
                   >
                     {cellText}
                   </button>
                 );
               }
-              return <span key={j} className={j === 0 ? 'text-[#1E2733] font-semibold' : ''}>{cellText}</span>;
+              return <span key={j} className={j === 0 ? 'text-[var(--text-primary)] font-semibold' : 'text-[var(--text-secondary)]'}>{cellText}</span>;
             })}
           </div>
         );
@@ -175,7 +175,7 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
 
       const boldParts = line.split(/\*\*(.*?)\*\*/g);
       return (
-        <p key={i} className={`${line === '' ? 'mt-2' : ''} leading-relaxed font-sans text-sm text-[#1E2733]`}>
+        <p key={i} className={`${line === '' ? 'mt-2' : ''} leading-relaxed font-sans text-sm text-[var(--text-primary)]`}>
           {boldParts.map((part, j) => {
             const isBold = j % 2 === 1;
             const caseRegex = /(KAR\/[A-Z]+\/\d+\/\d+|FIR-\d{4}-[A-Z]+-\d+)/g;
@@ -187,9 +187,9 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
                   <button
                     key={k}
                     onClick={() => onCaseClick && onCaseClick(subPart)}
-                    className="text-[#1E2733] hover:bg-[#1E2733]/20 font-mono font-bold border border-[#1E2733]/40 rounded-lg px-2 py-0.5 bg-[#1E2733]/10 transition-all mx-1 inline-flex items-center gap-1 focus:outline-none cursor-pointer shadow-sm"
+                    className="text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 font-mono font-bold border border-blue-500/30 rounded-lg px-2 py-0.5 bg-blue-500/10 transition-all mx-1 inline-flex items-center gap-1 focus:outline-none cursor-pointer shadow-xs"
                   >
-                    <FileText className="w-3 h-3 text-[#1E2733]" />
+                    <FileText className="w-3 h-3 text-blue-500" />
                     {subPart}
                   </button>
                 );
@@ -198,7 +198,7 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
             });
 
             return isBold ? (
-              <strong key={j} className="text-[#1E2733] font-extrabold">{renderedSubParts}</strong>
+              <strong key={j} className="text-[var(--text-primary)] font-extrabold">{renderedSubParts}</strong>
             ) : (
               <span key={j}>{renderedSubParts}</span>
             );
@@ -215,27 +215,27 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
       transition={{ duration: 0.3 }}
       className={`flex gap-3.5 group ${isUser ? 'flex-row-reverse' : ''}`}
     >
-      <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md border
+      <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm border
         ${isUser 
-          ? 'bg-[#1E2733] text-white border-[#1E2733]/40 shadow-slate-400/30' 
-          : 'bg-[#FAF6F0] text-[#1E2733] border-[#7A90A8]/40 shadow-slate-300/40'}`}>
+          ? 'bg-slate-900 dark:bg-slate-800 text-white border-slate-700' 
+          : 'bg-gradient-to-tr from-blue-600 to-indigo-600 text-white border-blue-500/40'}`}>
         {isUser
           ? <User className="w-4 h-4 text-white" />
-          : <Bot className="w-4 h-4 text-[#1E2733]" />
+          : <Bot className="w-4 h-4 text-white" />
         }
       </div>
 
       <div className={`max-w-[85%] ${isUser ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
-        <div className="flex items-center gap-2 text-[10px] font-mono text-[#48596D] px-1">
-          <span>{isUser ? 'INSPECTOR (YOU)' : 'DRISHTI INTELLIGENCE'}</span>
+        <div className="flex items-center gap-2 text-[10px] font-mono text-[var(--text-secondary)] px-1">
+          <span className="font-bold">{isUser ? 'INSPECTOR (YOU)' : 'DRISHTI INTELLIGENCE'}</span>
           <span>•</span>
           <span>{msg.timestamp || 'Just now'}</span>
         </div>
 
-        <div className={`rounded-2xl px-5 py-4 text-sm relative shadow-lg border backdrop-blur-md
+        <div className={`rounded-2xl px-5 py-4 text-sm relative shadow-sm border backdrop-blur-md
           ${isUser
-            ? 'bg-[#1E2733] text-white border-[#1E2733]/40 rounded-tr-xs shadow-slate-400/30'
-            : 'bg-[#FAF6F0] text-[#1E2733] border-[#7A90A8]/30 rounded-tl-xs shadow-slate-300/40'
+            ? 'bg-blue-600 text-white border-blue-500 rounded-tr-xs shadow-blue-600/10'
+            : 'bg-[var(--surface-1)] text-[var(--text-primary)] border border-[var(--border)]/70 rounded-tl-xs'
           }`}>
           {isUser
             ? <p className="font-sans leading-relaxed text-white">{msg.content}</p>
@@ -247,16 +247,16 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
           <div className="flex items-center gap-2 px-1 pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={handleCopy}
-              className="text-[10px] font-mono text-[#48596D] hover:text-[#1E2733] flex items-center gap-1 cursor-pointer transition-colors"
+              className="text-[10px] font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 cursor-pointer transition-colors"
             >
               {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
               {copied ? 'Copied' : 'Copy'}
             </button>
-            <span className="text-[#7A90A8]">•</span>
+            <span className="text-[var(--text-secondary)]">•</span>
             <button
               onClick={() => onSpeak && onSpeak(msg.content)}
               className={`text-[10px] font-mono flex items-center gap-1 cursor-pointer transition-colors ${
-                isSpeakingThis ? 'text-rose-600 font-bold animate-pulse' : 'text-[#48596D] hover:text-[#1E2733]'
+                isSpeakingThis ? 'text-rose-600 font-bold animate-pulse' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <Volume2 className="w-3 h-3" />
@@ -772,22 +772,22 @@ export default function ChatPage() {
     <div className="flex h-full relative overflow-hidden bg-[var(--surface-0)] text-[var(--text-primary)] font-sans">
       <div className="flex-grow flex flex-col h-full min-w-0 transition-all duration-300 relative z-10">
         {/* Header Command Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-3.5 bg-[var(--surface-1)]/90 backdrop-blur-md border-b border-[var(--border)]/30 shadow-sm z-20">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 bg-[var(--surface-1)]/90 backdrop-blur-md border-b border-[var(--border)]/50 shadow-xs z-20">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#1E2733] text-white flex items-center justify-center shadow-md">
-              <Bot className="w-5 h-5 text-[#AECAE8] animate-pulse" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md">
+              <Bot className="w-5 h-5 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-extrabold font-mono text-[#1E2733] tracking-wide">
+                <h2 className="text-base font-extrabold font-heading text-[var(--text-primary)] tracking-wide">
                   DRISHTI Co-Pilot
                 </h2>
-                <span className="inline-flex items-center gap-1 bg-[#16A34A]/10 text-emerald-700 border border-emerald-600/30 text-[10px] font-mono px-2 py-0.5 rounded-full font-bold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping" />
+                <span className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
                   LIVE GRID SYNC
                 </span>
               </div>
-              <p className="text-[10px] text-[#48596D] font-mono uppercase tracking-widest">
+              <p className="text-[10px] text-[var(--text-secondary)] font-mono uppercase tracking-widest mt-0.5">
                 Karnataka Police AI Intelligence & Multilingual RAG Engine
               </p>
             </div>
@@ -796,7 +796,7 @@ export default function ChatPage() {
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 onClick={stopSpeech}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-rose-100 border border-rose-300 text-rose-700 text-xs font-mono font-bold uppercase tracking-wider hover:bg-rose-200 transition-all cursor-pointer shadow-sm animate-pulse"
+                className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs font-mono font-bold uppercase tracking-wider hover:bg-rose-500/20 transition-all cursor-pointer shadow-xs animate-pulse"
               >
                 <VolumeX className="w-3.5 h-3.5" />
                 Mute Audio
@@ -805,8 +805,8 @@ export default function ChatPage() {
           </div>
 
           {/* Voice Profile Selector Pills & Clear Chat */}
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#EFEAE4] border border-[#7A90A8]/30 overflow-x-auto shadow-inner">
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]/60 overflow-x-auto shadow-inner">
               {VOICE_PROFILES.map((profile) => {
                 const active = voiceProfile === profile.id;
                 return (
@@ -815,8 +815,8 @@ export default function ChatPage() {
                     onClick={() => setVoiceProfile(profile.id)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all whitespace-nowrap cursor-pointer ${
                       active
-                        ? 'bg-[#1E2733] text-white shadow-md'
-                        : 'text-[#1E2733] hover:text-[#1E2733] hover:bg-[#E2D8CC]'
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-1)]'
                     }`}
                   >
                     {profile.label}
@@ -827,7 +827,7 @@ export default function ChatPage() {
             {messages.length > 0 && (
               <button
                 onClick={clearChatHistory}
-                className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-mono font-bold uppercase transition-all cursor-pointer shadow-sm shrink-0"
+                className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 text-xs font-mono font-bold uppercase transition-all cursor-pointer shadow-xs shrink-0"
                 title="Clear conversation history"
               >
                 Clear Chat
@@ -843,21 +843,21 @@ export default function ChatPage() {
               
               {/* Central AI Emblem */}
               <div className="relative">
-                <div className="absolute inset-0 rounded-3xl bg-[#7A90A8] blur-2xl opacity-20 animate-pulse" />
-                <div className="relative w-20 h-20 rounded-3xl bg-[#FAF6F0] border border-[#7A90A8]/40 flex items-center justify-center shadow-xl">
-                  <Cpu className="w-10 h-10 text-[#1E2733]" />
+                <div className="absolute inset-0 rounded-3xl bg-blue-500/20 blur-2xl opacity-40 animate-pulse" />
+                <div className="relative w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-500/10 via-indigo-500/10 to-cyan-500/10 border border-blue-500/30 flex items-center justify-center shadow-lg text-blue-600 dark:text-blue-400">
+                  <Cpu className="w-10 h-10" />
                 </div>
               </div>
 
-              <div className="text-center space-y-2 max-w-lg">
-                <span className="text-[10px] font-mono font-extrabold text-[#A68A69] bg-[#A68A69]/10 border border-[#A68A69]/30 px-3 py-1 rounded-full uppercase tracking-widest">
+              <div className="text-center space-y-2.5 max-w-lg">
+                <span className="text-[10px] font-mono font-extrabold text-blue-600 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3.5 py-1 rounded-full uppercase tracking-widest inline-block">
                   KARNATAKA POLICE AI COMMAND CENTER
                 </span>
-                <h3 className="text-3xl font-black text-[#1E2733] tracking-tight pt-1">
+                <h3 className="text-3xl font-black text-[var(--text-primary)] tracking-tight pt-1 font-heading">
                   Ask DRISHTI Co-Pilot
                 </h3>
-                <p className="text-xs sm:text-sm text-[#48596D] font-mono leading-relaxed">
-                  Query crime datastores, upload FIR documents, run ANPR watchlist lookups, or inspect suspect profiles in <span className="text-[#1E2733] font-bold">English</span>, <span className="text-[#1E2733] font-bold">Hindi</span>, or <span className="text-[#1E2733] font-bold">Kannada</span>.
+                <p className="text-xs sm:text-sm text-[var(--text-secondary)] font-sans leading-relaxed">
+                  Query crime datastores, upload FIR documents, run ANPR watchlist lookups, or inspect suspect profiles in <span className="text-[var(--text-primary)] font-bold">English</span>, <span className="text-[var(--text-primary)] font-bold">Hindi</span>, or <span className="text-[var(--text-primary)] font-bold">Kannada</span>.
                 </p>
               </div>
 
@@ -868,24 +868,24 @@ export default function ChatPage() {
                   return (
                     <motion.button
                       key={i}
-                      whileHover={{ y: -4, scale: 1.02 }}
+                      whileHover={{ y: -3, scale: 1.01 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => sendMessage(s.text)}
-                      className="text-left p-4.5 rounded-2xl bg-[#FAF6F0] hover:bg-[#FAF6F0]/90 border border-[#7A90A8]/40 hover:border-[#1E2733]/50 transition-all shadow-md hover:shadow-lg group cursor-pointer flex flex-col justify-between"
+                      className="text-left p-5 rounded-2xl bg-[var(--surface-1)] hover:bg-[var(--surface-2)]/80 border border-[var(--border)]/70 hover:border-blue-500/40 transition-all shadow-xs hover:shadow-md group cursor-pointer flex flex-col justify-between"
                     >
                       <div className="flex items-center justify-between mb-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#1E2733]/10 border border-[#1E2733]/20 text-[#1E2733] flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <Icon className="w-5 h-5 text-[#1E2733]" />
+                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                          <Icon className="w-5 h-5" />
                         </div>
-                        <span className="text-[9px] font-mono font-bold text-[#A68A69] bg-[#EFEAE4] border border-[#A68A69]/30 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                        <span className="text-[9px] font-mono font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                           {s.badge}
                         </span>
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-[#1E2733] font-mono mb-1 group-hover:text-[#1E2733] transition-colors">
+                        <p className="text-xs font-bold text-[var(--text-primary)] font-mono mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                           {s.title}
                         </p>
-                        <p className="text-xs text-[#48596D] font-sans line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-[var(--text-secondary)] font-sans line-clamp-2 leading-relaxed italic">
                           "{s.text}"
                         </p>
                       </div>
@@ -912,9 +912,9 @@ export default function ChatPage() {
         </div>
 
         {/* Input Floating Command Dock */}
-        <div className="p-4 sm:p-5 border-t border-[#7A90A8]/30 bg-[#EFEAE4]/90 backdrop-blur-md relative z-20">
+        <div className="p-4 sm:p-5 border-t border-[var(--border)]/50 bg-[var(--surface-1)]/90 backdrop-blur-md relative z-20">
           <div className="max-w-4xl mx-auto space-y-2">
-            <div className="flex items-center gap-2.5 bg-[#FAF6F0] border border-[#7A90A8]/40 rounded-2xl p-2 shadow-xl shadow-slate-400/20 focus-within:border-[#1E2733] transition-all">
+            <div className="flex items-center gap-2.5 bg-[var(--surface-0)] border border-[var(--border)]/70 focus-within:border-blue-500/60 rounded-2xl p-2 shadow-lg transition-all">
               <button
                 id="voice-btn"
                 onClick={handleMicClick}
@@ -927,7 +927,7 @@ export default function ChatPage() {
                 className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all cursor-pointer ${
                   isRecording
                     ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/40 animate-pulse'
-                    : 'bg-[#E2D8CC] hover:bg-[#D5C7B5] border border-[#7A90A8]/30 text-[#1E2733]'
+                    : 'bg-[var(--surface-2)] hover:bg-[var(--surface-1)] border border-[var(--border)]/50 text-[var(--text-primary)] hover:text-blue-600'
                 }`}
               >
                 {isRecording ? <MicOff className="w-5 h-5 text-white" /> : <Mic className="w-5 h-5" />}
@@ -945,7 +945,7 @@ export default function ChatPage() {
                 onClick={() => fileInputRef.current?.click()}
                 disabled={loading}
                 title="Upload FIR document or case file"
-                className="w-11 h-11 rounded-xl bg-[#E2D8CC] hover:bg-[#D5C7B5] border border-[#7A90A8]/30 text-[#1E2733] flex items-center justify-center flex-shrink-0 transition-all cursor-pointer shadow-sm"
+                className="w-11 h-11 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-1)] border border-[var(--border)]/50 text-[var(--text-primary)] hover:text-blue-600 flex items-center justify-center flex-shrink-0 transition-all cursor-pointer shadow-xs"
               >
                 <FileText className="w-5 h-5" />
               </button>
@@ -970,7 +970,7 @@ export default function ChatPage() {
                   })()}
                   rows={1}
                   style={{ resize: 'none', overflowY: 'hidden' }}
-                  className="w-full px-3 py-2 bg-transparent text-[#1E2733] text-sm placeholder-[#48596D]/60 focus:outline-none font-sans"
+                  className="w-full px-3 py-2 bg-transparent text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/60 focus:outline-none font-sans"
                 />
               </div>
 
@@ -980,16 +980,16 @@ export default function ChatPage() {
                 disabled={!input.trim() || loading}
                 className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all cursor-pointer ${
                   input.trim() && !loading
-                    ? 'bg-[#1E2733] hover:bg-[#2B3848] text-white shadow-lg shadow-[#1E2733]/30 hover:scale-105'
-                    : 'bg-[#E2D8CC] text-[#48596D]/40 cursor-not-allowed'
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/25 hover:scale-105'
+                    : 'bg-[var(--surface-2)] text-[var(--text-secondary)]/40 border border-[var(--border)]/40 cursor-not-allowed'
                 }`}
               >
                 <Send className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="flex items-center justify-between text-[10px] font-mono text-[#48596D] px-2">
-              <span>Press <kbd className="px-1.5 py-0.5 rounded bg-[#FAF6F0] border border-[#7A90A8]/40 text-[#1E2733] font-bold">Enter</kbd> to send · <kbd className="px-1.5 py-0.5 rounded bg-[#FAF6F0] border border-[#7A90A8]/40 text-[#1E2733] font-bold">Shift+Enter</kbd> for line break</span>
+            <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-secondary)] px-2">
+              <span>Press <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)]/60 text-[var(--text-primary)] font-bold">Enter</kbd> to send · <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)]/60 text-[var(--text-primary)] font-bold">Shift+Enter</kbd> for line break</span>
               {isRecording && <span className="text-rose-600 font-bold animate-pulse">🔴 Recording Voice Input...</span>}
             </div>
           </div>
