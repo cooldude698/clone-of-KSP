@@ -93,16 +93,18 @@ function speakDrishtiAlert(text) {
   } catch (_) {}
 }
 
-// CCTV Video Mapping — uses reliable public CORS video streams
+// CCTV Video Mapping — uses raw GitHub CDN for deployment stability & local fallback
+const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/vedeshskhatri/kspdatathon2026/main/nextjs/public/videos';
+const VIDEO_BASE = (typeof window !== 'undefined' && window.location.hostname === 'localhost') ? '/videos' : GITHUB_RAW_BASE;
 const CAMERA_SPECIFIC_VIDEOS = {
-  'CAM-BLR-0010': 'https://vjs.zencdn.net/v/oceans.mp4',
-  'CAM-BLR-0012': 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-  'CAM-BLR-0015': 'https://media.w3.org/2010/05/sintel/trailer.mp4',
-  'CAM-BLR-0035': 'https://vjs.zencdn.net/v/oceans.mp4',
-  'CAM-BLR-0042': 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-  'CAM-BLR-0050': 'https://media.w3.org/2010/05/sintel/trailer.mp4',
-  'CAM-BLR-0055': 'https://vjs.zencdn.net/v/oceans.mp4',
-  'CAM-BLR-0060': 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+  'CAM-BLR-0010': `${VIDEO_BASE}/traffic1.mp4`,
+  'CAM-BLR-0012': `${VIDEO_BASE}/people1.mp4`,
+  'CAM-BLR-0015': `${VIDEO_BASE}/traffic2.mp4`,
+  'CAM-BLR-0035': `${VIDEO_BASE}/people3.mp4`,
+  'CAM-BLR-0042': `${VIDEO_BASE}/people2.mp4`,
+  'CAM-BLR-0050': `${VIDEO_BASE}/traffic3.mp4`,
+  'CAM-BLR-0055': `${VIDEO_BASE}/people4.mp4`,
+  'CAM-BLR-0060': `${VIDEO_BASE}/traffic4.mp4`,
 };
 
 // ── Pinpoint Biometric Data & Precise Face/Plate Box Framing ──
