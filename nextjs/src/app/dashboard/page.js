@@ -141,13 +141,13 @@ function CachedBadge() {
   );
 }
 
-// ── useLiveCounter (dynamic 15 sec subtle fluctuation) ─────────────────────
-function useLiveCounter(baseValue, variance = 2, intervalMs = 15000) {
+// ── useLiveCounter (dynamic 5 sec subtle fluctuation) ──────────────────────
+function useLiveCounter(baseValue, variance = 1, intervalMs = 5000) {
   const [value, setValue] = React.useState(baseValue);
   React.useEffect(() => {
     const id = setInterval(() => {
-      // Subtle realistic fluctuation (-variance to +variance, e.g. -1, 0, +1)
-      const choices = [-1, 1, -2, 2, 0];
+      // Subtle small fluctuation (-1, 0, or +1)
+      const choices = [-1, 1, 0, 1, -1];
       const delta = choices[Math.floor(Math.random() * choices.length)];
       setValue(prev => Math.max(1, prev + delta));
     }, intervalMs);
@@ -245,10 +245,10 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('all');
   const [role, setRole] = useState('Inspector');
 
-  const liveFIRs = useLiveCounter(1430, 2, 15000);
-  const liveCameras = useLiveCounter(348, 1, 15000);
-  const liveOffenders = useLiveCounter(42, 1, 15000);
-  const liveHotspots = useLiveCounter(18, 1, 15000);
+  const liveFIRs = useLiveCounter(1430, 1, 5000);
+  const liveCameras = useLiveCounter(348, 1, 5000);
+  const liveOffenders = useLiveCounter(42, 1, 5000);
+  const liveHotspots = useLiveCounter(18, 1, 5000);
 
   const [insights, setInsights] = useState(DEMO_AI_INSIGHTS);
   const [insightsLoading, setInsightsLoading] = useState(false);
