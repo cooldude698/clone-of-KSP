@@ -68,26 +68,52 @@ export default function SuspectProfilePage() {
 
   const name = slugToName(slug || 'ramesh-kumar');
 
-  // Find suspect in demo data or default to Ramesh Kumar
+  // Find suspect in demo data or default
   const suspectsList = DEMO_REPEAT_OFFENDERS?.suspects || [];
-  const suspect = suspectsList.find(
-    (s) => s && (nameToSlug(s.name) === slug || s.name.toLowerCase() === name.toLowerCase() || (slug.includes('ramesh') && s.name.toLowerCase().includes('ramesh')))
-  ) || suspectsList[0] || {
-    suspect_id: 'SUS-8842',
-    name: 'Ramesh Kumar',
-    alias: 'Bullet Ramesh',
-    risk_score: 94,
-    status: 'ACTIVE_WATCHLIST',
-    phone: '+91 98450 12890',
-    primary_modus_operandi: 'Organises vehicle theft rings across district borders. Uses stolen motorcycles for resale.',
-    last_known_location: 'Silk Board Junction, Bengaluru',
-    associated_firs: ['FIR-2026-BL-4921', 'FIR-2026-BL-9104'],
-    known_hangouts: ['Silk Board TTMC', 'Hosur Border Checkpost'],
-    known_associates: ['Suresh Naidu (SUS-7104)', 'Deepak Shetty (SUS-4401)'],
-    ipc_sections: ['IPC §379', 'IPC §34', 'IPC §411'],
-    anpr_hits: 7,
-    camera_sightings: ['CAM-BLR-0010', 'CAM-BLR-0012'],
-  };
+  
+  // Tier 1: Strict exact ID, exact slug, or exact full name match
+  let suspect = suspectsList.find((s) => {
+    if (!s || !s.name) return false;
+    const sSlug = nameToSlug(s.name);
+    const querySlugLower = slug.toLowerCase();
+    const queryNameLower = name.toLowerCase();
+    return (
+      s.suspect_id?.toLowerCase() === querySlugLower ||
+      sSlug === querySlugLower ||
+      s.name.toLowerCase() === queryNameLower
+    );
+  });
+
+  // Tier 2: Match both first and last name if query has 2 words (e.g. "vikram-reddy")
+  if (!suspect) {
+    suspect = suspectsList.find((s) => {
+      if (!s || !s.name) return false;
+      const sSlug = nameToSlug(s.name);
+      const querySlugLower = slug.toLowerCase();
+      const queryParts = querySlugLower.split(/[-_\s]+/);
+      const targetParts = sSlug.split(/[-_\s]+/);
+
+      if (queryParts.length >= 2 && targetParts.length >= 2) {
+        return queryParts[0] === targetParts[0] && queryParts[1] === targetParts[1];
+      }
+      return false;
+    });
+  }
+
+  // Tier 3: Match first name token if query is a single word
+  if (!suspect) {
+    suspect = suspectsList.find((s) => {
+      if (!s || !s.name) return false;
+      const sNameLower = s.name.toLowerCase();
+      const querySlugLower = slug.toLowerCase();
+      return querySlugLower.includes(sNameLower.split(' ')[0]);
+    });
+  }
+
+  // Tier 4: Fallback to first suspect in list
+  if (!suspect) {
+    suspect = suspectsList[0];
+  }
 
   // Get their FIRs
   const firsList = DEMO_FIRS?.firs || [];
