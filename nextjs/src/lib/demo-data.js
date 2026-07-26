@@ -62,59 +62,143 @@ export const DEMO_FIRS = {
   }
 };
 
-export const DEMO_HOTSPOTS = {
-  hotspots: [
-    {
-      area_name: "Silk Board Junction Corridor",
-      district: "Bengaluru Urban",
-      crime_count: 48,
-      severity_score: 9.5,
-      risk_level: "critical",
-      primary_crime: "Vehicle Theft & Extortion",
-      lat: 12.9175,
-      lng: 77.6215
-    },
-    {
-      area_name: "MG Road Signal Approach",
-      district: "Bengaluru Urban",
-      crime_count: 32,
-      severity_score: 8.2,
-      risk_level: "high",
-      primary_crime: "Armed Robbery & Snatching",
-      lat: 12.9762,
-      lng: 77.6033
-    },
-    {
-      area_name: "Mysuru Palace West Gate",
-      district: "Mysuru",
-      crime_count: 24,
-      severity_score: 7.1,
-      risk_level: "high",
-      primary_crime: "Tourist Pickpocketing",
-      lat: 12.3051,
-      lng: 76.6551
-    },
-    {
-      area_name: "Hubballi Old Town Railway Approach",
-      district: "Hubballi-Dharwad",
-      crime_count: 18,
-      severity_score: 5.8,
-      risk_level: "medium",
-      primary_crime: "Commercial Burglary",
-      lat: 15.3647,
-      lng: 75.1240
-    },
-    {
-      area_name: "Mangaluru Port Container Yard",
-      district: "Mangaluru",
-      crime_count: 12,
-      severity_score: 4.2,
-      risk_level: "medium",
-      primary_crime: "Cargo Pilferage",
-      lat: 12.9141,
-      lng: 74.8560
+export function aggregateFirsToHotspots(firList) {
+  if (!Array.isArray(firList) || firList.length === 0) return [];
+
+  const locationCoords = {
+    'Murty Circle': { lat: 17.3354, lng: 76.8412 },
+    'Balay Circle': { lat: 16.2112, lng: 77.3510 },
+    'Wadhwa': { lat: 12.9621, lng: 77.6432 },
+    'Silk Board': { lat: 12.9175, lng: 77.6215 },
+    'Silk Board TTMC Parking Bay 3': { lat: 12.9175, lng: 77.6215 },
+    'Das Marg': { lat: 13.3480, lng: 74.7512 },
+    'Gara Zila': { lat: 12.9782, lng: 77.6102 },
+    'Keer Circle': { lat: 12.9645, lng: 77.5890 },
+    'Ganesh Marg': { lat: 13.3210, lng: 75.7801 },
+    'Bajaj Chowk': { lat: 13.3412, lng: 77.1089 },
+    'Padmanabhan Zila': { lat: 12.9234, lng: 77.5712 },
+    'Kumer Nagar': { lat: 13.0120, lng: 76.1112 },
+    'Whitefield Tech Park Corridor': { lat: 12.9860, lng: 77.7380 },
+    'ITPB Main Road': { lat: 12.9860, lng: 77.7380 },
+    'Karan Marg': { lat: 16.8350, lng: 75.7189 },
+    'Balan Street': { lat: 12.9912, lng: 77.5623 },
+    'Nagarajan Street': { lat: 12.9810, lng: 77.5710 },
+    'Behl Path': { lat: 17.3190, lng: 76.8201 },
+    'Shenoy Zila': { lat: 16.8240, lng: 75.7012 },
+    'Ramakrishnan Circle': { lat: 13.3310, lng: 77.0945 },
+    'Prasad Path': { lat: 13.3098, lng: 75.7645 },
+    'Mammen Marg': { lat: 15.3580, lng: 76.1620 },
+    'Narayan Street': { lat: 17.9150, lng: 77.5250 },
+    'Minhas Nagar': { lat: 16.1984, lng: 77.3398 },
+    'Prasad Circle': { lat: 12.9610, lng: 77.5920 },
+    'Bhandari Street': { lat: 12.9940, lng: 77.5840 },
+    'Saini': { lat: 12.9980, lng: 77.5690 },
+    'Thaman': { lat: 17.3489, lng: 76.8523 },
+    'Verma Circle': { lat: 17.9040, lng: 77.5120 },
+    'Kalita Path': { lat: 17.9210, lng: 77.5310 },
+    'Sahota Ganj': { lat: 14.4690, lng: 75.9280 },
+  };
+
+  const districtCenterCoords = {
+    'Bengaluru Urban': { lat: 12.9716, lng: 77.5946 },
+    'Kalaburagi': { lat: 17.3297, lng: 76.8343 },
+    'Raichur': { lat: 16.2076, lng: 77.3463 },
+    'Udupi': { lat: 13.3409, lng: 74.7421 },
+    'Chikkamagaluru': { lat: 13.3161, lng: 75.7720 },
+    'Tumakuru': { lat: 13.3392, lng: 77.1014 },
+    'Hassan': { lat: 13.0033, lng: 76.1004 },
+    'Vijayapura': { lat: 16.8302, lng: 75.7100 },
+    'Koppal': { lat: 15.3518, lng: 76.1554 },
+    'Bidar': { lat: 17.9104, lng: 77.5199 },
+    'Davangere': { lat: 14.4644, lng: 75.9218 },
+    'Mysuru': { lat: 12.3051, lng: 76.6551 },
+    'Mangaluru': { lat: 12.8703, lng: 74.8427 },
+    'Hubballi-Dharwad': { lat: 15.3647, lng: 75.1240 },
+    'Belagavi': { lat: 15.8497, lng: 74.5089 },
+    'Shivamogga': { lat: 13.9299, lng: 75.5681 },
+  };
+
+  const groups = {};
+  firList.forEach((f) => {
+    const dist = f.district_name || f.district || 'Bengaluru Urban';
+    const locRaw = f.location_name || f.location || f.police_station || dist;
+    let locClean = locRaw.split(',')[0].replace(/^Near\s+/i, '').trim();
+    if (!locClean || locClean.toLowerCase() === dist.toLowerCase()) {
+      locClean = f.police_station ? f.police_station.split('/')[0].trim() : `${dist} Central`;
     }
-  ]
+
+    const key = `${dist}__${locClean}`;
+    if (!groups[key]) {
+      groups[key] = {
+        area_name: locClean,
+        district: dist,
+        crime_count: 0,
+        crime_types_count: {},
+        lat: parseFloat(f.location_lat) || 0,
+        lng: parseFloat(f.location_lng) || 0,
+      };
+    }
+
+    const g = groups[key];
+    g.crime_count++;
+    const crimeCode = (f.crime_type_code || f.crime_type || 'theft').toLowerCase().replace(/\s+/g, '_');
+    g.crime_types_count[crimeCode] = (g.crime_types_count[crimeCode] || 0) + 1;
+  });
+
+  return Object.values(groups).map((g) => {
+    const topCrimes = Object.entries(g.crime_types_count)
+      .sort((a, b) => b[1] - a[1])
+      .map(([c]) => c);
+
+    let severity = 'low';
+    if (g.crime_count >= 3) {
+      severity = 'critical';
+    } else if (g.crime_count === 2) {
+      severity = 'high';
+    } else if (g.crime_count === 1) {
+      const topC = topCrimes[0] || '';
+      if (['robbery', 'drug_offence', 'hit_and_run', 'assault', 'cyber_fraud'].includes(topC)) {
+        severity = 'medium';
+      } else {
+        severity = 'low';
+      }
+    }
+
+    let lat = g.lat;
+    let lng = g.lng;
+
+    if (!lat || !lng || lat === 0 || lng === 0) {
+      const lookup = locationCoords[g.area_name];
+      if (lookup) {
+        lat = lookup.lat;
+        lng = lookup.lng;
+      } else {
+        const distCenter = districtCenterCoords[g.district] || districtCenterCoords['Bengaluru Urban'];
+        lat = distCenter.lat;
+        lng = distCenter.lng;
+      }
+    }
+
+    return {
+      area_name: g.area_name,
+      area: g.area_name,
+      district: g.district,
+      crime_count: g.crime_count,
+      count: g.crime_count,
+      severity: severity,
+      risk_level: severity,
+      primary_crime: topCrimes[0] ? topCrimes[0].replace(/_/g, ' ') : 'Theft',
+      top_crime_types: topCrimes,
+      lat,
+      lng,
+    };
+  });
+}
+
+export const DEMO_HOTSPOTS = {
+  get hotspots() {
+    return aggregateFirsToHotspots(DEMO_FIRS.firs);
+  }
 };
 
 export const DEMO_TRENDS = {
