@@ -121,14 +121,19 @@ export default function DashboardPage() {
   const [search, setSearch] = useState('');
   const [flagged, setFlagged] = useState(new Set());
   const [role, setRole] = useState('Inspector');
-  const [userName, setUserName] = useState('Officer V. Sharma');
+  const [officerName, setOfficerName] = useState('V. Sharma');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedRole = localStorage.getItem('drishti_role') || localStorage.getItem('role') || 'Inspector';
-      const storedName = localStorage.getItem('userName') || localStorage.getItem('drishti_user_name') || 'V. Sharma';
+      // Strip any rank prefix from stored name to get bare name
+      let rawName = localStorage.getItem('userName') || localStorage.getItem('drishti_user_name') || '';
+      // Remove leading rank title (with or without trailing name)
+      rawName = rawName.replace(/^(Inspector General|Sub-Inspector|Inspector|Officer|SI|DySP|SP|DSP)\s*/i, '').trim();
+      // If nothing meaningful left, use default
+      if (!rawName || rawName.length < 2) rawName = 'V. Sharma';
       setRole(storedRole);
-      setUserName(storedName.startsWith('Inspector') || storedName.startsWith('Officer') ? storedName : `Inspector ${storedName}`);
+      setOfficerName(rawName);
     }
   }, []);
 
@@ -226,7 +231,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2">
             <span className="text-xl">👋</span>
             <h2 className="text-xl font-bold tracking-tight text-[var(--text-primary)] font-heading">
-              Welcome back, {userName}
+              Welcome back, {role} {officerName}
             </h2>
           </div>
           <p className="text-xs text-[var(--text-secondary)] font-medium mt-1">

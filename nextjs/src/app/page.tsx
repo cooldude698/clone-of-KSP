@@ -19,24 +19,28 @@ const DEMO_TIERS = [
   { 
     role: 'Inspector', 
     empId: 'inspector',
+    officerName: 'V. Sharma',
     icon: UserCheck, 
     desc: 'Field Operations & ANPR Alerts'
   },
   { 
     role: 'Crime Analyst', 
     empId: 'analyst',
+    officerName: 'R. Deshmukh',
     icon: Activity, 
     desc: 'Hotspot Mapping & Pattern Recognition'
   },
   { 
     role: 'Supervisor', 
     empId: 'supervisor',
+    officerName: 'K. Patil',
     icon: Shield, 
     desc: 'District Command & Force Allocation'
   },
   { 
     role: 'Policymaker', 
     empId: 'policymaker',
+    officerName: 'M. Reddy',
     icon: Sliders, 
     desc: 'Strategic Crime Trends & Analytics'
   },
@@ -105,7 +109,7 @@ export default function LandingPage() {
       if (res.ok) {
         const data = await res.json();
         localStorage.setItem('role', finalRole);
-        localStorage.setItem('userName', data.user?.name || `${finalRole} Officer`);
+        localStorage.setItem('userName', data.user?.name || 'V. Sharma');
         localStorage.setItem('userEmail', email);
         localStorage.setItem('drishti_role', finalRole);
         localStorage.setItem('drishti_employee_id', finalId);
@@ -121,9 +125,9 @@ export default function LandingPage() {
     }
   };
 
-  const handleQuickLogin = (roleName: string, empId: string) => {
+  const handleQuickLogin = (roleName: string, empId: string, officerName?: string) => {
     localStorage.setItem('role', roleName);
-    localStorage.setItem('userName', `${roleName} Officer`);
+    localStorage.setItem('userName', officerName || 'V. Sharma');
     localStorage.setItem('userEmail', `${empId}@drishti.ksp`);
     localStorage.setItem('drishti_role', roleName);
     localStorage.setItem('drishti_employee_id', empId);
@@ -311,7 +315,7 @@ export default function LandingPage() {
                         return (
                           <button
                             key={tier.role}
-                            onClick={() => handleQuickLogin(tier.role, tier.empId)}
+                            onClick={() => handleQuickLogin(tier.role, tier.empId, tier.officerName)}
                             className="group p-3 rounded-xl bg-[var(--surface-0)] hover:bg-[var(--surface-2)] border border-[var(--border)]/50 text-left transition-all duration-200 shadow-sm flex items-center justify-between cursor-pointer"
                           >
                             <div className="flex items-center gap-3">
@@ -451,7 +455,7 @@ export default function LandingPage() {
                         <button
                           key={tier.role}
                           type="button"
-                          onClick={() => handleQuickLogin(tier.role, tier.empId)}
+                          onClick={() => handleQuickLogin(tier.role, tier.empId, tier.officerName)}
                           className="px-3 py-1.5 rounded-full bg-[var(--surface-0)] hover:bg-blue-600 hover:text-white border border-[var(--border)] text-[11px] font-semibold text-[var(--text-primary)] transition-all cursor-pointer shadow-sm"
                         >
                           {tier.role} →
