@@ -105,7 +105,4 @@ export default function NewsCard({ article, index = 0 }: NewsCardProps) {
         </div>
       </Card>
     </motion.div>
-  );
 }
-
-export { NewsCard };
