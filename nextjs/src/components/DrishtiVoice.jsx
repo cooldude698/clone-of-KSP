@@ -530,6 +530,21 @@ const useDrishtiVoice = ({
     if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.resume();
   }, []);
 
+  // Listen for global stop speech signal to avoid multi-voice collision
+  useEffect(() => {
+    const handleGlobalStop = () => {
+      stopSpeaking();
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('drishti-stop-speech', handleGlobalStop);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('drishti-stop-speech', handleGlobalStop);
+      }
+    };
+  }, [stopSpeaking]);
+
   // Double-clap wake word
   useEffect(() => {
     if (!enableClapWake || micPermission !== 'granted') return;

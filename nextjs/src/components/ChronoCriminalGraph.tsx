@@ -511,7 +511,7 @@ export default function ChronoCriminalGraph({
   }, [searchTerm]);
 
   return (
-    <div ref={containerRef} className="relative w-full rounded-2xl bg-steel-700 p-6 border border-steel-600/50 shadow-2xl flex flex-col select-none overflow-hidden text-paper-100 transition-colors duration-200">
+    <div ref={containerRef} className="relative w-full rounded-2xl bg-[var(--surface-1)] p-6 border border-[var(--border)]/50 shadow-2xl flex flex-col select-none overflow-hidden text-[var(--text-primary)] transition-colors duration-200">
       
       <style jsx global>{`
         @keyframes pulse-ring {
@@ -554,11 +554,11 @@ export default function ChronoCriminalGraph({
             placeholder="Search suspect / FIR..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-3 py-1.5 bg-void-000 border border-steel-600/60 rounded-xl text-xs text-paper-100 placeholder-paper-100/40 focus:outline-none focus:border-phosphor-500 transition-colors font-mono w-44"
+            className="px-3 py-1.5 bg-[var(--surface-0)] border border-[var(--border)]/60 rounded-xl text-xs text-[var(--text-primary)] placeholder-[var(--text-secondary)]/40 focus:outline-none focus:border-blue-500 transition-colors font-mono w-44"
           />
 
           {/* Date Badge */}
-          <div className="px-3 py-1.5 rounded-xl bg-void-000 border border-steel-600/50 flex items-center gap-2">
+          <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-0)] border border-[var(--border)]/50 flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-phosphor-500 animate-pulse" />
             <span className="text-xs font-semibold font-mono text-phosphor-500">
               {currentDateString}
@@ -570,12 +570,12 @@ export default function ChronoCriminalGraph({
       {/* Tooltip */}
       <div
         ref={tooltipRef}
-        className="pointer-events-none absolute left-0 top-0 z-50 rounded-xl border border-steel-600 bg-steel-700/95 p-3 shadow-2xl backdrop-blur-md opacity-0 transition-opacity duration-200 w-56 text-paper-100"
+        className="pointer-events-none absolute left-0 top-0 z-50 rounded-xl border border-[var(--border)] bg-[var(--surface-1)]/95 p-3 shadow-2xl backdrop-blur-md opacity-0 transition-opacity duration-200 w-56 text-[var(--text-primary)]"
         style={{ transform: "translate(0px, 0px)" }}
       />
 
       {/* Visualization Canvas */}
-      <div className="relative w-full rounded-xl bg-void-000/60 border border-steel-600/50 overflow-hidden flex-grow" style={{ height }}>
+      <div className="relative w-full rounded-xl bg-[var(--surface-0)]/60 border border-[var(--border)]/50 overflow-hidden flex-grow" style={{ height }}>
         <svg
           ref={svgRef}
           className="w-full h-full"
@@ -589,7 +589,7 @@ export default function ChronoCriminalGraph({
       </div>
 
       {/* Playback Control Bar */}
-      <div className="mt-4 flex flex-col sm:flex-row items-center gap-4 bg-void-000/40 border border-steel-600/40 p-4 rounded-xl">
+      <div className="mt-4 flex flex-col sm:flex-row items-center gap-4 bg-[var(--surface-0)]/40 border border-[var(--border)]/40 p-4 rounded-xl">
         
         {/* Play button */}
         <button
@@ -609,7 +609,7 @@ export default function ChronoCriminalGraph({
 
         {/* Range Slider */}
         <div className="flex-grow w-full flex items-center gap-3">
-          <span className="text-xs text-paper-100/50 font-mono">
+          <span className="text-xs text-[var(--text-secondary)] font-mono">
             {new Date(minTime).toLocaleDateString("en-IN", { year: "numeric", month: "short" })}
           </span>
           <input
@@ -621,23 +621,23 @@ export default function ChronoCriminalGraph({
               setCurrentTimestamp(parseInt(e.target.value, 10));
               setIsPlaying(false);
             }}
-            className="w-full h-1.5 bg-steel-600 rounded-lg appearance-none cursor-pointer accent-phosphor-500 focus:outline-none"
+            className="w-full h-1.5 bg-[var(--border)] rounded-lg appearance-none cursor-pointer accent-blue-500 focus:outline-none"
           />
-          <span className="text-xs text-paper-100/50 font-mono">
+          <span className="text-xs text-[var(--text-secondary)] font-mono">
             {new Date(maxTime).toLocaleDateString("en-IN", { year: "numeric", month: "short" })}
           </span>
         </div>
 
         {/* Speed Selector */}
-        <div className="flex items-center gap-1 bg-void-000 p-1 rounded-lg border border-steel-600/40 shrink-0">
+        <div className="flex items-center gap-1 bg-[var(--surface-0)] p-1 rounded-lg border border-[var(--border)]/40 shrink-0">
           {[1, 5, 20].map((s) => (
             <button
               key={s}
               onClick={() => setSpeed(s)}
               className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
                 speed === s
-                  ? "bg-steel-600 text-phosphor-500 border border-steel-600/50 shadow-inner"
-                  : "text-paper-100/50 hover:text-paper-100"
+                  ? "bg-[var(--surface-2)] text-blue-500 border border-[var(--border)]/50 shadow-inner"
+                  : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
               }`}
             >
               {s}x

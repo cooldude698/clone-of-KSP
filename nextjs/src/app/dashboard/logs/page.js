@@ -107,6 +107,7 @@ export default function LogsPage() {
   const [selectedCard, setSelectedCard] = useState(null);
   const [mounted, setMounted]           = useState(true);
   const [confirmClear, setConfirmClear] = useState(false);
+  const [exportingId, setExportingId]   = useState(null);
 
   // Load user localStorage chat history and segment into cards
   useEffect(() => {
@@ -221,27 +222,62 @@ export default function LogsPage() {
     });
   }, [sessionCards, search, filterType]);
 
-  const handleExportCard = (card) => {
-    const lines = card.messages.map(l =>
-      `[${l.timestamp || '??:??'}] ${l.role === 'user' ? 'OFFICER' : 'DRISHTI AI'}: ${l.content}`
-    );
-    const txt = [
-      `=== DRISHTI POLICE AI LOG: ${card.subject.toUpperCase()} ===`,
-      `Date: ${card.date} at ${card.time}`,
-      `Category: ${card.badge}`,
-      `Total Messages: ${card.msgCount}`,
-      '====================================================',
-      '',
-      ...lines,
-    ].join('\n');
+  const handleExportCard = async (card) => {
+    setExportingId(card.id);
+    try {
+      const res = await fetch('/api/export-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          conversation_id: card.id,
+          title: `DRISHTI Intelligence Log — ${card.subject}`,
+          officer_name: 'Inspector V. Sharma',
+          badge_number: 'KSP-4421',
+          messages: card.messages,
+        }),
+      });
 
-    const blob = new Blob([txt], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `drishti-log-${card.subject.toLowerCase().replace(/\s+/g, '-')}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.content_base64) {
+          const byteChars = atob(data.content_base64);
+          const byteArr = new Uint8Array(byteChars.length);
+          for (let i = 0; i < byteChars.length; i++) byteArr[i] = byteChars.charCodeAt(i);
+          const blob = new Blob([byteArr], { type: data.content_type || 'application/pdf' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = data.filename || `DRISHTI_Report_${card.id}.pdf`;
+          a.click();
+          URL.revokeObjectURL(url);
+          setExportingId(null);
+          return;
+        }
+      }
+      throw new Error('PDF export failed');
+    } catch (e) {
+      // Fallback to txt if PDF fails
+      const lines = card.messages.map(l =>
+        `[${l.timestamp || '??:??'}] ${l.role === 'user' ? 'OFFICER' : 'DRISHTI AI'}: ${l.content}`
+      );
+      const txt = [
+        `=== DRISHTI POLICE AI LOG: ${card.subject.toUpperCase()} ===`,
+        `Date: ${card.date} at ${card.time}`,
+        `Category: ${card.badge}`,
+        `Total Messages: ${card.msgCount}`,
+        '====================================================',
+        '',
+        ...lines,
+      ].join('\n');
+      const blob = new Blob([txt], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `drishti-log-${card.subject.toLowerCase().replace(/\s+/g, '-')}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+    setExportingId(null);
   };
 
   const handleDeleteCard = (cardId) => {
@@ -468,10 +504,14 @@ export default function LogsPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleExportCard(selectedCard)}
-                    className="p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-blue-500/40 transition-all cursor-pointer"
-                    title="Export Card (.txt)"
+                    disabled={exportingId === selectedCard?.id}
+                    className="p-2 rounded-lg hover:bg-[var(--surface-2)] transition-colors disabled:opacity-50 cursor-pointer"
+                    title="Export as PDF"
                   >
-                    <Download className="w-4 h-4" />
+                    {exportingId === selectedCard?.id
+                      ? <span className="text-[10px] font-mono text-[var(--text-secondary)] animate-pulse">...</span>
+                      : <Download className="w-4 h-4" />
+                    }
                   </button>
 
                   <button

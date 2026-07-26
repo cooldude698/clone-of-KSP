@@ -245,7 +245,7 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis, onSuggestion
         </div>
 
         {!isUser && (
-          <div className="flex items-center gap-2 px-1 pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-2 px-1 pt-1 opacity-100 transition-opacity">
             <button
               onClick={handleCopy}
               className="text-[10px] font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 cursor-pointer transition-colors"
@@ -346,6 +346,7 @@ export default function ChatPage() {
   const [activeCaseDetails, setActiveCaseDetails] = useState(null);
   const [isLoadingCase, setIsLoadingCase] = useState(false);
   const [downloadLoading, setDownloadLoading] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
 
   // Load chat history from localStorage on mount
   useEffect(() => {
@@ -395,6 +396,7 @@ export default function ChatPage() {
   const timestamp = () => new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
   const audioElementRef = useRef(null);
+  const speechTokenRef = useRef(0);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.speechSynthesis) {
@@ -404,12 +406,54 @@ export default function ChatPage() {
       initVoices();
       window.speechSynthesis.onvoiceschanged = initVoices;
     }
+
+    const unlockAudio = () => {
+      try {
+        if (typeof window !== 'undefined') {
+          window.speechSynthesis?.resume();
+          const silentAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA');
+          silentAudio.play().then(() => silentAudio.pause()).catch(() => {});
+        }
+      } catch (_) {}
+    };
+
+    const handleStopAll = () => {
+      if (typeof window !== 'undefined') {
+        try { window.speechSynthesis?.cancel(); } catch (_) {}
+      }
+      if (audioElementRef.current) {
+        try {
+          audioElementRef.current.pause();
+          audioElementRef.current.currentTime = 0;
+        } catch (_) {}
+        audioElementRef.current = null;
+      }
+      setIsSpeaking(false);
+      setSpeakingMsgIdx(null);
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('click', unlockAudio, { once: true });
+      window.addEventListener('keydown', unlockAudio, { once: true });
+      window.addEventListener('drishti-stop-speech', handleStopAll);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('click', unlockAudio);
+        window.removeEventListener('keydown', unlockAudio);
+        window.removeEventListener('drishti-stop-speech', handleStopAll);
+      }
+    };
   }, []);
 
   const stopSpeech = () => {
+    speechTokenRef.current++;
     if (typeof window !== 'undefined') {
       try {
         window.speechSynthesis?.cancel();
+      } catch (_) {}
+      try {
+        window.dispatchEvent(new CustomEvent('drishti-stop-speech'));
       } catch (_) {}
     }
     if (audioElementRef.current) {
@@ -423,12 +467,13 @@ export default function ChatPage() {
     setSpeakingMsgIdx(null);
   };
 
-  const speakWithBrowserSpeechSynthesis = (cleanText, profile, msgIdx) => {
+  const speakWithBrowserSpeechSynthesis = (cleanText, profile, msgIdx, token) => {
     if (typeof window === 'undefined' || !window.speechSynthesis) {
       setIsSpeaking(false);
       setSpeakingMsgIdx(null);
       return;
     }
+    if (token && speechTokenRef.current !== token) return;
 
     try {
       window.speechSynthesis.cancel();
@@ -436,25 +481,45 @@ export default function ChatPage() {
 
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.lang = profile.ttsLang || 'en-IN';
-      utterance.rate = 0.98;
+      utterance.rate = 0.95;
+      utterance.pitch = 1.0;
 
       const voices = window.speechSynthesis.getVoices() || [];
-      const matchedVoice = voices.find(
-        (v) => v.name.includes(profile.neural) || v.lang === profile.ttsLang || v.lang?.startsWith(profile.lang)
-      );
+      const matchedVoice =
+        voices.find(
+          (v) =>
+            (v.name.includes('Natural') ||
+              v.name.includes('Google') ||
+              v.name.includes('Online') ||
+              v.name.includes('Neerja') ||
+              v.name.includes('Swara') ||
+              v.name.includes('Sapna') ||
+              v.name.includes('Microsoft')) &&
+            (v.lang.startsWith(profile.lang) || v.lang === profile.ttsLang)
+        ) ||
+        voices.find((v) => v.lang === profile.ttsLang || v.lang.startsWith(profile.lang));
+
       if (matchedVoice) utterance.voice = matchedVoice;
 
       utterance.onstart = () => {
+        if (token && speechTokenRef.current !== token) {
+          window.speechSynthesis.cancel();
+          return;
+        }
         setIsSpeaking(true);
         setSpeakingMsgIdx(msgIdx);
       };
       utterance.onend = () => {
-        setIsSpeaking(false);
-        setSpeakingMsgIdx(null);
+        if (!token || speechTokenRef.current === token) {
+          setIsSpeaking(false);
+          setSpeakingMsgIdx(null);
+        }
       };
       utterance.onerror = () => {
-        setIsSpeaking(false);
-        setSpeakingMsgIdx(null);
+        if (!token || speechTokenRef.current === token) {
+          setIsSpeaking(false);
+          setSpeakingMsgIdx(null);
+        }
       };
 
       window.speechSynthesis.speak(utterance);
@@ -473,16 +538,15 @@ export default function ChatPage() {
       return;
     }
 
+    const currentToken = ++speechTokenRef.current;
     stopSpeech();
 
     const cleanText = text.replace(/[*#\_|`]/g, ' ').replace(/\s+/g, ' ').trim();
     if (!cleanText) return;
 
     const profile = VOICE_PROFILES.find((p) => p.id === voiceProfile) || VOICE_PROFILES[0];
-    setIsSpeaking(true);
-    setSpeakingMsgIdx(msgIdx);
 
-    // 1. Try high-quality Neural TTS / Zia TTS via backend API
+    // 1. Try high-quality Neural Edge TTS via backend API
     try {
       const res = await fetch(`${API_BASE}/drishtiVoice`, {
         method: 'POST',
@@ -490,37 +554,62 @@ export default function ChatPage() {
         body: JSON.stringify({ mode: 'tts', text: cleanText, lang: profile.lang }),
       });
 
+      if (speechTokenRef.current !== currentToken) return;
+
       if (res.ok) {
         const data = await res.json();
+        if (speechTokenRef.current !== currentToken) return;
+
         if (data && data.audioBase64) {
           const audioSrc = `data:${data.mimeType || 'audio/mpeg'};base64,${data.audioBase64}`;
           const audio = new Audio(audioSrc);
           audioElementRef.current = audio;
 
           audio.onplay = () => {
+            if (speechTokenRef.current !== currentToken) {
+              audio.pause();
+              return;
+            }
             setIsSpeaking(true);
             setSpeakingMsgIdx(msgIdx);
           };
+
           audio.onended = () => {
-            setIsSpeaking(false);
-            setSpeakingMsgIdx(null);
-            audioElementRef.current = null;
-          };
-          audio.onerror = () => {
-            audioElementRef.current = null;
-            speakWithBrowserSpeechSynthesis(cleanText, profile, msgIdx);
+            if (speechTokenRef.current === currentToken) {
+              setIsSpeaking(false);
+              setSpeakingMsgIdx(null);
+            }
+            if (audioElementRef.current === audio) {
+              audioElementRef.current = null;
+            }
           };
 
-          await audio.play();
-          return;
+          audio.onerror = () => {
+            if (audioElementRef.current === audio) {
+              audioElementRef.current = null;
+            }
+            if (speechTokenRef.current === currentToken) {
+              speakWithBrowserSpeechSynthesis(cleanText, profile, msgIdx, currentToken);
+            }
+          };
+
+          try {
+            await audio.play();
+            return;
+          } catch (playErr) {
+            console.warn('[drishtiVoice] audio.play() rejected (autoplay or audio error):', playErr);
+            audioElementRef.current = null;
+          }
         }
       }
     } catch (e) {
-      console.warn('[drishtiVoice] Backend TTS play warning, using browser fallback:', e.message);
+      console.warn('[drishtiVoice] Backend Neural TTS warning:', e.message);
     }
 
-    // 2. Fallback to browser SpeechSynthesis API
-    speakWithBrowserSpeechSynthesis(cleanText, profile, msgIdx);
+    // 2. Fallback to natural browser SpeechSynthesis if Neural API is unreachable
+    if (speechTokenRef.current === currentToken) {
+      speakWithBrowserSpeechSynthesis(cleanText, profile, msgIdx, currentToken);
+    }
   };
 
   const downloadReport = async () => {
@@ -640,6 +729,16 @@ export default function ChatPage() {
     setMessages((prev) => [...prev, userMsg]);
     setInput('');
     setLoading(true);
+
+    // Pre-unlock Audio element synchronously in user event handler to bypass browser autoplay restrictions
+    try {
+      if (typeof window !== 'undefined') {
+        window.speechSynthesis?.resume();
+        if (!audioElementRef.current) {
+          audioElementRef.current = new Audio();
+        }
+      }
+    } catch (_) {}
 
     // Auto-detect open suspect / FIR / CCTV / Crime map intent and navigate
     const qLower = text.toLowerCase().trim();
@@ -780,15 +879,49 @@ export default function ChatPage() {
 
       const newMsgIdx = messages.length + 1;
       speakText(responseText, newMsgIdx);
-
-      const caseRegex = /(KAR\/[A-Z]+\/\d+\/\d+|FIR-\d{4}-[A-Z]+-\d+)/;
-      const match = responseText.match(caseRegex);
-      if (match && match.length > 0) {
-        fetchCaseDetails(match[0]);
-      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleExportConversation = async () => {
+    if (!messages.length || exportingPdf) return;
+    setExportingPdf(true);
+    try {
+      const res = await fetch('/api/export-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          conversation_id: conversationId || `conv_${Date.now()}`,
+          title: 'DRISHTI Co-Pilot Chat — Intelligence Session',
+          officer_name: 'Inspector V. Sharma',
+          badge_number: 'KSP-4421',
+          messages: messages.map(m => ({
+            role: m.role,
+            content: m.content,
+            timestamp: m.timestamp || '',
+          })),
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.content_base64) {
+          const byteChars = atob(data.content_base64);
+          const byteArr = new Uint8Array(byteChars.length);
+          for (let i = 0; i < byteChars.length; i++) byteArr[i] = byteChars.charCodeAt(i);
+          const blob = new Blob([byteArr], { type: data.content_type || 'text/html' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = data.filename || `DRISHTI_Session_${Date.now()}.html`;
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      }
+    } catch (e) {
+      console.warn('Export failed:', e);
+    }
+    setExportingPdf(false);
   };
 
   const startVoice = async () => {
@@ -924,6 +1057,15 @@ export default function ChatPage() {
 
           {/* Voice Profile Selector Pills & Clear Chat */}
           <div className="flex items-center gap-2.5">
+            <button
+              onClick={handleExportConversation}
+              disabled={!messages.length || exportingPdf}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)]/50 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-40 transition-colors cursor-pointer"
+              title="Export conversation as PDF"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              {exportingPdf ? 'Exporting...' : 'Export PDF'}
+            </button>
             <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]/60 overflow-x-auto shadow-inner">
               {VOICE_PROFILES.map((profile) => {
                 const active = voiceProfile === profile.id;

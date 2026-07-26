@@ -247,6 +247,28 @@ function generateSmartPoliceResponse(question, lang = 'en', history = []) {
 
   const historyStr = (history || []).map(h => h.content || '').join(' ').toLowerCase();
 
+  // Polite / Conversational / Acknowledgement intent check
+  if (
+    q.includes('thank') || q === 'okay thank u' || q === 'okay thank you' || q === 'thanks' ||
+    q === 'ok thanks' || q === 'thx' || q === 'thank you sir' || q === 'thanks sir'
+  ) {
+    if (isHindi) return 'आपका स्वागत है, सर! मैं सक्रिय मोड में हूँ। यदि आपको किसी केस फ़ाइल की जाँच, ANPR स्कैन या स्टेशन SOP सहायता की आवश्यकता है, तो मुझे बताएं।';
+    if (isKannada) return 'ನಿಮಗೆ ಸ್ವಾಗತ, ಸರ್! ಧನ್ಯವಾದಗಳು. ನಿಮಗೆ ಯಾವುದೇ ಪ್ರಕರಣದ ಮಾಹಿತಿ ಅಥವಾ ತನಿಖಾ ಸಹಾಯ ಬೇಕಿದ್ದಲ್ಲಿ ತಿಳಿಸಿ, ಸರ್.';
+    return 'You are welcome, Inspector! DRISHTI AI is on active standby. Let me know whenever you need to inspect case files, run ANPR scans, or check crime SOPs for your shift, Sir.';
+  }
+
+  if (q === 'hello' || q === 'hi' || q === 'hey' || q === 'jai hind' || q.includes('good morning') || q.includes('good evening') || q.includes('good afternoon')) {
+    if (isHindi) return 'जय हिंद, सर! दृष्टि एआई चालू है और कर्नाटक पुलिस सीसीटीएस डेटाबेस से जुड़ा हुआ है। आज आपकी जांच में कैसे सहायता कर सकता हूं, सर?';
+    if (isKannada) return 'ಜೈ ಹಿಂದ್, ಸರ್! ದೃಷ್ಟಿ ಎಐ ಆನ್‌ಲೈನ್‌ನಲ್ಲಿದೆ. ಇಂದಿನ ತನಿಖೆಯಲ್ಲಿ ನಾನು ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ, ಸರ್?';
+    return 'Jai Hind, Inspector! DRISHTI AI is online and synced with the Karnataka State Police CCTNS datastore. How can I assist you with your investigation today, Sir?';
+  }
+
+  if (q === 'ok' || q === 'okay' || q === 'got it' || q === 'noted' || q === 'understood') {
+    if (isHindi) return 'समझ गया, सर। जब भी आपको आगे विश्लेषण या टीम निर्देशों की आवश्यकता हो, मुझे बताएं।';
+    if (isKannada) return 'ಗಮನಿಸಲಾಗಿದೆ, ಸರ್. ಮುಂದಿನ ಮಾಹಿತಿಗಾಗಿ ತಿಳಿಸಿ, ಸರ್.';
+    return 'Acknowledged, Inspector. Standing by for your next query or squad directive, Sir.';
+  }
+
   // 1a. Check for short follow-ups like "in three points?", "3 points", "summarize", etc.
   const isThreePointsQuery = q.includes('three point') || q.includes('3 point') || q.includes('three points') || q.includes('3 points') || q.includes('points?') || q.includes('short') || q.includes('summarize');
   if (isThreePointsQuery) {
