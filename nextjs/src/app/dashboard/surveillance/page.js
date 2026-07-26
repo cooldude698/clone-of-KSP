@@ -93,8 +93,8 @@ function speakDrishtiAlert(text) {
   } catch (_) {}
 }
 
-// CCTV Video Mapping — direct GitHub CDN URLs pinned to commit 6b33c15 containing your actual compressed KSP project videos!
-const CDN_BASE = 'https://raw.githubusercontent.com/vedeshskhatri/kspdatathon2026/6b33c15/nextjs/public/videos';
+// CCTV Video Mapping — direct GitHub CDN URLs pinned to full commit SHA containing your actual compressed KSP project videos!
+const CDN_BASE = 'https://raw.githubusercontent.com/vedeshskhatri/kspdatathon2026/16f1396ac0487ce1792722f33acb279cee0ca4db/nextjs/public/videos';
 
 const CAMERA_SPECIFIC_VIDEOS = {
   'CAM-BLR-0010': `${CDN_BASE}/traffic1.mp4`,
