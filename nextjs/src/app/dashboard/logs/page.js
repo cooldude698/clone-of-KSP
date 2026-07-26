@@ -383,21 +383,21 @@ export default function LogsPage() {
                   exit={{ opacity: 0, scale: 0.95 }}
                   whileHover={{ y: -3 }}
                   onClick={() => setSelectedCard(card)}
-                  className="glass-panel p-5 rounded-2xl border border-[var(--border)] hover:border-blue-500/40 transition-all shadow-md cursor-pointer flex flex-col justify-between group relative overflow-hidden"
+                  className="bg-white border border-slate-200/90 hover:border-blue-500/40 transition-all shadow-md hover:shadow-lg rounded-2xl p-5 cursor-pointer flex flex-col justify-between group relative overflow-hidden"
                 >
                   <div className="space-y-3">
                     {/* Top Row: Icon + Title + Badge */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500 flex-shrink-0">
+                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-600 flex-shrink-0">
                           <CardIcon className="w-5 h-5" />
                         </div>
                         <div className="min-w-0">
-                          <h3 className="text-sm font-extrabold text-[var(--text-primary)] font-mono truncate group-hover:text-blue-500 transition-colors">
+                          <h3 className="text-sm font-extrabold text-slate-900 font-mono truncate group-hover:text-blue-600 transition-colors">
                             {card.subject}
                           </h3>
-                          <div className="flex items-center gap-2 text-[11px] text-[var(--text-secondary)] font-mono mt-0.5">
-                            <Clock className="w-3 h-3" />
+                          <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono mt-0.5">
+                            <Clock className="w-3 h-3 text-slate-400" />
                             <span>{card.date} • {card.time}</span>
                           </div>
                         </div>
@@ -409,20 +409,20 @@ export default function LogsPage() {
                     </div>
 
                     {/* Summary Snippet */}
-                    <div className="bg-[var(--surface-2)]/60 rounded-xl p-3 border border-[var(--border)]/50">
-                      <p className="text-xs text-[var(--text-secondary)] leading-relaxed line-clamp-2">
+                    <div className="bg-slate-50 rounded-xl p-3 border border-slate-200/80">
+                      <p className="text-xs text-slate-700 font-sans leading-relaxed line-clamp-2">
                         &ldquo;{card.summary}&rdquo;
                       </p>
                     </div>
                   </div>
 
                   {/* Footer Row: Messages count & Action */}
-                  <div className="mt-4 pt-3 border-t border-[var(--border)]/60 flex items-center justify-between text-xs font-mono">
-                    <span className="text-[var(--text-secondary)]">
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-mono">
+                    <span className="text-slate-500">
                       {card.msgCount} message{card.msgCount !== 1 ? 's' : ''} in thread
                     </span>
 
-                    <div className="flex items-center gap-1 text-blue-500 font-bold group-hover:translate-x-1 transition-transform">
+                    <div className="flex items-center gap-1 text-blue-600 font-bold group-hover:translate-x-1 transition-transform">
                       <span>View Case Log</span>
                       <ChevronRight className="w-4 h-4" />
                     </div>
@@ -442,24 +442,24 @@ export default function LogsPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-[var(--surface-1)] border border-[var(--border)] rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden"
+              className="bg-white border border-slate-200 rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden"
             >
               {/* Modal Header */}
-              <div className="px-6 py-4 border-b border-[var(--border)] flex items-center justify-between gap-4 bg-[var(--surface-2)]">
+              <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between gap-4 bg-white">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-500">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
                     <selectedCard.icon className="w-5 h-5" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="text-base font-extrabold text-[var(--text-primary)] font-mono">
+                      <h2 className="text-base font-extrabold text-slate-900 font-mono">
                         {selectedCard.subject}
                       </h2>
                       <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold border ${selectedCard.badgeColor}`}>
                         {selectedCard.badge}
                       </span>
                     </div>
-                    <p className="text-xs text-[var(--text-secondary)] font-mono">
+                    <p className="text-xs text-slate-500 font-mono">
                       Recorded on {selectedCard.date} at {selectedCard.time} • {selectedCard.msgCount} Messages
                     </p>
                   </div>
@@ -468,7 +468,7 @@ export default function LogsPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleExportCard(selectedCard)}
-                    className="p-2 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-blue-500/40 transition-all cursor-pointer"
+                    className="p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-blue-500/40 transition-all cursor-pointer"
                     title="Export Card (.txt)"
                   >
                     <Download className="w-4 h-4" />
@@ -476,7 +476,7 @@ export default function LogsPage() {
 
                   <button
                     onClick={() => handleDeleteCard(selectedCard.id)}
-                    className="p-2 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-red-500 hover:bg-red-500/10 hover:border-red-500/40 transition-all cursor-pointer"
+                    className="p-2 rounded-xl bg-slate-50 border border-slate-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-all cursor-pointer"
                     title="Delete Session Card"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -484,7 +484,7 @@ export default function LogsPage() {
 
                   <button
                     onClick={() => setSelectedCard(null)}
-                    className="p-2 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer"
+                    className="p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:text-slate-900 transition-all cursor-pointer"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -492,7 +492,7 @@ export default function LogsPage() {
               </div>
 
               {/* Modal Message Thread */}
-              <div className="flex-1 overflow-auto p-6 space-y-4">
+              <div className="flex-1 overflow-auto p-6 space-y-4 bg-slate-50/50">
                 {selectedCard.messages.map((msg, idx) => {
                   const isUser = msg.role === 'user';
                   return (
@@ -501,22 +501,22 @@ export default function LogsPage() {
                       className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
-                        className={`max-w-[82%] p-4 rounded-2xl text-sm leading-relaxed border shadow-sm ${
+                        className={`max-w-[82%] p-4 rounded-2xl text-sm leading-relaxed border shadow-md ${
                           isUser
                             ? 'bg-blue-600 text-white border-blue-500 rounded-tr-xs'
-                            : 'bg-[var(--surface-2)] text-[var(--text-primary)] border-[var(--border)] rounded-tl-xs'
+                            : 'bg-white text-slate-900 border-slate-200/90 rounded-tl-xs'
                         }`}
                       >
-                        <div className="flex items-center justify-between gap-4 mb-2 pb-1 border-b border-white/10 dark:border-slate-700/40">
-                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider opacity-80">
+                        <div className="flex items-center justify-between gap-4 mb-2 pb-1.5 border-b border-slate-100 dark:border-slate-100">
+                          <span className={`text-[10px] font-mono font-bold uppercase tracking-wider ${isUser ? 'text-blue-100' : 'text-blue-600'}`}>
                             {isUser ? 'Officer / Inspector' : 'DRISHTI AI Intelligence'}
                           </span>
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-mono opacity-60">{msg.timestamp || '11:45 AM'}</span>
+                            <span className={`text-[10px] font-mono ${isUser ? 'text-blue-200' : 'text-slate-400'}`}>{msg.timestamp || '11:45 AM'}</span>
                             {!isUser && (
                               <button
                                 onClick={() => speakText(msg.content)}
-                                className="opacity-70 hover:opacity-100 transition-opacity"
+                                className="text-slate-400 hover:text-blue-600 transition-colors"
                                 title="Listen Audio"
                               >
                                 <Volume2 className="w-3.5 h-3.5" />
@@ -525,7 +525,7 @@ export default function LogsPage() {
                           </div>
                         </div>
 
-                        <p className="whitespace-pre-wrap">{msg.content}</p>
+                        <p className="whitespace-pre-wrap font-sans text-slate-800">{msg.content}</p>
                       </div>
                     </div>
                   );
@@ -533,13 +533,13 @@ export default function LogsPage() {
               </div>
 
               {/* Modal Footer */}
-              <div className="px-6 py-3 border-t border-[var(--border)] bg-[var(--surface-2)] flex items-center justify-between text-xs font-mono">
-                <span className="text-[var(--text-secondary)]">
+              <div className="px-6 py-3.5 border-t border-slate-200 bg-white flex items-center justify-between text-xs font-mono">
+                <span className="text-slate-500 font-medium">
                   Karnataka State Police AI Command Center
                 </span>
                 <button
                   onClick={() => setSelectedCard(null)}
-                  className="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-all cursor-pointer"
+                  className="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-all cursor-pointer shadow-md shadow-blue-500/20"
                 >
                   Close Card
                 </button>
