@@ -7,7 +7,8 @@ import {
   RefreshCw, Search, MapPin, AlertTriangle,
   Clock, CheckCircle2, FileText, TrendingUp, TrendingDown,
   ArrowRight, ChevronRight, Shield, Radio, ExternalLink,
-  Filter, Flag, Eye, Users, Camera, Sparkles
+  Filter, Flag, Eye, Users, Camera, Sparkles,
+  ArrowUpDown, ChevronDown
 } from 'lucide-react';
 import { fetchWithFallback, invalidateCache } from '@/lib/fetch-with-fallback';
 import {
@@ -120,6 +121,8 @@ export default function DashboardPage() {
   // UI State
   const [activeTab, setActiveTab] = useState('all');
   const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('date_desc'); // 'date_desc', 'date_asc', 'crime_type', 'case_number', 'location'
+  const [crimeTypeFilter, setCrimeTypeFilter] = useState('all');
   const [flagged, setFlagged] = useState(new Set());
   const [role, setRole] = useState('Inspector');
   const [officerName, setOfficerName] = useState('V. Sharma');
@@ -228,22 +231,61 @@ export default function DashboardPage() {
     return { total, open, investigating, closed };
   }, [firs]);
 
+  const SORT_LABELS = {
+    date_desc: 'newest first',
+    date_asc: 'oldest first',
+    crime_type: 'crime type',
+    case_number: 'case number',
+    location: 'location / PS',
+  };
+
   const displayed = useMemo(() => {
-    return firs
-      .filter(f => {
-        const status = f.status || f.case_status || 'open';
-        const matchTab = activeTab === 'all' || status === activeTab;
-        const q = search.trim().toLowerCase();
-        const matchSearch = !q ||
-          (f.case_number || '').toLowerCase().includes(q) ||
-          (f.crime_type_code || f.crime_type || '').toLowerCase().includes(q) ||
-          (f.description || '').toLowerCase().includes(q) ||
-          (f.police_station || '').toLowerCase().includes(q) ||
-          (f.district_name || f.district || '').toLowerCase().includes(q) ||
-          (f.investigation_office || '').toLowerCase().includes(q);
-        return matchTab && matchSearch;
-      });
-  }, [firs, activeTab, search]);
+    const list = firs.filter(f => {
+      const status = f.status || f.case_status || 'open';
+      const matchTab = activeTab === 'all' || status === activeTab;
+
+      const rawType = (f.crime_type_code || f.crime_type || '').toLowerCase();
+      const matchCrime = crimeTypeFilter === 'all' || rawType === crimeTypeFilter.toLowerCase() || rawType.includes(crimeTypeFilter.toLowerCase());
+
+      const q = search.trim().toLowerCase();
+      const matchSearch = !q ||
+        (f.case_number || '').toLowerCase().includes(q) ||
+        (f.crime_type_code || f.crime_type || '').toLowerCase().includes(q) ||
+        (f.description || '').toLowerCase().includes(q) ||
+        (f.police_station || '').toLowerCase().includes(q) ||
+        (f.district_name || f.district || '').toLowerCase().includes(q) ||
+        (f.investigation_office || '').toLowerCase().includes(q);
+
+      return matchTab && matchCrime && matchSearch;
+    });
+
+    return list.sort((a, b) => {
+      if (sortBy === 'date_desc') {
+        const da = new Date(`${a.date_filed || '2000-01-01'}T${a.time_filed || '00:00:00'}`).getTime();
+        const db = new Date(`${b.date_filed || '2000-01-01'}T${b.time_filed || '00:00:00'}`).getTime();
+        return db - da;
+      }
+      if (sortBy === 'date_asc') {
+        const da = new Date(`${a.date_filed || '2000-01-01'}T${a.time_filed || '00:00:00'}`).getTime();
+        const db = new Date(`${b.date_filed || '2000-01-01'}T${b.time_filed || '00:00:00'}`).getTime();
+        return da - db;
+      }
+      if (sortBy === 'crime_type') {
+        const ca = (a.crime_type || a.crime_type_code || '').toLowerCase();
+        const cb = (b.crime_type || b.crime_type_code || '').toLowerCase();
+        return ca.localeCompare(cb);
+      }
+      if (sortBy === 'case_number') {
+        return (a.case_number || '').localeCompare(b.case_number || '');
+      }
+      if (sortBy === 'location') {
+        const la = (a.location_name || a.police_station || a.district_name || '').toLowerCase();
+        const lb = (b.location_name || b.police_station || b.district_name || '').toLowerCase();
+        return la.localeCompare(lb);
+      }
+      return 0;
+    });
+  }, [firs, activeTab, crimeTypeFilter, search, sortBy]);
 
   const tabCounts = useMemo(() => ({
     all: firs.length,
@@ -350,24 +392,65 @@ export default function DashboardPage() {
 
           {/* Table Header */}
           <div className="px-5 pt-5 pb-0 space-y-4 border-b border-[var(--border)]/50">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div>
                 <h2 className="text-base font-bold text-[var(--text-primary)] font-heading">Incident Register</h2>
                 <p className="text-[12px] text-[var(--text-secondary)] mt-0.5">
-                  {loading ? 'Loading…' : `${displayed.length} records · Sorted newest first`}
+                  {loading ? 'Loading…' : `${displayed.length} records · Sorted ${SORT_LABELS[sortBy] || 'newest first'}`}
                 </p>
               </div>
 
-              {/* Search */}
-              <div className="relative">
-                <Search className="w-3.5 h-3.5 text-[var(--text-secondary)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  placeholder="Case #, crime type, location, officer…"
-                  className="pl-9 pr-4 py-2 rounded-lg bg-[var(--surface-0)] border border-[var(--border)]/50 text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)] transition-colors w-full sm:w-72 placeholder:text-[var(--text-secondary)]"
-                />
+              {/* Search, Filter & Sort Controls */}
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Search */}
+                <div className="relative flex-1 sm:flex-initial">
+                  <Search className="w-3.5 h-3.5 text-[var(--text-secondary)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    placeholder="Case #, crime type, location, officer…"
+                    className="pl-9 pr-4 py-2 rounded-lg bg-[var(--surface-0)] border border-[var(--border)]/50 text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)] transition-colors w-full sm:w-60 placeholder:text-[var(--text-secondary)]"
+                  />
+                </div>
+
+                {/* Crime Type Filter */}
+                <div className="relative">
+                  <select
+                    value={crimeTypeFilter}
+                    onChange={e => setCrimeTypeFilter(e.target.value)}
+                    className="pl-8 pr-8 py-2 rounded-lg bg-[var(--surface-0)] border border-[var(--border)]/50 text-[12px] font-semibold text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)] transition-colors cursor-pointer appearance-none shadow-xs"
+                  >
+                    <option value="all">All Crime Types</option>
+                    <option value="vehicle_theft">Vehicle Theft</option>
+                    <option value="cyber_fraud">Cyber Fraud</option>
+                    <option value="robbery">Robbery</option>
+                    <option value="burglary">Burglary</option>
+                    <option value="drug_offence">Drug Offence</option>
+                    <option value="assault">Assault</option>
+                    <option value="hit_and_run">Hit & Run</option>
+                    <option value="senior_citizen_crime">Senior Citizen Crime</option>
+                  </select>
+                  <Filter className="w-3.5 h-3.5 text-[var(--text-secondary)] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <ChevronDown className="w-3 h-3 text-[var(--text-secondary)] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
+
+                {/* Sort By Dropdown */}
+                <div className="relative">
+                  <select
+                    value={sortBy}
+                    onChange={e => setSortBy(e.target.value)}
+                    className="pl-8 pr-8 py-2 rounded-lg bg-[var(--surface-0)] border border-[var(--border)]/50 text-[12px] font-semibold text-[var(--text-primary)] focus:outline-none focus:border-[var(--text-primary)] transition-colors cursor-pointer appearance-none shadow-xs"
+                  >
+                    <option value="date_desc">Sort: Date (Newest)</option>
+                    <option value="date_asc">Sort: Date (Oldest)</option>
+                    <option value="crime_type">Sort: Crime Type</option>
+                    <option value="case_number">Sort: Case Number</option>
+                    <option value="location">Sort: Location / PS</option>
+                  </select>
+                  <ArrowUpDown className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <ChevronDown className="w-3 h-3 text-[var(--text-secondary)] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
               </div>
             </div>
 
@@ -396,11 +479,46 @@ export default function DashboardPage() {
 
           {/* Column Header Row */}
           <div className="hidden md:grid grid-cols-[45px_1.8fr_1.8fr_2fr_1fr_135px_50px] gap-4 px-5 py-2.5 border-b border-[var(--border)]/50 bg-[var(--surface-0)] items-center">
-            {['#', 'Case Number', 'Crime Type', 'Location / PS', 'Filed', 'Status', 'Action'].map(col => (
-              <span key={col} className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">
-                {col}
-              </span>
-            ))}
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">#</span>
+
+            <button
+              onClick={() => setSortBy(sortBy === 'case_number' ? 'date_desc' : 'case_number')}
+              className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer text-left group"
+              title="Click to sort by Case Number"
+            >
+              Case Number
+              <ArrowUpDown className={`w-3 h-3 transition-colors ${sortBy === 'case_number' ? 'text-blue-600 dark:text-blue-400' : 'opacity-0 group-hover:opacity-60'}`} />
+            </button>
+
+            <button
+              onClick={() => setSortBy(sortBy === 'crime_type' ? 'date_desc' : 'crime_type')}
+              className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer text-left group"
+              title="Click to sort by Crime Type"
+            >
+              Crime Type
+              <ArrowUpDown className={`w-3 h-3 transition-colors ${sortBy === 'crime_type' ? 'text-blue-600 dark:text-blue-400' : 'opacity-0 group-hover:opacity-60'}`} />
+            </button>
+
+            <button
+              onClick={() => setSortBy(sortBy === 'location' ? 'date_desc' : 'location')}
+              className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer text-left group"
+              title="Click to sort by Location"
+            >
+              Location / PS
+              <ArrowUpDown className={`w-3 h-3 transition-colors ${sortBy === 'location' ? 'text-blue-600 dark:text-blue-400' : 'opacity-0 group-hover:opacity-60'}`} />
+            </button>
+
+            <button
+              onClick={() => setSortBy(sortBy === 'date_desc' ? 'date_asc' : 'date_desc')}
+              className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer text-left group"
+              title="Click to toggle Date sort"
+            >
+              Filed
+              <ArrowUpDown className={`w-3 h-3 transition-colors ${sortBy === 'date_desc' || sortBy === 'date_asc' ? 'text-blue-600 dark:text-blue-400' : 'opacity-0 group-hover:opacity-60'}`} />
+            </button>
+
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">Status</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">Action</span>
           </div>
 
           {/* Rows */}

@@ -4,6 +4,12 @@ import fs from 'fs';
 import path from 'path';
 import { UPLOADED_FIRS, UPLOADED_SUSPECTS, persistUploadedStore } from '@/lib/uploadedFirsStore';
 
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
 const DISK_FILE = path.join(process.cwd(), 'src/lib/uploaded_firs_disk.json');
 
 function readDiskData() {

@@ -11,6 +11,7 @@ import {
 import Spinner from '@/components/ui/Spinner';
 import InvestigatorWall from '@/components/InvestigatorWall';
 import VoiceDebugStatus from '@/components/VoiceDebugStatus';
+import { UPLOADED_FIRS } from '@/lib/uploadedFirsStore';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
 
@@ -393,51 +394,133 @@ export default function ChatPage() {
 
   const timestamp = () => new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
-  const speakText = (text, msgIdx) => {
-    if (typeof window === 'undefined') return;
-    window.speechSynthesis?.cancel();
+  const audioElementRef = useRef(null);
 
-    if (isSpeaking && speakingMsgIdx === msgIdx) {
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      const initVoices = () => {
+        try { window.speechSynthesis.getVoices(); } catch (_) {}
+      };
+      initVoices();
+      window.speechSynthesis.onvoiceschanged = initVoices;
+    }
+  }, []);
+
+  const stopSpeech = () => {
+    if (typeof window !== 'undefined') {
+      try {
+        window.speechSynthesis?.cancel();
+      } catch (_) {}
+    }
+    if (audioElementRef.current) {
+      try {
+        audioElementRef.current.pause();
+        audioElementRef.current.currentTime = 0;
+      } catch (_) {}
+      audioElementRef.current = null;
+    }
+    setIsSpeaking(false);
+    setSpeakingMsgIdx(null);
+  };
+
+  const speakWithBrowserSpeechSynthesis = (cleanText, profile, msgIdx) => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) {
       setIsSpeaking(false);
       setSpeakingMsgIdx(null);
       return;
     }
 
-    const cleanText = text.replace(/[*#\_|`]/g, ' ').replace(/\s+/g, ' ').trim();
-    const profile = VOICE_PROFILES.find((p) => p.id === voiceProfile) || VOICE_PROFILES[0];
+    try {
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.resume();
 
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = profile.ttsLang;
-    utterance.rate = 0.98;
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.lang = profile.ttsLang || 'en-IN';
+      utterance.rate = 0.98;
 
-    const voices = window.speechSynthesis?.getVoices() || [];
-    const matchedVoice = voices.find(
-      (v) => v.name.includes(profile.neural) || v.lang === profile.ttsLang
-    );
-    if (matchedVoice) utterance.voice = matchedVoice;
+      const voices = window.speechSynthesis.getVoices() || [];
+      const matchedVoice = voices.find(
+        (v) => v.name.includes(profile.neural) || v.lang === profile.ttsLang || v.lang?.startsWith(profile.lang)
+      );
+      if (matchedVoice) utterance.voice = matchedVoice;
 
-    utterance.onstart = () => {
-      setIsSpeaking(true);
-      setSpeakingMsgIdx(msgIdx);
-    };
-    utterance.onend = () => {
+      utterance.onstart = () => {
+        setIsSpeaking(true);
+        setSpeakingMsgIdx(msgIdx);
+      };
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        setSpeakingMsgIdx(null);
+      };
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+        setSpeakingMsgIdx(null);
+      };
+
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {
+      console.warn('Browser SpeechSynthesis error:', e);
       setIsSpeaking(false);
       setSpeakingMsgIdx(null);
-    };
-    utterance.onerror = () => {
-      setIsSpeaking(false);
-      setSpeakingMsgIdx(null);
-    };
-
-    window.speechSynthesis?.speak(utterance);
+    }
   };
 
-  const stopSpeech = () => {
-    if (typeof window !== 'undefined') {
-      window.speechSynthesis?.cancel();
+  const speakText = async (text, msgIdx) => {
+    if (typeof window === 'undefined') return;
+
+    if (isSpeaking && speakingMsgIdx === msgIdx) {
+      stopSpeech();
+      return;
     }
-    setIsSpeaking(false);
-    setSpeakingMsgIdx(null);
+
+    stopSpeech();
+
+    const cleanText = text.replace(/[*#\_|`]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!cleanText) return;
+
+    const profile = VOICE_PROFILES.find((p) => p.id === voiceProfile) || VOICE_PROFILES[0];
+    setIsSpeaking(true);
+    setSpeakingMsgIdx(msgIdx);
+
+    // 1. Try high-quality Neural TTS / Zia TTS via backend API
+    try {
+      const res = await fetch(`${API_BASE}/drishtiVoice`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'tts', text: cleanText, lang: profile.lang }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.audioBase64) {
+          const audioSrc = `data:${data.mimeType || 'audio/mpeg'};base64,${data.audioBase64}`;
+          const audio = new Audio(audioSrc);
+          audioElementRef.current = audio;
+
+          audio.onplay = () => {
+            setIsSpeaking(true);
+            setSpeakingMsgIdx(msgIdx);
+          };
+          audio.onended = () => {
+            setIsSpeaking(false);
+            setSpeakingMsgIdx(null);
+            audioElementRef.current = null;
+          };
+          audio.onerror = () => {
+            audioElementRef.current = null;
+            speakWithBrowserSpeechSynthesis(cleanText, profile, msgIdx);
+          };
+
+          await audio.play();
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('[drishtiVoice] Backend TTS play warning, using browser fallback:', e.message);
+    }
+
+    // 2. Fallback to browser SpeechSynthesis API
+    speakWithBrowserSpeechSynthesis(cleanText, profile, msgIdx);
   };
 
   const downloadReport = async () => {
@@ -524,8 +607,14 @@ export default function ChatPage() {
           }),
         });
 
-        const data = await res.json();
-        if (data.success) {
+        let data = null;
+        try {
+          data = await res.json();
+        } catch (parseErr) {
+          console.warn('Failed to parse upload-fir JSON response:', parseErr);
+        }
+
+        if (data && data.success) {
           const rec = data.record;
           const cardMsg = `📄 **AUTOMATED FIR ENTRY STORED IN DATASTORE**\n\n- **Case Number:** \`${rec.case_number}\`\n- **Crime Type:** ${rec.crime_type_code}\n- **District:** ${rec.district_name}\n- **Police Station:** ${rec.police_station}\n- **Date Filed:** ${rec.date_filed}\n- **Status:** ${rec.status}\n\n**Document Summary:**\n_${rec.description}_\n\n✅ *This case has been indexed and is now searchable by DRISHTI AI.*`;
 
@@ -610,12 +699,34 @@ export default function ChatPage() {
         targetRoute = '/dashboard/suspect/imran-khan';
       } else if (qLower.includes('farid') || qLower.includes('mirza') || qLower.includes('फरीद')) {
         targetRoute = '/dashboard/suspect/farid-mirza';
+      } else if (qLower.includes('vikram') || qLower.includes('malhotra') || qLower.includes('vicky') || qLower.includes('9104')) {
+        const topCase = (UPLOADED_FIRS && UPLOADED_FIRS.length > 0) ? UPLOADED_FIRS.find(f => (f.suspect_name || '').toLowerCase().includes('vikram') || f.case_number === 'FIR-2026-BL-9104') : null;
+        const caseNum = topCase ? topCase.case_number : 'FIR-2026-BL-9104';
+        fetchCaseDetails(caseNum);
+        const openMsg = `Opening case file ${caseNum} for Suspect Vikram Malhotra, Sir.`;
+        setMessages((prev) => [...prev, { role: 'assistant', content: openMsg, timestamp: timestamp() }]);
+        speakText(openMsg, messages.length + 1);
+        setLoading(false);
+        return;
       } else if (qLower.includes('4921') || qLower.includes('492')) {
         targetRoute = '/dashboard/fir/FIR-2026-BL-4921';
       } else if (qLower.includes('4000')) {
         targetRoute = '/dashboard/fir/FIR-2026-BL-4000';
       } else if (qLower.includes('112') || qLower.includes('mys')) {
         targetRoute = '/dashboard/fir/FIR-2026-MYS-0112';
+      } else if (
+        qLower.includes('uploaded') || qLower.includes('his case') || qLower.includes('this case') ||
+        qLower.includes('the case') || qLower.includes('the fir') || qLower.includes('his file')
+      ) {
+        const topRec = (UPLOADED_FIRS && UPLOADED_FIRS.length > 0) ? UPLOADED_FIRS[0] : null;
+        const caseNum = topRec ? topRec.case_number : 'FIR-2026-BL-9104';
+        const sName = topRec ? (topRec.suspect_name || topRec.accused_name || 'Vikram Malhotra') : 'Vikram Malhotra';
+        fetchCaseDetails(caseNum);
+        const openMsg = `Opening active case file ${caseNum} for Suspect ${sName}, Sir.`;
+        setMessages((prev) => [...prev, { role: 'assistant', content: openMsg, timestamp: timestamp() }]);
+        speakText(openMsg, messages.length + 1);
+        setLoading(false);
+        return;
       }
 
       if (targetRoute) {
@@ -624,25 +735,9 @@ export default function ChatPage() {
             window.location.href = targetRoute;
           }
         }, 800);
-      } else {
-        // Extract requested target name
-        let targetName = text
-          .replace(/\b(can you|please|hey|hi|drishti|could you|would you)\b/gi, '')
-          .replace(/\b(open|show|view|bring up|pull up|check|get|find|search)\b/gi, '')
-          .replace(/\b(suspect|person|person's|persons|case|file|profile|record|fir|details|this)\b/gi, '')
-          .trim();
-        targetName = targetName ? targetName.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'the requested query';
-
-        const notFoundMsg = `Sir, no suspect profile or case file found for "${targetName}" in the Karnataka Police database. Please verify the name or FIR number.`;
-
-        setMessages((prev) => [
-          ...prev,
-          { role: 'assistant', content: notFoundMsg, timestamp: timestamp() },
-        ]);
-        speakText(notFoundMsg, messages.length + 1);
-        setLoading(false);
         return;
       }
+      // NOTE: Fall through to API call if no static route or direct case details modal matched
     }
 
     try {
