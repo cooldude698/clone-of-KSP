@@ -122,7 +122,7 @@ async function fetchLiveDatabaseContext(query) {
 
 async function fetchLiveCatalystData(question) {
   const q = (question || '').toLowerCase();
-  const BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001';
+  const BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
   let liveStr = '';
 
   try {

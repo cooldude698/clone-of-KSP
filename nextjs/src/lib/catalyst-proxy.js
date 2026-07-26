@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 const BASE = process.env.NODE_ENV === 'development' 
   ? 'http://localhost:3000/server' 
-  : 'https://drishti-ksp-60073715607.development.catalystserverless.in/server';
+  : '/server';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',

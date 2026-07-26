@@ -15,10 +15,10 @@ const _responseCache = new Map(); // key → { data, ts }
 const _deadEndpoints = new Map(); // key → ts (timestamp when it failed)
 
 const CACHE_TTL_MS    = 60_000;  // Cache valid responses for 60 s
-const DEAD_TTL_MS     = 300_000; // Don't retry a dead/slow endpoint for 5 mins
+const DEAD_TTL_MS     = 30_000;  // Don't retry a dead/slow endpoint for 30s
 
 export async function fetchWithFallback(endpoint, demoData, options = {}) {
-  const timeoutMs     = options.timeoutMs || 300; // Fast 300ms timeout for instant fast navigation!
+  const timeoutMs     = options.timeoutMs || 8000; // Increased to 8000ms for Catalyst cold starts
   const bypassCache   = options.bypassCache || false;
   const method        = (options.method || 'GET').toUpperCase();
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/api/${endpoint}`;
