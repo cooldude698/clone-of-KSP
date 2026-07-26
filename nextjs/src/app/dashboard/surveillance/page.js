@@ -377,13 +377,19 @@ const INITIAL_EVENTS = [
 ];
 
 function CameraStream({ cam, videoRef, isPaused }) {
-  const localVideo = CAMERA_SPECIFIC_VIDEOS[cam.id] || '/videos/traffic1.mp4';
+  const localVideo = CAMERA_SPECIFIC_VIDEOS[cam.id] || 'https://vjs.zencdn.net/v/oceans.mp4';
   const [hasError, setHasError] = useState(false);
+  const [timeStr, setTimeStr] = useState('');
 
-  const handleError = (e) => {
-    if (e && e.preventDefault) e.preventDefault();
-    setHasError(true);
-  };
+  useEffect(() => {
+    const updateClock = () => {
+      const now = new Date();
+      setTimeStr(now.toISOString().replace('T', ' ').slice(0, 19) + '.' + String(now.getMilliseconds()).padStart(3, '0'));
+    };
+    updateClock();
+    const interval = setInterval(updateClock, 100);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (!videoRef || !videoRef.current) return;
@@ -394,56 +400,76 @@ function CameraStream({ cam, videoRef, isPaused }) {
     }
   }, [isPaused, videoRef]);
 
-  if (hasError || !cam.is_active) {
-    return (
-      <div className="absolute inset-0 w-full h-full bg-slate-950 flex flex-col items-center justify-center p-4 overflow-hidden select-none">
-        {/* Animated Cyber Radar Grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:20px_20px] opacity-40" />
-        
-        {/* Target Bounding Box Frame */}
-        {cam.detected_target && (
-          <div className={`absolute inset-4 border-2 rounded-lg ${cam.has_face_recog ? 'border-red-500/70 bg-red-500/10' : 'border-emerald-500/70 bg-emerald-500/10'} flex flex-col justify-between p-3 z-10`}>
-            <div className="flex justify-between items-start">
-              <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded shadow-sm ${cam.has_face_recog ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'}`}>
-                {cam.target_type || 'TARGET DETECTED'}
-              </span>
-              <span className="text-[10px] font-mono text-cyan-300 font-extrabold bg-slate-900/80 px-2 py-0.5 rounded border border-cyan-500/30">
-                {cam.confidence}% MATCH
-              </span>
-            </div>
-            <div className="flex justify-between items-end">
-              <span className="text-[11px] font-mono font-extrabold text-white bg-slate-900/90 px-2.5 py-1 rounded border border-white/20 shadow-md">
-                🎯 {cam.detected_target}
-              </span>
-              <span className="text-[9px] font-mono text-slate-400">
-                CCTNS STREAM · {cam.id}
-              </span>
-            </div>
-          </div>
-        )}
-
-        <div className="z-20 flex flex-col items-center gap-1.5 text-center">
-          <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
-            <Camera className="w-5 h-5" />
-          </div>
-          <span className="text-xs font-mono font-extrabold text-slate-200 tracking-wider uppercase">KSP Optical Sensor Stream</span>
-          <span className="text-[10px] font-mono text-slate-400 max-w-[200px] truncate">{cam.name}</span>
-        </div>
-      </div>
-    );
-  }
+  const handleError = () => {
+    setHasError(true);
+  };
 
   return (
-    <video
-      ref={videoRef}
-      src={localVideo}
-      autoPlay
-      loop
-      muted
-      playsInline
-      onError={handleError}
-      className="absolute inset-0 w-full h-full object-cover filter brightness-[0.95] contrast-[1.05] pointer-events-none"
-    />
+    <div className="absolute inset-0 w-full h-full bg-slate-950 flex flex-col justify-between p-3 overflow-hidden select-none font-mono">
+      {/* Background Cyber CCTV Video Stream */}
+      {!hasError && (
+        <video
+          ref={videoRef}
+          src={localVideo}
+          autoPlay
+          loop
+          muted
+          playsInline
+          onError={handleError}
+          className="absolute inset-0 w-full h-full object-cover filter brightness-[0.85] contrast-[1.15] opacity-80"
+        />
+      )}
+
+      {/* Cyber Grid & Scanline Overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0284c7_1px,transparent_1px),linear-gradient(to_bottom,#0284c7_1px,transparent_1px)] bg-[size:24px_24px] opacity-15 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 via-transparent to-black/60 pointer-events-none" />
+
+      {/* Top Feed HUD */}
+      <div className="relative z-10 flex justify-between items-start">
+        <div className="flex items-center gap-2 bg-slate-950/90 backdrop-blur-md px-2 py-0.5 rounded border border-cyan-500/30 shadow-sm">
+          <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+          <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">LIVE CCTNS SENSOR</span>
+        </div>
+        <span className="text-[9px] font-bold text-emerald-400 bg-slate-950/90 backdrop-blur-md px-2 py-0.5 rounded border border-emerald-500/30">
+          {timeStr || 'LIVE'}
+        </span>
+      </div>
+
+      {/* Target Scanning Reticle Bounding Box */}
+      {cam.detected_target ? (
+        <div className={`relative z-10 border-2 rounded-lg p-2.5 flex flex-col justify-between ${cam.has_face_recog ? 'border-red-500/80 bg-red-500/10' : 'border-emerald-500/80 bg-emerald-500/10'} shadow-[0_0_15px_rgba(239,68,68,0.2)]`}>
+          <div className="flex justify-between items-center">
+            <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase ${cam.has_face_recog ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'}`}>
+              {cam.target_type || 'TARGET DETECTED'}
+            </span>
+            <span className="text-[9px] font-bold text-cyan-300 bg-slate-950/90 px-1.5 py-0.5 rounded border border-cyan-500/40">
+              {cam.confidence || 95.8}% MATCH
+            </span>
+          </div>
+          <div className="mt-3 flex justify-between items-end">
+            <div className="bg-slate-950/90 px-2 py-1 rounded border border-white/20">
+              <p className="text-[10px] font-extrabold text-white">🎯 {cam.detected_target}</p>
+              <p className="text-[8px] text-slate-400 uppercase">CCTNS SENSOR: {cam.id}</p>
+            </div>
+            <span className="text-[8px] text-cyan-400 font-bold uppercase tracking-wider animate-pulse">
+              [ OPTICAL TRACKING ACTIVE ]
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div className="relative z-10 flex flex-col items-center justify-center my-auto text-center opacity-80">
+          <Camera className="w-6 h-6 text-cyan-400 mb-1 animate-pulse" />
+          <span className="text-[10px] font-bold text-slate-200 uppercase tracking-widest">{cam.name}</span>
+          <span className="text-[8px] text-slate-400 uppercase">FEED SECURED · 60 FPS OPTICAL SENSOR</span>
+        </div>
+      )}
+
+      {/* Bottom Sensor Footer */}
+      <div className="relative z-10 flex justify-between items-center text-[8px] text-slate-400">
+        <span>SENSOR: {cam.id}</span>
+        <span>LAT 12.9716° N · LNG 77.5946° E</span>
+      </div>
+    </div>
   );
 }
 
