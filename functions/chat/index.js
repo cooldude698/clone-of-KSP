@@ -144,7 +144,7 @@ async function getWorkingKey(generateAction) {
   if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'PASTE_KEY_HERE') {
     keys.push(process.env.GEMINI_API_KEY);
   }
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 1; i <= 13; i++) {
     const key = process.env[`GEMINI_API_KEY_${i}`];
     if (key && key !== 'PASTE_KEY_HERE' && !keys.includes(key)) keys.push(key);
   }

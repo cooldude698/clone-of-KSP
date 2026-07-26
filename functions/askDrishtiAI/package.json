@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "askDrishtiAI",
   "version": "1.0.0",
   "description": "DRISHTI AI — QuickML RAG primary, Gemini fallback, rawData last-resort",

@@ -1,7 +1,7 @@
 {
 	"deployment": {
 		"name": "drishti_ksp_function",
-		"stack": "node24",
+		"stack": "node20",
 		"type": "advancedio",
 		"env_variables": {}
 	},

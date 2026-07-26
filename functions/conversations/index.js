@@ -6,7 +6,7 @@ module.exports = async (req, res) => {
     res.writeHead(statusCode, {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, DELETE, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type'
     });
     res.end(JSON.stringify(data));
@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
   if (method === 'OPTIONS') {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, DELETE, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type'
     });
     res.end();
@@ -29,14 +29,13 @@ module.exports = async (req, res) => {
   if (method === 'GET') {
     try {
       const queryParams = req.getQueryParams() || {};
-      const limit = parseInt(queryParams.limit || '20', 10) || 20;
+      const limit = parseInt(queryParams.limit || '50', 10) || 50;
 
       const catalystApp = catalyst.initialize(req);
       const nosql = catalystApp.nosql();
       const collectionName = process.env.NOSQL_CONVERSATIONS_COLLECTION || 'conversations';
       const collection = nosql.collection(collectionName);
 
-      // Robust fallback query mechanisms to support different platform/SDK versions
       let docs = [];
       if (typeof collection.getDocuments === 'function') {
         docs = await collection.getDocuments();
@@ -65,12 +64,14 @@ module.exports = async (req, res) => {
         let preview = '';
         if (doc.messages && doc.messages.length > 0) {
           const lastMsg = doc.messages[doc.messages.length - 1];
-          preview = (lastMsg.content || '').substring(0, 80);
+          preview = (lastMsg.content || '').substring(0, 120);
         }
         return {
-          conversation_id: doc.document_id || doc.id || doc._id || '',
+          conversation_id: doc.document_id || doc.id || doc._id || doc.conversation_id || '',
+          subject: doc.subject || '',
           last_updated: doc.last_updated || '',
           preview: preview,
+          messages: doc.messages || [],
           message_count: doc.messages ? doc.messages.length : 0
         };
       });
@@ -82,11 +83,56 @@ module.exports = async (req, res) => {
     }
   }
 
+  // POST — Create or Update a conversation
+  if (method === 'POST') {
+    try {
+      let body = req.body;
+      if (!body || Object.keys(body).length === 0) {
+        const raw = await new Promise((resolve, reject) => {
+          let data = '';
+          req.on('data', chunk => { data += chunk; });
+          req.on('end', () => resolve(data));
+          req.on('error', reject);
+        });
+        body = JSON.parse(raw || '{}');
+      }
+
+      const { conversation_id, messages, subject } = body;
+      const convId = conversation_id || `conv_${Date.now()}`;
+
+      const catalystApp = catalyst.initialize(req);
+      const nosql = catalystApp.nosql();
+      const collectionName = process.env.NOSQL_CONVERSATIONS_COLLECTION || 'conversations';
+      const collection = nosql.collection(collectionName);
+
+      const docData = {
+        document_id: convId,
+        conversation_id: convId,
+        subject: subject || '',
+        messages: messages || [],
+        last_updated: new Date().toISOString()
+      };
+
+      if (typeof collection.upsertDocument === 'function') {
+        await collection.upsertDocument(docData);
+      } else if (typeof collection.insert === 'function') {
+        await collection.insert(docData);
+      } else if (typeof collection.createDocument === 'function') {
+        await collection.createDocument(docData);
+      }
+
+      return send(200, { success: true, conversation_id: convId });
+    } catch (err) {
+      console.error('Error saving conversation:', err);
+      return send(500, { error: true, message: err.message || 'Internal Server Error' });
+    }
+  }
+
   // DELETE — Delete a conversation
   if (method === 'DELETE') {
     try {
       const queryParams = req.getQueryParams() || {};
-      const conversation_id = queryParams.conversation_id;
+      const conversation_id = queryParams.conversation_id || (req.body && req.body.conversation_id);
 
       if (!conversation_id) {
         return send(400, { error: true, message: 'conversation_id is required' });
@@ -97,7 +143,6 @@ module.exports = async (req, res) => {
       const collectionName = process.env.NOSQL_CONVERSATIONS_COLLECTION || 'conversations';
       const collection = nosql.collection(collectionName);
 
-      // Robust fallback delete mechanisms to support different platform/SDK versions
       if (typeof collection.deleteDocument === 'function') {
         await collection.deleteDocument(conversation_id);
       } else if (typeof collection.delete === 'function') {
@@ -106,8 +151,6 @@ module.exports = async (req, res) => {
         await collection.removeDocument(conversation_id);
       } else if (typeof collection.remove === 'function') {
         await collection.remove(conversation_id);
-      } else {
-        throw new Error('No delete method found on collection');
       }
 
       return send(200, { success: true, deleted_id: conversation_id });
@@ -117,6 +160,5 @@ module.exports = async (req, res) => {
     }
   }
 
-  // All other methods → 405
   return send(405, { error: true, message: 'Method Not Allowed' });
 };

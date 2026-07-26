@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
   Shield, Search, Trash2, Download, MessageSquare, AlertCircle, 
   User, MapPin, Calendar, Clock, ChevronRight, X, Filter, Bot,
-  FileText, CheckCircle2, ArrowUpRight, Volume2
+  FileText, CheckCircle2, ArrowUpRight, Volume2, Radio
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -101,6 +102,7 @@ const DEFAULT_SESSION_CARDS = [
 ];
 
 export default function LogsPage() {
+  const router = useRouter();
   const [sessionCards, setSessionCards] = useState(DEFAULT_SESSION_CARDS);
   const [search, setSearch]             = useState('');
   const [filterType, setFilterType]     = useState('all'); // all, suspect, unindexed, location, fir
@@ -109,12 +111,48 @@ export default function LogsPage() {
   const [confirmClear, setConfirmClear] = useState(false);
   const [exportingId, setExportingId]   = useState(null);
 
-  // Load user localStorage chat history and segment into cards
+  const handleOpenInCopilot = (card, e) => {
+    e?.stopPropagation();
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('drishti_chat_history_v2', JSON.stringify(card.messages));
+        window.dispatchEvent(new Event('storage'));
+      } catch (_) {}
+    }
+    router.push('/dashboard/chat');
+  };
+
+  const handleOpenInOrb = (card, e) => {
+    e?.stopPropagation();
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('drishti_session_logs', JSON.stringify(card.messages));
+        window.dispatchEvent(new Event('storage'));
+        window.dispatchEvent(new CustomEvent('drishti-open-orb', { detail: { messages: card.messages } }));
+      } catch (_) {}
+    }
+  };
+
+  // Load Catalyst Datastore conversations and local chat history into cards
   useEffect(() => {
     setMounted(true);
 
-    const loadSessionLogs = () => {
+    const loadSessionLogs = async () => {
       try {
+        let catalystCards = [];
+        try {
+          const res = await fetch('/api/conversations');
+          if (res.ok) {
+            const data = await res.json();
+            if (data && Array.isArray(data.conversations)) {
+              catalystCards = data.conversations.filter(c => c.messages && c.messages.length > 0).map((c, i) => {
+                const subject = c.subject || extractSubjectFromText(c.preview || c.messages[0]?.content) || 'Catalyst Investigation Log';
+                return buildCardObject(subject, c.messages, i, c.conversation_id);
+              });
+            }
+          }
+        } catch (_) {}
+
         const rawUserChat = localStorage.getItem('drishti_chat_history_v2');
         const rawSessionLogs = localStorage.getItem('drishti_session_logs');
         
@@ -143,13 +181,17 @@ export default function LogsPage() {
           }
         });
 
-        if (uniqueMessages.length > 0) {
-          // Segment user messages into distinct subject cards
-          const userCards = segmentMessagesIntoCards(uniqueMessages);
-          setSessionCards([...userCards, ...DEFAULT_SESSION_CARDS]);
-        } else {
-          setSessionCards(DEFAULT_SESSION_CARDS);
-        }
+        const userCards = uniqueMessages.length > 0 ? segmentMessagesIntoCards(uniqueMessages) : [];
+        
+        // Deduplicate cards by id
+        const cardMap = new Map();
+        [...catalystCards, ...userCards, ...DEFAULT_SESSION_CARDS].forEach(card => {
+          if (!cardMap.has(card.id)) {
+            cardMap.set(card.id, card);
+          }
+        });
+
+        setSessionCards(Array.from(cardMap.values()));
       } catch (e) {
         console.error('Error parsing session logs:', e);
         setSessionCards(DEFAULT_SESSION_CARDS);
@@ -223,7 +265,7 @@ export default function LogsPage() {
     return null;
   }
 
-  function buildCardObject(subject, messages, idx) {
+  function buildCardObject(subject, messages, idx, customId = null) {
     const isUnindexed = messages.some(m => m.content?.includes('no suspect profile') || m.content?.includes('no case file found'));
     const isLocation = subject.toLowerCase().includes('indiranagar') || subject.toLowerCase().includes('area') || subject.toLowerCase().includes('silk board') || subject.toLowerCase().includes('anpr');
     const isFir = subject.toLowerCase().includes('fir') || subject.toLowerCase().includes('theft') || subject.toLowerCase().includes('case');
@@ -243,7 +285,7 @@ export default function LogsPage() {
     const firstUserQuery = messages.find(m => m.role === 'user')?.content || messages[0]?.content || 'Session inquiry';
 
     return {
-      id: `user-session-${idx}-${Date.now()}`,
+      id: customId || `user-session-${idx}-${Date.now()}`,
       subject,
       type,
       badge,
@@ -330,9 +372,12 @@ export default function LogsPage() {
     setExportingId(null);
   };
 
-  const handleDeleteCard = (cardId) => {
+  const handleDeleteCard = async (cardId) => {
     setSessionCards(prev => prev.filter(c => c.id !== cardId));
     if (selectedCard?.id === cardId) setSelectedCard(null);
+    try {
+      await fetch(`/api/conversations?conversation_id=${encodeURIComponent(cardId)}`, { method: 'DELETE' });
+    } catch (_) {}
   };
 
   const handleClearAllLogs = () => {
@@ -502,15 +547,36 @@ export default function LogsPage() {
                     </div>
                   </div>
 
-                  {/* Footer Row: Messages count & Action */}
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-mono">
+                  {/* Footer Row: Messages count & Linking Actions */}
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs font-mono">
                     <span className="text-slate-500">
-                      {card.msgCount} message{card.msgCount !== 1 ? 's' : ''} in thread
+                      {card.msgCount} message{card.msgCount !== 1 ? 's' : ''}
                     </span>
 
-                    <div className="flex items-center gap-1 text-blue-600 font-bold group-hover:translate-x-1 transition-transform">
-                      <span>View Case Log</span>
-                      <ChevronRight className="w-4 h-4" />
+                    <div className="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+                      <button
+                        onClick={(e) => handleOpenInCopilot(card, e)}
+                        className="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-mono font-bold transition-all flex items-center gap-1 cursor-pointer shadow-xs"
+                        title="Continue this conversation in Co-Pilot Chat"
+                      >
+                        <MessageSquare className="w-3 h-3" />
+                        <span>Chat</span>
+                      </button>
+                      <button
+                        onClick={(e) => handleOpenInOrb(card, e)}
+                        className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-mono font-bold transition-all flex items-center gap-1 cursor-pointer shadow-xs"
+                        title="Load this session into Drishti Voice Orb"
+                      >
+                        <Volume2 className="w-3 h-3" />
+                        <span>Orb</span>
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDeleteCard(card.id); }}
+                        className="p-1 rounded-lg bg-red-50 border border-red-200 text-red-600 hover:bg-red-600 hover:text-white transition-all flex items-center justify-center cursor-pointer shadow-xs"
+                        title="Delete AI Log from Datastore"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </div>
                 </motion.div>
@@ -531,7 +597,7 @@ export default function LogsPage() {
               className="bg-white border border-slate-200 rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden"
             >
               {/* Modal Header */}
-              <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between gap-4 bg-white">
+              <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between gap-4 bg-white flex-wrap sm:flex-nowrap">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
                     <selectedCard.icon className="w-5 h-5" />
@@ -553,14 +619,32 @@ export default function LogsPage() {
 
                 <div className="flex items-center gap-2">
                   <button
+                    onClick={() => handleOpenInCopilot(selectedCard)}
+                    className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+                    title="Continue thread in Co-Pilot Chat"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Open in Co-Pilot</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleOpenInOrb(selectedCard)}
+                    className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+                    title="Load thread into Drishti Orb Voice Assistant"
+                  >
+                    <Volume2 className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Open in Orb</span>
+                  </button>
+
+                  <button
                     onClick={() => handleExportCard(selectedCard)}
                     disabled={exportingId === selectedCard?.id}
-                    className="p-2 rounded-lg hover:bg-[var(--surface-2)] transition-colors disabled:opacity-50 cursor-pointer"
+                    className="p-2 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-colors disabled:opacity-50 cursor-pointer"
                     title="Export as PDF"
                   >
                     {exportingId === selectedCard?.id
                       ? <span className="text-[10px] font-mono text-[var(--text-secondary)] animate-pulse">...</span>
-                      : <Download className="w-4 h-4" />
+                      : <Download className="w-4 h-4 text-slate-600" />
                     }
                   </button>
 

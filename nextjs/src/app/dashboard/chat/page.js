@@ -369,23 +369,82 @@ export default function ChatPage() {
     }
   }, []);
 
-  // Save chat history to localStorage on update
+  const extractSubjectFromMessages = (msgs) => {
+    const userMsgs = (msgs || []).filter(m => m.role === 'user');
+    if (!userMsgs.length) return 'General Shift Inquiry';
+    const firstText = userMsgs[0].content || '';
+    const q = firstText.toLowerCase();
+
+    const firMatch = firstText.match(/(KAR\/[A-Z]+\/\d+\/\d+|FIR-\d{4}-[A-Z]+-\d+)/i);
+    if (firMatch) return `Case ${firMatch[0].toUpperCase()}`;
+
+    if (q.includes('vikram') || q.includes('malhotra') || q.includes('9104')) return 'Vikram Malhotra (Cyber Fraud)';
+    if (q.includes('anand') || q.includes('gowda')) return 'Anand Gowda';
+    if (q.includes('zakir') || q.includes('hussain')) return 'Zakir Hussain';
+    if (q.includes('ramesh') || q.includes('bullet ramesh')) return 'Ramesh Kumar';
+    if (q.includes('suresh') || q.includes('naidu')) return 'Suresh Naidu';
+    if (q.includes('silk board') || q.includes('anpr')) return 'Silk Board & ANPR Surveillance';
+
+    const clean = firstText.replace(/[*#\_|`]/g, ' ').replace(/^(can you|please|hey|hi|drishti|open|show|view|tell me|list|give me|find)\b/gi, '').trim();
+    const words = clean.split(/\s+/).slice(0, 4).join(' ');
+    if (words && words.length > 3) {
+      return words.charAt(0).toUpperCase() + words.slice(1);
+    }
+    return 'Shift Inquiry Session';
+  };
+
+  // Save chat history to localStorage & auto-sync to Catalyst Datastore on update
   useEffect(() => {
     if (typeof window !== 'undefined' && messages.length > 0) {
       try {
         localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
         window.dispatchEvent(new Event('storage'));
+
+        // Auto-sync to Catalyst Datastore NoSQL collection
+        const activeConvId = conversationId || `conv_${Date.now()}`;
+        const subject = extractSubjectFromMessages(messages);
+        fetch(`${API_BASE}/conversations`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            conversation_id: activeConvId,
+            messages,
+            subject,
+          }),
+        }).catch(() => {});
       } catch (e) {
         console.warn('Failed to save chat history:', e);
       }
     }
-  }, [messages]);
+  }, [messages, conversationId]);
 
-  const clearChatHistory = () => {
+  const clearChatHistory = async () => {
+    if (messages.length > 0) {
+      // 1. Archive current active conversation to Catalyst Datastore before clearing
+      const activeConvId = conversationId || `conv_${Date.now()}`;
+      const subject = extractSubjectFromMessages(messages);
+      try {
+        await fetch(`${API_BASE}/conversations`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            conversation_id: activeConvId,
+            messages,
+            subject,
+          }),
+        });
+      } catch (e) {
+        console.warn('Failed to archive conversation to Catalyst:', e);
+      }
+    }
+
+    // 2. Clear current screen messages and generate new unique conversation ID for next chat session
     setMessages([]);
+    setConversationId(`CONV-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`);
     if (typeof window !== 'undefined') {
       try {
         localStorage.removeItem(CHAT_STORAGE_KEY);
+        window.dispatchEvent(new Event('storage'));
       } catch (_) {}
     }
   };
@@ -1058,6 +1117,14 @@ export default function ChatPage() {
 
           {/* Voice Profile Selector Pills & Clear Chat */}
           <div className="flex items-center gap-2.5">
+            <button
+              onClick={() => router.push('/dashboard/logs')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/30 text-xs font-mono font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 transition-all cursor-pointer shadow-xs"
+              title="View all AI Subject Log Cards"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>AI Logs</span>
+            </button>
             <button
               onClick={handleExportConversation}
               disabled={!messages.length || exportingPdf}

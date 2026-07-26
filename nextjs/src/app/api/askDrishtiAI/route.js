@@ -13,8 +13,8 @@ export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: CORS });
 }
 
-// Model fallback list with valid Gemini v1beta REST API model identifiers
-const GEMINI_MODELS = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro', 'gemini-2.0-flash-exp'];
+// Model fallback list with active Gemini REST API model identifiers (Free Tier Verified)
+const GEMINI_MODELS = ['gemini-flash-latest', 'gemini-3.6-flash', 'gemini-3.5-flash'];
 
 const GEMINI_KEYS = [
   process.env.GEMINI_API_KEY,

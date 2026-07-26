@@ -1,7 +1,7 @@
 {
 	"deployment": {
 		"name": "anpr-check",
-		"stack": "node24",
+		"stack": "node20",
 		"type": "advancedio",
 		"env_variables": {}
 	},

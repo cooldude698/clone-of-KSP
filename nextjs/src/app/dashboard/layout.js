@@ -404,11 +404,49 @@ export default function DashboardLayout({ children }) {
     }
   }, [language, sessionLogs, speak, router]);
 
-  // ─── Change 4: Sync sessionLogs to localStorage ──────────────────
+  // ─── Sync sessionLogs to localStorage & handle drishti-open-orb events ──────
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('drishti_session_logs');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) setSessionLogs(parsed);
+        }
+      } catch (_) {}
+    }
+
+    const handleOpenOrbWithLogs = (e) => {
+      setIsPanelOpen(true);
+      if (e.detail && Array.isArray(e.detail.messages)) {
+        setSessionLogs(e.detail.messages);
+        try {
+          localStorage.setItem('drishti_session_logs', JSON.stringify(e.detail.messages));
+          window.dispatchEvent(new Event('storage'));
+        } catch (_) {}
+        const lastAssistantMsg = e.detail.messages.slice().reverse().find(m => m.role === 'assistant')?.content;
+        if (lastAssistantMsg) {
+          setOrbResponse(lastAssistantMsg);
+          try { speak(lastAssistantMsg.replace(/[*#\_|`]/g, ' '), 'en-IN'); } catch (_) {}
+        }
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('drishti-open-orb', handleOpenOrbWithLogs);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('drishti-open-orb', handleOpenOrbWithLogs);
+      }
+    };
+  }, [speak]);
+
   useEffect(() => {
     if (typeof window !== 'undefined' && sessionLogs.length > 0) {
       try {
         localStorage.setItem('drishti_session_logs', JSON.stringify(sessionLogs));
+        window.dispatchEvent(new Event('storage'));
       } catch (_) {}
     }
   }, [sessionLogs]);
