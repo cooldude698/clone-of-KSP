@@ -26,3 +26,6 @@ Thumbs.db
 # Misc
 *.zip
 crime-database/raw-data/
+
+# Large video assets — served via GitHub raw CDN, not bundled in deployment
+nextjs/public/videos/*.mp4

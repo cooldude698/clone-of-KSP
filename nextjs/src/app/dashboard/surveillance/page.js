@@ -93,8 +93,8 @@ function speakDrishtiAlert(text) {
   } catch (_) {}
 }
 
-// CCTV Video Mapping — served from GitHub raw CDN to avoid Catalyst build zip size limits
-const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/vedeshskhatri/kspdatathon2026/main/nextjs/public/videos';
+// CCTV Video Mapping — served from GitHub raw CDN (pinned commit) to avoid Catalyst build zip size limits
+const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/vedeshskhatri/kspdatathon2026/16f1396ac0487ce1792722f33acb279cee0ca4db/nextjs/public/videos';
 const CAMERA_SPECIFIC_VIDEOS = {
   'CAM-BLR-0010': `${GITHUB_RAW_BASE}/traffic1.mp4`, // Senior IPS Officer Press Conference at KSP HQ
   'CAM-BLR-0012': `${GITHUB_RAW_BASE}/people1.mp4`,  // Commercial Street Pedestrian Plaza Walkway
