@@ -77,8 +77,10 @@ export default function TrailMapView({ trailData = [], highlightedHop = null }) 
       center: defaultCenter,
       zoom: 13,
       scrollWheelZoom: true,
-      zoomControl: true,
+      zoomControl: false,
     });
+
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; OpenStreetMap contributors &copy; CARTO',

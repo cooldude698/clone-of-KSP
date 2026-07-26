@@ -574,3 +574,38 @@ body {
 .bg-success-500 .text-paper-100 {
   color: #FAF6F0 !important;
 }
+
+/* ═══════════════════════════════════════════════════════
+   LEAFLET MAP CONTROLS OVERRIDES — REMOVE WHITE BOX SPOTS
+   ═══════════════════════════════════════════════════════ */
+.leaflet-control-container .leaflet-control-zoom,
+.leaflet-control-container .leaflet-bar {
+  border: 1px solid var(--border) !important;
+  background: var(--surface-1) !important;
+  backdrop-filter: blur(12px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+.leaflet-control-container .leaflet-control-zoom a {
+  background-color: var(--surface-1) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+.leaflet-control-container .leaflet-control-zoom a:hover {
+  background-color: var(--surface-2) !important;
+  color: var(--accent) !important;
+}
+
+.leaflet-control-attribution {
+  background: var(--surface-1) !important;
+  color: var(--text-secondary) !important;
+  font-size: 9px !important;
+  border-radius: 4px !important;
+  opacity: 0.7 !important;
+}
+.leaflet-control-attribution a {
+  color: var(--text-secondary) !important;
+}
