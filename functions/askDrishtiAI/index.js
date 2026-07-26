@@ -692,6 +692,18 @@ function generateSmartPoliceResponse(question, lang = 'en') {
    - Activate ANPR camera watchlists for black Honda Activa (KA-01-EA-4921).`;
   }
 
+  if (q.includes('ramesh') || q.includes('रमेश') || q.includes('ರಮೇಶ್')) {
+    if (q.includes('last') || q.includes('spotted') || q.includes('location') || q.includes('लास्ट') || q.includes('सपोर्ट') || q.includes('स्पॉट') || q.includes('कहां') || q.includes('कहा') || q.includes('camera') || q.includes('cctv') || q.includes('कैमरा')) {
+      if (lang === 'hi') {
+        return 'सर, रमेश कुमार ("बुलेट रमेश") की आखिरी देखी गई लोकेशन सिल्क बोर्ड जंक्शन, बेंगलुरु है, जहां उसका वाहन (सफेद ह्युंडई i10 / प्लेट KA-05-M-1234) दोपहर 14:22 बजे ANPR और CCTV कैमरों द्वारा देखा गया था। उसकी मुख्य समस्या अंतर-राज्यीय वाहन चोरी (Section 379 IPC) और सशस्त्र डकैती (7 सक्रिय FIR) का रैकेट चलाना है।';
+      }
+      if (lang === 'kn') {
+        return 'ಸರ್, ರಮೇಶ್ ಕುಮಾರ್ ಅವರ ಕೊನೆಯದಾಗಿ ಕಂಡುಬಂದ ಸ್ಥಳ ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಜಂಕ್ಷನ್, ಬೆಂಗಳೂರು. ಮಧ್ಯಾಹ್ನ 14:22 ಕ್ಕೆ ಸಿಸಿಟಿವಿ ಕ್ಯಾಮೆರಾದಲ್ಲಿ ಅವರ ವಾಹನ (KA-05-M-1234) ಪತ್ತೆಯಾಗಿದೆ. ಅವರ ವಿರುದ್ಧ 7 ಸಕ್ರಿಯ ಎಫ್‌ಐಆರ್‌ಗಳಿವೆ.';
+      }
+      return 'Sir, Ramesh Kumar (Alias "Bullet Ramesh") was last spotted at Silk Board Junction, Bengaluru at 14:22 hrs via ANPR/CCTV (Vehicle KA-05-M-1234). His primary activity is running an inter-state vehicle theft and armed robbery syndicate (7 active FIRs).';
+    }
+  }
+
   if (q.includes('repeat') || q.includes('offender') || q.includes('accused') || q.includes('suspect') || q.includes('ramesh')) {
     return `Sir, here is the detailed High-Risk Repeat Offenders Report:
 

@@ -450,21 +450,46 @@ export default function ChatPage() {
     setInput('');
     setLoading(true);
 
-    // Auto-detect open suspect / FIR intent and navigate
+    // Auto-detect open suspect / FIR / CCTV / Crime map intent and navigate
     const qLower = text.toLowerCase().trim();
-    const isOpenAction = qLower.includes('open') || qLower.includes('show') || qLower.includes('view') || qLower.includes('bring up') || qLower.includes('pull up') || qLower.includes('check') || qLower.includes('case file') || qLower.includes('profile') || qLower.includes('file');
+
+    // Direct CCTV / Surveillance check
+    if (qLower.includes('cctv') || qLower.includes('surveillance') || qLower.includes('camera') || qLower.includes('सीसीटीवी') || qLower.includes('सर्विलांस') || qLower.includes('कैमरा')) {
+      const cctvMsg = /[\u0900-\u097F]/.test(text)
+        ? 'सिल्क बोर्ड और शहर ग्रिड के सीसीटीवी कैमरे और सर्विलांस सिस्टम खोले जा रहे हैं, सर।'
+        : 'Opening Surveillance & CCTV live camera feeds, Sir.';
+      setMessages((prev) => [...prev, { role: 'assistant', content: cctvMsg, timestamp: timestamp() }]);
+      speakText(cctvMsg, messages.length + 1);
+      setTimeout(() => { if (typeof window !== 'undefined') window.location.href = '/dashboard/surveillance'; }, 800);
+      setLoading(false);
+      return;
+    }
+
+    // Direct Crime Map check
+    if (qLower.includes('crime map') || qLower.includes('map') || qLower.includes('क्राइम मैप') || qLower.includes('मैप') || qLower.includes('नक्शा')) {
+      const mapMsg = /[\u0900-\u097F]/.test(text)
+        ? 'क्राइम मैप और लोकेशन ट्रैकिंग दिखाई जा रही है, सर।'
+        : 'Opening Crime Map, Sir.';
+      setMessages((prev) => [...prev, { role: 'assistant', content: mapMsg, timestamp: timestamp() }]);
+      speakText(mapMsg, messages.length + 1);
+      setTimeout(() => { if (typeof window !== 'undefined') window.location.href = '/dashboard/map'; }, 800);
+      setLoading(false);
+      return;
+    }
+
+    const isOpenAction = qLower.includes('open') || qLower.includes('show') || qLower.includes('view') || qLower.includes('bring up') || qLower.includes('pull up') || qLower.includes('check') || qLower.includes('case file') || qLower.includes('profile') || qLower.includes('file') || qLower.includes('खोलो') || qLower.includes('खोल') || qLower.includes('खोलना') || qLower.includes('दिखाओ') || qLower.includes('सीरी') || qLower.includes('प्रोफाइल');
 
     if (isOpenAction) {
       let targetRoute = null;
-      if (qLower.includes('anant') || qLower.includes('anand') || qLower.includes('gowda') || qLower.includes('godwa') || qLower.includes('buda') || qLower.includes('guda') || qLower.includes('goda')) {
+      if (qLower.includes('anant') || qLower.includes('anand') || qLower.includes('gowda') || qLower.includes('godwa') || qLower.includes('buda') || qLower.includes('guda') || qLower.includes('goda') || qLower.includes('आनंद')) {
         targetRoute = '/dashboard/suspect/anand-gowda';
-      } else if (qLower.includes('ramesh') || qLower.includes('bullet ramesh')) {
+      } else if (qLower.includes('ramesh') || qLower.includes('bullet ramesh') || qLower.includes('रमेश')) {
         targetRoute = '/dashboard/suspect/ramesh-kumar';
-      } else if (qLower.includes('suresh') || qLower.includes('naidu')) {
+      } else if (qLower.includes('suresh') || qLower.includes('naidu') || qLower.includes('सुरेश')) {
         targetRoute = '/dashboard/suspect/suresh-naidu';
-      } else if (qLower.includes('imran') || qLower.includes('chotta imran')) {
+      } else if (qLower.includes('imran') || qLower.includes('chotta imran') || qLower.includes('इमरान')) {
         targetRoute = '/dashboard/suspect/imran-khan';
-      } else if (qLower.includes('farid') || qLower.includes('mirza')) {
+      } else if (qLower.includes('farid') || qLower.includes('mirza') || qLower.includes('फरीद')) {
         targetRoute = '/dashboard/suspect/farid-mirza';
       } else if (qLower.includes('4921') || qLower.includes('492')) {
         targetRoute = '/dashboard/fir/FIR-2026-BL-4921';

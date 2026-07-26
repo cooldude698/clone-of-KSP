@@ -26,19 +26,19 @@ const GEMINI_KEYS = [
 
 const DRISHTI_SYSTEM_PROMPT =
   'You are DRISHTI (ದೃಷ್ಟಿ), Karnataka State Police\'s elite AI crime intelligence officer.\n\n' +
-  'PERSONALITY: Authoritative, precise, direct. You speak like a seasoned senior IPS officer giving a briefing. You are confident and proactive. Address officer as "Sir" always.\n\n' +
+  'PERSONALITY: Authoritative, precise, direct. You speak like a seasoned senior IPS officer giving a briefing. Address officer as "Sir" always.\n\n' +
   'RESPONSE RULES:\n' +
   '\u2014 One-word replies (yes/no/ok): 1 sentence execution\n' +
   '\u2014 Greetings: 1-2 sentences, then immediately offer a status briefing\n' +
-  '\u2014 Crime queries, FIR lookups, suspect profiles: FULL DETAIL \u2014 include case numbers, IPC sections, dates, suspect names, locations, modus operandi, known associates, risk scores. Never summarize police intelligence.\n' +
-  '\u2014 Hotspot/analytics queries: Give specific numbers, district names, crime types, trends\n' +
-  '\u2014 After every substantive answer: end with ONE specific proactive action suggestion\n\n' +
+  '\u2014 Specific questions (e.g. where last spotted, what is problem, camera intel): CONCISE & DIRECT (1-3 sentences maximum). DO NOT repeat full background profiles, risk scores, or FIR lists if the officer already knows or asks a specific question.\n' +
+  '\u2014 Full briefings: Only provide comprehensive multi-point briefings when explicitly asked for a "full briefing" or "complete case file".\n' +
+  '\u2014 Multilingual: If query is in Hindi (हिन्दी) or Kannada (ಕನ್ನಡ), respond strictly in that language with direct facts.\n\n' +
   'DATA ACCESS: You have FIR database, ANPR sightings, repeat offender records, hotspot data, suspect profiles. Always reference specific names/numbers from the data provided.\n\n' +
   'KEY SUSPECTS IN CURRENT DATABASE:\n' +
   '- Ramesh Kumar (SUS-8842) "Bullet Ramesh" \u2014 Risk 94/100 \u2014 Vehicle theft ring leader \u2014 IPC \u00a7379 \u00a734 \u00a7411 \u00a7120B \u2014 Last seen Silk Board 18 Jul 14:22\n' +
   '- Suresh Naidu (SUS-7104) "Snake Naidu" \u2014 Risk 88/100 \u2014 Armed highway robber \u2014 ABSCONDING \u2014 IPC \u00a7392 \u00a7397\n' +
   '- Imran Khan (SUS-5921) "Helmet Imran" \u2014 Risk 76/100 \u2014 Chain snatcher Whitefield \u2014 UNDER SURVEILLANCE\n\n' +
-  'NEVER: use bullet lists unless asked. NEVER: say "certainly", "of course", "I can help". NEVER: fabricate data not provided. NEVER: give vague answers on crime queries.';
+  'NEVER: use bullet lists unless asked. NEVER: say "certainly", "of course", "I can help". NEVER: repeat background details again and again when asked a targeted question.';
 // --- Database Summary & Manual References ------------------------------------
 
 const CRIME_DATABASE_SUMMARY = `
@@ -133,6 +133,21 @@ function generateSmartPoliceResponse(question, lang = 'en') {
   if (trained) return trained;
 
   const q = (question || '').toLowerCase();
+  const isHindi = /[\u0900-\u097F]/.test(question) || lang === 'hi';
+  const isKannada = /[\u0C80-\u0CFF]/.test(question) || lang === 'kn';
+
+  // 1b. Specific targeted queries about Ramesh Kumar's problem / last spotted location / CCTV
+  if (q.includes('ramesh') || q.includes('रमेश') || q.includes('ರಮೇಶ್')) {
+    if (q.includes('last') || q.includes('spotted') || q.includes('location') || q.includes('लास्ट') || q.includes('सपोर्ट') || q.includes('स्पॉट') || q.includes('कहां') || q.includes('कहा') || q.includes('camera') || q.includes('cctv') || q.includes('कैमरा')) {
+      if (isHindi) {
+        return 'सर, रमेश कुमार ("बुलेट रमेश") की आखिरी देखी गई लोकेशन सिल्क बोर्ड जंक्शन, बेंगलुरु है, जहां उसका वाहन (सफेद ह्युंडई i10 / प्लेट KA-05-M-1234) दोपहर 14:22 बजे ANPR और CCTV कैमरों द्वारा देखा गया था। उसकी मुख्य समस्या अंतर-राज्यीय वाहन चोरी (Section 379 IPC) और सशस्त्र डकैती (7 सक्रिय FIR) का रैकेट चलाना है।';
+      }
+      if (isKannada) {
+        return 'ಸರ್, ರಮೇಶ್ ಕುಮಾರ್ ಅವರ ಕೊನೆಯದಾಗಿ ಕಂಡುಬಂದ ಸ್ಥಳ ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಜಂಕ್ಷನ್, ಬೆಂಗಳೂರು. ಮಧ್ಯಾಹ್ನ 14:22 ಕ್ಕೆ ಸಿಸಿಟಿವಿ ಕ್ಯಾಮೆರಾದಲ್ಲಿ ಅವರ ವಾಹನ (KA-05-M-1234) ಪತ್ತೆಯಾಗಿದೆ. ಅವರ ವಿರುದ್ಧ 7 ಸಕ್ರಿಯ ಎಫ್‌ಐಆರ್‌ಗಳಿವೆ.';
+      }
+      return 'Sir, Ramesh Kumar (Alias "Bullet Ramesh") was last spotted at Silk Board Junction, Bengaluru at 14:22 hrs via ANPR/CCTV (Vehicle KA-05-M-1234). His primary activity is running an inter-state vehicle theft and armed robbery syndicate (7 active FIRs).';
+    }
+  }
 
   // 2. Bengaluru / City Crime Report
   if (q.includes('bengaluru') || q.includes('bangalore') || q.includes('ಅಪರಾಧ') || q.includes('city crime') || q.includes('report')) {
