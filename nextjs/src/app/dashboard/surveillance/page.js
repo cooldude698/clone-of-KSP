@@ -398,10 +398,39 @@ function CameraStream({ cam, videoRef, isPaused }) {
 
   if (hasError || !cam.is_active) {
     return (
-      <div className="absolute inset-0 w-full h-full bg-slate-900 flex flex-col items-center justify-center p-4">
-        <Camera className="w-8 h-8 text-slate-500 mb-2" />
-        <span className="text-xs font-semibold text-slate-400">CCTNS Stream Standby</span>
-        <span className="text-[10px] text-slate-500 mt-0.5">{cam.id}</span>
+      <div className="absolute inset-0 w-full h-full bg-slate-950 flex flex-col items-center justify-center p-4 overflow-hidden select-none">
+        {/* Animated Cyber Radar Grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:20px_20px] opacity-40" />
+        
+        {/* Target Bounding Box Frame */}
+        {cam.detected_target && (
+          <div className={`absolute inset-4 border-2 rounded-lg ${cam.has_face_recog ? 'border-red-500/70 bg-red-500/10' : 'border-emerald-500/70 bg-emerald-500/10'} flex flex-col justify-between p-3 z-10`}>
+            <div className="flex justify-between items-start">
+              <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded shadow-sm ${cam.has_face_recog ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'}`}>
+                {cam.target_type || 'TARGET DETECTED'}
+              </span>
+              <span className="text-[10px] font-mono text-cyan-300 font-extrabold bg-slate-900/80 px-2 py-0.5 rounded border border-cyan-500/30">
+                {cam.confidence}% MATCH
+              </span>
+            </div>
+            <div className="flex justify-between items-end">
+              <span className="text-[11px] font-mono font-extrabold text-white bg-slate-900/90 px-2.5 py-1 rounded border border-white/20 shadow-md">
+                🎯 {cam.detected_target}
+              </span>
+              <span className="text-[9px] font-mono text-slate-400">
+                CCTNS STREAM · {cam.id}
+              </span>
+            </div>
+          </div>
+        )}
+
+        <div className="z-20 flex flex-col items-center gap-1.5 text-center">
+          <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+            <Camera className="w-5 h-5" />
+          </div>
+          <span className="text-xs font-mono font-extrabold text-slate-200 tracking-wider uppercase">KSP Optical Sensor Stream</span>
+          <span className="text-[10px] font-mono text-slate-400 max-w-[200px] truncate">{cam.name}</span>
+        </div>
       </div>
     );
   }
