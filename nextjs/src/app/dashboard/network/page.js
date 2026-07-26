@@ -46,6 +46,8 @@ export default function NetworkPage() {
   const [edges, setEdges] = useState(MOCK_EDGES);
   const [selectedNode, setSelectedNode] = useState(null);
   const [selectedEdge, setSelectedEdge] = useState(null);
+  const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [panelOpen, setPanelOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState('split'); // 'graph' | 'map' | 'split'
 
