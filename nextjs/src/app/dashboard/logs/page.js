@@ -507,12 +507,12 @@ export default function LogsPage() {
                             : 'bg-white text-slate-900 border-slate-200/90 rounded-tl-xs'
                         }`}
                       >
-                        <div className="flex items-center justify-between gap-4 mb-2 pb-1.5 border-b border-slate-100 dark:border-slate-100">
-                          <span className={`text-[10px] font-mono font-bold uppercase tracking-wider ${isUser ? 'text-blue-100' : 'text-blue-600'}`}>
+                        <div className={`flex items-center justify-between gap-4 mb-2 pb-1.5 border-b ${isUser ? 'border-blue-500/40' : 'border-slate-100'}`}>
+                          <span className={`text-[10px] font-mono font-bold uppercase tracking-wider ${isUser ? 'text-white' : 'text-blue-600'}`}>
                             {isUser ? 'Officer / Inspector' : 'DRISHTI AI Intelligence'}
                           </span>
                           <div className="flex items-center gap-2">
-                            <span className={`text-[10px] font-mono ${isUser ? 'text-blue-200' : 'text-slate-400'}`}>{msg.timestamp || '11:45 AM'}</span>
+                            <span className={`text-[10px] font-mono ${isUser ? 'text-blue-100' : 'text-slate-400'}`}>{msg.timestamp || '11:45 AM'}</span>
                             {!isUser && (
                               <button
                                 onClick={() => speakText(msg.content)}
@@ -525,7 +525,7 @@ export default function LogsPage() {
                           </div>
                         </div>
 
-                        <p className="whitespace-pre-wrap font-sans text-slate-800">{msg.content}</p>
+                        <p className={`whitespace-pre-wrap font-sans text-sm leading-relaxed ${isUser ? 'text-white font-medium' : 'text-slate-800'}`}>{msg.content}</p>
                       </div>
                     </div>
                   );
