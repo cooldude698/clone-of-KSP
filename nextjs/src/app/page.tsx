@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, ShieldAlert, Shield, KeyRound, UserCheck, Eye, EyeOff, 
-  Activity, Radio, Cpu, Layers, Sparkles, ArrowRight, Zap, CheckCircle2, Lock
+  Activity, Radio, Cpu, Layers, Bot, ArrowRight, Zap, CheckCircle2, Lock
 } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 import Card from '@/components/ui/Card';
@@ -331,7 +331,7 @@ export default function LandingPage() {
         <div className="relative z-30 text-center max-w-2xl mx-auto flex flex-col items-center gap-6 py-12">
           
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--surface-1)] border border-[var(--border)] shadow-sm">
-            <Sparkles className="w-3.5 h-3.5 text-[var(--cyan-accent)]" />
+            <Bot className="w-3.5 h-3.5 text-[var(--cyan-accent)]" />
             <span className="text-[11px] font-mono font-medium text-[var(--text-secondary)] tracking-wider">
               NEXT-GEN CRIME INTELLIGENCE PLATFORM
             </span>

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useTheme } from 'next-themes';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, MicOff, Send, X, Volume2, VolumeX, History, Pin, Sun, Moon, Sparkles, MessageSquare, ShieldAlert, Cpu } from 'lucide-react';
+import { Mic, MicOff, Send, X, Volume2, VolumeX, History, Pin, Sun, Moon, Bot, MessageSquare, ShieldAlert, Cpu } from 'lucide-react';
 
 /** Typewriter — reveals text character by character */
 function useTypewriter(text, speed = 14) {
@@ -355,7 +355,7 @@ export default function DrishtiPanel({
                   >
                     <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-slate-700/30">
                       <div className="flex items-center gap-1.5 text-blue-400 font-bold text-[10px] font-mono uppercase tracking-wider">
-                        <Sparkles className="w-3 h-3 text-blue-400 animate-spin" />
+                        <Bot className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
                         DRISHTI INTELLIGENCE
                       </div>
                       {!done ? (

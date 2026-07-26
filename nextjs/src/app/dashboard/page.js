@@ -8,7 +8,7 @@ import {
   TrendingUp, TrendingDown, AlertTriangle, Shield,
   FileText, Camera, Users, MapPin, Activity, ArrowRight,
   Clock, ShieldAlert, CheckCircle2, ChevronRight, RefreshCw,
-  WifiOff, Database, Sparkles, RotateCcw, Zap, Radio,
+  WifiOff, Database, Bot, RotateCcw, Zap, Radio,
   BarChart3, Eye, Filter, ArrowUpRight, Flame
 } from 'lucide-react';
 
@@ -384,14 +384,24 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <motion.button
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              onClick={() => router.push('/dashboard/chat')}
+              className="btn-primary flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all cursor-pointer"
+            >
+              <Bot className="w-4 h-4 text-amber-300 animate-pulse" />
+              <span>Launch Drishti Co-Pilot</span>
+            </motion.button>
+
             <motion.button
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
               onClick={() => router.push('/dashboard/analytics')}
-              className="btn-secondary flex items-center gap-2.5 px-6 py-3 rounded-xl text-sm md:text-base font-medium transition-all cursor-pointer shadow-sm hover:shadow"
+              className="btn-secondary flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all cursor-pointer"
             >
-              <BarChart3 className="w-5 h-5 text-[var(--cyan-accent)]" />
+              <BarChart3 className="w-4 h-4 text-[var(--cyan-accent)]" />
               <span>Analytics Report</span>
             </motion.button>
 
@@ -400,9 +410,9 @@ export default function DashboardPage() {
               whileTap={{ scale: 0.96 }}
               onClick={() => fetchDashboardData(true)}
               disabled={refreshing || loading}
-              className="btn-secondary flex items-center gap-2.5 px-6 py-3 rounded-xl text-sm md:text-base font-medium text-[var(--status-success)] border border-[var(--status-success)]/40 transition-all cursor-pointer disabled:opacity-50 shadow-sm hover:shadow"
+              className="btn-secondary flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-[var(--status-success)] border border-[var(--status-success)]/40 transition-all cursor-pointer disabled:opacity-50"
             >
-              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
               <span>{refreshing ? 'Syncing...' : 'Sync Data'}</span>
             </motion.button>
           </div>
@@ -422,7 +432,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-[var(--accent)]/15 text-[var(--accent)] flex items-center justify-center border border-[var(--accent)]/30 shadow-inner">
-                <Sparkles className="w-5 h-5 text-[var(--accent-light)] animate-pulse" />
+                <Bot className="w-5 h-5 text-[var(--accent-light)] animate-pulse" />
               </div>
               <div>
                 <h2 className="text-xs font-black text-[var(--text-primary)] font-mono uppercase tracking-widest">DRISHTI AI INTELLIGENCE BRIEF</h2>

@@ -647,7 +647,7 @@ export default function ChatPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 glass-panel z-10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[var(--accent)]/20 text-[var(--accent)] flex items-center justify-center shadow-md">
-              <Sparkles className="w-5 h-5 text-[var(--accent-light)] animate-pulse" />
+              <Bot className="w-5 h-5 text-[var(--accent-light)] animate-pulse" />
             </div>
             <div>
               <div className="flex items-center gap-2">
