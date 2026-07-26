@@ -73,7 +73,6 @@ const HERO_TILES: Tile[] = [
   { id: 46, label: 'BLR-JNC-28', isLit: false, litDelay: 0, spanClass: 'col-span-2' },
   { id: 47, label: 'KAL-JNC-04', isLit: true, litDelay: 2.0, spanClass: 'col-span-1' },
   { id: 48, label: 'BEL-CCTV-08', isLit: false, litDelay: 0, spanClass: 'col-span-1' },
->>>>>>> 5c25998 (feat: multilingual greeting, dynamic crime breakdown, orb styling, and key fixes)
 ];
 
 const ROLES = ['Inspector', 'Crime Analyst', 'Supervisor', 'Policymaker'];
@@ -404,8 +403,6 @@ export default function LandingPage() {
                       </button>
                     </div>
                   </div>
-                    </div>
-                  </div>
                 </div>
               ) : (
                 <motion.div
@@ -498,7 +495,6 @@ export default function LandingPage() {
                     >
                       1-Click Demo Login →
                     </button>
-                  </div>
                   </div>
                 </motion.div>
               )}
