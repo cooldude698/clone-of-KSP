@@ -160,8 +160,8 @@ export default function DashboardPage() {
   const fetchFirs = useCallback(async () => {
     const res = await fetchWithFallback('/api/firs', DEMO_FIRS, { timeoutMs: 2000 });
     let rows = [];
-    if (Array.isArray(res?.data)) rows = res.data;
-    else if (Array.isArray(res?.data?.firs)) rows = res.data.firs;
+    if (Array.isArray(res?.data?.firs) && res.data.firs.length >= 50) rows = res.data.firs;
+    else if (Array.isArray(res?.data) && res.data.length >= 50) rows = res.data;
     else rows = DEMO_FIRS.firs;
 
     // Enforce 100% UNIQUE case numbers for every single row
