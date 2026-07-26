@@ -117,124 +117,103 @@ function FIRDetailPageContent() {
   const rawId      = params?.id;
   const caseNumber = Array.isArray(rawId) ? rawId.map(decodeURIComponent).join('/') : decodeURIComponent(rawId || '');
 
-  const [fir,          setFir]          = useState(null);
-  const [suspects,     setSuspects]     = useState([]);
-  const [relatedCases, setRelatedCases] = useState([]);
-  const [trailData,    setTrailData]    = useState([]);
-  const [trailLoading, setTrailLoading] = useState(false);
-  const [trailError,   setTrailError]   = useState(null);
-  const [detectedPlate,setDetectedPlate]= useState(null);
-  const [loading,      setLoading]      = useState(true);
-  const [notFound,     setNotFound]     = useState(false);
+  // Instant calculation for zero white screen rendering delay
+  const storedFir = caseNumber ? getFIRFromStore(caseNumber) : null;
+  let demoCase = storedFir || DEMO_FIRS.firs.find(f => f.case_number === caseNumber);
 
-  const fetchTrail = useCallback(async (plate) => {
-    if (!plate) return;
-    setTrailLoading(true);
-    setTrailError(null);
-    try {
-      const { data } = await fetchWithFallback('trail', DEMO_TRAIL);
-      if (data?.trail?.length) {
-        setTrailData(data.trail);
-      } else {
-        setTrailData(DEMO_TRAIL.trail);
-      }
-    } catch {
-      setTrailData(DEMO_TRAIL.trail);
-    } finally {
-      setTrailLoading(false);
+  if (!demoCase && caseNumber) {
+    const parts = caseNumber.split('/');
+    const stationCode = parts[1] || 'BEN';
+    const numPart = parseInt(parts[3] || '0', 10);
+
+    let cCode = 'vehicle_theft';
+    let cLabel = 'Vehicle Theft';
+
+    if (numPart % 8 === 0 || caseNumber.includes('KAL')) { cCode = 'hit_and_run'; cLabel = 'Hit And Run'; }
+    else if (numPart % 8 === 1 || caseNumber.includes('RAI')) { cCode = 'vehicle_theft'; cLabel = 'Vehicle Theft'; }
+    else if (numPart % 8 === 2 || caseNumber.includes('UDU')) { cCode = 'senior_citizen_crime'; cLabel = 'Senior Citizen Crime'; }
+    else if (numPart % 8 === 3 || caseNumber.includes('CHI')) { cCode = 'burglary'; cLabel = 'Burglary'; }
+    else if (numPart % 8 === 4 || caseNumber.includes('TUM')) { cCode = 'drug_offence'; cLabel = 'Drug Offence'; }
+    else if (numPart % 8 === 5 || caseNumber.includes('HAS') || caseNumber.includes('VIJ')) { cCode = 'domestic_violence'; cLabel = 'Domestic Violence'; }
+    else if (numPart % 8 === 6 || caseNumber.includes('KOP') || caseNumber.includes('BID')) { cCode = 'robbery'; cLabel = 'Robbery'; }
+    else { cCode = 'cybercrime'; cLabel = 'Cybercrime'; }
+
+    demoCase = {
+      case_number: caseNumber,
+      date_filed: "2024-06-01",
+      time_filed: "10:15:00",
+      crime_type_code: cCode,
+      crime_type: cLabel,
+      description: `${cLabel} incident reported at ${stationCode} Police Station jurisdiction area under IPC provisions. Active investigation in progress.`,
+      status: numPart % 3 === 0 ? "open" : numPart % 3 === 1 ? "under_investigation" : "chargesheeted",
+      case_status: numPart % 3 === 0 ? "open" : numPart % 3 === 1 ? "under_investigation" : "chargesheeted",
+      district_name: `${stationCode} District`,
+      police_station: `${stationCode} Sector PS`,
+      location_name: `Near Main Junction, ${stationCode}`,
+      location_lat: 12.9716,
+      location_lng: 77.5946,
+      accused_name: "Suspect Under Investigation",
+      risk_score: 85,
+      investigation_officer: "Insp. Officer In-Charge"
+    };
+  }
+
+  const [fir, setFir] = useState(demoCase);
+  const [suspects, setSuspects] = useState([
+    {
+      full_name: demoCase?.accused_name || 'Ramesh Kumar',
+      alias: 'Bullet Ramesh',
+      risk_score: demoCase?.risk_score || 94,
+      status: 'ACTIVE_WATCHLIST'
     }
-  }, []);
+  ]);
+  const [relatedCases, setRelatedCases] = useState(
+    DEMO_FIRS.firs.filter(f => f.case_number !== caseNumber).slice(0, 4)
+  );
+  const [trailData, setTrailData] = useState(DEMO_TRAIL.trail);
+  const [trailLoading, setTrailLoading] = useState(false);
+  const [trailError, setTrailError] = useState(null);
+  const [detectedPlate, setDetectedPlate] = useState(
+    extractPlate(demoCase?.description) || 'KA-01-MJ-8821'
+  );
 
   useEffect(() => {
     if (!caseNumber) return;
 
-    async function load() {
-      setLoading(true);
-      setNotFound(false);
-
-      const storedFir = getFIRFromStore(caseNumber);
-      let demoCase = storedFir || DEMO_FIRS.firs.find(f => f.case_number === caseNumber);
-
-      if (!demoCase) {
-        const parts = caseNumber.split('/');
-        const stationCode = parts[1] || 'BEN';
-        const numPart = parseInt(parts[3] || '0', 10);
-
-        let cCode = 'vehicle_theft';
-        let cLabel = 'Vehicle Theft';
-
-        if (numPart % 8 === 0 || caseNumber.includes('KAL')) { cCode = 'hit_and_run'; cLabel = 'Hit And Run'; }
-        else if (numPart % 8 === 1 || caseNumber.includes('RAI')) { cCode = 'vehicle_theft'; cLabel = 'Vehicle Theft'; }
-        else if (numPart % 8 === 2 || caseNumber.includes('UDU')) { cCode = 'senior_citizen_crime'; cLabel = 'Senior Citizen Crime'; }
-        else if (numPart % 8 === 3 || caseNumber.includes('CHI')) { cCode = 'burglary'; cLabel = 'Burglary'; }
-        else if (numPart % 8 === 4 || caseNumber.includes('TUM')) { cCode = 'drug_offence'; cLabel = 'Drug Offence'; }
-        else if (numPart % 8 === 5 || caseNumber.includes('HAS') || caseNumber.includes('VIJ')) { cCode = 'domestic_violence'; cLabel = 'Domestic Violence'; }
-        else if (numPart % 8 === 6 || caseNumber.includes('KOP') || caseNumber.includes('BID')) { cCode = 'robbery'; cLabel = 'Robbery'; }
-        else { cCode = 'cybercrime'; cLabel = 'Cybercrime'; }
-
-        demoCase = {
-          case_number: caseNumber,
-          date_filed: "2024-06-01",
-          time_filed: "10:15:00",
-          crime_type_code: cCode,
-          crime_type: cLabel,
-          description: `${cLabel} incident reported at ${stationCode} Police Station jurisdiction area under IPC provisions. Active investigation in progress.`,
-          status: numPart % 3 === 0 ? "open" : numPart % 3 === 1 ? "under_investigation" : "chargesheeted",
-          case_status: numPart % 3 === 0 ? "open" : numPart % 3 === 1 ? "under_investigation" : "chargesheeted",
-          district_name: `${stationCode} District`,
-          police_station: `${stationCode} Sector PS`,
-          location_name: `Near Main Junction, ${stationCode}`,
-          location_lat: 12.9716,
-          location_lng: 77.5946,
-          accused_name: "Suspect Under Investigation",
-          risk_score: 85,
-          investigation_officer: "Insp. Officer In-Charge"
-        };
-      }
-
+    let isMounted = true;
+    async function loadBackendData() {
       try {
         const { data } = await fetchWithFallback(
           `firs?case_number=${encodeURIComponent(caseNumber)}&limit=1`,
           { firs: [demoCase] }
         );
 
+        if (!isMounted) return;
         const arr = data?.firs || (data?.fir ? [data.fir] : [demoCase]);
         const firData = arr.find(f => f.case_number === caseNumber) || demoCase;
-
-        setFir(firData);
+        if (firData) setFir(firData);
 
         const plate = extractPlate(firData.description) || 'KA-01-MJ-8821';
         setDetectedPlate(plate);
-        fetchTrail(plate);
 
-        setSuspects([
-          {
-            full_name: firData.accused_name || 'Ramesh Kumar',
-            alias: 'Bullet Ramesh',
-            risk_score: firData.risk_score || 94,
-            status: 'ACTIVE_WATCHLIST'
-          }
-        ]);
-
-        setRelatedCases(DEMO_FIRS.firs.filter(f => f.case_number !== firData.case_number).slice(0, 4));
+        fetchWithFallback('trail', DEMO_TRAIL)
+          .then(({ data: tData }) => {
+            if (isMounted && tData?.trail?.length) setTrailData(tData.trail);
+          })
+          .catch(() => {});
       } catch (err) {
-        console.warn('[FIRDetailPage] Error loading FIR details, falling back:', err);
-        setFir(demoCase);
-      } finally {
-        setLoading(false);
+        console.warn('[FIRDetailPage] Backend call skipped, using local offline case:', err);
       }
     }
 
-    load();
-  }, [caseNumber, fetchTrail]);
-
-  if (loading)  return <PageSkeleton />;
-  if (notFound) return <NotFound caseNumber={caseNumber} />;
+    loadBackendData();
+    return () => { isMounted = false; };
+  }, [caseNumber]);
 
   return (
     <FIRDetailView
-      caseNumber={caseNumber}
-      fir={fir}
+      caseNumber={caseNumber || 'KAR/BEN/2024/0122'}
+      fir={fir || demoCase}
       suspects={suspects}
       trailData={trailData}
       trailLoading={trailLoading}
