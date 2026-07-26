@@ -19,6 +19,10 @@ import {
   Play,
   Pause,
   RotateCcw,
+  Share2,
+  Car,
+  Layers,
+  Check,
 } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -37,14 +41,96 @@ const TrailMapView = dynamic(() => import('./TrailMapView'), {
   ),
 });
 
-// ── MOCK MULTI-VEHICLE ANPR DATABASE ──────────────────────────────────────────
+// ── MOCK MULTI-VEHICLE ANPR DATABASE (10 DISTINCT SCENARIOS) ──────────────────
 const MOCK_VEHICLE_TRAILS = {
+  // 1. CLEAN HIGH-CONFIDENCE TRAIL (5 HOPS, NO ANOMALIES)
+  'KA-05-HB-3342': {
+    target: 'Suresh Reddy (Highway Transit)',
+    crime_linked: 'FIR-2026-BL-0199 (Cargo Hijack Routine Surveillance)',
+    trail_status: 'active',
+    duration_minutes: 35,
+    total_distance_km: 10.4,
+    vehicle_type: 'Mahindra Bolero Pickup (White)',
+    related_vehicles: [
+      { plate: 'KA-05-MH-1102', camera: 'Domlur Flyover BATCS Camera 14', time: '09:32 IST', delta: '+2m' },
+      { plate: 'KA-53-P-9941', camera: 'Marathahalli Bridge Checkpost', time: '09:51 IST', delta: '+1m' },
+    ],
+    trail: [
+      {
+        hop: 1,
+        camera_id: 'CAM-BLR-0301',
+        camera_name: 'Koramangala 80ft Road ANPR Cam #02',
+        lat: 12.9352,
+        lng: 77.6245,
+        timestamp: '2026-07-26T09:15:00Z',
+        plate_detected: 'KA-05-HB-3342',
+        confidence: 98.7,
+        sighting_type: 'ANPR Sighting',
+        distance_from_crime_km: 0.3,
+      },
+      {
+        hop: 2,
+        camera_id: 'CAM-BLR-0305',
+        camera_name: 'Intermediate Ring Road Signal Junction',
+        lat: 12.9512,
+        lng: 77.6321,
+        timestamp: '2026-07-26T09:23:00Z',
+        plate_detected: 'KA-05-HB-3342',
+        confidence: 97.2,
+        sighting_type: 'Traffic Signal',
+        distance_from_crime_km: 2.1,
+      },
+      {
+        hop: 3,
+        camera_id: 'CAM-BLR-0310',
+        camera_name: 'Domlur Flyover BATCS Camera 14',
+        lat: 12.9601,
+        lng: 77.6382,
+        timestamp: '2026-07-26T09:30:00Z',
+        plate_detected: 'KA-05-HB-3342',
+        confidence: 96.5,
+        sighting_type: 'Traffic Signal',
+        distance_from_crime_km: 3.5,
+      },
+      {
+        hop: 4,
+        camera_id: 'CAM-BLR-0318',
+        camera_name: 'Old Airport Road Surveillance Post',
+        lat: 12.9592,
+        lng: 77.6541,
+        timestamp: '2026-07-26T09:38:00Z',
+        plate_detected: 'KA-05-HB-3342',
+        confidence: 95.8,
+        sighting_type: 'CCTV Sweep',
+        distance_from_crime_km: 5.8,
+      },
+      {
+        hop: 5,
+        camera_id: 'CAM-BLR-0325',
+        camera_name: 'Marathahalli Bridge Checkpost',
+        lat: 12.9564,
+        lng: 77.6982,
+        timestamp: '2026-07-26T09:50:00Z',
+        plate_detected: 'KA-05-HB-3342',
+        confidence: 97.9,
+        sighting_type: 'Toll Checkpoint',
+        distance_from_crime_km: 10.4,
+      },
+    ],
+  },
+
+  // 2. LOW-CONFIDENCE HOP + PROJECTED VECTOR (4 HOPS)
   'KA-01-MJ-8821': {
     target: 'Ramesh Kumar (Bullet Ramesh)',
     crime_linked: 'FIR-2026-BL-0492 (Vehicle Theft & Armed Robbery)',
     trail_status: 'active',
     duration_minutes: 48,
     total_distance_km: 12.1,
+    vehicle_type: 'Hyundai Creta SUV (Silver)',
+    related_vehicles: [
+      { plate: 'KA-04-EZ-4410', camera: 'MG Road BATCS Signal Pole 5', time: '14:37 IST', delta: '+2m' },
+      { plate: 'KA-03-HA-4512', camera: 'Silk Board Toll Plaza Checkpost', time: '14:48 IST', delta: '+2m' },
+    ],
     trail: [
       {
         hop: 1,
@@ -96,105 +182,508 @@ const MOCK_VEHICLE_TRAILS = {
       },
     ],
   },
-  'KA-05-EV-9012': {
-    target: 'Anand Gowda (SUS-8842)',
-    crime_linked: 'FIR-2026-BL-1104 (Extortion & Chain Snatching)',
-    trail_status: 'active',
-    duration_minutes: 62,
-    total_distance_km: 14.8,
+
+  // 3. SUSPICIOUS GAP TRAIL (4 HOPS, 45 MINUTE UNUSUAL GAP OVER 1.8 KM)
+  'KA-09-RT-7765': {
+    target: 'Manjunath B. (SUS-9921)',
+    crime_linked: 'FIR-2026-BL-0732 (Commercial Burglary)',
+    trail_status: 'flagged',
+    duration_minutes: 64,
+    total_distance_km: 7.2,
+    vehicle_type: 'Maruti Swift Dzire (Dark Gray)',
+    related_vehicles: [
+      { plate: 'KA-02-AB-9901', camera: 'Orion Mall Back Gate CCTV Sweep', time: '15:55 IST', delta: '+2m' },
+    ],
     trail: [
       {
         hop: 1,
-        camera_id: 'CAM-BLR-0101',
-        camera_name: 'Jayanagar 4th Block ANPR Cam #04',
+        camera_id: 'CAM-BLR-0401',
+        camera_name: 'Malleshwaram 18th Cross ANPR #01',
+        lat: 13.0031,
+        lng: 77.5684,
+        timestamp: '2026-07-26T15:00:00Z',
+        plate_detected: 'KA-09-RT-7765',
+        confidence: 96.8,
+        sighting_type: 'ANPR Sighting',
+        distance_from_crime_km: 0.4,
+      },
+      {
+        hop: 2,
+        camera_id: 'CAM-BLR-0405',
+        camera_name: 'Rajajinagar 1st Block BATCS Junction',
+        lat: 12.9912,
+        lng: 77.5542,
+        timestamp: '2026-07-26T15:08:00Z',
+        plate_detected: 'KA-09-RT-7765',
+        confidence: 94.5,
+        sighting_type: 'Traffic Signal',
+        distance_from_crime_km: 2.1,
+      },
+      {
+        hop: 3,
+        camera_id: 'CAM-BLR-0412',
+        camera_name: 'Orion Mall Back Gate CCTV Sweep',
+        lat: 12.9972,
+        lng: 77.5582,
+        timestamp: '2026-07-26T15:53:00Z',
+        plate_detected: 'KA-09-RT-7765',
+        confidence: 89.1,
+        sighting_type: 'CCTV Sweep',
+        distance_from_crime_km: 3.9,
+      },
+      {
+        hop: 4,
+        camera_id: 'CAM-BLR-0420',
+        camera_name: 'Yeshwanthpur Railway Station Checkpost',
+        lat: 13.0234,
+        lng: 77.5501,
+        timestamp: '2026-07-26T16:04:00Z',
+        plate_detected: 'KA-09-RT-7765',
+        confidence: 96.2,
+        sighting_type: 'Toll Checkpoint',
+        distance_from_crime_km: 7.2,
+      },
+    ],
+  },
+
+  // 4. LONG TRAIL (8 HOPS, WIDER GEOGRAPHIC SPREAD TO WHITEFIELD)
+  'KA-03-KL-1190': {
+    target: 'Vikramaditya Hegde (Interstate Syndicate)',
+    crime_linked: 'FIR-2026-BL-1502 (Grand Theft & Smuggling)',
+    trail_status: 'active',
+    duration_minutes: 95,
+    total_distance_km: 28.5,
+    vehicle_type: 'Toyota Fortuner SUV (Black)',
+    related_vehicles: [
+      { plate: 'KA-51-MD-7700', camera: 'Trinity Circle Junction CCTV', time: '07:56 IST', delta: '+2m' },
+      { plate: 'KA-04-EZ-4410', camera: 'Whitefield ITPL Main Entrance ANPR', time: '08:55 IST', delta: '+3m' },
+    ],
+    trail: [
+      {
+        hop: 1,
+        camera_id: 'CAM-BLR-0501',
+        camera_name: 'Majestic KSRTC Bus Stand ANPR Cam #01',
+        lat: 12.9767,
+        lng: 77.5713,
+        timestamp: '2026-07-26T07:30:00Z',
+        plate_detected: 'KA-03-KL-1190',
+        confidence: 98.1,
+        sighting_type: 'ANPR Sighting',
+        distance_from_crime_km: 0.2,
+      },
+      {
+        hop: 2,
+        camera_id: 'CAM-BLR-0505',
+        camera_name: 'Corporation Circle BATCS Signal',
+        lat: 12.9654,
+        lng: 77.5891,
+        timestamp: '2026-07-26T07:42:00Z',
+        plate_detected: 'KA-03-KL-1190',
+        confidence: 96.4,
+        sighting_type: 'Traffic Signal',
+        distance_from_crime_km: 2.8,
+      },
+      {
+        hop: 3,
+        camera_id: 'CAM-BLR-0510',
+        camera_name: 'Trinity Circle Junction CCTV',
+        lat: 12.9731,
+        lng: 77.6172,
+        timestamp: '2026-07-26T07:54:00Z',
+        plate_detected: 'KA-03-KL-1190',
+        confidence: 95.0,
+        sighting_type: 'CCTV Sweep',
+        distance_from_crime_km: 6.1,
+      },
+      {
+        hop: 4,
+        camera_id: 'CAM-BLR-0518',
+        camera_name: 'Indiranagar 100ft Road Dome Cam',
+        lat: 12.9784,
+        lng: 77.6408,
+        timestamp: '2026-07-26T08:08:00Z',
+        plate_detected: 'KA-03-KL-1190',
+        confidence: 97.5,
+        sighting_type: 'ANPR Sighting',
+        distance_from_crime_km: 9.3,
+      },
+      {
+        hop: 5,
+        camera_id: 'CAM-BLR-0524',
+        camera_name: 'HAL Main Gate BATCS Signal',
+        lat: 12.9572,
+        lng: 77.6681,
+        timestamp: '2026-07-26T08:22:00Z',
+        plate_detected: 'KA-03-KL-1190',
+        confidence: 94.8,
+        sighting_type: 'Traffic Signal',
+        distance_from_crime_km: 13.7,
+      },
+      {
+        hop: 6,
+        camera_id: 'CAM-BLR-0530',
+        camera_name: 'Kundalahalli Gate Surveillance Post',
+        lat: 12.9712,
+        lng: 77.7152,
+        timestamp: '2026-07-26T08:38:00Z',
+        plate_detected: 'KA-03-KL-1190',
+        confidence: 96.1,
+        sighting_type: 'CCTV Sweep',
+        distance_from_crime_km: 19.8,
+      },
+      {
+        hop: 7,
+        camera_id: 'CAM-BLR-0538',
+        camera_name: 'Whitefield ITPL Main Entrance ANPR',
+        lat: 12.9864,
+        lng: 77.7381,
+        timestamp: '2026-07-26T08:52:00Z',
+        plate_detected: 'KA-03-KL-1190',
+        confidence: 97.9,
+        sighting_type: 'ANPR Sighting',
+        distance_from_crime_km: 24.2,
+      },
+      {
+        hop: 8,
+        camera_id: 'CAM-BLR-0545',
+        camera_name: 'Hoodi Junction Checkpost',
+        lat: 12.9942,
+        lng: 77.7171,
+        timestamp: '2026-07-26T09:05:00Z',
+        plate_detected: 'KA-03-KL-1190',
+        confidence: 98.6,
+        sighting_type: 'Toll Checkpoint',
+        distance_from_crime_km: 28.5,
+      },
+    ],
+  },
+
+  // 5. SINGLE HOP EDGE CASE (1 SIGHTING ONLY)
+  'KA-19-MN-4456': {
+    target: 'Praveen Poojary (Local Offender)',
+    crime_linked: 'FIR-2026-MNG-0211 (Chain Snatching Intercept)',
+    trail_status: 'flagged',
+    duration_minutes: 0,
+    total_distance_km: 0.0,
+    vehicle_type: 'Hero Splendor Motorcycle (Black)',
+    related_vehicles: [
+      { plate: 'KA-19-P-2020', camera: 'Mangaluru KSRTC Bus Stand ANPR', time: '08:32 IST', delta: '+2m' },
+    ],
+    trail: [
+      {
+        hop: 1,
+        camera_id: 'CAM-MNG-0101',
+        camera_name: 'Mangaluru KSRTC Bus Stand ANPR Cam #01',
+        lat: 12.8703,
+        lng: 74.8427,
+        timestamp: '2026-07-26T08:30:00Z',
+        plate_detected: 'KA-19-MN-4456',
+        confidence: 97.4,
+        sighting_type: 'ANPR Sighting',
+        distance_from_crime_km: 0.0,
+      },
+    ],
+  },
+
+  // 6. TWO-WHEELER DENSE URBAN TRAIL (6 HOPS IN SMALL RADIUS)
+  'KA-02-VS-9981': {
+    target: 'Kiran Kumar (Snatch-and-Run)',
+    crime_linked: 'FIR-2026-BL-0931 (Phone Snatching Pursuit)',
+    trail_status: 'active',
+    duration_minutes: 24,
+    total_distance_km: 5.8,
+    vehicle_type: 'TVS Jupiter Scooter (Matte Blue)',
+    related_vehicles: [
+      { plate: 'KA-05-EV-9012', camera: 'Jayanagar 4th Block Complex ANPR', time: '17:02 IST', delta: '+2m' },
+    ],
+    trail: [
+      {
+        hop: 1,
+        camera_id: 'CAM-BLR-0601',
+        camera_name: 'Jayanagar 4th Block Complex ANPR',
         lat: 12.9298,
         lng: 77.5826,
-        timestamp: '2026-07-26T11:10:00Z',
-        plate_detected: 'KA-05-EV-9012',
-        confidence: 97.9,
+        timestamp: '2026-07-26T17:00:00Z',
+        plate_detected: 'KA-02-VS-9981',
+        confidence: 98.2,
+        sighting_type: 'ANPR Sighting',
+        distance_from_crime_km: 0.1,
+      },
+      {
+        hop: 2,
+        camera_id: 'CAM-BLR-0605',
+        camera_name: 'Jayanagar 9th Block BATCS Signal',
+        lat: 12.9212,
+        lng: 77.5901,
+        timestamp: '2026-07-26T17:04:00Z',
+        plate_detected: 'KA-02-VS-9981',
+        confidence: 97.5,
+        sighting_type: 'Traffic Signal',
+        distance_from_crime_km: 1.1,
+      },
+      {
+        hop: 3,
+        camera_id: 'CAM-BLR-0610',
+        camera_name: 'BTM 2nd Stage 100ft Road CCTV',
+        lat: 12.9166,
+        lng: 77.6001,
+        timestamp: '2026-07-26T17:09:00Z',
+        plate_detected: 'KA-02-VS-9981',
+        confidence: 96.8,
+        sighting_type: 'CCTV Sweep',
+        distance_from_crime_km: 2.3,
+      },
+      {
+        hop: 4,
+        camera_id: 'CAM-BLR-0615',
+        camera_name: 'BTM Water Tank Signal Junction',
+        lat: 12.9123,
+        lng: 77.6082,
+        timestamp: '2026-07-26T17:14:00Z',
+        plate_detected: 'KA-02-VS-9981',
+        confidence: 95.9,
+        sighting_type: 'Traffic Signal',
+        distance_from_crime_km: 3.4,
+      },
+      {
+        hop: 5,
+        camera_id: 'CAM-BLR-0620',
+        camera_name: 'Silk Board Flyover Entry ANPR',
+        lat: 12.9178,
+        lng: 77.6180,
+        timestamp: '2026-07-26T17:18:00Z',
+        plate_detected: 'KA-02-VS-9981',
+        confidence: 97.1,
+        sighting_type: 'ANPR Sighting',
+        distance_from_crime_km: 4.6,
+      },
+      {
+        hop: 6,
+        camera_id: 'CAM-BLR-0625',
+        camera_name: 'HSR Layout 27th Main Checkpost',
+        lat: 12.9112,
+        lng: 77.6382,
+        timestamp: '2026-07-26T17:24:00Z',
+        plate_detected: 'KA-02-VS-9981',
+        confidence: 98.0,
+        sighting_type: 'Toll Checkpoint',
+        distance_from_crime_km: 5.8,
+      },
+    ],
+  },
+
+  // 7. CROSS-DISTRICT STATEWIDE TRAIL (MYSURU -> MANDYA -> RAMANAGARA -> BENGALURU)
+  'KA-25-BG-3310': {
+    target: 'Ganesh Shetty (Inter-District Gang)',
+    crime_linked: 'FIR-2026-MYS-0412 (Interstate Gold Heist)',
+    trail_status: 'active',
+    duration_minutes: 260,
+    total_distance_km: 132.6,
+    vehicle_type: 'Mahindra Scorpio SUV (White)',
+    related_vehicles: [
+      { plate: 'KA-09-MA-7001', camera: 'Mandya Highway Toll Plaza ANPR', time: '07:18 IST', delta: '+3m' },
+      { plate: 'KA-42-R-8833', camera: 'Kengeri Satellite Town CCTV Sweep', time: '09:44 IST', delta: '+4m' },
+    ],
+    trail: [
+      {
+        hop: 1,
+        camera_id: 'CAM-MYS-0101',
+        camera_name: 'Mysuru Suburban Bus Stand ANPR',
+        lat: 12.3087,
+        lng: 76.6575,
+        timestamp: '2026-07-26T06:00:00Z',
+        plate_detected: 'KA-25-BG-3310',
+        confidence: 98.5,
         sighting_type: 'ANPR Sighting',
         distance_from_crime_km: 0.5,
       },
       {
         hop: 2,
-        camera_id: 'CAM-BLR-0105',
-        camera_name: 'Bannerghatta Road Signal Junction',
-        lat: 12.9081,
-        lng: 77.5954,
-        timestamp: '2026-07-26T11:18:00Z',
-        plate_detected: 'KA-05-EV-9012',
-        confidence: 94.2,
-        sighting_type: 'Traffic Signal',
-        distance_from_crime_km: 3.2,
+        camera_id: 'CAM-MND-0205',
+        camera_name: 'Mandya Highway Toll Plaza ANPR',
+        lat: 12.5218,
+        lng: 76.8951,
+        timestamp: '2026-07-26T07:15:00Z',
+        plate_detected: 'KA-25-BG-3310',
+        confidence: 96.8,
+        sighting_type: 'Toll Checkpoint',
+        distance_from_crime_km: 45.2,
       },
       {
         hop: 3,
-        camera_id: 'CAM-BLR-0112',
-        camera_name: 'BTM 2nd Stage CCTV Surveillance',
-        lat: 12.9166,
-        lng: 77.6101,
-        timestamp: '2026-07-26T12:08:00Z',
-        plate_detected: 'KA-05-EV-9012',
-        confidence: 86.5,
-        sighting_type: 'CCTV Surveillance',
-        distance_from_crime_km: 5.8,
+        camera_id: 'CAM-RMG-0310',
+        camera_name: 'Ramanagara Bypass Signal BATCS',
+        lat: 12.7210,
+        lng: 77.2814,
+        timestamp: '2026-07-26T08:30:00Z',
+        plate_detected: 'KA-25-BG-3310',
+        confidence: 95.4,
+        sighting_type: 'Traffic Signal',
+        distance_from_crime_km: 92.8,
       },
       {
         hop: 4,
-        camera_id: 'CAM-BLR-0120',
-        camera_name: 'Electronics City Expressway Toll',
-        lat: 12.8452,
-        lng: 77.6602,
-        timestamp: '2026-07-26T12:12:00Z',
-        plate_detected: 'KA-05-EV-9012',
-        confidence: 96.8,
+        camera_id: 'CAM-BLR-0715',
+        camera_name: 'Kengeri Satellite Town CCTV Sweep',
+        lat: 12.9082,
+        lng: 77.4821,
+        timestamp: '2026-07-26T09:40:00Z',
+        plate_detected: 'KA-25-BG-3310',
+        confidence: 94.2,
+        sighting_type: 'CCTV Sweep',
+        distance_from_crime_km: 118.4,
+      },
+      {
+        hop: 5,
+        camera_id: 'CAM-BLR-0725',
+        camera_name: 'Bengaluru City Town Hall Checkpost',
+        lat: 12.9634,
+        lng: 77.5812,
+        timestamp: '2026-07-26T10:20:00Z',
+        plate_detected: 'KA-25-BG-3310',
+        confidence: 97.6,
         sighting_type: 'Toll Checkpoint',
-        distance_from_crime_km: 14.8,
+        distance_from_crime_km: 132.6,
       },
     ],
   },
-  'KA-03-HA-4512': {
-    target: 'Zakir Hussain (Unindexed Record)',
-    crime_linked: 'FIR-2026-BL-0811 (Cyber Fraud Intercept)',
-    trail_status: 'flagged',
-    duration_minutes: 25,
-    total_distance_km: 6.4,
+
+  // 8. RICH RELATED VEHICLES CASE (3 CO-OCCURRENCES ACROSS HOPS)
+  'KA-14-JP-6602': {
+    target: 'Shivaram Hegde (Contraband Trafficking)',
+    crime_linked: 'FIR-2026-SMG-0188 (Illicit Goods Seizure)',
+    trail_status: 'active',
+    duration_minutes: 130,
+    total_distance_km: 98.4,
+    vehicle_type: 'Tata Nexon EV (Teal)',
+    related_vehicles: [
+      { plate: 'KA-14-M-5001', camera: 'Shivamogga Bus Terminal ANPR', time: '11:03 IST', delta: '+3m' },
+      { plate: 'KA-18-B-9920', camera: 'Bhadravathi Bypass Signal', time: '11:24 IST', delta: '+2m' },
+      { plate: 'KA-13-N-4411', camera: 'Hassan Highway Checkpost', time: '13:12 IST', delta: '+2m' },
+    ],
     trail: [
       {
         hop: 1,
-        camera_id: 'CAM-BLR-0201',
-        camera_name: 'Shivajinagar Bus Stand CCTV',
-        lat: 12.9857,
-        lng: 77.6057,
-        timestamp: '2026-07-26T13:00:00Z',
-        plate_detected: 'KA-03-HA-4512',
-        confidence: 95.1,
-        sighting_type: 'CCTV Surveillance',
-        distance_from_crime_km: 0.8,
+        camera_id: 'CAM-SMG-0101',
+        camera_name: 'Shivamogga Bus Terminal ANPR',
+        lat: 13.9299,
+        lng: 75.5681,
+        timestamp: '2026-07-26T11:00:00Z',
+        plate_detected: 'KA-14-JP-6602',
+        confidence: 98.9,
+        sighting_type: 'ANPR Sighting',
+        distance_from_crime_km: 0.4,
       },
       {
         hop: 2,
-        camera_id: 'CAM-BLR-0205',
-        camera_name: 'MG Road Metro Station ANPR',
-        lat: 12.9756,
-        lng: 77.6068,
-        timestamp: '2026-07-26T13:12:00Z',
-        plate_detected: 'KA-03-HA-4512',
-        confidence: 92.4,
-        sighting_type: 'ANPR Sighting',
-        distance_from_crime_km: 2.5,
+        camera_id: 'CAM-SMG-0108',
+        camera_name: 'Bhadravathi Bypass Signal',
+        lat: 13.8421,
+        lng: 75.7021,
+        timestamp: '2026-07-26T11:22:00Z',
+        plate_detected: 'KA-14-JP-6602',
+        confidence: 97.4,
+        sighting_type: 'Traffic Signal',
+        distance_from_crime_km: 18.2,
       },
       {
         hop: 3,
-        camera_id: 'CAM-BLR-0210',
-        camera_name: 'Indiranagar 100ft Road Signal Junction',
-        lat: 12.9784,
-        lng: 77.6408,
-        timestamp: '2026-07-26T13:25:00Z',
-        plate_detected: 'KA-03-HA-4512',
-        confidence: 87.0,
-        sighting_type: 'Traffic Signal',
-        distance_from_crime_km: 6.4,
+        camera_id: 'CAM-CKM-0215',
+        camera_name: 'Kadur Junction CCTV Sweep',
+        lat: 13.5542,
+        lng: 76.0121,
+        timestamp: '2026-07-26T12:15:00Z',
+        plate_detected: 'KA-14-JP-6602',
+        confidence: 96.1,
+        sighting_type: 'CCTV Sweep',
+        distance_from_crime_km: 58.6,
+      },
+      {
+        hop: 4,
+        camera_id: 'CAM-HSN-0320',
+        camera_name: 'Hassan Highway Checkpost',
+        lat: 13.0072,
+        lng: 76.1012,
+        timestamp: '2026-07-26T13:10:00Z',
+        plate_detected: 'KA-14-JP-6602',
+        confidence: 97.8,
+        sighting_type: 'Toll Checkpoint',
+        distance_from_crime_km: 98.4,
+      },
+    ],
+  },
+
+  // 9. ALL-ANPR CAMERA TRAIL (EVERY HOP USES ANPR)
+  'KA-33-EC-8847': {
+    target: 'Basavaraj Patil (Border Smuggling)',
+    crime_linked: 'FIR-2026-YDG-0055 (Illegal Timber Transport)',
+    trail_status: 'flagged',
+    duration_minutes: 270,
+    total_distance_km: 165.2,
+    vehicle_type: 'Eicher Commercial Truck (Yellow)',
+    related_vehicles: [
+      { plate: 'KA-32-TR-1100', camera: 'Kalaburagi Ring Road ANPR Cam #04', time: '05:22 IST', delta: '+2m' },
+    ],
+    trail: [
+      {
+        hop: 1,
+        camera_id: 'CAM-YDG-0101',
+        camera_name: 'Yadgir Highway ANPR Cam #01',
+        lat: 16.7612,
+        lng: 77.1378,
+        timestamp: '2026-07-26T04:00:00Z',
+        plate_detected: 'KA-33-EC-8847',
+        confidence: 99.1,
+        sighting_type: 'ANPR Sighting',
+        distance_from_crime_km: 0.5,
+      },
+      {
+        hop: 2,
+        camera_id: 'CAM-KLB-0204',
+        camera_name: 'Kalaburagi Ring Road ANPR Cam #04',
+        lat: 17.3297,
+        lng: 76.8343,
+        timestamp: '2026-07-26T05:20:00Z',
+        plate_detected: 'KA-33-EC-8847',
+        confidence: 98.4,
+        sighting_type: 'ANPR Sighting',
+        distance_from_crime_km: 42.1,
+      },
+      {
+        hop: 3,
+        camera_id: 'CAM-BDR-0302',
+        camera_name: 'Humnabad Toll Plaza ANPR Cam #02',
+        lat: 17.7712,
+        lng: 77.1291,
+        timestamp: '2026-07-26T06:40:00Z',
+        plate_detected: 'KA-33-EC-8847',
+        confidence: 97.8,
+        sighting_type: 'ANPR Sighting',
+        distance_from_crime_km: 98.3,
+      },
+      {
+        hop: 4,
+        camera_id: 'CAM-BDR-0308',
+        camera_name: 'Bidar Highway Checkpost ANPR Cam #08',
+        lat: 17.9104,
+        lng: 77.5199,
+        timestamp: '2026-07-26T07:45:00Z',
+        plate_detected: 'KA-33-EC-8847',
+        confidence: 98.6,
+        sighting_type: 'ANPR Sighting',
+        distance_from_crime_km: 135.0,
+      },
+      {
+        hop: 5,
+        camera_id: 'CAM-BDR-0315',
+        camera_name: 'Bhalki Border Checkpost ANPR Cam #05',
+        lat: 18.0421,
+        lng: 77.2104,
+        timestamp: '2026-07-26T08:30:00Z',
+        plate_detected: 'KA-33-EC-8847',
+        confidence: 99.0,
+        sighting_type: 'ANPR Sighting',
+        distance_from_crime_km: 165.2,
       },
     ],
   },
@@ -305,11 +794,37 @@ export default function GeoTrailPage() {
   const [metadata, setMetadata] = useState(null);
   const [highlightedHop, setHighlightedHop] = useState(null);
   const [visibleHopsCount, setVisibleHopsCount] = useState(1);
+  const [shareToast, setShareToast] = useState(false);
 
   // SCRUBBER PLAYBACK STATE & SPEED MULTIPLIER
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [scrubberPercent, setScrubberPercent] = useState(0);
+
+  // COMPUTED SPARKLINE DATA POINTS (SAFE ON 1-HOP SCENARIOS)
+  const speedSparklinePoints = useMemo(() => {
+    if (!trailData || trailData.length < 2) return [];
+    const points = [];
+    for (let i = 1; i < trailData.length; i++) {
+      const prev = trailData[i - 1];
+      const curr = trailData[i];
+      const { speedKmh, anomaly } = analyzeHopInsights(curr, prev);
+      points.push({
+        hop: curr.hop,
+        speed: speedKmh || 30,
+        isAnomaly: !!anomaly,
+        label: `Hop ${prev.hop}→${curr.hop}`,
+      });
+    }
+    return points;
+  }, [trailData]);
+
+  // COMPUTED AVERAGE MATCH PERCENTAGE (SAFE ON 1-HOP)
+  const averageMatchPercent = useMemo(() => {
+    if (!trailData || trailData.length === 0) return 0;
+    const total = trailData.reduce((acc, h) => acc + (h.confidence || 95), 0);
+    return (total / trailData.length).toFixed(1);
+  }, [trailData]);
 
   // PROPORTIONAL TIMESTAMP INTERPOLATION FOR GHOST MARKER
   const ghostPosition = useMemo(() => {
@@ -398,6 +913,8 @@ export default function GeoTrailPage() {
             duration_minutes: mockEntry.duration_minutes,
             target: mockEntry.target,
             crime_linked: mockEntry.crime_linked,
+            vehicle_type: mockEntry.vehicle_type,
+            related_vehicles: mockEntry.related_vehicles,
           }
         : null;
 
@@ -418,11 +935,13 @@ export default function GeoTrailPage() {
       setTrailData(activeTrail);
       setMetadata({
         totalHops: data?.total_hops || fallbackPayload.total_hops,
-        totalDistance: data?.total_distance_km || fallbackPayload.total_distance_km,
+        totalDistance: data?.total_distance_km ?? fallbackPayload.total_distance_km,
         status: data?.trail_status || fallbackPayload.trail_status,
-        duration: data?.duration_minutes || fallbackPayload.duration_minutes,
+        duration: data?.duration_minutes ?? fallbackPayload.duration_minutes,
         target: data?.target || fallbackPayload.target,
         crimeLinked: data?.crime_linked || fallbackPayload.crime_linked,
+        vehicleType: data?.vehicle_type || fallbackPayload.vehicle_type || 'Commercial Vehicle',
+        relatedVehicles: data?.related_vehicles || fallbackPayload.related_vehicles || [],
         lastUpdated: new Date().toLocaleTimeString('en-IN'),
       });
     } catch {
@@ -435,6 +954,8 @@ export default function GeoTrailPage() {
           duration: mockEntry.duration_minutes,
           target: mockEntry.target,
           crimeLinked: mockEntry.crime_linked,
+          vehicleType: mockEntry.vehicle_type || 'Commercial Vehicle',
+          relatedVehicles: mockEntry.related_vehicles || [],
           lastUpdated: new Date().toLocaleTimeString('en-IN'),
         });
       } else {
@@ -494,6 +1015,18 @@ export default function GeoTrailPage() {
     }
   };
 
+  const handleShareReport = () => {
+    if (!metadata || trailData.length === 0) return;
+
+    const summaryText = `[DRISHTI POLICE CO-PILOT] GEO-TRAIL SUMMARY FOR ${searchedPlate}\nTarget: ${metadata.target}\nVehicle: ${metadata.vehicleType}\nHops: ${metadata.totalHops} | Dist: ${metadata.totalDistance} km | Duration: ${metadata.duration}m | Avg Match: ${averageMatchPercent}%\nLast Seen: ${trailData[trailData.length - 1].camera_name} at ${new Date(trailData[trailData.length - 1].timestamp).toLocaleTimeString('en-IN')} IST`;
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(summaryText);
+      setShareToast(true);
+      setTimeout(() => setShareToast(false), 2500);
+    }
+  };
+
   // Export Trail Report
   const handleExportReport = () => {
     if (!metadata || trailData.length === 0) return;
@@ -504,10 +1037,12 @@ export default function GeoTrailPage() {
       `SUSPECT GEO-TRAIL TACTICAL REPORT\n` +
       `=======================================================\n\n` +
       `Target Plate:     ${searchedPlate}\n` +
+      `Vehicle Type:     ${metadata.vehicleType || 'N/A'}\n` +
       `Suspect Linked:   ${metadata.target || 'Under Investigation'}\n` +
       `Linked Case:      ${metadata.crimeLinked || 'FIR-2026-BL-0492'}\n` +
       `Trail Status:     ${metadata.status.toUpperCase()}\n` +
       `Total Hops:       ${metadata.totalHops}\n` +
+      `Avg Match %:      ${averageMatchPercent}%\n` +
       `Total Distance:   ${metadata.totalDistance} km\n` +
       `Total Duration:   ${metadata.duration} minutes\n` +
       `Generated At:     ${new Date().toLocaleString('en-IN')} IST\n\n` +
@@ -553,9 +1088,9 @@ export default function GeoTrailPage() {
 
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6 bg-void-000 text-paper-100 min-h-screen">
-      {/* ── HEADER & SEARCH BAR ────────────────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-steel-600/30">
-        <div>
+      {/* ── HEADER ROW ────────────────────────────────────────────────────── */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-steel-600/50">
+        <div className="flex flex-col justify-center">
           <div className="flex items-center gap-2">
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-phosphor-500 opacity-75"></span>
@@ -565,8 +1100,8 @@ export default function GeoTrailPage() {
               TACTICAL ANPR RECONSTRUCTION
             </span>
           </div>
-          <h1 className="text-xl md:text-2xl font-bold text-paper-100 mt-1 flex items-center gap-2 font-sans">
-            <Navigation className="w-6 h-6 text-phosphor-500" />
+          <h1 className="text-xl md:text-2xl font-bold text-paper-100 mt-1 flex items-center gap-2.5 font-sans">
+            <Navigation className="w-6 h-6 text-phosphor-500 shrink-0" />
             Suspect Geo-Trail Tracker
           </h1>
           <p className="text-xs text-paper-100/60 mt-0.5 font-sans">
@@ -574,23 +1109,119 @@ export default function GeoTrailPage() {
           </p>
         </div>
 
-        {/* Search Input Form */}
-        <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 w-full md:w-96">
-          <div className="relative flex-1">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search Plate (e.g. KA-01-MJ-8821)..."
-              className="w-full px-3.5 py-2 pl-9 rounded-md bg-steel-700 border border-steel-600/50 text-xs font-mono text-paper-100 placeholder:text-paper-100/40 focus:outline-none focus:border-phosphor-500 transition-all shadow-sm"
-            />
-            <Search className="w-4 h-4 text-paper-100/40 absolute left-3 top-2.5" />
+        {/* Search Input Form with Helper Quick Links */}
+        <div className="flex flex-col gap-1.5 w-full md:w-auto">
+          <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 w-full md:w-96">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search Plate (e.g. KA-19-MN-4456, KA-25-BG-3310)..."
+                className="w-full px-3.5 py-2 pl-9 rounded-xl bg-steel-700 border border-steel-600/50 text-xs font-mono text-paper-100 placeholder:text-paper-100/40 focus:outline-none focus:border-phosphor-500 transition-all shadow-md"
+              />
+              <Search className="w-4 h-4 text-paper-100/40 absolute left-3 top-2.5" />
+            </div>
+            <Button type="submit" variant="primary" size="sm" className="font-mono text-xs shrink-0 rounded-xl">
+              Search
+            </Button>
+          </form>
+
+          {/* Search Helper Quick Links (10 Scenarios) */}
+          <div className="flex items-center flex-wrap gap-1 text-[10px] font-mono text-paper-100/50 px-0.5 max-w-xl">
+            <span className="text-paper-100/40 font-semibold">Try:</span>
+            {[
+              { plate: 'KA-05-HB-3342', label: 'Clean 5-Hop' },
+              { plate: 'KA-01-MJ-8821', label: 'Vector' },
+              { plate: 'KA-09-RT-7765', label: 'Gap Anomaly' },
+              { plate: 'KA-03-KL-1190', label: '8-Hop Long' },
+              { plate: 'KA-19-MN-4456', label: '1-Hop Edge' },
+              { plate: 'KA-02-VS-9981', label: '2-Wheeler' },
+              { plate: 'KA-25-BG-3310', label: 'Statewide' },
+              { plate: 'KA-14-JP-6602', label: '3 Co-Occur' },
+              { plate: 'KA-33-EC-8847', label: 'All-ANPR' },
+              { plate: 'KA-07-DD-0021', label: 'Not Found' },
+            ].map((item, idx) => (
+              <span key={item.plate} className="inline-flex items-center gap-1">
+                {idx > 0 && <span className="text-paper-100/20">•</span>}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery(item.plate);
+                    loadTrailForPlate(item.plate);
+                  }}
+                  className="hover:text-phosphor-500 hover:underline transition-colors focus:outline-none cursor-pointer"
+                >
+                  {item.plate} ({item.label})
+                </button>
+              </span>
+            ))}
           </div>
-          <Button type="submit" variant="primary" size="sm" className="font-mono text-xs shrink-0">
-            Search
-          </Button>
-        </form>
+        </div>
       </div>
+
+      {/* SUSPECT SUMMARY CARD */}
+      {metadata && !notFound && (
+        <Card className="p-4 border border-steel-600/50 bg-steel-700/40 rounded-xl shadow-md">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 divide-x divide-steel-600/30">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-lg bg-steel-700 border border-steel-600/60 text-phosphor-500 shrink-0">
+                <Car className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-[10px] font-mono text-paper-100/50 uppercase tracking-wider block">
+                  VEHICLE SPEC
+                </span>
+                <span className="text-xs font-mono font-bold text-paper-100 block truncate">
+                  {metadata.vehicleType || 'Sedan / Commercial'}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pl-4">
+              <div className="p-2.5 rounded-lg bg-steel-700 border border-steel-600/60 text-phosphor-500 shrink-0">
+                <Layers className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-[10px] font-mono text-paper-100/50 uppercase tracking-wider block">
+                  TOTAL HOPS
+                </span>
+                <span className="text-xs font-mono font-bold text-paper-100 block">
+                  {metadata.totalHops} {metadata.totalHops === 1 ? 'Sighting' : 'Hops Captured'}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pl-4">
+              <div className="p-2.5 rounded-lg bg-steel-700 border border-steel-600/60 text-phosphor-500 shrink-0">
+                <Activity className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-[10px] font-mono text-paper-100/50 uppercase tracking-wider block">
+                  AVG MATCH %
+                </span>
+                <span className="text-xs font-mono font-bold text-phosphor-500 block">
+                  {averageMatchPercent}% Confidence
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pl-4">
+              <div className="p-2.5 rounded-lg bg-steel-700 border border-steel-600/60 text-phosphor-500 shrink-0">
+                <Clock className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-[10px] font-mono text-paper-100/50 uppercase tracking-wider block">
+                  DURATION
+                </span>
+                <span className="text-xs font-mono font-bold text-paper-100 block">
+                  {metadata.totalHops === 1 ? '0m (Single Point)' : `${metadata.duration} mins (${metadata.totalDistance} km)`}
+                </span>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* ── NOT FOUND STATE ────────────────────────────────────────────────── */}
       {notFound ? (
@@ -598,19 +1229,19 @@ export default function GeoTrailPage() {
           icon={Search}
           title={`No Sightings Found for Plate "${searchedPlate}"`}
           description="No automated camera hits or CCTV sightings detected in the ANPR matrix for this plate."
-          className="py-16 bg-steel-700/20 border border-steel-600/30"
+          className="py-16 bg-steel-700/20 border border-steel-600/30 rounded-xl"
         >
           <div className="mt-4 flex flex-col items-center gap-3">
             <p className="text-xs font-mono text-paper-100/60">Try searching active sample watchlists:</p>
             <div className="flex flex-wrap items-center justify-center gap-2">
-              {['KA-01-MJ-8821', 'KA-05-EV-9012', 'KA-03-HA-4512'].map((plate) => (
+              {['KA-05-HB-3342', 'KA-01-MJ-8821', 'KA-09-RT-7765', 'KA-19-MN-4456', 'KA-25-BG-3310'].map((plate) => (
                 <button
                   key={plate}
                   onClick={() => {
                     setSearchQuery(plate);
                     loadTrailForPlate(plate);
                   }}
-                  className="px-3 py-1.5 rounded bg-steel-700 hover:bg-steel-600 border border-steel-600/60 text-xs font-mono text-phosphor-500 transition-all"
+                  className="px-3 py-1.5 rounded-lg bg-steel-700 hover:bg-steel-600 border border-steel-600/60 text-xs font-mono text-phosphor-500 transition-all cursor-pointer shadow-sm"
                 >
                   {plate}
                 </button>
@@ -619,11 +1250,11 @@ export default function GeoTrailPage() {
           </div>
         </EmptyState>
       ) : (
-        /* ── MAIN DUAL-PANEL GRID (MAP + SCRUBBER + TIMELINE) ──────────────── */
+        /* ── MAIN DUAL-PANEL GRID ─────────────────────────────────────────── */
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[620px] items-stretch">
           {/* ── LEFT: LEAFLET MAP & SCRUBBER PANEL (7 COLS) ─────────────────── */}
           <div className="lg:col-span-7 flex flex-col min-h-[480px] lg:min-h-[620px] relative space-y-3">
-            <Card className="flex-1 p-2 relative overflow-hidden flex flex-col border border-steel-600/50 bg-steel-700/30 min-h-[450px]">
+            <Card className="flex-1 p-2 relative overflow-hidden flex flex-col border border-steel-600/50 bg-steel-700/30 min-h-[450px] rounded-xl shadow-md">
               {loading && (
                 <div className="absolute inset-0 z-50 bg-void-000/80 backdrop-blur-sm flex flex-col items-center justify-center">
                   <Spinner size="lg" />
@@ -662,7 +1293,7 @@ export default function GeoTrailPage() {
                           DISTANCE:
                         </span>{' '}
                         <span className="font-semibold text-[#EFEAE4] font-mono">
-                          {metadata.totalDistance} km
+                          {metadata.totalHops === 1 ? '0.0 km' : `${metadata.totalDistance} km`}
                         </span>
                       </div>
                       <span className="text-[#48596D]">|</span>
@@ -671,7 +1302,7 @@ export default function GeoTrailPage() {
                           DURATION:
                         </span>{' '}
                         <span className="font-semibold text-[#EFEAE4] font-mono">
-                          {metadata.duration}m
+                          {metadata.totalHops === 1 ? '0m' : `${metadata.duration}m`}
                         </span>
                       </div>
                     </div>
@@ -680,9 +1311,9 @@ export default function GeoTrailPage() {
               </div>
             </Card>
 
-            {/* REPLAY SCRUBBER PANEL */}
+            {/* REPLAY SCRUBBER PANEL (HIDDEN SAFELY ON 1-HOP TRAIL) */}
             {trailData.length > 1 && (
-              <Card className="p-3.5 border border-steel-600/50 bg-steel-700/40 space-y-2.5 shrink-0">
+              <Card className="p-3.5 border border-steel-600/50 bg-steel-700/40 space-y-2.5 shrink-0 rounded-xl shadow-md">
                 <div className="flex items-center justify-between font-mono text-xs text-paper-100/70">
                   <div className="flex items-center gap-2">
                     <span className="text-phosphor-500 font-bold uppercase tracking-wider text-[11px] font-sans flex items-center gap-1.5">
@@ -693,7 +1324,7 @@ export default function GeoTrailPage() {
 
                   <div className="flex items-center gap-3">
                     {/* Speed Multiplier Buttons */}
-                    <div className="flex items-center gap-1 bg-steel-600/30 p-0.5 rounded border border-steel-600/40">
+                    <div className="flex items-center gap-1 bg-steel-600/30 p-0.5 rounded-lg border border-steel-600/40">
                       {[1, 2, 4].map((spd) => (
                         <button
                           key={spd}
@@ -724,7 +1355,7 @@ export default function GeoTrailPage() {
                       if (scrubberPercent >= 100) setScrubberPercent(0);
                       setIsPlaying(!isPlaying);
                     }}
-                    className="p-2 rounded bg-steel-600 hover:bg-steel-600/80 text-paper-100 transition-all shrink-0 focus:outline-none focus:border-phosphor-500 active:scale-95 shadow cursor-pointer"
+                    className="p-2 rounded-lg bg-steel-600 hover:bg-steel-600/80 text-paper-100 transition-all shrink-0 focus:outline-none focus:border-phosphor-500 active:scale-95 shadow cursor-pointer"
                     title={isPlaying ? 'Pause Replay' : 'Play Replay'}
                   >
                     {isPlaying ? (
@@ -734,7 +1365,6 @@ export default function GeoTrailPage() {
                     )}
                   </button>
 
-                  {/* BUTTON 3: RESET BUTTON HANDLER FIX */}
                   <button
                     type="button"
                     onClick={() => {
@@ -746,7 +1376,7 @@ export default function GeoTrailPage() {
                         setVisibleHopsCount(1);
                       }
                     }}
-                    className="p-2 rounded bg-steel-600/50 hover:bg-steel-600 text-paper-100/70 hover:text-paper-100 transition-all shrink-0 cursor-pointer"
+                    className="p-2 rounded-lg bg-steel-600/50 hover:bg-steel-600 text-paper-100/70 hover:text-paper-100 transition-all shrink-0 cursor-pointer"
                     title="Reset Trail & Scrubber to Start"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
@@ -776,9 +1406,9 @@ export default function GeoTrailPage() {
           </div>
 
           {/* ── RIGHT: SIGHTINGS TIMELINE & INSIGHTS PANEL (5 COLS) ─────────── */}
-          <div className="lg:col-span-5 flex flex-col min-h-[480px]">
-            <Card className="flex-1 flex flex-col p-4 border border-steel-600/50 bg-steel-700/30 justify-between space-y-4">
-              {/* Timeline Header & Export */}
+          <div className="lg:col-span-5 flex flex-col min-h-[480px] space-y-4">
+            <Card className="flex-1 flex flex-col p-4 border border-steel-600/50 bg-steel-700/30 justify-between space-y-4 rounded-xl shadow-md">
+              {/* Timeline Header & Export / Share Buttons */}
               <div className="flex items-center justify-between pb-3 border-b border-steel-600/30">
                 <div>
                   <h3 className="text-sm font-bold text-paper-100 flex items-center gap-2 font-sans">
@@ -787,24 +1417,42 @@ export default function GeoTrailPage() {
                   </h3>
                   {metadata && (
                     <p className="text-[11px] font-mono text-paper-100/50 mt-0.5">
-                      {metadata.target} • {metadata.totalHops} Hops Captured
+                      {metadata.target} • {metadata.totalHops} {metadata.totalHops === 1 ? 'Sighting' : 'Hops Captured'}
                     </p>
                   )}
                 </div>
 
-                <Button
-                  onClick={handleExportReport}
-                  variant="secondary"
-                  size="sm"
-                  className="font-mono text-xs flex items-center gap-1.5"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Export</span>
-                </Button>
+                <div className="flex items-center gap-1.5 relative">
+                  {shareToast && (
+                    <span className="absolute -top-7 right-0 text-[10px] font-mono text-phosphor-500 bg-steel-700 border border-phosphor-500/50 px-2 py-0.5 rounded shadow-lg animate-fade-in flex items-center gap-1">
+                      <Check className="w-3 h-3 text-phosphor-500" /> Copied!
+                    </span>
+                  )}
+                  <Button
+                    onClick={handleShareReport}
+                    variant="secondary"
+                    size="sm"
+                    className="font-mono text-xs flex items-center gap-1 rounded-lg"
+                    title="Copy Summary Report to Clipboard"
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                    <span>Share</span>
+                  </Button>
+
+                  <Button
+                    onClick={handleExportReport}
+                    variant="secondary"
+                    size="sm"
+                    className="font-mono text-xs flex items-center gap-1 rounded-lg"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Export</span>
+                  </Button>
+                </div>
               </div>
 
               {/* Hop Timeline List */}
-              <div className="flex-1 overflow-y-auto space-y-3 pr-1 max-h-[520px]">
+              <div className="flex-1 overflow-y-auto space-y-3 pr-1 max-h-[380px]">
                 {trailData.map((hop, idx) => {
                   const prevHop = idx > 0 ? trailData[idx - 1] : null;
                   const { speedKmh, diffMinutes, anomaly } = analyzeHopInsights(hop, prevHop);
@@ -831,7 +1479,7 @@ export default function GeoTrailPage() {
                             Hop {hop.hop}
                           </Badge>
 
-                          <span className="flex items-center gap-1 text-[11px] font-mono text-paper-100/60 bg-steel-600/20 px-2 py-0.5 rounded">
+                          <span className="flex items-center gap-1 text-[11px] font-mono text-paper-100/60 bg-steel-600/20 px-2 py-0.5 rounded-md">
                             <CamIcon className="w-3 h-3 text-phosphor-500" />
                             <span>{camDetails.label}</span>
                           </span>
@@ -853,7 +1501,7 @@ export default function GeoTrailPage() {
 
                       {/* Speed Anomaly Badge or Speed Detail */}
                       {anomaly ? (
-                        <div className="mt-2 p-2 rounded bg-steel-700/80 border border-steel-600/50 space-y-1">
+                        <div className="mt-2 p-2 rounded-lg bg-steel-700/80 border border-steel-600/50 space-y-1">
                           <div className="flex items-center gap-1.5">
                             <AlertTriangle
                               className={`w-3.5 h-3.5 ${
@@ -912,6 +1560,98 @@ export default function GeoTrailPage() {
                   </div>
                 )}
               </div>
+
+              {/* SPEED SPARKLINE CHART (SAFE ON 1-HOP CASE) */}
+              <div className="pt-3 border-t border-steel-600/30 space-y-1.5">
+                <div className="flex items-center justify-between text-[10px] font-mono text-paper-100/60">
+                  <span className="flex items-center gap-1 uppercase tracking-wider font-semibold">
+                    <Zap className="w-3 h-3 text-phosphor-500" />
+                    Inter-Hop Velocity Profile
+                  </span>
+                  <span>
+                    {speedSparklinePoints.length > 0
+                      ? `Max: ${Math.max(...speedSparklinePoints.map((p) => p.speed))} km/h`
+                      : 'Single Sighting'}
+                  </span>
+                </div>
+
+                {speedSparklinePoints.length > 0 ? (
+                  <div className="h-10 w-full bg-steel-700/60 border border-steel-600/40 rounded-lg p-1.5 flex items-end justify-between relative overflow-hidden">
+                    <svg className="w-full h-full overflow-visible" viewBox="0 0 100 30" preserveAspectRatio="none">
+                      <line x1="0" y1="15" x2="100" y2="15" stroke="#48596D" strokeWidth="0.5" strokeDasharray="2,2" opacity="0.5" />
+                      <polyline
+                        fill="none"
+                        stroke="#4A8B6F"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        points={speedSparklinePoints
+                          .map((pt, idx) => {
+                            const x = (idx / Math.max(1, speedSparklinePoints.length - 1)) * 100;
+                            const maxSpd = Math.max(100, ...speedSparklinePoints.map((p) => p.speed));
+                            const y = 28 - (pt.speed / maxSpd) * 24;
+                            return `${x},${y}`;
+                          })
+                          .join(' ')}
+                      />
+                      {speedSparklinePoints.map((pt, idx) => {
+                        const x = (idx / Math.max(1, speedSparklinePoints.length - 1)) * 100;
+                        const maxSpd = Math.max(100, ...speedSparklinePoints.map((p) => p.speed));
+                        const y = 28 - (pt.speed / maxSpd) * 24;
+                        const color = pt.isAnomaly ? '#D97706' : pt.speed > 85 ? '#B91C1C' : '#4A8B6F';
+
+                        return (
+                          <circle
+                            key={idx}
+                            cx={x}
+                            cy={y}
+                            r="3"
+                            fill={color}
+                            stroke="#1E2733"
+                            strokeWidth="1"
+                          />
+                        );
+                      })}
+                    </svg>
+                  </div>
+                ) : (
+                  <div className="h-9 w-full bg-steel-700/40 border border-steel-600/30 rounded-lg flex items-center justify-center text-[10px] font-mono text-paper-100/50">
+                    Single Hop Sighting — Inter-Hop Velocity Profile Unavailable
+                  </div>
+                )}
+              </div>
+
+              {/* RELATED VEHICLES CO-OCCURRENCE PANEL */}
+              {metadata?.relatedVehicles && metadata.relatedVehicles.length > 0 && (
+                <div className="pt-3 border-t border-steel-600/30 space-y-2">
+                  <div className="flex items-center justify-between text-[10px] font-mono text-paper-100/60">
+                    <span className="uppercase tracking-wider font-semibold flex items-center gap-1">
+                      <Car className="w-3 h-3 text-phosphor-500" />
+                      Related Vehicles (Co-Occurrences Near Route)
+                    </span>
+                    <span>{metadata.relatedVehicles.length} Spotted</span>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    {metadata.relatedVehicles.map((rel) => (
+                      <button
+                        key={rel.plate}
+                        type="button"
+                        onClick={() => {
+                          console.log('[GeoTrail Debug] Related vehicle chip clicked:', rel.plate);
+                          setSearchQuery(rel.plate);
+                          loadTrailForPlate(rel.plate);
+                        }}
+                        className="px-2.5 py-1.5 rounded-lg bg-steel-700 hover:bg-steel-600 border border-steel-600/60 text-xs font-mono text-phosphor-500 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm group"
+                        title={`Spotted at ${rel.camera} at ${rel.time} (${rel.delta})`}
+                      >
+                        <span className="font-bold group-hover:underline">{rel.plate}</span>
+                        <span className="text-[10px] text-paper-100/40">({rel.delta})</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Bottom Target Meta Footer */}
               {metadata && (
