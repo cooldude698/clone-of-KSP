@@ -653,19 +653,52 @@ export async function POST(req) {
       content: h.content || '',
     }));
 
-    // 2. Try Groq (fastest reliable free LLM)
+// --- QuickML RAG & Zia Translation Call -------------------------------------
+
+async function callQuickML(question, sessionHistory = []) {
+  const ragUrl = process.env.QUICKML_RAG_ENDPOINT_URL;
+  const token = process.env.QUICKML_OAUTH_TOKEN;
+
+  if (!ragUrl || !token) throw new Error('QuickML credentials missing');
+
+  const headers = {
+    Authorization: `Zoho-oauthtoken ${token}`,
+    'Content-Type': 'application/json',
+  };
+
+  // 1. Call QuickML RAG endpoint
+  const ragRes = await axios.post(
+    ragUrl,
+    { question, history: sessionHistory },
+    { headers, timeout: 8000 }
+  );
+
+  const answer = ragRes.data?.answer || ragRes.data?.response || ragRes.data?.data?.answer || '';
+  if (answer.trim()) return answer.trim();
+
+  throw new Error('QuickML RAG returned empty answer');
+}
+
+// ── Inside POST handler ──────────────────────────────────────────────────────
+    // 2. Try Catalyst QuickML first (Primary Platform AI Agent)
     try {
-      finalAnswer = await callGroq(workingQuestion, knowledgeContext, formattedHistory);
-      source = 'groq';
-    } catch (groqErr) {
-      // 3. Try Gemini with models iteration
+      finalAnswer = await callQuickML(workingQuestion, formattedHistory);
+      source = 'catalyst_quickml';
+    } catch (quickMlErr) {
+      // 3. Fallback to Groq
       try {
-        finalAnswer = await callGemini(workingQuestion, knowledgeContext, formattedHistory);
-        source = 'gemini';
-      } catch (geminiErr) {
-        // 4. Use Smart Police Intelligence Engine fallback (NEVER FAIL!)
-        finalAnswer = generateSmartPoliceResponse(workingQuestion, targetLang, activeHistory);
-        source = 'smart_police_engine';
+        finalAnswer = await callGroq(workingQuestion, knowledgeContext, formattedHistory);
+        source = 'groq';
+      } catch (groqErr) {
+        // 4. Fallback to Gemini
+        try {
+          finalAnswer = await callGemini(workingQuestion, knowledgeContext, formattedHistory);
+          source = 'gemini';
+        } catch (geminiErr) {
+          // 5. Smart Police Engine (NEVER FAIL!)
+          finalAnswer = generateSmartPoliceResponse(workingQuestion, targetLang, activeHistory);
+          source = 'smart_police_engine';
+        }
       }
     }
 
