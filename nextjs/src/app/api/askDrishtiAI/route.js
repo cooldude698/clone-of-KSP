@@ -220,9 +220,26 @@ function generateSmartPoliceResponse(question, lang = 'en') {
   if (lang === 'kn') {
     return `ಸರ್, ಪೋಲಿಸ್ ಮಾಹಿತಿ ಪೋರ್ಟಲ್‌ನ ಸಾರಾಂಶ ಇಲ್ಲಿದೆ:
 
-೧. ಸಕ್ರಿಯ ಎಫ್.ಐ.ಆರ್ ಪ್ರಕರಣಗಳು: ೯೬೮ ಪ್ರಕರಣಗಳು ಸಕ್ರಿಯವಾಗಿವೆ.
+೧. ಸಕ್ರಿಯ ಎಫ್.ಐ.ರ್ ಪ್ರಕರಣಗಳು: ೯೬೮ ಪ್ರಕರಣಗಳು ಸಕ್ರಿಯವಾಗಿವೆ.
 ೨. ಪ್ರಮುಖ ಶಂಕಿತರು: ರಮೇಶ್ ಕುಮಾರ್ (೭ ಪ್ರಕರಣಗಳು), ಸುರೇಶ್ ನಾಯ್ಡು (೫ ಪ್ರಕರಣಗಳು).
 ೩. ಪೋಲಿಸ್ ತನಿಖೆಗೆ ಅಗತ್ಯವಿದ್ದರೆ ನಿರ್ದಿಷ್ಟ ಪ್ರಕರಣ ಸಂಖ್ಯೆ (ಉದಾಹರಣೆಗೆ FIR-2026-BL-0492) ಅಥವಾ ಶಂಕಿತನ ಹೆಸರನ್ನು ನಮೂದಿಸಿ ಮಾಹಿತಿ ಪಡೆಯಬಹುದು.`;
+  }
+
+  if (lang === 'hi') {
+    return `सर, पुलिस इंटेलिजेंस और केस डेटाबेस की विस्तृत रिपोर्ट:
+
+1. वर्तमान डेटाबेस की स्थिति:
+   - कुल सक्रिय एफ़.आई.आर मामले: कर्नाटक पुलिस स्टेशनों में 968 मामले सक्रिय हैं।
+   - पिछले 24 घंटों में दर्ज नए मामले: 14 नए मामले दर्ज।
+   - सक्रिय निगरानी में आदतन अपराधी: 12 उच्च-जोखिम वाले अपराधी।
+
+2. मुख्य एफ़.आई.आर मामले:
+   - FIR-2026-BL-0492: वाहन चोरी (धारा 379 IPC) | स्थान: दक्षिण बेंगलुरु | स्थिति: जांच जारी है।
+   - FIR-2026-BL-0493: चेन स्नेचिंग (धारा 392 IPC) | स्थान: एमजी रोड, बेंगलुरु | स्थिति: आरोप पत्र (Chargesheet) तैयार।
+   - FIR-2026-MYS-0112: साइबर वित्तीय धोखाधड़ी (IT Act Sec 66D) | स्थान: मैसूरु | स्थिति: 1930 हेल्पलाइन द्वारा ₹1.45 लाख राशि फ़्रीज़ की गई।
+
+3. आगे की पुलिस कार्रवाई:
+   - आप किसी भी विशिष्ट FIR नंबर, संदिग्ध प्रोफ़ाइल या शहर अपराध रिपोर्ट के बारे में जानकारी प्राप्त कर सकते हैं, सर।`;
   }
 
   return `Sir, here is the detailed Police Intelligence & Case Summary for your query:
@@ -230,7 +247,7 @@ function generateSmartPoliceResponse(question, lang = 'en') {
 1. Current Database Status:
    - Total Active FIR Cases: 968 cases across Karnataka Police stations.
    - Repeat Offenders Tracked: 12 high-risk criminals under active surveillance.
-   - ANPR Camera Surveillance Network: 94% camera coverage across major city junctions.
+   - ANPR Camera Surveillance Network: 94% coverage across major city junctions.
 
 2. Primary FIR Highlights:
    - FIR-2026-BL-0492: Vehicle Theft (Section 379 IPC) | Location: South Bengaluru | Status: Under Investigation.
@@ -247,49 +264,66 @@ async function callGroq(question, knowledgeContext = '', sessionHistory = []) {
   const token = process.env.GROQ_API_KEY;
   if (!token) throw new Error('GROQ_API_KEY not configured');
 
-  const userContent = knowledgeContext
-    ? `OFFICER QUERY: ${question}\n\nRELEVANT CONTEXT:\n${knowledgeContext}`
-    : question;
+  const isHindi = /[\u0900-\u097F]/.test(question);
+  const isKannada = /[\u0C80-\u0CFF]/.test(question);
 
-  const GROQ_MODELS = [
-    process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
-    'llama-3.1-8b-instant',
-    'gemma2-9b-it',
+  let langInstruction = '';
+  if (isHindi) {
+    langInstruction = '\n\nIMPORTANT: The user query is in Hindi (हिन्दी) Devanagari script. Respond ENTIRELY in clear, natural Hindi (हिन्दी) script.';
+  } else if (isKannada) {
+    langInstruction = '\n\nIMPORTANT: The user query is in Kannada. Respond ENTIRELY in clear Kannada script.';
+  }
+
+  const userContent = knowledgeContext
+    ? `CONTEXT DATA:\n${knowledgeContext}\n\nUSER QUESTION:\n${question}${langInstruction}`
+    : `${question}${langInstruction}`;
+
+  const messages = [
+    { role: 'system', content: DRISHTI_SYSTEM_PROMPT },
+    ...sessionHistory,
+    { role: 'user', content: userContent },
   ];
 
-  for (const model of GROQ_MODELS) {
-    try {
-      const response = await axios.post(
-        'https://api.groq.com/openai/v1/chat/completions',
-        {
-          model,
-          messages: [
-            { role: 'system', content: DRISHTI_SYSTEM_PROMPT },
-            ...sessionHistory.slice(-6).map(h => ({ role: h.role, content: h.content })),
-            { role: 'user', content: userContent },
-          ],
-          max_tokens: 1200,
-          temperature: 0.2,
-        },
-        { headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, timeout: 8000 }
-      );
-      const answer = response.data?.choices?.[0]?.message?.content;
-      if (answer?.trim()) return answer.trim();
-    } catch (e) {
-      console.warn(`[DRISHTI] Groq model ${model} failed:`, e.message);
+  const res = await axios.post(
+    'https://api.groq.com/openai/v1/chat/completions',
+    {
+      model: 'llama-3.3-70b-versatile',
+      messages,
+      temperature: 0.2,
+      max_tokens: 1200,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      timeout: 8000,
     }
-  }
-  throw new Error('All Groq models failed');
+  );
+
+  const answer = res.data?.choices?.[0]?.message?.content || '';
+  if (answer.trim()) return answer.trim();
+  throw new Error('Empty response from Groq');
 }
 
 // --- Gemini LLM API Call ------------------------------------------------------
 
 async function callGemini(question, knowledgeContext = '', sessionHistory = []) {
-  const fullPrompt = knowledgeContext
-    ? `OFFICER QUESTION: ${question}\n\nPOLICE DATABASE & MANUAL CONTEXT:\n${knowledgeContext}`
-    : question;
+  const isHindi = /[\u0900-\u097F]/.test(question);
+  const isKannada = /[\u0C80-\u0CFF]/.test(question);
 
-  const historyContents = sessionHistory.slice(-6).map(h => ({
+  let langInstruction = '';
+  if (isHindi) {
+    langInstruction = '\n\nIMPORTANT: The user query is in Hindi (हिन्दी). Respond ENTIRELY in clear, natural Hindi (हिन्दी) Devanagari script.';
+  } else if (isKannada) {
+    langInstruction = '\n\nIMPORTANT: The user query is in Kannada. Respond ENTIRELY in clear Kannada script.';
+  }
+
+  const fullPrompt = knowledgeContext
+    ? `CONTEXT DATA:\n${knowledgeContext}\n\nUSER QUESTION:\n${question}${langInstruction}`
+    : `${question}${langInstruction}`;
+
+  const historyContents = sessionHistory.map(h => ({
     role: h.role === 'assistant' ? 'model' : 'user',
     parts: [{ text: h.content }],
   }));
@@ -407,9 +441,14 @@ export async function POST(req) {
 
     // Translate output if needed and not already translated
     let spokenAnswer = finalAnswer;
-    if (targetLang !== 'en' && source !== 'smart_police_engine') {
-      finalAnswer = await translateWithGemini(finalAnswer, targetLang);
-      spokenAnswer = finalAnswer;
+    if (targetLang !== 'en') {
+      const containsDevanagari = /[\u0900-\u097F]/.test(finalAnswer);
+      const containsKannada = /[\u0C80-\u0CFF]/.test(finalAnswer);
+
+      if ((targetLang === 'hi' && !containsDevanagari) || (targetLang === 'kn' && !containsKannada)) {
+        finalAnswer = await translateWithGemini(finalAnswer, targetLang);
+        spokenAnswer = finalAnswer;
+      }
     }
 
     const suggestions = [

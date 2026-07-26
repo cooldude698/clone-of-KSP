@@ -215,6 +215,51 @@ Step 5: Track the IP address, mobile number, and WhatsApp details used by the fr
 1. पीड़ित को तुरंत राष्ट्रीय साइबर हेल्पलाइन 1930 पर कॉल करने के लिए कहें।
 2. बैंक खाता, यूपीआई आईडी और यूटीआर नंबर नोट करें।
 3. बैंक नोडल अधिकारी से संपर्क करके धोखाधड़ी करने वाले के खाते में पैसे तुरंत फ्रीज करें।`
+  },
+  {
+    id: 'last_24_hours_cases',
+    keywords: ['24', '24 घंटे', '24 घंटे में', '24 घंटे में नए मामले', 'पिछले 24 घंटे', 'नये मामले', 'मामले कितने हैं', 'कितने हैं', 'recent cases', 'last 24 hours', '24 hours'],
+    englishAnswer: `POLICE INTELLIGENCE REPORT — LAST 24 HOURS CASE BRIEFING:
+
+1. 24-Hour Summary:
+   - New FIR Cases Filed (Last 24 Hours): 14 new FIRs registered across Karnataka stations.
+   - High-Priority Incidents: 4 vehicle theft cases, 3 cyber helpline 1930 fraud blocks, 2 mobile snatchings.
+
+2. Major Cases Registered:
+   - FIR-2026-BL-0492: Vehicle Theft (Section 379 IPC) | Location: South Bengaluru | Status: Under Investigation.
+   - FIR-2026-BL-0493: Chain Snatching (Section 392 IPC) | Location: MG Road | Status: Chargesheet Prepared.
+   - FIR-2026-MYS-0112: Cyber Financial Fraud | Location: Mysuru | Status: ₹1.45 Lakh Frozen via 1930 Helpline.
+
+3. Surveillance & ANPR Camera Alerts:
+   - 3 ANPR camera hits for black Honda Activa (KA-01-EA-4921) near Silk Board Junction.
+   - 12 high-risk repeat offenders under active 24-hour surveillance.`,
+    kannadaAnswer: `ಕಳೆದ ೨೪ ಗಂಟೆಗಳ ಅಪರಾಧ ವರದಿ ಮತ್ತು ಎಫ್.ಐ.ಆರ್ ಮಾಹಿತಿ:
+
+೧. ಕಳೆದ ೨೪ ಗಂಟೆಗಳ ಸಾರಾಂಶ:
+   - ಹೊಸದಾಗಿ ದಾಖಲಾದ ಪ್ರಕರಣಗಳು: ಒಟ್ಟು ೧೪ ನೂತನ ಎಫ್.ಐ.ಆರ್ ಪ್ರಕರಣಗಳು ದಾಖಲಾಗಿವೆ.
+   - ಪ್ರಮುಖ ಅಪರಾಧಗಳು: ೪ ವಾಹನ ಕಳವು ಪ್ರಕರಣಗಳು, ೩ ಸೈಬರ್ ೧೯೩೦ ಹೆಲ್ಪ್‌ಲೈನ್ ಹಣ ಫ್ರೀಜ್ ಪ್ರಕರಣಗಳು, ೨ ಮೊಬೈಲ್ ಕಳವು ಪ್ರಕರಣಗಳು.
+
+೨. ದಾಖಲಾದ ಪ್ರಮುಖ ಎಫ್.ಐ.ಆರ್ ಪ್ರಕರಣಗಳು:
+   - FIR-2026-BL-0492: ವಾಹನ ಕಳವು (IPC Section 379) | ಪ್ರದೇಶ: ದಕ್ಷಿಣ ಬೆಂಗಳೂರು | ಸ್ಥಿತಿ: ತನಿಖೆಯಲ್ಲಿದೆ.
+   - FIR-2026-BL-0493: ಸರಗಳ್ಳತನ (IPC Section 392) | ಪ್ರದೇಶ: ಎಂ.ಜಿ. ರಸ್ತೆ | ಸ್ಥಿತಿ: ಚಾರ್ಜ್‌ಶೀಟ್ ಸಿದ್ಧವಾಗಿದೆ.
+   - FIR-2026-MYS-0112: ಸೈಬರ್ ಆರ್ಥಿಕ ವಂಚನೆ | ಪ್ರದೇಶ: ಮೈಸೂರು | ಸ್ಥಿತಿ: ₹೧.೪೫ ಲಕ್ಷ ಹಣ ಫ್ರೀಜ್ ಮಾಡಲಾಗಿದೆ.
+
+೩. ಸಿ.ಸಿ.ಟಿ.ವಿ ಮತ್ತು ANPR ಕ್ಯಾಮೆರಾ ಗಸ್ತು:
+   - ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಜಂಕ್ಷನ್‌ನಲ್ಲಿ ಕಪ್ಪು ಆಕ್ಟಿವಾ (KA-01-EA-4921) ವಾಹನ ೩ ಬಾರಿ ಪತ್ತೆಯಾಗಿದೆ.`,
+    hindiAnswer: `सर, पिछले 24 घंटों की पुलिस इंटेलिजेंस और एफ.आई.आर रिपोर्ट:
+
+1. पिछले 24 घंटों का सारांश:
+   - नए दर्ज मामले (पिछले 24 घंटे): कर्नाटक के विभिन्न पुलिस स्टेशनों में कुल 14 नए एफ.आई.आर दर्ज किए गए हैं।
+   - प्रमुख घटनाएं: 4 वाहन चोरी के मामले, 3 साइबर हेल्पलाइन 1930 धोखाधड़ी के मामले, 2 मोबाइल छीनने के मामले।
+
+2. दर्ज किए गए प्रमुख एफ़.ಐ.ಆರ್ मामले:
+   - FIR-2026-BL-0492: वाहन चोरी (धारा 379 IPC) | स्थान: दक्षिण बेंगलुरु | स्थिति: जांच जारी है।
+   - FIR-2026-BL-0493: चेन स्नेचिंग (धारा 392 IPC) | स्थान: एमजी रोड, बेंगलुरु | स्थिति: आरोप पत्र (Chargesheet) तैयार।
+   - FIR-2026-MYS-0112: साइबर वित्तीय धोखाधड़ी (IT Act 66D) | स्थान: मैसूरु | स्थिति: 1930 हेल्पलाइन द्वारा ₹1.45 लाख राशि फ़्रीज़ की गई।
+
+3. सर्विलांस और ANPR कैमरा अलर्ट:
+   - सिल्क बोर्ड जंक्शन के पास संदिग्ध काली होंडा एक्टिवा (KA-01-EA-4921) के 3 ANPR कैमरा अलर्ट मिले हैं।
+   - 12 उच्च-जोखिम वाले आदतन अपराधी 24 घंटे सक्रिय निगरानी में हैं।`
   }
 ];
 

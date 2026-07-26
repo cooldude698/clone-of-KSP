@@ -504,13 +504,17 @@ export default function ChatPage() {
     try {
       let responseText = '';
       let isDemoResp = false;
+      const isHindiInput = /[\u0900-\u097F]/.test(text);
+      const isKannadaInput = /[\u0C80-\u0CFF]/.test(text);
+      const activeLang = isKannadaInput ? 'kn' : isHindiInput ? 'hi' : (VOICE_PROFILES.find(p => p.id === voiceProfile) || VOICE_PROFILES[0]).lang;
+
       try {
         const res = await fetch(`${API_BASE}/askDrishtiAI`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             question: text,
-            lang: (VOICE_PROFILES.find(p => p.id === voiceProfile) || VOICE_PROFILES[0]).lang,
+            lang: activeLang,
           }),
         });
         if (res.ok) {
