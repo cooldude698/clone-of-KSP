@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Newspaper, RefreshCw, AlertCircle, Radio } from 'lucide-react';
+import { Newspaper, RefreshCw, AlertCircle, Radio, ChevronDown } from 'lucide-react';
 import NewsCard from '@/components/NewsCard';
 import Skeleton from '@/components/ui/Skeleton';
 import EmptyState from '@/components/ui/EmptyState';
@@ -40,17 +40,23 @@ interface Article {
 export default function LiveNewsPage() {
   const [selectedState, setSelectedState] = useState<string>('All India');
   const [articles, setArticles] = useState<Article[]>([]);
+  const [totalArticles, setTotalArticles] = useState<number>(0);
+  const [page, setPage] = useState<number>(1);
+  const [hasMore, setHasMore] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [minsAgo, setMinsAgo] = useState<string>('0 min ago');
 
+  // Fetch initial page 1 on state change or manual refresh
   const fetchNews = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setPage(1);
     try {
       const param = encodeURIComponent(selectedState);
-      const res = await fetch(`/api/news?state=${param}`);
+      const res = await fetch(`/api/news?state=${param}&page=1`);
       const data = await res.json();
 
       if (!res.ok || (data.error && (!data.articles || data.articles.length === 0))) {
@@ -58,18 +64,52 @@ export default function LiveNewsPage() {
       }
 
       setArticles(data.articles || []);
+      setTotalArticles(data.totalArticles || data.totalCount || data.articles?.length || 0);
+      setHasMore(data.hasMore ?? false);
       setLastUpdated(new Date());
+
       if (data.error) {
-        // Soft error notice if using fallback feed
         setError(data.error);
       }
     } catch (err: any) {
       setError(err?.message || 'Network error while loading crime news feed.');
       setArticles([]);
+      setTotalArticles(0);
+      setHasMore(false);
     } finally {
       setLoading(false);
     }
   }, [selectedState]);
+
+  // Load more function for pagination (appends next page results)
+  const handleLoadMore = async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const nextPage = page + 1;
+
+    try {
+      const param = encodeURIComponent(selectedState);
+      const res = await fetch(`/api/news?state=${param}&page=${nextPage}`);
+      const data = await res.json();
+
+      if (data.articles && data.articles.length > 0) {
+        setArticles((prev) => {
+          const existingUrls = new Set(prev.map((a) => a.url));
+          const newUnique = data.articles.filter((a: Article) => !existingUrls.has(a.url));
+          return [...prev, ...newUnique];
+        });
+        setPage(nextPage);
+        setHasMore(data.hasMore ?? false);
+        if (data.totalArticles) setTotalArticles(data.totalArticles);
+      } else {
+        setHasMore(false);
+      }
+    } catch (err) {
+      console.error('Failed to load more news:', err);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   // Initial fetch and fetch on state change
   useEffect(() => {
@@ -90,11 +130,7 @@ export default function LiveNewsPage() {
       if (!lastUpdated) return;
       const diffSecs = Math.floor((Date.now() - lastUpdated.getTime()) / 1000);
       const mins = Math.floor(diffSecs / 60);
-      if (mins < 1) {
-        setMinsAgo('just now');
-      } else {
-        setMinsAgo(`${mins} min ago`);
-      }
+      setMinsAgo(mins < 1 ? 'just now' : `${mins} min ago`);
     }, 10_000);
 
     if (lastUpdated) {
@@ -130,9 +166,9 @@ export default function LiveNewsPage() {
           </p>
         </div>
 
-        {/* Action Controls: State Select Dropdown + Refresh Button + Timestamp */}
+        {/* Action Controls: State Select Dropdown + Refresh Button + Timestamp + Count */}
         <div className="flex flex-wrap items-center gap-3">
-          {/* State Select Dropdown (Reusing exact Select/dropdown styling) */}
+          {/* State Select Dropdown */}
           <div className="flex items-center gap-1.5">
             <label htmlFor="state-filter" className="text-xs font-mono text-paper-100/60 hidden sm:inline">
               State:
@@ -168,6 +204,14 @@ export default function LiveNewsPage() {
             <Radio className="w-3 h-3 text-phosphor-500" />
             <span>Last updated: {minsAgo}</span>
           </div>
+
+          {/* Total Available Articles Badge */}
+          {totalArticles > 0 && (
+            <div className="text-xs font-mono text-paper-100/80 bg-steel-700 px-3 py-1.5 rounded border border-steel-600/40">
+              Showing <span className="text-phosphor-500 font-bold">{articles.length}</span> of{' '}
+              <span className="font-bold">{totalArticles.toLocaleString('en-IN')}</span> articles
+            </div>
+          )}
         </div>
       </div>
 
@@ -204,7 +248,6 @@ export default function LiveNewsPage() {
           ))}
         </div>
       ) : error && articles.length === 0 ? (
-        /* Error State reusing EmptyState component */
         <EmptyState
           icon={AlertCircle}
           title="Unable to Load Live News Feed"
@@ -216,7 +259,6 @@ export default function LiveNewsPage() {
           </Button>
         </EmptyState>
       ) : articles.length === 0 ? (
-        /* Empty State reusing EmptyState component */
         <EmptyState
           icon={Newspaper}
           title={`No Crime Reports Found for ${selectedState}`}
@@ -224,12 +266,42 @@ export default function LiveNewsPage() {
           className="py-16"
         />
       ) : (
-        /* News Grid (1 col mobile, 2 tablet, 3 desktop) */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {articles.map((article, idx) => (
-            <NewsCard key={`${article.url}-${idx}`} article={article} index={idx} />
-          ))}
-        </div>
+        <>
+          {/* News Grid (1 col mobile, 2 tablet, 3 desktop) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {articles.map((article, idx) => (
+              <NewsCard key={`${article.url}-${idx}`} article={article} index={idx} />
+            ))}
+          </div>
+
+          {/* Load More Button Pagination */}
+          {hasMore && (
+            <div className="flex flex-col items-center justify-center pt-6">
+              <Button
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                variant="secondary"
+                size="md"
+                className="flex items-center gap-2 font-mono text-xs px-6 py-2.5 border-steel-600 hover:border-phosphor-500"
+              >
+                {loadingMore ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin text-phosphor-500" />
+                    <span>Loading Next Page...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Load More News</span>
+                    <ChevronDown className="w-4 h-4 text-phosphor-500" />
+                  </>
+                )}
+              </Button>
+              <p className="text-[11px] font-mono text-paper-100/50 mt-2">
+                Page {page} • Showing {articles.length} of {totalArticles.toLocaleString('en-IN')} total results
+              </p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

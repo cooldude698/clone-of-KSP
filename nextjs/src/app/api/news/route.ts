@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-// Server-side in-memory cache per state: key -> { timestamp, data }
+// Server-side in-memory cache per state and page: key -> { timestamp, data }
 const cache = new Map<string, { timestamp: number; data: any }>();
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
@@ -60,46 +60,61 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const stateParam = (searchParams.get('state') || '').trim();
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
 
     const isAllIndia = !stateParam || stateParam.toLowerCase() === 'all india';
-    const cacheKey = isAllIndia ? 'all-india' : stateParam.toLowerCase();
+    const cacheKey = `${isAllIndia ? 'all-india' : stateParam.toLowerCase()}_p${page}`;
     const now = Date.now();
 
     // 1. Check server-side 5-minute cache
     if (cache.has(cacheKey)) {
       const cached = cache.get(cacheKey)!;
       if (now - cached.timestamp < CACHE_TTL_MS) {
+        console.log(`[GNews Cache Hit] Key: ${cacheKey}, Articles: ${cached.data.articles?.length}, totalArticles: ${cached.data.totalArticles}`);
         return NextResponse.json(cached.data);
       }
     }
 
     const apiKey = process.env.NEWS_API_KEY;
 
-    // 2. If no NEWS_API_KEY set, return structured fallback data gracefully
+    // 2. If no NEWS_API_KEY set, return fallback demo data
     if (!apiKey) {
       const responsePayload = {
         articles: MOCK_CRIME_NEWS,
+        totalArticles: MOCK_CRIME_NEWS.length,
+        totalCount: MOCK_CRIME_NEWS.length,
+        page,
+        hasMore: false,
         isFallback: true,
+        error: 'NEWS_API_KEY is missing. Showing fallback crime news feed.',
       };
       cache.set(cacheKey, { timestamp: now, data: responsePayload });
       return NextResponse.json(responsePayload);
     }
 
-    // 3. Construct GNews query: q=crime+OR+police+OR+arrest+(state name)
+    // 3. Construct optimal GNews search query for max coverage & relevance
     const query = isAllIndia
       ? 'crime OR police OR arrest'
-      : `crime OR police OR arrest "${stateParam}"`;
+      : `crime OR police OR arrest ${stateParam}`;
 
     const gnewsUrl = `https://gnews.io/api/v4/search?q=${encodeURIComponent(
       query
-    )}&lang=en&country=in&max=20&apikey=${apiKey}`;
+    )}&lang=en&country=in&max=10&page=${page}&apikey=${apiKey}`;
 
     const res = await fetch(gnewsUrl);
 
     if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      const errorMsg = errBody?.errors?.[0] || `GNews API error (${res.status})`;
+      console.warn(`[GNews API Error] Status: ${res.status}, Error: ${errorMsg}`);
+
       const errorPayload = {
-        error: `GNews API error (${res.status}): Failed to fetch live crime news feed.`,
+        error: `GNews API notice (${res.status}): ${errorMsg}`,
         articles: MOCK_CRIME_NEWS,
+        totalArticles: MOCK_CRIME_NEWS.length,
+        totalCount: MOCK_CRIME_NEWS.length,
+        page,
+        hasMore: false,
         isFallback: true,
       };
       cache.set(cacheKey, { timestamp: now, data: errorPayload });
@@ -107,7 +122,15 @@ export async function GET(request: Request) {
     }
 
     const data = await res.json();
-    const articles = (data.articles || []).map((art: any) => ({
+    const rawTotalArticles = data.totalArticles ?? 0;
+    const returnedArticles = data.articles || [];
+
+    // Explicitly log the raw GNews response article counts as requested
+    console.log(
+      `[GNews API Response] Query: "${query}", Page: ${page}, Raw totalArticles: ${rawTotalArticles}, Articles returned: ${returnedArticles.length}`
+    );
+
+    const articles = returnedArticles.map((art: any) => ({
       title: art.title || 'Untitled Crime Report',
       description: art.description || '',
       url: art.url || '#',
@@ -116,15 +139,26 @@ export async function GET(request: Request) {
       source: typeof art.source === 'object' ? art.source?.name || 'GNews' : art.source || 'GNews',
     }));
 
-    const responsePayload = { articles };
-    cache.set(cacheKey, { timestamp: now, data: responsePayload });
+    const responsePayload = {
+      articles,
+      totalArticles: rawTotalArticles,
+      totalCount: rawTotalArticles,
+      page,
+      hasMore: page * 10 < rawTotalArticles,
+    };
 
+    cache.set(cacheKey, { timestamp: now, data: responsePayload });
     return NextResponse.json(responsePayload);
   } catch (err: any) {
+    console.error('[GNews API Exception]', err);
     return NextResponse.json(
       {
         error: `Server error while fetching news: ${err?.message || 'Unknown error'}`,
         articles: MOCK_CRIME_NEWS,
+        totalArticles: MOCK_CRIME_NEWS.length,
+        totalCount: MOCK_CRIME_NEWS.length,
+        page: 1,
+        hasMore: false,
         isFallback: true,
       },
       { status: 200 }
