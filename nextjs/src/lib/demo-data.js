@@ -250,33 +250,53 @@ export const DEMO_REPEAT_OFFENDERS = {
 
 export const DEMO_NETWORK_GRAPH = {
   nodes: [
-    { id: "SUS-8842", label: "Ramesh Kumar", type: "suspect", risk: 94, role: "Gang Leader", crime: "vehicle_theft", district: "South Bengaluru" },
-    { id: "SUS-7104", label: "Suresh Naidu", type: "suspect", risk: 88, role: "Co-Accused", crime: "robbery", district: "Mysuru" },
-    { id: "SUS-5921", label: "Imran Khan", type: "suspect", risk: 76, role: "Snatcher", crime: "chain_snatching", district: "Whitefield" },
-    { id: "SUS-4401", label: "Deepak Shetty", type: "suspect", risk: 71, role: "Vehicle Fence", crime: "vehicle_theft", district: "Yelahanka" },
-    { id: "SUS-3302", label: "Arun Gowda", type: "suspect", risk: 65, role: "Lookout", crime: "robbery", district: "Tumkur" },
-    { id: "SUS-2211", label: "Farid Mirza", type: "suspect", risk: 82, role: "Weapons Source", crime: "assault", district: "Central Bengaluru" },
-    { id: "SUS-1190", label: "Manoj Reddy", type: "suspect", risk: 59, role: "Driver", crime: "vehicle_theft", district: "Electronic City" },
-    { id: "FIR-2026-BL-4921", label: "FIR-4921\nVehicle Theft", type: "fir", crime: "vehicle_theft" },
-    { id: "FIR-2026-MY-1103", label: "FIR-1103\nArmed Robbery", type: "fir", crime: "robbery" },
-    { id: "FIR-2026-BL-4920", label: "FIR-4920\nChain Snatching", type: "fir", crime: "chain_snatching" },
-    { id: "FIR-2026-BL-5001", label: "FIR-5001\nAssault", type: "fir", crime: "assault" },
-    { id: "FIR-2026-YL-0234", label: "FIR-0234\nStolen Parts", type: "fir", crime: "vehicle_theft" },
+    // ── GANG-NORTH: Vehicle Theft Syndicate ──────────────────────────────────
+    { id: "SUS-8842", label: "Ramesh Kumar",  type: "suspect", risk: 94, role: "Gang Leader",      crime: "vehicle_theft",  district: "South Bengaluru",   gang_id: "GANG-NORTH", size: 26, first_crime_date: "2025-03-10", last_crime_date: "2026-07-18" },
+    { id: "SUS-4401", label: "Deepak Shetty", type: "suspect", risk: 71, role: "Weapons Handler",  crime: "vehicle_theft",  district: "Yelahanka",         gang_id: "GANG-NORTH", size: 15, first_crime_date: "2025-04-22", last_crime_date: "2026-06-30" },
+    { id: "SUS-2211", label: "Farid Mirza",   type: "suspect", risk: 82, role: "Arms & Contraband Supplier", crime: "assault", district: "Central Bengaluru", gang_id: "GANG-NORTH", size: 20, first_crime_date: "2025-05-15", last_crime_date: "2026-07-01" },
+    { id: "SUS-1190", label: "Manoj Reddy",   type: "suspect", risk: 65, role: "Lookout",          crime: "vehicle_theft",  district: "Electronic City",   gang_id: "GANG-NORTH", size: 15, first_crime_date: "2025-06-01", last_crime_date: "2026-05-20" },
+    { id: "SUS-9901", label: "Ravi Shankar",  type: "suspect", risk: 88, role: "Finance Handler", crime: "fraud",          district: "Indiranagar",      gang_id: "GANG-NORTH", size: 20, first_crime_date: "2025-07-10", last_crime_date: "2026-07-10" },
+    { id: "SUS-6633", label: "Basha Khan",    type: "suspect", risk: 91, role: "Enforcer",        crime: "assault",        district: "Shivajinagar",     gang_id: "GANG-NORTH", size: 20, first_crime_date: "2025-08-05", last_crime_date: "2026-07-15" },
+
+    // ── GANG-SOUTH: Chain Snatching Cell ─────────────────────────────────────
+    { id: "SUS-5921", label: "Imran Khan",    type: "suspect", risk: 76, role: "Gang Leader",      crime: "chain_snatching", district: "Whitefield",      gang_id: "GANG-SOUTH", size: 26, first_crime_date: "2025-03-20", last_crime_date: "2026-07-16" },
+    { id: "SUS-7104", label: "Suresh Naidu",  type: "suspect", risk: 88, role: "Co-Accused",       crime: "robbery",        district: "Mysuru",          gang_id: "GANG-SOUTH", size: 20, first_crime_date: "2025-04-01", last_crime_date: "2026-06-25" },
+    { id: "SUS-3302", label: "Arun Gowda",    type: "suspect", risk: 65, role: "Lookout",          crime: "robbery",        district: "Tumkur",          gang_id: "GANG-SOUTH", size: 15, first_crime_date: "2025-05-10", last_crime_date: "2026-05-30" },
+    { id: "SUS-0012", label: "Prakash Nair",  type: "suspect", risk: 67, role: "Intel Mole",       crime: "cybercrime",     district: "Koramangala",     gang_id: "GANG-SOUTH", size: 15, first_crime_date: "2025-09-12", last_crime_date: "2026-07-05" },
+
+    // ── FIR Case Nodes ───────────────────────────────────────────────────────
+    { id: "FIR-2026-BL-4921", label: "FIR-4921\nVehicle Theft",  type: "fir", crime: "vehicle_theft",  first_crime_date: "2025-03-10" },
+    { id: "FIR-2026-MY-1103", label: "FIR-1103\nArmed Robbery",  type: "fir", crime: "robbery",        first_crime_date: "2025-04-01" },
+    { id: "FIR-2026-BL-4920", label: "FIR-4920\nChain Snatching",type: "fir", crime: "chain_snatching",first_crime_date: "2025-03-20" },
+    { id: "FIR-2026-BL-5001", label: "FIR-5001\nAssault",        type: "fir", crime: "assault",        first_crime_date: "2025-08-05" },
+    { id: "FIR-2026-YL-0234", label: "FIR-0234\nStolen Parts",   type: "fir", crime: "vehicle_theft",  first_crime_date: "2025-04-22" },
   ],
   edges: [
-    { source: "SUS-8842", target: "FIR-2026-BL-4921", relation: "Primary Accused", weight: 5 },
-    { source: "SUS-8842", target: "SUS-7104", relation: "Gang Associate", weight: 4 },
-    { source: "SUS-8842", target: "SUS-4401", relation: "Sells stolen vehicles to", weight: 3 },
-    { source: "SUS-8842", target: "SUS-2211", relation: "Procures weapons from", weight: 4 },
-    { source: "SUS-7104", target: "FIR-2026-MY-1103", relation: "Primary Accused", weight: 5 },
-    { source: "SUS-7104", target: "SUS-5921", relation: "Operational Partner", weight: 4 },
-    { source: "SUS-7104", target: "SUS-3302", relation: "Uses as Lookout", weight: 2 },
-    { source: "SUS-5921", target: "FIR-2026-BL-4920", relation: "Primary Accused", weight: 5 },
-    { source: "SUS-5921", target: "SUS-1190", relation: "Getaway Driver", weight: 3 },
-    { source: "SUS-4401", target: "FIR-2026-YL-0234", relation: "Receiver of Stolen Goods", weight: 4 },
-    { source: "SUS-2211", target: "FIR-2026-BL-5001", relation: "Co-Accused", weight: 3 },
-    { source: "SUS-3302", target: "FIR-2026-MY-1103", relation: "Accessory", weight: 2 },
-    { source: "SUS-1190", target: "FIR-2026-BL-4921", relation: "Accessory (Driver)", weight: 2 },
+    // ── GANG-NORTH intra-gang edges ─────────────────────────────────────────
+    { source: "SUS-8842", target: "FIR-2026-BL-4921", relation: "Primary Accused",          weight: 5, date: "2025-03-10" },
+    { source: "SUS-8842", target: "SUS-4401",         relation: "Sells stolen vehicles to", weight: 3, date: "2025-04-22" },
+    { source: "SUS-8842", target: "SUS-2211",         relation: "Procures weapons from",    weight: 4, date: "2025-05-15" },
+    { source: "SUS-8842", target: "SUS-9901",         relation: "Finances gang ops",        weight: 4, date: "2025-07-10" },
+    { source: "SUS-8842", target: "SUS-6633",         relation: "Enforcement unit",         weight: 4, date: "2025-08-05" },
+    { source: "SUS-4401", target: "FIR-2026-YL-0234", relation: "Receiver of Stolen Goods", weight: 4, date: "2025-04-22" },
+    { source: "SUS-2211", target: "FIR-2026-BL-5001", relation: "Co-Accused",               weight: 3, date: "2025-08-05" },
+    { source: "SUS-1190", target: "FIR-2026-BL-4921", relation: "Accessory (Driver)",       weight: 2, date: "2025-06-01" },
+    { source: "SUS-6633", target: "SUS-2211",         relation: "Enforcement Partner",      weight: 3, date: "2025-09-01" },
+    { source: "SUS-9901", target: "SUS-4401",         relation: "Money Laundering Link",   weight: 3, date: "2025-10-15" },
+
+    // ── GANG-SOUTH intra-gang edges ─────────────────────────────────────────
+    { source: "SUS-5921", target: "FIR-2026-BL-4920", relation: "Primary Accused",    weight: 5, date: "2025-03-20" },
+    { source: "SUS-5921", target: "SUS-7104",         relation: "Operational Partner", weight: 4, date: "2025-04-01" },
+    { source: "SUS-5921", target: "SUS-3302",         relation: "Uses as Lookout",     weight: 2, date: "2025-05-10" },
+    { source: "SUS-5921", target: "SUS-0012",         relation: "Intel Sharing",       weight: 3, date: "2025-09-12" },
+    { source: "SUS-7104", target: "FIR-2026-MY-1103", relation: "Primary Accused",    weight: 5, date: "2025-04-01" },
+    { source: "SUS-7104", target: "SUS-3302",         relation: "Uses as Lookout",     weight: 2, date: "2025-05-15" },
+    { source: "SUS-0012", target: "SUS-3302",         relation: "Coordination",        weight: 2, date: "2026-01-20" },
+
+    // ── Cross-gang edges ────────────────────────────────────────────────────
+    { source: "SUS-8842", target: "SUS-7104",         relation: "Cross-Gang Intel",    weight: 2, date: "2025-06-15" },
+    { source: "SUS-2211", target: "SUS-5921",         relation: "Arms Supply to South", weight: 2, date: "2026-02-10" },
+    { source: "SUS-9901", target: "SUS-0012",         relation: "Financial Conduit",   weight: 2, date: "2026-05-01" },
   ]
 };
 

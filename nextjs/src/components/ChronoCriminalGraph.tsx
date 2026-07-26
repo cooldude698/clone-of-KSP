@@ -207,7 +207,13 @@ export default function ChronoCriminalGraph({
       .force("link", d3.forceLink<GraphNode, GraphEdge>(visibleEdges)
         .id(d => d.id)
         .distance(120)
-      );
+      )
+      .force("gang_x", d3.forceX<GraphNode>(d => {
+        if ((d as any).gang_id === "GANG-NORTH") return width * 0.35;
+        if ((d as any).gang_id === "GANG-SOUTH") return width * 0.65;
+        return width / 2;
+      }).strength(0.12))
+      .force("gang_y", d3.forceY<GraphNode>(_ => height / 2).strength(0.05));
 
     // Render group elements
     const linkGroup = g.append("g").attr("class", "links");
@@ -233,12 +239,44 @@ export default function ChronoCriminalGraph({
 
     const linkEnter = linkSel.enter()
       .append("line")
-      .attr("stroke", d => getEdgeColor(d.crime_type))
+      .attr("stroke", d => {
+        const sId = typeof d.source === 'object' ? (d.source as GraphNode).id : d.source as string;
+        const tId = typeof d.target === 'object' ? (d.target as GraphNode).id : d.target as string;
+        const sNode = visibleNodes.find(n => n.id === sId);
+        const tNode = visibleNodes.find(n => n.id === tId);
+        const sGang = (sNode as any)?.gang_id;
+        const tGang = (tNode as any)?.gang_id;
+        if (sGang && tGang && sGang === tGang) {
+          return sGang === "GANG-NORTH" ? "#f97316" : "#8b5cf6";
+        }
+        if (sGang && tGang && sGang !== tGang) return "#ef4444"; // cross-gang link
+        return getEdgeColor(d.crime_type);
+      })
       .attr("stroke-opacity", 0.7)
       .attr("stroke-width", d => Math.max(2, d.weight || 2))
       .attr("stroke-dasharray", d => d.crime_type === 'surveillance' ? '4 3' : 'none');
 
     linkEnter.merge(linkSel);
+
+    // ── Gang label badges above each cluster ──
+    const gangLabels = [
+      { id: "GANG-NORTH", label: "▲ GANG-NORTH", x: width * 0.30, y: 40, color: "#f97316" },
+      { id: "GANG-SOUTH", label: "▲ GANG-SOUTH", x: width * 0.65, y: 40, color: "#8b5cf6" },
+    ];
+    g.selectAll(".gang-label")
+      .data(gangLabels)
+      .enter()
+      .append("text")
+      .attr("class", "gang-label")
+      .attr("x", d => d.x)
+      .attr("y", d => d.y)
+      .attr("text-anchor", "middle")
+      .attr("fill", d => d.color)
+      .style("font-size", "11px")
+      .style("font-weight", "bold")
+      .style("font-family", "monospace")
+      .style("opacity", "0.7")
+      .text(d => d.label);
 
     // ── Update Nodes ──
     const nodeSel = nodeGroup.selectAll<SVGGElement, GraphNode>("g")
@@ -286,6 +324,7 @@ export default function ChronoCriminalGraph({
           tooltipRef.current.innerHTML = `
             <div class="font-mono font-bold text-paper-100 text-sm mb-1">${d.label}</div>
             <div class="text-paper-100/70 text-xs font-mono">Category: <span class="text-paper-100 font-semibold uppercase">${d.type}</span></div>
+            ${(d as any).gang_id ? `<div class="text-paper-100/70 text-xs font-mono">Gang: <span class="font-bold" style="color: ${(d as any).gang_id === 'GANG-NORTH' ? '#f97316' : '#8b5cf6'}">${(d as any).gang_id}</span></div>` : ''}
             ${d.type === 'accused' ? `<div class="text-paper-100/70 text-xs font-mono">FIR Count: <span class="text-phosphor-500 font-bold">${d.total_firs || 1}</span></div>` : ''}
             ${d.risk_score ? `<div class="text-paper-100/70 text-xs font-mono">Threat Index: <span class="font-bold" style="color: ${riskColor}">${d.risk_score}/100</span></div>` : ''}
             <div class="mt-2 flex flex-wrap gap-1">
@@ -333,9 +372,9 @@ export default function ChronoCriminalGraph({
     nodeEnter.each(function(d) {
       const gNode = d3.select(this);
       const nodeSize = d.size || 16;
-      const nodeColor = d.color || (d.type === 'case' ? '#2d83d9' : d.type === 'camera' ? '#00f0ff' : '#f0a848');
 
       if (d.type === 'case') {
+        const nodeColor = '#2d83d9';
         gNode.append("rect")
           .attr("x", -nodeSize)
           .attr("y", -nodeSize)
@@ -375,6 +414,8 @@ export default function ChronoCriminalGraph({
 
       } else {
         // Accused Suspect Circle
+        const gangId = (d as any).gang_id;
+        const nodeColor = gangId === "GANG-NORTH" ? "#f97316" : gangId === "GANG-SOUTH" ? "#8b5cf6" : (d.color || "#f0a848");
         gNode.append("circle")
           .attr("r", nodeSize)
           .attr("fill", nodeColor)

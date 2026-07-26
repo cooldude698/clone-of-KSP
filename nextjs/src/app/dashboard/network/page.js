@@ -29,18 +29,18 @@ function buildNetworkFromFirs(firsList) {
   const activeFirs = Array.isArray(firsList) && firsList.length > 0 ? firsList : DEMO_FIRS.firs;
 
   const suspectNodes = [
-    { id: "SUS-8842", label: "Ramesh Kumar", type: "suspect", risk_score: 94, size: 22, color: "#dc2626", district: "Bengaluru Urban", role: "Vehicle Theft Ring Leader" },
-    { id: "SUS-7104", label: "Suresh Naidu", type: "suspect", risk_score: 91, size: 20, color: "#dc2626", district: "Mysuru / Vijayapura", role: "Armed Robbery Leader" },
-    { id: "SUS-5921", label: "Imran Khan", type: "suspect", risk_score: 96, size: 22, color: "#dc2626", district: "Bengaluru Urban", role: "Narcotics Syndicate Head" },
-    { id: "SUS-4401", label: "Deepak Shetty", type: "suspect", risk_score: 75, size: 18, color: "#e11d48", district: "Yelahanka", role: "Chopshop Fence" },
-    { id: "SUS-3302", label: "Arun Gowda", type: "suspect", risk_score: 68, size: 16, color: "#f59e0b", district: "Tumakuru", role: "Lookout & Logistics" },
-    { id: "SUS-2211", label: "Farid Mirza", type: "suspect", risk_score: 82, size: 18, color: "#dc2626", district: "Central Bengaluru", role: "Arms & Contraband Supplier" },
-    { id: "SUS-1190", label: "Manoj Reddy", type: "suspect", risk_score: 65, size: 16, color: "#f59e0b", district: "Electronic City", role: "Getaway Driver" },
-    { id: "SUS-9012", label: "Vikram Singh", type: "suspect", risk_score: 88, size: 20, color: "#dc2626", district: "Kalaburagi / Davangere", role: "Hit & Run Ring" },
-    { id: "SUS-8041", label: "Anand Shinde", type: "suspect", risk_score: 90, size: 20, color: "#dc2626", district: "Hassan / Belagavi", role: "Violence & Extortion" },
-    { id: "SUS-6022", label: "Bhavani Karpe", type: "suspect", risk_score: 85, size: 18, color: "#06b6d4", district: "Bengaluru / Chikkamagaluru", role: "Cyber Fraud Network" },
-    { id: "SUS-5011", label: "Vikram Reddy", type: "suspect", risk_score: 84, size: 18, color: "#f97316", district: "Chikkamagaluru", role: "Housebreaking Syndicate" },
-    { id: "SUS-4009", label: "Saanvi Dara", type: "suspect", risk_score: 82, size: 18, color: "#a855f7", district: "Udupi", role: "Senior Citizen Extortion" },
+    { id: "SUS-8842", label: "Ramesh Kumar", type: "suspect", risk_score: 94, size: 22, color: "#dc2626", district: "Bengaluru Urban", role: "Vehicle Theft Ring Leader", gang_id: "GANG-NORTH" },
+    { id: "SUS-7104", label: "Suresh Naidu", type: "suspect", risk_score: 91, size: 20, color: "#dc2626", district: "Mysuru / Vijayapura", role: "Armed Robbery Leader", gang_id: "GANG-SOUTH" },
+    { id: "SUS-5921", label: "Imran Khan", type: "suspect", risk_score: 96, size: 22, color: "#dc2626", district: "Bengaluru Urban", role: "Narcotics Syndicate Head", gang_id: "GANG-SOUTH" },
+    { id: "SUS-4401", label: "Deepak Shetty", type: "suspect", risk_score: 75, size: 18, color: "#e11d48", district: "Yelahanka", role: "Chopshop Fence", gang_id: "GANG-NORTH" },
+    { id: "SUS-3302", label: "Arun Gowda", type: "suspect", risk_score: 68, size: 16, color: "#f59e0b", district: "Tumakuru", role: "Lookout & Logistics", gang_id: "GANG-SOUTH" },
+    { id: "SUS-2211", label: "Farid Mirza", type: "suspect", risk_score: 82, size: 18, color: "#dc2626", district: "Central Bengaluru", role: "Arms & Contraband Supplier", gang_id: "GANG-NORTH" },
+    { id: "SUS-1190", label: "Manoj Reddy", type: "suspect", risk_score: 65, size: 16, color: "#f59e0b", district: "Electronic City", role: "Getaway Driver", gang_id: "GANG-NORTH" },
+    { id: "SUS-9012", label: "Vikram Singh", type: "suspect", risk_score: 88, size: 20, color: "#dc2626", district: "Kalaburagi / Davangere", role: "Hit & Run Ring", gang_id: undefined },
+    { id: "SUS-8041", label: "Anand Shinde", type: "suspect", risk_score: 90, size: 20, color: "#dc2626", district: "Hassan / Belagavi", role: "Violence & Extortion", gang_id: undefined },
+    { id: "SUS-6022", label: "Bhavani Karpe", type: "suspect", risk_score: 85, size: 18, color: "#06b6d4", district: "Bengaluru / Chikkamagaluru", role: "Cyber Fraud Network", gang_id: undefined },
+    { id: "SUS-5011", label: "Vikram Reddy", type: "suspect", risk_score: 84, size: 18, color: "#f97316", district: "Chikkamagaluru", role: "Housebreaking Syndicate", gang_id: undefined },
+    { id: "SUS-4009", label: "Saanvi Dara", type: "suspect", risk_score: 82, size: 18, color: "#a855f7", district: "Udupi", role: "Senior Citizen Extortion", gang_id: undefined },
   ];
 
   const crimeSuspectMapping = {
@@ -152,7 +152,8 @@ const GANG_PREDICTIONS = [
     predicted_window: '28 Jul 2026 – 30 Jul 2026',
     primary_crime: 'Vehicle Theft & Commercial Hijack',
     vector_summary: 'Predictive analytics indicate peak vehicle theft window during 22:00-03:00 hrs. Target vehicles: Bajaj Pulsar & TVS Apache for inter-state chopshop transit.',
-    suggested_action: 'Dispatch 2 Beat Patrol Units to Silk Board approach. Activate ANPR Checkpost 4 with automatic plate scanning.'
+    suggested_action: 'Dispatch 2 Beat Patrol Units to Silk Board approach. Activate ANPR Checkpost 4 with automatic plate scanning.',
+    gang_leader_node_id: 'SUS-8842',
   },
   {
     id: 'PRED-02',
@@ -164,7 +165,8 @@ const GANG_PREDICTIONS = [
     predicted_window: '29 Jul 2026 – 01 Aug 2026',
     primary_crime: 'Pillion Chain Snatching',
     vector_summary: 'Temporal cluster analysis identifies 18:30-21:00 hrs shift change window near tech parks. High risk for unlit service roads.',
-    suggested_action: 'Deploy plainclothes Crime Branch officers near ITPL Gate 2. Increase street lighting along Banaswadi outer ring road.'
+    suggested_action: 'Deploy plainclothes Crime Branch officers near ITPL Gate 2. Increase street lighting along Banaswadi outer ring road.',
+    gang_leader_node_id: 'SUS-5921',
   }
 ];
 
@@ -526,7 +528,10 @@ export default function NetworkPage() {
                   <div className="pt-3 border-t border-[var(--border)]/40 flex items-center justify-between text-xs">
                     <span className="font-bold text-[var(--text-primary)]">Leader: {pred.leader}</span>
                     <button
-                      onClick={() => handleNodeClick('SUS-8842')}
+                      onClick={() => {
+                        handleNodeClick(pred.gang_leader_node_id);
+                        setViewMode('graph');
+                      }}
                       className="text-blue-600 dark:text-blue-400 font-bold hover:underline"
                     >
                       View Network Ties →
