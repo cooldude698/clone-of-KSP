@@ -4,6 +4,19 @@ import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
+// Deterministic coordinate generator so unmapped nodes stay rock-solid static
+function hashCoords(idStr, label) {
+  let hash = 0;
+  const str = (idStr || '') + (label || '');
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  const normLat = 12.9100 + (Math.abs(hash % 1000) / 1000) * 0.15;
+  const normLng = 77.5500 + (Math.abs((hash >> 3) % 1000) / 1000) * 0.20;
+  return { lat: normLat, lng: normLng, area: label || idStr };
+}
+
 export default function NetworkMapView({
   nodes,
   edges,
@@ -13,28 +26,32 @@ export default function NetworkMapView({
 }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
-  const markersRef = useRef([]);
-  const polylineRef = useRef(null);
+  const layerGroupRef = useRef(null);
 
-  // Map center default (Bengaluru)
-  const defaultCenter = [12.9716, 77.5946];
+  // Map center default (Bengaluru Urban)
+  const defaultCenter = [12.9716, 77.6000];
   const tileUrl = process.env.NEXT_PUBLIC_MAPS_TILE ||
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-  // Coordinate mapping for mock nodes
+  // Explicit, accurate coordinate dictionary for Karnataka Gang & FIR Network
   const NODE_COORDS = {
-    n1: { lat: 12.9175, lng: 77.6215, area: 'Silk Board Junction' },      // Ramesh Kumar
-    n2: { lat: 12.9762, lng: 77.6033, area: 'MG Road Signal' },         // Suresh Naidu
-    n3: { lat: 12.9279, lng: 77.6271, area: 'HSR Layout Sector 1' },    // Anand Murthy
-    n4: { lat: 13.0456, lng: 77.6256, area: 'Hebbal Flyover' },         // Kiran Gowda
-    n5: { lat: 12.9141, lng: 77.5998, area: 'JP Nagar 5th Phase' },     // Vijay Bhaskar
-    n6: { lat: 12.9344, lng: 77.6264, area: 'FIR-2026-BL-0492 Scene' }, // FIR 0492
-    n7: { lat: 12.9762, lng: 77.6033, area: 'FIR-2026-BL-0811 Scene' }, // FIR 0811
-    n8: { lat: 12.9698, lng: 77.7499, area: 'FIR-2026-BL-1104 Scene' }, // FIR 1104
-    n9: { lat: 12.9698, lng: 77.7499, area: 'Whitefield ITPL Road' },   // Venkatesh Gowda
-    n10: { lat: 12.9542, lng: 77.4975, area: 'Rajajinagar Metro' },     // Prakash Raj
-    n11: { lat: 12.9175, lng: 77.6215, area: 'Silk Board Cam #45' },    // Cam 45
-    n12: { lat: 12.9762, lng: 77.6033, area: 'MG Road Cam #102' }       // Cam 102
+    'SUS-8842': { lat: 12.9175, lng: 77.6215, area: 'Silk Board Junction (Ramesh Kumar - Leader)' },
+    'SUS-7104': { lat: 12.9762, lng: 77.6033, area: 'MG Road Signal (Suresh Naidu - Robber)' },
+    'SUS-5921': { lat: 12.9698, lng: 77.7499, area: 'Whitefield ITPL (Imran Khan - Snatcher)' },
+    'SUS-4401': { lat: 13.1007, lng: 77.5963, area: 'Yelahanka Chopshop Yard (Deepak Shetty - Fence)' },
+    'SUS-3302': { lat: 13.3392, lng: 77.1015, area: 'Tumkur Highway Bypass (Arun Gowda - Lookout)' },
+    'SUS-2211': { lat: 12.9716, lng: 77.5946, area: 'Central Bengaluru (Farid Mirza - Weapons Source)' },
+    'SUS-1190': { lat: 12.8452, lng: 77.6602, area: 'Electronic City Toll (Manoj Reddy - Driver)' },
+
+    'FIR-2026-BL-4921': { lat: 12.9175, lng: 77.6215, area: 'Silk Board Metro Approach (Vehicle Theft)' },
+    'FIR-2026-MY-1103': { lat: 12.9762, lng: 77.6033, area: 'MG Road Corridor (Armed Robbery)' },
+    'FIR-2026-BL-4920': { lat: 12.9698, lng: 77.7499, area: 'ITPL Main Road (Chain Snatching)' },
+    'FIR-2026-BL-5001': { lat: 12.9716, lng: 77.5946, area: 'Cubbon Park Fringe (Assault)' },
+    'FIR-2026-YL-0234': { lat: 13.1007, lng: 77.5963, area: 'Yelahanka Auto Yard (Stolen Goods)' },
+
+    n1: { lat: 12.9175, lng: 77.6215, area: 'Silk Board Junction' },
+    n2: { lat: 12.9762, lng: 77.6033, area: 'MG Road Signal' },
+    n3: { lat: 12.9698, lng: 77.7499, area: 'ITPL Main Road' },
   };
 
   useEffect(() => {
@@ -54,6 +71,8 @@ export default function NetworkMapView({
       attribution: '&copy; OpenStreetMap contributors',
     }).addTo(map);
 
+    const layerGroup = L.layerGroup().addTo(map);
+    layerGroupRef.current = layerGroup;
     mapRef.current = map;
 
     return () => {
@@ -67,53 +86,62 @@ export default function NetworkMapView({
     };
   }, [tileUrl]);
 
-  // Update map markers & suspect trail lines when nodes or selection changes
+  // Update map markers & gang trajectory links when nodes, edges, or selection change
   useEffect(() => {
-    if (!mapRef.current) return;
+    if (!mapRef.current || !layerGroupRef.current) return;
 
-    // Clear old markers
-    markersRef.current.forEach(m => m.remove());
-    markersRef.current = [];
-    if (polylineRef.current) {
-      polylineRef.current.remove();
-      polylineRef.current = null;
-    }
+    const layerGroup = layerGroupRef.current;
+    layerGroup.clearLayers();
 
-    const map = mapRef.current;
-    const trailPositions = [];
+    // 1. Draw Connecting Link Lines between connected criminal nodes
+    edges.forEach((edge) => {
+      const sourceId = typeof edge.source === 'object' ? edge.source.id : edge.source;
+      const targetId = typeof edge.target === 'object' ? edge.target.id : edge.target;
 
+      const sCoords = NODE_COORDS[sourceId] || hashCoords(sourceId, '');
+      const tCoords = NODE_COORDS[targetId] || hashCoords(targetId, '');
+
+      if (sCoords && tCoords) {
+        const line = L.polyline([[sCoords.lat, sCoords.lng], [tCoords.lat, tCoords.lng]], {
+          color: '#2563eb',
+          weight: 2.5,
+          opacity: 0.7,
+          dashArray: '6 6'
+        });
+        layerGroup.addLayer(line);
+      }
+    });
+
+    // 2. Render Node Markers
     nodes.forEach((node) => {
-      const coords = NODE_COORDS[node.id] || {
-        lat: 12.9716 + (Math.random() - 0.5) * 0.08,
-        lng: 77.5946 + (Math.random() - 0.5) * 0.08,
-        area: node.label
-      };
-
+      const coords = NODE_COORDS[node.id] || hashCoords(node.id, node.label);
       const isSelected = selectedNodeId === node.id;
-      const isAccused = node.type === 'accused';
-      const isCase = node.type === 'case';
-      const isCamera = node.type === 'camera';
+      const isCase = node.type === 'case' || node.type === 'fir' || node.id?.startsWith('FIR');
 
-      const color = isAccused
-        ? ((node.risk_score || 0) > 70 ? '#ef4444' : (node.risk_score || 0) > 40 ? '#f97316' : '#10b981')
-        : isCase ? '#2563eb' : '#06b6d4';
+      const color = isCase
+        ? '#2563eb'
+        : (node.risk_score || 0) > 80
+        ? '#dc2626'
+        : (node.risk_score || 0) > 60
+        ? '#d97706'
+        : '#16a34a';
 
-      const radius = isSelected ? 14 : isAccused ? 10 : 8;
+      const radius = isSelected ? 14 : isCase ? 9 : 11;
 
       const circle = L.circleMarker([coords.lat, coords.lng], {
         radius,
         fillColor: color,
-        fillOpacity: isSelected ? 0.95 : 0.75,
+        fillOpacity: isSelected ? 0.95 : 0.8,
         color: isSelected ? '#ffffff' : '#0f172a',
         weight: isSelected ? 3 : 1.5,
       });
 
       const tooltipContent = `
-        <div class="text-xs font-mono font-sans p-1">
-          <strong style="color: ${color}">${node.label}</strong>
-          <p class="text-[10px] text-gray-300 mt-0.5">${coords.area}</p>
-          ${isAccused ? `<p class="text-[10px] font-bold">Threat Score: ${node.risk_score || 70}/100</p>` : ''}
-          <p class="text-[10px] text-blue-400 capitalize mt-0.5">${node.type}</p>
+        <div style="font-family: system-ui; padding: 2px;">
+          <strong style="color: ${color}; font-size: 12px;">${node.label}</strong>
+          <p style="font-size: 10px; color: #475569; margin-top: 2px;">${coords.area}</p>
+          ${!isCase ? `<p style="font-size: 10px; font-weight: bold; color: #dc2626;">Threat Risk Index: ${node.risk_score || 80}/100</p>` : ''}
+          <p style="font-size: 9px; text-transform: uppercase; color: #64748b;">${node.type || 'Suspect'}</p>
         </div>
       `;
 
@@ -122,47 +150,16 @@ export default function NetworkMapView({
         if (onNodeClick) onNodeClick(node.id);
       });
 
-      circle.addTo(map);
-      markersRef.current.push(circle);
-
-      if (isSelected || node.id === 'n1') {
-        trailPositions.push([coords.lat, coords.lng]);
-      }
+      layerGroup.addLayer(circle);
     });
 
-    // Draw connecting trail lines between linked nodes
-    const edgeLines = [];
-    edges.forEach((edge) => {
-      const sourceId = typeof edge.source === 'object' ? edge.source.id : edge.source;
-      const targetId = typeof edge.target === 'object' ? edge.target.id : edge.target;
-
-      const sCoords = NODE_COORDS[sourceId];
-      const tCoords = NODE_COORDS[targetId];
-
-      if (sCoords && tCoords) {
-        edgeLines.push([[sCoords.lat, sCoords.lng], [tCoords.lat, tCoords.lng]]);
-      }
-    });
-
-    if (edgeLines.length > 0) {
-      edgeLines.forEach(line => {
-        const poly = L.polyline(line, {
-          color: '#38bdf8',
-          weight: 2,
-          opacity: 0.6,
-          dashArray: '5 5'
-        }).addTo(map);
-        markersRef.current.push(poly);
-      });
-    }
-
-    // Pan map to selected node if active
-    if (selectedNodeId && NODE_COORDS[selectedNodeId]) {
-      const selCoords = NODE_COORDS[selectedNodeId];
-      map.flyTo([selCoords.lat, selCoords.lng], 13, { animate: true, duration: 1 });
+    // Pan smoothly to selected node coordinates
+    if (selectedNodeId) {
+      const selCoords = NODE_COORDS[selectedNodeId] || hashCoords(selectedNodeId, '');
+      mapRef.current.flyTo([selCoords.lat, selCoords.lng], 13, { animate: true, duration: 0.8 });
     }
 
   }, [nodes, edges, selectedNodeId, onNodeClick]);
 
-  return <div ref={containerRef} className="w-full rounded-xl overflow-hidden shadow-2xl" style={{ height }} />;
+  return <div ref={containerRef} className="w-full rounded-xl overflow-hidden shadow-xl border border-[var(--border)]/50" style={{ height }} />;
 }

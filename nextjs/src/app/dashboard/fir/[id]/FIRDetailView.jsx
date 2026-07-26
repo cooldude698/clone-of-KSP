@@ -3,12 +3,19 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import {
   ArrowLeft, FileText, Clock, Shield, AlertTriangle,
   CheckCircle2, ShieldAlert, MapPin, User, Users, Phone,
   Activity, Camera, ChevronRight, ExternalLink,
-  Star, UserPlus, StickyNote, Circle, Zap, Send, MessageSquare, Lock
+  Star, UserPlus, StickyNote, Circle, Zap, Send, MessageSquare, Lock,
+  Newspaper, X
 } from 'lucide-react';
+
+const InvestigatorWall = dynamic(() => import('@/components/InvestigatorWall'), {
+  ssr: false,
+  loading: () => <div className="p-8 text-center text-xs font-mono text-slate-500">Loading Investigation Chronicle...</div>
+});
 
 // ── Realistic case detail fallback map for realistic KSP case records ───────
 const CASE_DETAILS_MAP = {
@@ -120,7 +127,6 @@ const CASE_DETAILS_MAP = {
   }
 };
 
-// Default fallback generator for dynamically queried FIRs
 function getCaseDetail(caseNumber, fir) {
   if (CASE_DETAILS_MAP[caseNumber]) {
     return CASE_DETAILS_MAP[caseNumber];
@@ -189,9 +195,6 @@ function fmtTime(str) {
   } catch { return str; }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TAB 1: DETAILS
-// ─────────────────────────────────────────────────────────────────────────────
 function DetailsTab({ fir, detail }) {
   const fields = [
     { label: 'IPC / BNS SECTION', value: fir.ipc_section || (fir.crime_type_code || fir.crime_type || 'IPC 379').toUpperCase().replace(/_/g, ' ') },
@@ -342,9 +345,6 @@ function DetailsTab({ fir, detail }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TAB 2: TIMELINE
-// ─────────────────────────────────────────────────────────────────────────────
 function TimelineTab({ fir }) {
   const status = fir.status || fir.case_status || 'open';
   const fileDate = fir.date_filed ? new Date(fir.date_filed) : new Date();
@@ -392,13 +392,9 @@ function TimelineTab({ fir }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TAB 3: ANPR CAMERA NETWORK SIGHTINGS
-// ─────────────────────────────────────────────────────────────────────────────
 function ANPRTab({ detectedPlate, trailData, detail }) {
   return (
     <div className="space-y-6">
-      {/* Target Vehicle Banner */}
       <div className="p-5 rounded-2xl bg-gradient-to-r from-[var(--surface-1)] to-[var(--surface-2)] border border-[var(--border)]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
         <div>
           <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] block">Target Vehicle License Plate</span>
@@ -419,7 +415,6 @@ function ANPRTab({ detectedPlate, trailData, detail }) {
         </div>
       </div>
 
-      {/* ANPR Camera Sightings Log */}
       <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]/50 bg-[var(--surface-0)]">
           <div className="flex items-center gap-2.5">
@@ -461,9 +456,6 @@ function ANPRTab({ detectedPlate, trailData, detail }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SIDEBAR (WITH SHARED OFFICIAL INVESTIGATION NOTES FEED & CLEARANCE VIEW)
-// ─────────────────────────────────────────────────────────────────────────────
 function Sidebar({ fir, detail, relatedCases }) {
   const [notes, setNotes] = useState(detail.notes || []);
   const [newNote, setNewNote] = useState('');
@@ -484,7 +476,6 @@ function Sidebar({ fir, detail, relatedCases }) {
 
   return (
     <aside className="w-full xl:w-80 shrink-0 space-y-4">
-      {/* Officer Quick Actions */}
       <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 p-4 space-y-2.5 shadow-sm">
         <button
           onClick={() => setAssigned(!assigned)}
@@ -507,7 +498,6 @@ function Sidebar({ fir, detail, relatedCases }) {
         </button>
       </div>
 
-      {/* SHARED OFFICIAL CASE NOTES (SHARED WITH ALL CLEARED OFFICERS) */}
       <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]/50 bg-[var(--surface-0)]">
           <div className="flex items-center gap-2">
@@ -521,7 +511,6 @@ function Sidebar({ fir, detail, relatedCases }) {
           </span>
         </div>
 
-        {/* Notes feed */}
         <div className="p-4 space-y-3 max-h-64 overflow-y-auto divide-y divide-[var(--border)]/30">
           {notes.map(n => (
             <div key={n.id} className="pt-2 first:pt-0 space-y-1">
@@ -536,7 +525,6 @@ function Sidebar({ fir, detail, relatedCases }) {
           ))}
         </div>
 
-        {/* Add Note Area */}
         <div className="p-4 border-t border-[var(--border)]/50 bg-[var(--surface-0)] space-y-2">
           <textarea
             value={newNote}
@@ -556,7 +544,6 @@ function Sidebar({ fir, detail, relatedCases }) {
         </div>
       </div>
 
-      {/* Related Cases */}
       {relatedCases.length > 0 && (
         <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">
           <div className="px-5 py-4 border-b border-[var(--border)]/50 bg-[var(--surface-0)]">
@@ -583,15 +570,56 @@ function Sidebar({ fir, detail, relatedCases }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MAIN FIRDetailView
-// ─────────────────────────────────────────────────────────────────────────────
 export default function FIRDetailView({ caseNumber, fir, suspects, trailData, trailLoading, trailError, relatedCases, detectedPlate }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('details');
+  const [chronicleOpen, setChronicleOpen] = useState(false);
 
   const status = fir.status || fir.case_status || 'open';
   const detail = getCaseDetail(caseNumber, fir);
+
+  const wallData = {
+    fir: {
+      case_number: caseNumber,
+      crime_type: (fir.crime_type_code || fir.crime_type || 'vehicle_theft').replace(/_/g, ' '),
+      date_filed: fir.date_filed || '2026-07-18',
+      location_name: fir.location_name || fir.location || 'Silk Board Junction, Bengaluru',
+      case_status: status,
+      description: fir.description || 'Stolen Pulsar 220 Black (KA-01-MJ-8821) outside Silk Board metro station approach road.',
+      police_station: fir.police_station || 'HSR Layout PS',
+    },
+    accused: [
+      {
+        full_name: detail.accused_name,
+        alias: detail.accused_alias,
+        age: 34,
+        gender: 'Male',
+        address: `${fir.police_station || 'HSR Layout'} Jurisdiction, Bengaluru`,
+        district_name: fir.district_name || 'Bengaluru Urban',
+        occupation: 'Gang Operative',
+        prior_convictions: 3,
+        modus_operandi: 'Organises vehicle theft rings across district borders. Uses stolen motorcycles for resale in Mysuru and Hubballi.',
+        risk_score: detail.accused_risk,
+      }
+    ],
+    victims: [
+      {
+        full_name: detail.victim_name,
+        age: parseInt(detail.victim_age) || 34,
+        gender: detail.victim_gender,
+        occupation: 'Software Engineer',
+        district_name: fir.district_name || 'Bengaluru Urban',
+        vulnerability_score: 55,
+      }
+    ],
+    related_firs: (relatedCases || []).slice(0, 3).map(r => ({
+      case_number: r.case_number,
+      crime_type: (r.crime_type_code || r.crime_type || 'theft').replace(/_/g, ' '),
+      date_filed: r.date_filed || '2026-07-16',
+      link_reason: 'Shared MO and accomplice network match'
+    })),
+    case_summary: `Official CCTNS Case Chronicle for ${caseNumber}. Primary suspect ${detail.accused_name} ("${detail.accused_alias}") tracked via ANPR camera network. Intercept alert broadcast to patrol units.`
+  };
 
   return (
     <div className="flex flex-col xl:flex-row gap-6 p-5 sm:p-7 max-w-[1700px] mx-auto min-h-screen text-[var(--text-primary)] font-sans">
@@ -613,7 +641,7 @@ export default function FIRDetailView({ caseNumber, fir, suspects, trailData, tr
           </button>
         </div>
 
-        {/* Case Banner Header Card */}
+        {/* Case Banner Header Card with Investigation Chronicle Trigger */}
         <div className="p-6 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 flex-wrap">
@@ -624,9 +652,20 @@ export default function FIRDetailView({ caseNumber, fir, suspects, trailData, tr
               Registered on {fmtDateTime(fir.date_filed || fir.created_at)} · {fir.police_station || 'HSR Layout PS'} ({fir.district_name || 'Bengaluru Urban'})
             </p>
           </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 font-bold text-xs shrink-0">
-            <Shield className="w-4 h-4" />
-            <span>KSP CCTNS OFFICIAL FILE</span>
+
+          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+            <button
+              onClick={() => setChronicleOpen(true)}
+              className="px-4 py-2 rounded-xl bg-slate-900 text-amber-300 hover:bg-slate-800 font-bold text-xs flex items-center gap-2 transition-all shadow-md cursor-pointer border border-amber-500/30 font-serif"
+            >
+              <Newspaper className="w-4 h-4 text-amber-400" />
+              <span>Open Investigation Chronicle 🗞️</span>
+            </button>
+
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 font-bold text-xs">
+              <Shield className="w-4 h-4" />
+              <span>KSP CCTNS OFFICIAL</span>
+            </div>
           </div>
         </div>
 
@@ -664,6 +703,38 @@ export default function FIRDetailView({ caseNumber, fir, suspects, trailData, tr
       <div className="xl:sticky xl:top-6 xl:self-start">
         <Sidebar fir={fir} detail={detail} relatedCases={relatedCases} />
       </div>
+
+      {/* INVESTIGATION CHRONICLE MODAL OVERLAY */}
+      {chronicleOpen && (
+        <div className="fixed inset-0 bg-[#F5F2EB] flex flex-col z-[99999] overflow-y-auto animate-newspaper-spin">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-300 shrink-0 bg-[#F5F2EB]/95 sticky top-0 z-30 backdrop-blur-md">
+            <div className="flex items-center gap-2.5 text-slate-800">
+              <ShieldAlert className="w-5 h-5 text-red-600" />
+              <h3 className="text-base font-extrabold font-serif tracking-wider uppercase">
+                Investigation Chronicle — {caseNumber}
+              </h3>
+            </div>
+            <button
+              onClick={() => setChronicleOpen(false)}
+              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-red-600 text-white font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5"
+            >
+              <X className="w-4 h-4" />
+              <span>Close Chronicle</span>
+            </button>
+          </div>
+
+          <div className="flex-1 p-6 md:p-8 lg:p-10 max-w-[1200px] w-full mx-auto">
+            <InvestigatorWall
+              fir={wallData.fir}
+              accused={wallData.accused}
+              victims={wallData.victims}
+              related_firs={wallData.related_firs}
+              case_summary={wallData.case_summary}
+              isLoading={false}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
