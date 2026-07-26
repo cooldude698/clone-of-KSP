@@ -14,7 +14,9 @@
       "underreporting",
       "chat",
       "conversations",
-      "export-pdf"
+      "export-pdf",
+      "askDrishtiAI",
+      "drishtiVoice"
     ],
     "ignore": [
       "**/node_modules/**",
