@@ -437,37 +437,42 @@ function CameraStream({ cam, videoRef, isPaused }) {
         </span>
       </div>
 
-      {/* Target Scanning Reticle Bounding Box */}
-      {cam.detected_target ? (
-        <div className={`relative z-10 border-2 rounded-lg p-2.5 flex flex-col justify-between ${cam.has_face_recog ? 'border-red-500/80 bg-red-500/10' : 'border-emerald-500/80 bg-emerald-500/10'} shadow-[0_0_15px_rgba(239,68,68,0.2)]`}>
-          <div className="flex justify-between items-center">
-            <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase ${cam.has_face_recog ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'}`}>
-              {cam.target_type || 'TARGET DETECTED'}
-            </span>
-            <span className="text-[9px] font-bold text-cyan-300 bg-slate-950/90 px-1.5 py-0.5 rounded border border-cyan-500/40">
-              {cam.confidence || 95.8}% MATCH
-            </span>
-          </div>
-          <div className="mt-3 flex justify-between items-end">
-            <div className="bg-slate-950/90 px-2 py-1 rounded border border-white/20">
-              <p className="text-[10px] font-extrabold text-white">🎯 {cam.detected_target}</p>
-              <p className="text-[8px] text-slate-400 uppercase">CCTNS SENSOR: {cam.id}</p>
+      {/* Targeted Bounding Box — rendered precisely over the suspect/vehicle target */}
+      {cam.detected_target && (() => {
+        const cropBox = CINEMATIC_SUSPECT_DATA[cam.id]?.cropBox || { x: 32, y: 25, w: 22, h: 32 };
+        const isRed = cam.has_face_recog;
+        return (
+          <div
+            className={`absolute z-20 rounded-md border-2 ${
+              isRed
+                ? 'border-red-500 bg-red-500/10 shadow-[0_0_15px_rgba(239,68,68,0.5)] ring-2 ring-red-500/20'
+                : 'border-emerald-500 bg-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.5)] ring-2 ring-emerald-500/20'
+            } transition-all pointer-events-none`}
+            style={{
+              top: `${cropBox.y}%`,
+              left: `${cropBox.x}%`,
+              width: `${cropBox.w}%`,
+              height: `${cropBox.h}%`,
+            }}
+          >
+            {/* Precise Corner Reticles */}
+            <span className={`absolute -top-1 -left-1 w-2.5 h-2.5 border-t-2 border-l-2 ${isRed ? 'border-red-400' : 'border-emerald-400'}`} />
+            <span className={`absolute -top-1 -right-1 w-2.5 h-2.5 border-t-2 border-r-2 ${isRed ? 'border-red-400' : 'border-emerald-400'}`} />
+            <span className={`absolute -bottom-1 -left-1 w-2.5 h-2.5 border-b-2 border-l-2 ${isRed ? 'border-red-400' : 'border-emerald-400'}`} />
+            <span className={`absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b-2 border-r-2 ${isRed ? 'border-red-400' : 'border-emerald-400'}`} />
+
+            {/* Micro Badge tag */}
+            <div className={`absolute -top-5 left-0 px-1.5 py-0.5 rounded text-[8px] font-extrabold whitespace-nowrap shadow-md ${
+              isRed ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'
+            }`}>
+              🎯 {cam.detected_target} ({cam.confidence || 95}% MATCH)
             </div>
-            <span className="text-[8px] text-cyan-400 font-bold uppercase tracking-wider animate-pulse">
-              [ OPTICAL TRACKING ACTIVE ]
-            </span>
           </div>
-        </div>
-      ) : (
-        <div className="relative z-10 flex flex-col items-center justify-center my-auto text-center opacity-80">
-          <Camera className="w-6 h-6 text-cyan-400 mb-1 animate-pulse" />
-          <span className="text-[10px] font-bold text-slate-200 uppercase tracking-widest">{cam.name}</span>
-          <span className="text-[8px] text-slate-400 uppercase">FEED SECURED · 60 FPS OPTICAL SENSOR</span>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Bottom Sensor Footer */}
-      <div className="relative z-10 flex justify-between items-center text-[8px] text-slate-400">
+      <div className="relative z-10 flex justify-between items-center text-[8px] text-slate-400 mt-auto">
         <span>SENSOR: {cam.id}</span>
         <span>LAT 12.9716° N · LNG 77.5946° E</span>
       </div>
