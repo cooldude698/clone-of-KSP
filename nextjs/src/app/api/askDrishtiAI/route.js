@@ -120,6 +120,96 @@ async function fetchLiveDatabaseContext(query) {
   return liveDataStr;
 }
 
+async function fetchLiveCatalystData(question) {
+  const q = (question || '').toLowerCase();
+  const BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001';
+  let liveStr = '';
+
+  try {
+    const wantsHotspots = q.includes('hotspot') || q.includes('where') || q.includes('area') || q.includes('location') || q.includes('zone') || q.includes('cluster');
+    const wantsTrends = q.includes('trend') || q.includes('month') || q.includes('increase') || q.includes('this year') || q.includes('2026') || q.includes('rise') || q.includes('last month');
+    const wantsOffenders = q.includes('offender') || q.includes('repeat') || q.includes('suspect') || q.includes('accused') || q.includes('criminal') || q.includes('wanted');
+    const wantsFirs = q.includes('fir') || q.includes('case') || q.includes('registered') || q.includes('recent') || q.includes('crime') || q.includes('theft') || q.includes('robbery');
+
+    const fetches = [];
+
+    if (wantsHotspots) {
+      fetches.push(
+        fetch(`${BASE}/api/hotspots`, { signal: AbortSignal.timeout(2500) })
+          .then(r => r.ok ? r.json() : null)
+          .then(data => {
+            const spots = (data?.hotspots || data || []).slice(0, 5);
+            if (!spots.length) return '';
+            let out = '\n\n[LIVE HOTSPOT DATA FROM DATABASE]\n';
+            spots.forEach((s, i) => {
+              out += `${i+1}. ${s.area_name || s.area || 'Unknown Area'} — District: ${s.district || '?'} — Incidents: ${s.crime_count || s.count || '?'} — Severity: ${s.severity || '?'} — Crimes: ${(s.top_crime_types || []).join(', ') || '?'}\n`;
+            });
+            return out;
+          })
+          .catch(() => '')
+      );
+    }
+
+    if (wantsTrends) {
+      fetches.push(
+        fetch(`${BASE}/api/trends`, { signal: AbortSignal.timeout(2500) })
+          .then(r => r.ok ? r.json() : null)
+          .then(data => {
+            const months = (data?.monthly_trend || data?.trends || []).slice(-6);
+            if (!months.length) return '';
+            let out = '\n\n[LIVE MONTHLY CRIME TREND DATA]\n';
+            months.forEach(m => {
+              out += `${m.month || m.period}: ${m.count || m.crimes || m.total || '?'} incidents\n`;
+            });
+            return out;
+          })
+          .catch(() => '')
+      );
+    }
+
+    if (wantsOffenders) {
+      fetches.push(
+        fetch(`${BASE}/api/repeat-offenders?min_firs=2&limit=5`, { signal: AbortSignal.timeout(2500) })
+          .then(r => r.ok ? r.json() : null)
+          .then(data => {
+            const list = (data?.offenders || data || []).slice(0, 5);
+            if (!list.length) return '';
+            let out = '\n\n[LIVE REPEAT OFFENDERS FROM DATABASE]\n';
+            list.forEach((o, i) => {
+              out += `${i+1}. ${o.accused_full_name || o.name || '?'} — FIRs: ${o.fir_count || o.total_firs || '?'} — District: ${o.district || '?'} — Crimes: ${(o.crime_types || []).join(', ') || o.crime_type || '?'}\n`;
+            });
+            return out;
+          })
+          .catch(() => '')
+      );
+    }
+
+    if (wantsFirs) {
+      fetches.push(
+        fetch(`${BASE}/api/analytics/firs?limit=5`, { signal: AbortSignal.timeout(2500) })
+          .then(r => r.ok ? r.json() : null)
+          .then(data => {
+            const firs = (data?.firs || data || []).slice(0, 5);
+            if (!firs.length) return '';
+            let out = '\n\n[RECENT LIVE FIR RECORDS FROM DATABASE]\n';
+            firs.forEach((f, i) => {
+              out += `${i+1}. ${f.case_number || f.fir_number || '?'} — Crime: ${f.crime_type || f.offense || '?'} — Date: ${f.date_filed || f.date || '?'} — Station: ${f.police_station || '?'} — Status: ${f.status || 'open'}\n`;
+            });
+            return out;
+          })
+          .catch(() => '')
+      );
+    }
+
+    const results = await Promise.all(fetches);
+    liveStr = results.filter(Boolean).join('');
+  } catch (e) {
+    // Silently fail — never block the AI response
+  }
+
+  return liveStr;
+}
+
 async function findKnowledgeContext(query) {
   const q = query.toLowerCase();
   let context = '';
@@ -128,6 +218,9 @@ async function findKnowledgeContext(query) {
   if (liveDbData) {
     context += liveDbData + '\n\n';
   }
+
+  const liveCatalystData = await fetchLiveCatalystData(query);
+  if (liveCatalystData) context += liveCatalystData;
 
   context += CRIME_DATABASE_SUMMARY;
 

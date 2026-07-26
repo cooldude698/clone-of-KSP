@@ -49,7 +49,7 @@ const VOICE_PROFILES = [
   { id: 'hi-SwaraNeural',   label: 'हिंदी · Swara', lang: 'hi', ttsLang: 'hi-IN', neural: 'hi-IN-SwaraNeural'  },
 ];
 
-function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
+function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis, onSuggestionClick }) {
   const [copied, setCopied] = useState(false);
   const isUser = msg.role === 'user';
 
@@ -262,6 +262,27 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
               <Volume2 className="w-3 h-3" />
               {isSpeakingThis ? 'Speaking...' : 'Listen'}
             </button>
+          </div>
+        )}
+
+        {!isUser && (msg.suggestions || msg.follow_up_suggestions)?.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 pt-1.5 px-1">
+            {(msg.suggestions || msg.follow_up_suggestions).map((s, idx) => (
+              <button
+                key={idx}
+                onClick={() => {
+                  if (onSuggestionClick) {
+                    onSuggestionClick(s);
+                  } else {
+                    setInput('');
+                    sendMessage(s);
+                  }
+                }}
+                className="px-2.5 py-1 rounded-full bg-[var(--surface-1)] hover:bg-blue-500/10 border border-[var(--border)] hover:border-blue-500/40 text-[11px] font-mono text-[var(--text-secondary)] hover:text-blue-600 dark:hover:text-blue-400 transition-all cursor-pointer shadow-xs"
+              >
+                {s}
+              </button>
+            ))}
           </div>
         )}
       </div>
@@ -627,6 +648,7 @@ export default function ChatPage() {
     try {
       let responseText = '';
       let isDemoResp = false;
+      let followUps = [];
       const isHindiInput = /[\u0900-\u097F]/.test(text);
       const isKannadaInput = /[\u0C80-\u0CFF]/.test(text);
       const activeLang = isKannadaInput ? 'kn' : isHindiInput ? 'hi' : (VOICE_PROFILES.find(p => p.id === voiceProfile) || VOICE_PROFILES[0]).lang;
@@ -645,6 +667,7 @@ export default function ChatPage() {
           const data = await res.json();
           responseText = data.answer || data.response_text || 'Database query processed.';
           isDemoResp = data.source === 'demo_ai';
+          followUps = data.follow_up_suggestions || [];
         } else {
           throw new Error('API error');
         }
@@ -657,7 +680,7 @@ export default function ChatPage() {
 
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: responseText, isDemo: isDemoResp, timestamp: timestamp() },
+        { role: 'assistant', content: responseText, isDemo: isDemoResp, timestamp: timestamp(), suggestions: followUps },
       ]);
 
       const newMsgIdx = messages.length + 1;
@@ -903,6 +926,7 @@ export default function ChatPage() {
                   onCaseClick={fetchCaseDetails}
                   onSpeak={(text) => speakText(text, i)}
                   isSpeakingThis={speakingMsgIdx === i && isSpeaking}
+                  onSuggestionClick={(s) => { setInput(''); sendMessage(s); }}
                 />
               ))}
               {loading && <TypingIndicator />}
