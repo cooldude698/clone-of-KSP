@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
-import { UPLOADED_FIRS, UPLOADED_SUSPECTS } from '@/lib/uploadedFirsStore';
+import { UPLOADED_FIRS, UPLOADED_SUSPECTS, persistUploadedStore } from '@/lib/uploadedFirsStore';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -129,6 +129,8 @@ export async function POST(req) {
         UPLOADED_SUSPECTS.unshift(suspectObj);
       }
     }
+
+    persistUploadedStore(UPLOADED_FIRS, UPLOADED_SUSPECTS);
 
     return NextResponse.json(
       {
