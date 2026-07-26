@@ -5,6 +5,9 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AlertTriangle } from 'lucide-react';
 import FIRDetailView from './FIRDetailView';
+import { fetchWithFallback } from '@/lib/fetch-with-fallback';
+import { DEMO_FIRS, DEMO_TRAIL } from '@/lib/demo-data';
+import { getFIRFromStore } from '@/lib/fir-store';
 
 // ── Plate extractor: finds first KA-XX-XX-XXXX pattern ──────────────────────
 function extractPlate(text) {
@@ -59,11 +62,6 @@ function NotFound({ caseNumber }) {
     </div>
   );
 }
-
-import { fetchWithFallback } from '@/lib/fetch-with-fallback';
-import { DEMO_FIRS, DEMO_TRAIL } from '@/lib/demo-data';
-
-import { getFIRFromStore } from '@/lib/fir-store';
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function FIRDetailPage() {
