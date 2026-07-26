@@ -384,8 +384,12 @@ export default function DashboardLayout({ children }) {
 
   const handleCancelTranscript = useCallback(() => {
     setPendingTranscript('');
+    if (isListening) {
+      stopListeningAndGetTranscript();
+    }
+    stopSpeaking();
     setOrbState('idle');
-  }, []);
+  }, [isListening, stopListeningAndGetTranscript, stopSpeaking]);
 
   const handleConfirmTyping = useCallback(() => {
     if (!typingText.trim()) return;
@@ -395,42 +399,30 @@ export default function DashboardLayout({ children }) {
     handleQuery(text);
   }, [typingText, handleQuery]);
 
-  // ─── Greeting on first open ──────────────────────────────────────
-  const triggerGreeting = useCallback(() => {
-    if (hasGreeted) return;
-    setHasGreeted(true);
-
+  // ─── Greeting Helper by Language ──────────────────────────────────
+  const getGreetingForLang = useCallback((lang, role = 'Supervisor') => {
     const h = new Date().getHours();
-    const greeting =
-      h >= 5  && h < 12 ? `Good morning, ${roleRef.current}. Drishti is online. A lot can happen on a shift — want me to pull up the latest updates?`
-      : h >= 12 && h < 17 ? `Good afternoon, ${roleRef.current}. Drishti is ready. Need a situation update or something specific?`
-      : h >= 17 && h < 21 ? `Good evening, ${roleRef.current}. I'm here to assist. Say the word and I'll brief you on recent activity.`
-      : `Good evening, ${roleRef.current}. Night shift active. I'll keep watch. Just say the word if you need anything.`;
+    const timeKey = h >= 5 && h < 12 ? 'morning' : h >= 12 && h < 17 ? 'afternoon' : h >= 17 && h < 21 ? 'evening' : 'night';
+    
+    if (lang === 'kn') {
+      if (timeKey === 'morning') return `ಶುಭೋದಯ, ${role}. ದೃಷ್ಟಿ ಎಐ ಆನ್‌ಲೈನ್‌ನಲ್ಲಿದೆ. ಇತ್ತೀಚಿನ ಸನ್ನಿವೇಶದ ಮಾಹಿತಿ ಬೇಕೇ?`;
+      if (timeKey === 'afternoon') return `ಶುಭ ಮಧ್ಯಾಹ್ನ, ${role}. ದೃಷ್ಟಿ ಸಿದ್ಧವಾಗಿದೆ. ಸ್ಥಿತಿಗತಿ ವರದಿ ಅಥವಾ ನಿರ್ದಿಷ್ಟ ಮಾಹಿತಿ ಬೇಕೇ?`;
+      if (timeKey === 'evening') return `ಶುಭ ಸಂಜೆ, ${role}. ನಾನು ಸಹಾಯ ಮಾಡಲು ಸಿದ್ಧನಾಗಿದ್ದೇನೆ. ಇತ್ತೀಚಿನ ವರದಿ ನೀಡಬೇಕೇ?`;
+      return `ಶುಭ ರಾತ್ರಿ, ${role}. ನೈಟ್ ಶಿಫ್ಟ್ ಸಕ್ರಿಯವಾಗಿದೆ. ಯಾವುದೇ ಮಾಹಿತಿ ಅಗತ್ಯವಿದ್ದರೆ ತಿಳಿಸಿ.`;
+    }
+    
+    if (lang === 'hi') {
+      if (timeKey === 'morning') return `शुभ प्रभात, ${role} जी। दृष्टि एआई ऑनलाइन है। क्या आपको ताज़ा अपडेट चाहिए?`;
+      if (timeKey === 'afternoon') return `शुभ दोपहर, ${role} जी। दृष्टि तैयार है। क्या आपको स्थिति की जानकारी चाहिए या कोई विशिष्ट विवरण?`;
+      if (timeKey === 'evening') return `शुभ संध्या, ${role} जी। मैं आपकी सहायता के लिए तैयार हूँ। हालिया गतिविधियों की जानकारी चाहिए?`;
+      return `शुभ रात्रि, ${role} जी। नाइट शिफ्ट सक्रिय है। कोई भी जानकारी चाहिए हो तो बताइए।`;
+    }
 
-    setGreetingText(greeting);
-    originalResponseRef.current = { text: greeting, lang: 'en' };
-    setOrbState('speaking');
-    setSessionLogs(prev => [...prev, {
-      role: 'assistant', content: greeting,
-      timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
-    }]);
-    setTimeout(() => speak(greeting, getLocale(language)), 400);
-  }, [hasGreeted, language, speak]);
-
-  const openPanel = useCallback(() => {
-    setIsPanelOpen(true);
-    hasInteractedRef.current = true;
-    setProactiveSuggestion(null);
-    if (!hasGreeted) triggerGreeting();
-  }, [hasGreeted, triggerGreeting]);
-
-  const closePanel = useCallback(() => {
-    setIsPanelOpen(false);
-    setStateOverrideLabel('');
-    if (isListening) { stopListeningAndGetTranscript(); }
-    stopSpeaking();
-    setOrbState('idle');
-  }, [isListening, stopListeningAndGetTranscript, stopSpeaking]);
+    if (timeKey === 'morning') return `Good morning, ${role}. Drishti is online. A lot can happen on a shift — want me to pull up the latest updates?`;
+    if (timeKey === 'afternoon') return `Good afternoon, ${role}. Drishti is ready. Need a situation update or something specific?`;
+    if (timeKey === 'evening') return `Good evening, ${role}. I'm here to assist. Say the word and I'll brief you on recent activity.`;
+    return `Good evening, ${role}. Night shift active. I'll keep watch. Just say the word if you need anything.`;
+  }, []);
 
   // ─── Permanent Mute State ──────────────────────────────────────────
   const [isMuted, setIsMuted] = useState(false);
@@ -447,23 +439,70 @@ export default function DashboardLayout({ children }) {
 
   const safeSpeak = useCallback((text, lang) => {
     if (isMutedRef.current) return;
-    speak(text, lang);
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
 
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      try {
-        window.speechSynthesis.cancel();
-        const utt = new SpeechSynthesisUtterance(text);
-        utt.lang = lang || 'en-IN';
-        utt.rate = 0.95;
-        utt.pitch = 1.0;
-        window.speechSynthesis.speak(utt);
-      } catch (e) {
-        console.warn('TTS speech trigger warning:', e);
-      }
+    try {
+      window.speechSynthesis.cancel();
+      const targetLang = lang || 'en-IN';
+      const cleanText = (text || '').replace(/[*#_`]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (!cleanText) return;
+
+      const utt = new SpeechSynthesisUtterance(cleanText);
+      utt.lang = targetLang;
+      utt.rate = 0.95;
+      utt.pitch = 1.0;
+
+      // Select best matching voice for clear pronunciation
+      const voices = window.speechSynthesis.getVoices() || [];
+      const bestVoice = voices.find(v => v.lang === targetLang) ||
+                        voices.find(v => v.lang.startsWith(targetLang.split('-')[0]));
+      if (bestVoice) utt.voice = bestVoice;
+
+      window.speechSynthesis.speak(utt);
+    } catch (e) {
+      console.warn('TTS speech trigger warning:', e);
     }
-  }, [speak]);
+  }, []);
+
+  // ─── Greeting on first open ──────────────────────────────────────
+  const triggerGreeting = useCallback(() => {
+    if (hasGreeted) return;
+    setHasGreeted(true);
+
+    const greeting = getGreetingForLang(language, roleRef.current);
+
+    setGreetingText(greeting);
+    originalResponseRef.current = { text: greeting, lang: language || 'en', isGreeting: true };
+    setOrbState('speaking');
+    setSessionLogs(prev => [...prev, {
+      role: 'assistant', content: greeting,
+      timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+    }]);
+    const locale = language === 'kn' ? 'kn-IN' : language === 'hi' ? 'hi-IN' : 'en-IN';
+    setTimeout(() => safeSpeak(greeting, locale), 400);
+  }, [hasGreeted, language, safeSpeak, getGreetingForLang]);
+
+  const openPanel = useCallback(() => {
+    setIsPanelOpen(true);
+    hasInteractedRef.current = true;
+    setProactiveSuggestion(null);
+    if (!hasGreeted) triggerGreeting();
+  }, [hasGreeted, triggerGreeting]);
+
+  const closePanel = useCallback(() => {
+    setIsPanelOpen(false);
+    setStateOverrideLabel('');
+    if (isListening) { stopListeningAndGetTranscript(); }
+    stopSpeaking();
+    setOrbState('idle');
+  }, [isListening, stopListeningAndGetTranscript, stopSpeaking]);
 
   const shouldSpeakOnLangChangeRef = useRef(false);
+
+  const handleLanguageChange = useCallback((newLang) => {
+    shouldSpeakOnLangChangeRef.current = true;
+    setLanguage(newLang);
+  }, []);
 
   const handleSpeakText = useCallback((text, locale) => {
     if (isMutedRef.current) return;
@@ -475,23 +514,45 @@ export default function DashboardLayout({ children }) {
   // Automatically translate current response or greeting when active language changes
   useEffect(() => {
     const targetLang = language;
+    const locale = targetLang === 'kn' ? 'kn-IN' : targetLang === 'hi' ? 'hi-IN' : 'en-IN';
+
+    const updateAssistantLog = (newText) => {
+      setSessionLogs(prev => {
+        if (!prev || prev.length === 0) return prev;
+        const copy = [...prev];
+        const lastIdx = copy.map(m => m.role).lastIndexOf('assistant');
+        if (lastIdx !== -1) {
+          copy[lastIdx] = { ...copy[lastIdx], content: newText };
+        }
+        return copy;
+      });
+    };
+
+    if (!response || originalResponseRef.current?.isGreeting) {
+      const translatedGreeting = getGreetingForLang(targetLang, roleRef.current);
+      setGreetingText(translatedGreeting);
+      updateAssistantLog(translatedGreeting);
+      if (shouldSpeakOnLangChangeRef.current) {
+        shouldSpeakOnLangChangeRef.current = false;
+        setOrbState('speaking');
+        safeSpeak(translatedGreeting, locale);
+      }
+      return;
+    }
+
     const sourceLang = originalResponseRef.current.lang || 'en';
     const sourceText = originalResponseRef.current.text;
-
     if (!sourceText) return;
-
-    const locale = targetLang === 'kn' ? 'kn-IN' : targetLang === 'hi' ? 'hi-IN' : 'en-IN';
 
     if (targetLang === sourceLang) {
       if (response && response.response_text !== sourceText) {
         setResponse(prev => prev ? { ...prev, response_text: sourceText } : null);
-      } else if (!response && greetingText !== sourceText) {
-        setGreetingText(sourceText);
+        updateAssistantLog(sourceText);
       }
       if (shouldSpeakOnLangChangeRef.current) {
         shouldSpeakOnLangChangeRef.current = false;
         setOrbState('speaking');
-        speak(sourceText, locale);
+        safeSpeak(sourceText, locale);
       }
     } else {
       (async () => {
@@ -512,17 +573,14 @@ export default function DashboardLayout({ children }) {
             const data = await res.json();
             if (data.text) {
               const translatedText = data.text;
-              if (response && response.response_text !== translatedText) {
-                setResponse(prev => prev ? { ...prev, response_text: translatedText } : null);
-              } else if (!response && greetingText !== translatedText) {
-                setGreetingText(translatedText);
-              }
+              setResponse(prev => prev ? { ...prev, response_text: translatedText } : null);
+              updateAssistantLog(translatedText);
               setOrbState('idle');
               setStateOverrideLabel('');
               if (shouldSpeakOnLangChangeRef.current) {
                 shouldSpeakOnLangChangeRef.current = false;
                 setOrbState('speaking');
-                speak(data.spokenText || translatedText, locale);
+                safeSpeak(data.spokenText || translatedText, locale);
               }
             }
           } else {
@@ -536,7 +594,7 @@ export default function DashboardLayout({ children }) {
         }
       })();
     }
-  }, [language, speak]);
+  }, [language, response, safeSpeak, getGreetingForLang]);
 
   // ─── Keyboard Shortcuts (Alt+O: Toggle Panel, Alt+M: Toggle Mute, Enter: confirm pending) ───
   useEffect(() => {
@@ -818,7 +876,7 @@ export default function DashboardLayout({ children }) {
         onStopSpeaking={stopSpeaking}
         isListening={isListening}
         language={language}
-        onLanguageChange={setLanguage}
+        onLanguageChange={handleLanguageChange}
         greetingText={greetingText}
         micPermission={micPermission}
         onRequestMicPermission={requestMicPermission}

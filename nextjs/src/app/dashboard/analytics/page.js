@@ -39,11 +39,14 @@ const MOCK_DISTRICT_DATA = [
 ];
 
 const MOCK_CRIME_TYPES = [
-  { type: 'Fraud',           count: 43, pct: 24 },
-  { type: 'Vehicle Theft',   count: 42, pct: 23 },
-  { type: 'Burglary',        count: 35, pct: 19 },
-  { type: 'Chain Snatching', count: 34, pct: 19 },
-  { type: 'Robbery',         count: 27, pct: 15 },
+  { type: 'Cyber Fraud',     count: 68, pct: 23 },
+  { type: 'Vehicle Theft',   count: 57, pct: 19 },
+  { type: 'Robbery',         count: 46, pct: 15 },
+  { type: 'Burglary',        count: 38, pct: 13 },
+  { type: 'Chain Snatching', count: 32, pct: 11 },
+  { type: 'Assault',         count: 24, pct: 8 },
+  { type: 'Narcotics / NDPS',count: 18, pct: 6 },
+  { type: 'Extortion',       count: 15, pct: 5 },
 ];
 
 const MOCK_DARK_ZONES_FALLBACK = [
@@ -136,7 +139,21 @@ export default function AnalyticsPage() {
           return { ...item, count: Math.max(5, item.count + shift) };
         });
       });
-    }, 10000);
+
+      setCrimeTypes(prev => {
+        if (!prev || prev.length === 0) return prev;
+        const updated = prev.map(item => {
+          const delta = Math.floor(Math.random() * 3) - 1;
+          const newCount = Math.max(5, item.count + delta);
+          return { ...item, count: newCount };
+        });
+        const total = updated.reduce((sum, i) => sum + i.count, 0) || 1;
+        return updated.map(item => ({
+          ...item,
+          pct: Math.round((item.count / total) * 100)
+        }));
+      });
+    }, 6000);
 
     return () => clearInterval(interval);
   }, []);
@@ -209,7 +226,7 @@ export default function AnalyticsPage() {
       });
       const sortedCrimes = Object.keys(crimeCounts)
         .sort((a, b) => crimeCounts[b] - crimeCounts[a])
-        .slice(0, 5)
+        .slice(0, 8)
         .map(c => {
           const count = crimeCounts[c];
           const pct = Math.round((count / (validCrimesCount || 1)) * 100);
@@ -416,31 +433,35 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
         {/* Crime Type Breakdown */}
-        <div className="glass-card rounded-xl border border-steel-600/40">
+        <div className="glass-card rounded-xl border border-steel-600/40 flex flex-col justify-between">
           <div className="px-5 py-4 border-b border-steel-600/40 flex items-center justify-between">
             <p className="text-sm font-semibold text-paper-100">Crime Type Breakdown</p>
             <p className="text-xs text-paper-100/40">Sample (300 recent FIRs)</p>
           </div>
-          <div className="p-4 space-y-3">
+          <div className="p-5 space-y-3.5 flex-1 flex flex-col justify-between">
             {loading ? (
-              Array.from({ length: 5 }).map((_, i) => (
+              Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-3">
-                  <Skeleton className="w-28 h-4" />
-                  <Skeleton className="flex-1 h-2 rounded-full" />
-                  <Skeleton className="w-8 h-4" />
+                  <Skeleton className="w-32 h-4" />
+                  <Skeleton className="flex-1 h-2.5 rounded-full" />
+                  <Skeleton className="w-14 h-4" />
                 </div>
               ))
             ) : (
               crimeTypes.map((c) => (
-                <div key={c.type} className="flex items-center gap-3">
-                  <span className="text-xs text-paper-100/60 w-32 truncate flex-shrink-0">{c.type}</span>
-                  <div className="flex-1 h-2 bg-steel-600/40 rounded-full overflow-hidden">
+                <div key={c.type} className="flex items-center gap-4 group">
+                  <span className="text-xs font-medium text-paper-100/70 w-36 truncate shrink-0 group-hover:text-paper-100 transition-colors">
+                    {c.type}
+                  </span>
+                  <div className="flex-1 h-2.5 bg-steel-600/40 rounded-full overflow-hidden relative border border-white/5">
                     <div
-                      className="h-full bg-phosphor-500 rounded-full transition-all duration-700"
-                      style={{ width: `${c.pct}%` }}
+                      className="h-full bg-slate-900 dark:bg-slate-100 rounded-full transition-all duration-700 shadow-sm"
+                      style={{ width: `${Math.max(c.pct, 4)}%` }}
                     />
                   </div>
-                  <span className="text-xs font-mono text-paper-100/60 w-12 text-right">{c.count} ({c.pct}%)</span>
+                  <span className="text-xs font-mono font-semibold text-paper-100/80 w-16 text-right shrink-0">
+                    {c.count} <span className="text-paper-100/40 text-[10px]">({c.pct}%)</span>
+                  </span>
                 </div>
               ))
             )}

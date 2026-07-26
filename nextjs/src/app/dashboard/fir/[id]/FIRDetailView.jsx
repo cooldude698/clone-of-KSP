@@ -550,9 +550,9 @@ function Sidebar({ fir, detail, relatedCases }) {
             <h3 className="font-bold text-[var(--text-primary)] text-xs uppercase tracking-wider font-heading">Related Incident Files</h3>
           </div>
           <div className="divide-y divide-[var(--border)]/30">
-            {relatedCases.slice(0, 4).map((rc) => (
+            {relatedCases.slice(0, 4).map((rc, idx) => (
               <Link
-                key={rc.case_number}
+                key={`${rc.case_number || 'rc'}-${idx}`}
                 href={`/dashboard/fir/${rc.case_number}`}
                 className="flex items-center justify-between px-5 py-3 hover:bg-[var(--surface-2)]/50 transition-colors group"
               >

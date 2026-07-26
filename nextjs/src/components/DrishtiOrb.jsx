@@ -123,6 +123,22 @@ const DrishtiOrb = ({
   onToggleMute,
 }) => {
   const [isClient, setIsClient] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
+
+  useEffect(() => {
+    if (!liveTranscript && !pendingTranscript && !orbResponse) {
+      setIsDismissed(false);
+    }
+  }, [liveTranscript, pendingTranscript, orbResponse]);
+
+  const handleDismissBubble = (e) => {
+    e?.stopPropagation?.();
+    e?.preventDefault?.();
+    setIsDismissed(true);
+    onCancelTranscript?.();
+    onDismissResponse?.();
+  };
+
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const isDragging = React.useRef(false);
   const dragStart = React.useRef({ x: 0, y: 0 });
@@ -400,11 +416,12 @@ const DrishtiOrb = ({
               @property --c2 { syntax: "<color>"; inherits: true; initial-value: oklch(55% 0.2 295); }
               @property --c3 { syntax: "<color>"; inherits: true; initial-value: oklch(50% 0.18 325); }
               @property --bg { syntax: "<color>"; inherits: true; initial-value: #040817; }
-              .siri-orb { display:grid; grid-template-areas:"stack"; overflow:hidden; border-radius:50%; position:relative; background:var(--bg); transition:--c1 0.8s ease-in-out,--c2 0.8s ease-in-out,--c3 0.8s ease-in-out,--bg 0.8s ease-in-out,width 0.08s ease-out,height 0.08s ease-out; }
-              .siri-orb::before,.siri-orb::after { content:""; display:block; grid-area:stack; width:100%; height:100%; border-radius:50%; }
-              .siri-orb::before { background: conic-gradient(from calc(var(--angle)*2) at 25% 70%,var(--c3),transparent 20% 80%,var(--c3)),conic-gradient(from calc(var(--angle)*2) at 45% 75%,var(--c2),transparent 30% 60%,var(--c2)),conic-gradient(from calc(var(--angle)*-3) at 80% 20%,var(--c1),transparent 40% 60%,var(--c1)),conic-gradient(from calc(var(--angle)*2) at 15% 5%,var(--c2),transparent 10% 90%,var(--c2)),conic-gradient(from calc(var(--angle)*1) at 20% 80%,var(--c1),transparent 10% 90%,var(--c1)),conic-gradient(from calc(var(--angle)*-2) at 85% 10%,var(--c3),transparent 20% 80%,var(--c3)); box-shadow:inset var(--bg) 0 0 var(--shadow-spread) calc(var(--shadow-spread)*0.2); filter:blur(var(--blur-amount)) contrast(var(--contrast-amount)); animation:rotate var(--animation-duration) linear infinite; }
+              .siri-orb { display:grid; grid-template-areas:"stack"; overflow:hidden; border-radius:50% !important; clip-path:circle(50% at 50% 50%) !important; isolation:isolate; position:relative; background:var(--bg); outline:none !important; box-shadow:none !important; -webkit-tap-highlight-color:transparent; transition:--c1 0.8s ease-in-out,--c2 0.8s ease-in-out,--c3 0.8s ease-in-out,--bg 0.8s ease-in-out,width 0.08s ease-out,height 0.08s ease-out; }
+              .siri-orb:focus, .siri-orb:active, .siri-orb:hover, .siri-orb:focus-visible { outline:none !important; box-shadow:none !important; border:none !important; }
+              .siri-orb::before,.siri-orb::after { content:""; display:block; grid-area:stack; width:100%; height:100%; border-radius:50% !important; clip-path:circle(50% at 50% 50%) !important; }
+              .siri-orb::before { background: conic-gradient(from calc(var(--angle)*2) at 25% 70%,var(--c3),transparent 20% 80%,var(--c3)),conic-gradient(from calc(var(--angle)*2) at 45% 75%,var(--c2),transparent 30% 60%,var(--c2)),conic-gradient(from calc(var(--angle)*-3) at 80% 20%,var(--c1),transparent 40% 60%,var(--c1)),conic-gradient(from calc(var(--angle)*2) at 15% 5%,var(--c2),transparent 10% 90%,var(--c2)),conic-gradient(from calc(var(--angle)*1) at 20% 80%,var(--c1),transparent 10% 90%,var(--c1)),conic-gradient(from calc(var(--angle)*-2) at 85% 10%,var(--c3),transparent 20% 80%,var(--c3)); filter:blur(var(--blur-amount)) contrast(var(--contrast-amount)); animation:rotate var(--animation-duration) linear infinite; }
               .siri-orb[data-state="idle"]::before { animation:rotate var(--animation-duration) linear infinite,breathe 2.5s ease-in-out infinite; }
-              .siri-orb::after { background-image:radial-gradient(circle at center,rgba(255,255,255,0.35) var(--dot-size),transparent var(--dot-size)); background-size:calc(var(--dot-size)*2.5) calc(var(--dot-size)*2.5); backdrop-filter:blur(calc(var(--blur-amount)*1.5)) contrast(calc(var(--contrast-amount)*1.5)); mix-blend-mode:overlay; }
+              .siri-orb::after { background-image:radial-gradient(circle at center,rgba(255,255,255,0.35) var(--dot-size),transparent var(--dot-size)); background-size:calc(var(--dot-size)*2.5) calc(var(--dot-size)*2.5); mix-blend-mode:overlay; }
               .siri-orb[style*="--mask-radius: 0%"]::after { mask-image:none; }
               .siri-orb:not([style*="--mask-radius: 0%"])::after { mask-image:radial-gradient(black var(--mask-radius),transparent 75%); }
               @keyframes rotate { to { --angle:360deg; } }
@@ -436,7 +453,7 @@ const DrishtiOrb = ({
     >
 
       {/* ── TRANSCRIPT / RESPONSE BUBBLE — appears above orb ── */}
-      {(liveTranscript || pendingTranscript || orbResponse) && (
+      {!isDismissed && (liveTranscript || pendingTranscript || orbResponse) && (
         <div className="w-64 rounded-2xl overflow-hidden mb-1.5 animate-fade-in shadow-2xl relative">
           {/* subtle glow behind bubble */}
           <div className="absolute inset-0 bg-white/5 blur-xl pointer-events-none" />
@@ -450,11 +467,23 @@ const DrishtiOrb = ({
             {/* Live transcript while listening */}
             {liveTranscript && !pendingTranscript && (
               <div>
-                <div className="flex items-center gap-1.5 mb-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-[9px] text-emerald-400 uppercase tracking-widest font-bold font-mono">
-                    Listening
-                  </span>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-[9px] text-emerald-400 uppercase tracking-widest font-bold font-mono">
+                      Listening
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleDismissBubble}
+                    className="text-white/40 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center p-1 rounded-full cursor-pointer"
+                    title="Cancel & Dismiss"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
                 </div>
                 <p className="text-white/75 text-sm leading-relaxed italic">
                   {liveTranscript}
@@ -465,11 +494,23 @@ const DrishtiOrb = ({
             {/* Pending transcript — waiting for user to confirm */}
             {pendingTranscript && (
               <div>
-                <div className="flex items-center gap-1.5 mb-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                  <span className="text-[9px] text-blue-400 uppercase tracking-widest font-bold font-mono">
-                    Ready to send
-                  </span>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                    <span className="text-[9px] text-blue-400 uppercase tracking-widest font-bold font-mono">
+                      Ready to send
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleDismissBubble}
+                    className="text-white/40 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center p-1 rounded-full cursor-pointer"
+                    title="Cancel & Dismiss"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
                 </div>
                 <p className="text-white/90 text-sm leading-relaxed mb-3">
                   {pendingTranscript}
@@ -484,7 +525,7 @@ const DrishtiOrb = ({
                     <span className="opacity-40 text-xs">↵</span>
                   </button>
                   <button
-                    onClick={onCancelTranscript}
+                    onClick={handleDismissBubble}
                     className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/50 hover:text-white text-[10px] uppercase font-bold tracking-widest transition-all border border-white/10"
                   >
                     Cancel
@@ -514,7 +555,7 @@ const DrishtiOrb = ({
                       </button>
                     )}
                     <button
-                      onClick={onDismissResponse}
+                      onClick={handleDismissBubble}
                       className="text-white/40 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center p-1 rounded-full cursor-pointer"
                       title="Cancel / Close Speech Bubble"
                     >
@@ -613,7 +654,7 @@ const DrishtiOrb = ({
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
           className={cn(
-            "siri-orb cursor-pointer transition-all duration-500 hover:scale-105 active:scale-95 relative shadow-2xl shadow-black/40",
+            "siri-orb cursor-pointer transition-all duration-500 hover:scale-105 active:scale-95 relative outline-none ring-0 border-none select-none rounded-full",
             className
           )}
           style={{
@@ -637,11 +678,12 @@ const DrishtiOrb = ({
             @property --c2 { syntax: "<color>"; inherits: true; initial-value: oklch(55% 0.2 295); }
             @property --c3 { syntax: "<color>"; inherits: true; initial-value: oklch(50% 0.18 325); }
             @property --bg { syntax: "<color>"; inherits: true; initial-value: #040817; }
-            .siri-orb { display:grid; grid-template-areas:"stack"; overflow:hidden; border-radius:50%; position:relative; background:var(--bg); transition:--c1 0.8s ease-in-out,--c2 0.8s ease-in-out,--c3 0.8s ease-in-out,--bg 0.8s ease-in-out,width 0.08s ease-out,height 0.08s ease-out; }
-            .siri-orb::before,.siri-orb::after { content:""; display:block; grid-area:stack; width:100%; height:100%; border-radius:50%; }
-            .siri-orb::before { background: conic-gradient(from calc(var(--angle)*2) at 25% 70%,var(--c3),transparent 20% 80%,var(--c3)),conic-gradient(from calc(var(--angle)*2) at 45% 75%,var(--c2),transparent 30% 60%,var(--c2)),conic-gradient(from calc(var(--angle)*-3) at 80% 20%,var(--c1),transparent 40% 60%,var(--c1)),conic-gradient(from calc(var(--angle)*2) at 15% 5%,var(--c2),transparent 10% 90%,var(--c2)),conic-gradient(from calc(var(--angle)*1) at 20% 80%,var(--c1),transparent 10% 90%,var(--c1)),conic-gradient(from calc(var(--angle)*-2) at 85% 10%,var(--c3),transparent 20% 80%,var(--c3)); box-shadow:inset var(--bg) 0 0 var(--shadow-spread) calc(var(--shadow-spread)*0.2); filter:blur(var(--blur-amount)) contrast(var(--contrast-amount)); animation:rotate var(--animation-duration) linear infinite; }
+            .siri-orb { display:grid; grid-template-areas:"stack"; overflow:hidden; border-radius:50% !important; clip-path:circle(50% at 50% 50%) !important; isolation:isolate; position:relative; background:var(--bg); outline:none !important; box-shadow:none !important; -webkit-tap-highlight-color:transparent; transition:--c1 0.8s ease-in-out,--c2 0.8s ease-in-out,--c3 0.8s ease-in-out,--bg 0.8s ease-in-out,width 0.08s ease-out,height 0.08s ease-out; }
+            .siri-orb:focus, .siri-orb:active, .siri-orb:hover, .siri-orb:focus-visible { outline:none !important; box-shadow:none !important; border:none !important; }
+            .siri-orb::before,.siri-orb::after { content:""; display:block; grid-area:stack; width:100%; height:100%; border-radius:50% !important; clip-path:circle(50% at 50% 50%) !important; }
+            .siri-orb::before { background: conic-gradient(from calc(var(--angle)*2) at 25% 70%,var(--c3),transparent 20% 80%,var(--c3)),conic-gradient(from calc(var(--angle)*2) at 45% 75%,var(--c2),transparent 30% 60%,var(--c2)),conic-gradient(from calc(var(--angle)*-3) at 80% 20%,var(--c1),transparent 40% 60%,var(--c1)),conic-gradient(from calc(var(--angle)*2) at 15% 5%,var(--c2),transparent 10% 90%,var(--c2)),conic-gradient(from calc(var(--angle)*1) at 20% 80%,var(--c1),transparent 10% 90%,var(--c1)),conic-gradient(from calc(var(--angle)*-2) at 85% 10%,var(--c3),transparent 20% 80%,var(--c3)); filter:blur(var(--blur-amount)) contrast(var(--contrast-amount)); animation:rotate var(--animation-duration) linear infinite; }
             .siri-orb[data-state="idle"]::before { animation:rotate var(--animation-duration) linear infinite,breathe 2.5s ease-in-out infinite; }
-            .siri-orb::after { background-image:radial-gradient(circle at center,rgba(255,255,255,0.35) var(--dot-size),transparent var(--dot-size)); background-size:calc(var(--dot-size)*2.5) calc(var(--dot-size)*2.5); backdrop-filter:blur(calc(var(--blur-amount)*1.5)) contrast(calc(var(--contrast-amount)*1.5)); mix-blend-mode:overlay; }
+            .siri-orb::after { background-image:radial-gradient(circle at center,rgba(255,255,255,0.35) var(--dot-size),transparent var(--dot-size)); background-size:calc(var(--dot-size)*2.5) calc(var(--dot-size)*2.5); mix-blend-mode:overlay; }
             .siri-orb[style*="--mask-radius: 0%"]::after { mask-image:none; }
             .siri-orb:not([style*="--mask-radius: 0%"])::after { mask-image:radial-gradient(black var(--mask-radius),transparent 75%); }
             @keyframes rotate { to { --angle:360deg; } }

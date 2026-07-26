@@ -9,7 +9,10 @@ export default function ChronoNetworkMockup() {
       {/* Header */}
       <div className="flex items-center justify-between pb-2 border-b border-steel-600/20 shrink-0">
         <span className="text-phosphor-500 font-bold">CHRONO-CRIMINAL GRAPH</span>
-        <span className="text-paper-100/40 text-[8px] uppercase">GANG_AFFILIATION_MAP</span>
+        <div className="flex items-center gap-2">
+          <span className="text-paper-100/40 text-[8px] uppercase">GANG AFFILIATION MAP</span>
+          <span className="badge badge-success font-mono text-[9px] px-2 py-0.5">CASE: NET-32</span>
+        </div>
       </div>
 
       {/* Network visualization */}

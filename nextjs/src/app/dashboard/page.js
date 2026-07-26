@@ -378,14 +378,14 @@ export default function DashboardPage() {
                 No records match current filter.
               </div>
             ) : (
-              displayed.map(fir => {
+              displayed.map((fir, idx) => {
                 const status = fir.status || fir.case_status || 'open';
                 const crimeLabel = CRIME_LABELS[fir.crime_type_code] || fir.crime_type || fir.crime_type_code || 'Incident';
                 const isFlagged = flagged.has(fir.case_number);
 
                 return (
                   <div
-                    key={fir.case_number}
+                    key={`${fir.case_number || 'fir'}-${idx}`}
                     className="group flex flex-col md:grid md:grid-cols-[2fr_1.5fr_1.5fr_auto_auto_auto] gap-4 items-start md:items-center px-5 py-3.5 hover:bg-[var(--surface-2)]/50 transition-colors"
                   >
                     {/* Case Number */}

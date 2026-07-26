@@ -161,11 +161,11 @@ export default function SuspectProfilePage() {
                 <h2 className="font-semibold text-paper-100 text-sm tracking-wide">Associated FIRs</h2>
               </div>
               <div className="space-y-3">
-                {suspect.associated_firs?.map((firNum) => {
+                {suspect.associated_firs?.map((firNum, idx) => {
                   const fir = DEMO_FIRS.firs.find(f => f.case_number === firNum);
                   return (
                     <Link
-                      key={firNum}
+                      key={`${firNum}-${idx}`}
                       href={`/dashboard/fir/${encodeURIComponent(firNum)}`}
                       className="flex items-center justify-between p-3 rounded-xl bg-steel-700/40 border border-steel-600/40 hover:border-phosphor-500/30 hover:bg-phosphor-500/5 transition-all group"
                     >
