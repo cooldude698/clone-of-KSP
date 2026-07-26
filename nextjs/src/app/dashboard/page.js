@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   RefreshCw, Search, MapPin, AlertTriangle,
   Clock, CheckCircle2, FileText, TrendingUp, TrendingDown,
   ArrowRight, ChevronRight, Shield, Radio, ExternalLink,
-  Filter, Flag, Eye, Users, Camera
+  Filter, Flag, Eye, Users, Camera, Sparkles
 } from 'lucide-react';
 import { fetchWithFallback, invalidateCache } from '@/lib/fetch-with-fallback';
 import {
@@ -17,6 +17,7 @@ import {
   DEMO_REPEAT_OFFENDERS,
   DEMO_AI_INSIGHTS
 } from '@/lib/demo-data';
+import { saveFIRsToStore } from '@/lib/fir-store';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CONSTANTS
@@ -122,20 +123,39 @@ export default function DashboardPage() {
   const [flagged, setFlagged] = useState(new Set());
   const [role, setRole] = useState('Inspector');
   const [officerName, setOfficerName] = useState('V. Sharma');
+  const tableContainerRef = useRef(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedRole = localStorage.getItem('drishti_role') || localStorage.getItem('role') || 'Inspector';
-      // Strip any rank prefix from stored name to get bare name
       let rawName = localStorage.getItem('userName') || localStorage.getItem('drishti_user_name') || '';
-      // Remove leading rank title (with or without trailing name)
       rawName = rawName.replace(/^(Inspector General|Sub-Inspector|Inspector|Officer|SI|DySP|SP|DSP)\s*/i, '').trim();
-      // If nothing meaningful left, use default
       if (!rawName || rawName.length < 2) rawName = 'V. Sharma';
       setRole(storedRole);
       setOfficerName(rawName);
     }
   }, []);
+
+  // Restore scroll position after data loads
+  useEffect(() => {
+    if (!loading && typeof window !== 'undefined') {
+      const savedScroll = sessionStorage.getItem('drishti_fir_scroll');
+      if (savedScroll && tableContainerRef.current) {
+        setTimeout(() => {
+          if (tableContainerRef.current) {
+            tableContainerRef.current.scrollTop = parseInt(savedScroll, 10);
+          }
+        }, 80);
+      }
+    }
+  }, [loading]);
+
+  const handleOpenFIR = (caseNumber) => {
+    if (tableContainerRef.current) {
+      sessionStorage.setItem('drishti_fir_scroll', tableContainerRef.current.scrollTop);
+    }
+    router.push(`/dashboard/fir/${caseNumber}`);
+  };
 
   const fetchFirs = useCallback(async () => {
     const res = await fetchWithFallback('/api/firs', DEMO_FIRS, { timeoutMs: 2000 });
@@ -143,7 +163,24 @@ export default function DashboardPage() {
     if (Array.isArray(res?.data)) rows = res.data;
     else if (Array.isArray(res?.data?.firs)) rows = res.data.firs;
     else rows = DEMO_FIRS.firs;
-    setFirs(rows);
+
+    // Enforce 100% UNIQUE case numbers for every single row
+    const seen = new Set();
+    const uniqueRows = rows.map((fir, idx) => {
+      let caseNum = fir.case_number;
+      if (!caseNum || seen.has(caseNum)) {
+        const distCode = (fir.district_name || fir.location_name || 'BEN').substring(0, 3).toUpperCase().replace(/[^A-Z]/g, 'B');
+        caseNum = `KAR/${distCode}/2024/${String(idx + 101).padStart(4, '0')}`;
+      }
+      seen.add(caseNum);
+      return {
+        ...fir,
+        case_number: caseNum
+      };
+    });
+
+    saveFIRsToStore(uniqueRows);
+    setFirs(uniqueRows);
     setDataSource(res.source || 'demo');
   }, []);
 
@@ -223,10 +260,10 @@ export default function DashboardPage() {
     : '—';
 
   return (
-    <div className="flex flex-col gap-6 p-5 sm:p-7 max-w-[1700px] mx-auto min-h-screen text-[var(--text-primary)]">
+    <div className="w-full px-4 sm:px-6 pt-4 pb-0 flex flex-col gap-4 text-[var(--text-primary)]">
 
       {/* ── RESPECTFUL OFFICER GREETING BANNER (NO DUPLICATE OVERVIEW TITLE) ───────── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-r from-[var(--surface-1)] via-[var(--surface-1)] to-[var(--surface-2)] border border-[var(--border)]/50 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl bg-gradient-to-r from-[var(--surface-1)] via-[var(--surface-1)] to-[var(--surface-2)] border border-[var(--border)]/50 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xl">👋</span>
@@ -258,14 +295,14 @@ export default function DashboardPage() {
             href="/dashboard/chat"
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--text-primary)] text-[var(--surface-0)] text-xs font-bold hover:opacity-90 transition-opacity shadow-sm"
           >
-            Ask Drishti AI
-            <ArrowRight className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5" />
+            Co-Pilot Chat
           </Link>
         </div>
       </div>
 
-      {/* ── METRIC CARDS ─────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* ── TOP STATS BAR ─────────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
         <MetricCard
           label="Total FIRs"
           value={metrics.total.toLocaleString('en-IN')}
@@ -298,8 +335,7 @@ export default function DashboardPage() {
           label="ANPR Cameras"
           value="12,500+"
           sub="99.4% operational"
-          subTrend="down"
-          icon={Camera}
+          icon={Shield}
           iconColor="text-emerald-600 dark:text-emerald-400"
           iconBg="bg-emerald-50 dark:bg-emerald-900/20"
           loading={false}
@@ -307,7 +343,7 @@ export default function DashboardPage() {
       </div>
 
       {/* ── MAIN GRID ─────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-5 items-start">
 
         {/* LEFT: INCIDENT TABLE */}
         <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 flex flex-col overflow-hidden shadow-sm">
@@ -359,8 +395,8 @@ export default function DashboardPage() {
           </div>
 
           {/* Column Header Row */}
-          <div className="hidden md:grid grid-cols-[2fr_1.5fr_1.5fr_auto_auto_auto] gap-4 px-5 py-2.5 border-b border-[var(--border)]/50 bg-[var(--surface-0)]">
-            {['Case Number', 'Crime Type', 'Location / PS', 'Filed', 'Status', 'Action'].map(col => (
+          <div className="hidden md:grid grid-cols-[45px_1.8fr_1.8fr_2fr_1fr_135px_50px] gap-4 px-5 py-2.5 border-b border-[var(--border)]/50 bg-[var(--surface-0)] items-center">
+            {['#', 'Case Number', 'Crime Type', 'Location / PS', 'Filed', 'Status', 'Action'].map(col => (
               <span key={col} className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">
                 {col}
               </span>
@@ -368,7 +404,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Rows */}
-          <div className="flex-1 divide-y divide-[var(--border)]/30 overflow-y-auto max-h-[480px]">
+          <div ref={tableContainerRef} className="divide-y divide-[var(--border)]/30 overflow-y-auto max-h-[1020px]">
             {loading ? (
               <div className="py-16 text-center text-[13px] text-[var(--text-secondary)]">
                 Loading live CCTNS feed…
@@ -380,62 +416,70 @@ export default function DashboardPage() {
             ) : (
               displayed.map((fir, idx) => {
                 const status = fir.status || fir.case_status || 'open';
-                const crimeLabel = CRIME_LABELS[fir.crime_type_code] || fir.crime_type || fir.crime_type_code || 'Incident';
+                const rawLabel = CRIME_LABELS[fir.crime_type_code] || fir.crime_type || fir.crime_type_code || 'Incident';
+                const crimeLabel = String(rawLabel).replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
                 const isFlagged = flagged.has(fir.case_number);
 
                 return (
                   <div
                     key={`${fir.case_number || 'fir'}-${idx}`}
-                    className="group flex flex-col md:grid md:grid-cols-[2fr_1.5fr_1.5fr_auto_auto_auto] gap-4 items-start md:items-center px-5 py-3.5 hover:bg-[var(--surface-2)]/50 transition-colors"
+                    className="group flex flex-col md:grid md:grid-cols-[45px_1.8fr_1.8fr_2fr_1fr_135px_50px] gap-4 items-start md:items-center px-5 py-3.5 hover:bg-[var(--surface-2)]/50 transition-colors"
                   >
+                    {/* S.No Counting */}
+                    <div className="md:block hidden min-w-0">
+                      <span className="text-[12px] font-mono font-extrabold text-[var(--text-secondary)]">#{idx + 1}</span>
+                    </div>
+
                     {/* Case Number */}
-                    <div>
+                    <div className="min-w-0">
                       <button
-                        onClick={() => router.push(`/dashboard/fir/${fir.case_number}`)}
-                        className="text-[13px] font-bold font-mono text-blue-700 dark:text-blue-400 hover:underline cursor-pointer text-left"
+                        onClick={() => handleOpenFIR(fir.case_number)}
+                        className="text-[13px] font-bold font-mono text-blue-700 dark:text-blue-400 hover:underline cursor-pointer text-left truncate block max-w-full"
                       >
                         {fir.case_number}
                       </button>
-                      <p className="text-[11px] text-[var(--text-secondary)] mt-0.5 truncate max-w-[180px]">
+                      <p className="text-[11px] text-[var(--text-secondary)] mt-0.5 truncate">
                         {fir.investigation_office || 'Unassigned'}
                       </p>
                     </div>
 
                     {/* Crime Type */}
-                    <div className="md:block hidden">
-                      <span className="text-[13px] font-semibold text-[var(--text-primary)]">{crimeLabel}</span>
+                    <div className="md:block hidden min-w-0">
+                      <span className="text-[13px] font-semibold text-[var(--text-primary)] block leading-tight">{crimeLabel}</span>
                     </div>
 
                     {/* Location */}
-                    <div className="md:block hidden">
-                      <p className="text-[13px] font-medium text-[var(--text-primary)] truncate max-w-[180px]">
+                    <div className="md:block hidden min-w-0">
+                      <p className="text-[13px] font-medium text-[var(--text-primary)] truncate">
                         {fir.location_name || fir.district_name || '—'}
                       </p>
-                      <p className="text-[11px] text-[var(--text-secondary)] truncate max-w-[180px]">
+                      <p className="text-[11px] text-[var(--text-secondary)] truncate">
                         {fir.police_station || '—'}
                       </p>
                     </div>
 
                     {/* Filed Date */}
-                    <div className="md:block hidden">
+                    <div className="md:block hidden min-w-0">
                       <p className="text-[13px] font-semibold text-[var(--text-primary)] whitespace-nowrap">{fmtDate(fir.date_filed)}</p>
                       {fir.time_filed && <p className="text-[11px] text-[var(--text-secondary)]">{fmtTime(fir.time_filed)}</p>}
                     </div>
 
                     {/* Mobile summary */}
                     <div className="md:hidden flex flex-wrap items-center gap-2 mt-1">
+                      <span className="text-[11px] font-mono font-bold text-[var(--text-secondary)]">#{idx + 1}</span>
+                      <span className="text-[11px] text-[var(--text-secondary)]">·</span>
                       <span className="text-[12px] font-semibold text-[var(--text-primary)]">{crimeLabel}</span>
                       <span className="text-[11px] text-[var(--text-secondary)]">·</span>
                       <span className="text-[11px] text-[var(--text-secondary)]">{fmtDate(fir.date_filed)}</span>
                     </div>
 
                     {/* Status */}
-                    <div>
+                    <div className="min-w-0">
                       <StatusPill status={status} />
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 min-w-0">
                       <button
                         onClick={e => {
                           e.stopPropagation();
@@ -451,7 +495,7 @@ export default function DashboardPage() {
                         <Flag className="w-3.5 h-3.5" />
                       </button>
                       <button
-                        onClick={() => router.push(`/dashboard/fir/${fir.case_number}`)}
+                        onClick={() => handleOpenFIR(fir.case_number)}
                         title="View full dossier"
                         className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-2)] transition-colors cursor-pointer"
                       >

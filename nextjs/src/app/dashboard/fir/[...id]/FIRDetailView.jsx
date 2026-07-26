@@ -12,6 +12,8 @@ import {
   Newspaper, X
 } from 'lucide-react';
 
+import { getNormalizedCrimeCode } from '@/lib/fir-store';
+
 const InvestigatorWall = dynamic(() => import('@/components/InvestigatorWall'), {
   ssr: false,
   loading: () => <div className="p-8 text-center text-xs font-mono text-slate-500">Loading Investigation Chronicle...</div>
@@ -127,28 +129,312 @@ const CASE_DETAILS_MAP = {
   }
 };
 
+function hashCode(str) {
+  if (!str) return 12345;
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+const VICTIM_NAMES = [
+  'Santhosh Kumar', 'Kiran Hegde', 'Rajesh Gowda', 'Siddharth Rao', 'Sunita Deshmukh',
+  'Anamika Sule', 'Prof. K. V. Sharma', 'Mahesh Patil', 'Priya Shenoy', 'Jyoti Kumer',
+  'Ramesh Verma', 'Deepak Adiga', 'Lata Nair', 'Gautam Menon', 'Vinay Prasad'
+];
+
+const ACCUSED_LIST = [
+  { name: 'Vikram Singh', alias: 'Vicky Speed', risk: 88, status: 'ABSCONDING' },
+  { name: 'Imran Khan', alias: 'Helmet Imran', risk: 96, status: 'UNDER SURVEILLANCE' },
+  { name: 'Ramesh Kumar', alias: 'Bullet Ramesh', risk: 94, status: 'ACTIVE WATCHLIST' },
+  { name: 'Suresh Naidu', alias: 'Snake Naidu', risk: 91, status: 'CHARGESHEETED' },
+  { name: 'Bhavani Karpe', alias: 'Phish Master', risk: 85, status: 'CYBER TRACKING' },
+  { name: 'Saanvi Dara', alias: 'Shadow Saanvi', risk: 82, status: 'UNDER INVESTIGATION' },
+  { name: 'Mahika Ramachandran', alias: 'Mahi Iron', risk: 78, status: 'ACTIVE WATCHLIST' },
+  { name: 'Anand Shinde', alias: 'Buda Anand', risk: 90, status: 'JUDICIAL CUSTODY' },
+  { name: 'Vikram Reddy', alias: 'Locksmith Vikram', risk: 84, status: 'CHARGESHEETED' },
+  { name: 'Chetan Shetty', alias: 'Phantom Chetan', risk: 89, status: 'ABSCONDING' }
+];
+
 function getCaseDetail(caseNumber, fir) {
   if (CASE_DETAILS_MAP[caseNumber]) {
     return CASE_DETAILS_MAP[caseNumber];
   }
-  const district = fir?.district_name || fir?.district || 'Bengaluru Urban';
-  const station = fir?.police_station || 'Central PS';
+
+  const hash = hashCode(caseNumber || 'KAR/2024/0001');
+  const district = fir?.location_name || fir?.district_name || fir?.district || 'Karnataka State Police Zone';
+  const station = fir?.police_station || 'Central Police Station';
+  const officer = fir?.investigation_officer || fir?.investigation_office || 'Insp. Investigating Officer';
+  const dateFiled = fir?.date_filed || '01 Jun 2024';
+  const timeFiled = fir?.time_filed || '12:00';
+  const crimeTypeRaw = getNormalizedCrimeCode(fir?.crime_type, fir?.crime_type_code);
+
+  const victimName = VICTIM_NAMES[hash % VICTIM_NAMES.length];
+  const accusedObj = ACCUSED_LIST[hash % ACCUSED_LIST.length];
+  const rCode = (hash % 30) + 1;
+  const distCode = rCode < 10 ? `0${rCode}` : `${rCode}`;
+  const char1 = String.fromCharCode(65 + (hash % 26));
+  const char2 = String.fromCharCode(65 + ((hash + 7) % 26));
+  const numPart = (hash % 8999) + 1000;
+  const plate = `KA-${distCode}-${char1}${char2}-${numPart}`;
+  const phone = `+91 9${(hash % 8) + 2}${(hash % 89) + 10} ${(hash % 899) + 100}${(hash % 90) + 10}`;
+  const age = 22 + (hash % 50);
+
+  // 1. HIT AND RUN
+  if (crimeTypeRaw === 'hit_and_run') {
+    return {
+      victim_name: `${victimName} (Pedestrian/Rider)`,
+      victim_contact: phone,
+      victim_age: `${age} Yrs`,
+      victim_gender: hash % 2 === 0 ? 'Male' : 'Female',
+      victim_address: `${district}, ${station}`,
+      officer_name: officer,
+      division: `${station} Traffic & Enforcement Division`,
+      accused_name: accusedObj.name,
+      accused_alias: accusedObj.alias,
+      accused_status: 'ABSCONDING',
+      accused_risk: accusedObj.risk,
+      vehicle_plate: plate,
+      vehicle_model: 'Mahindra XUV700 (Midnight Black)',
+      incident_summary: `Speeding vehicle collided with two-wheeler near ${district} approach under ${station} at ${timeFiled} hrs and fled towards bypass without rendering medical assistance. ANPR cameras logged registration plate ${plate}.`,
+      notes: [
+        { id: 1, time: `${dateFiled}, ${timeFiled}`, officer: `${officer} (${station})`, text: `Hit and run incident logged at ${district}. Victim hospitalized. CCTV footage extracted from traffic pole #${(hash % 20) + 1}.` },
+        { id: 2, time: `${dateFiled}, 18:30`, officer: 'Control Room Officer', text: `ANPR trigger logged vehicle ${plate} bypassing toll plaza at 17:42 hrs. Border checkposts alerted.` },
+        { id: 3, time: '01 Jun 2024, 10:00', officer: `${officer} (${station})`, text: `Forensic paint transfer samples sent for lab matching. Search warrant issued for suspect ${accusedObj.name}.` }
+      ]
+    };
+  }
+
+  // 2. DRUG OFFENCE
+  if (crimeTypeRaw === 'drug_offence') {
+    return {
+      victim_name: 'State of Karnataka (Narcotics Control Wing)',
+      victim_contact: phone,
+      victim_age: 'N/A (State Complainant)',
+      victim_gender: 'N/A',
+      victim_address: `Special Narcotics Jurisdiction, ${station}`,
+      officer_name: officer,
+      division: 'Anti-Narcotics & Special Intelligence Cell',
+      accused_name: accusedObj.name,
+      accused_alias: accusedObj.alias,
+      accused_status: 'UNDER SURVEILLANCE',
+      accused_risk: accusedObj.risk,
+      vehicle_plate: plate,
+      vehicle_model: 'Hyundai Verna (Dark Grey)',
+      incident_summary: `Tactical raid executed near ${district} under ${station} resulting in seizure of 3.2 kg commercial grade MDMA contraband packaged in sealed foil pouches for nightlife distribution networks.`,
+      notes: [
+        { id: 1, time: `${dateFiled}, ${timeFiled}`, officer: `${officer} (${station})`, text: `Decoy operation conducted near ${district}. Commercial narcotics payload intercepted; vehicle ${plate} confiscated.` },
+        { id: 2, time: '01 Jun 2024, 06:30', officer: 'Cyber Intelligence Officer', text: `Encrypted chat logs recovered from confiscated devices linking interstate distribution hub.` }
+      ]
+    };
+  }
+
+  // 3. VEHICLE THEFT
+  if (crimeTypeRaw === 'vehicle_theft') {
+    return {
+      victim_name: victimName,
+      victim_contact: phone,
+      victim_age: `${age} Yrs`,
+      victim_gender: hash % 2 === 0 ? 'Male' : 'Female',
+      victim_address: `${district}, ${station}`,
+      officer_name: officer,
+      division: 'Auto Theft Special Task Force',
+      accused_name: accusedObj.name,
+      accused_alias: accusedObj.alias,
+      accused_status: 'ACTIVE WATCHLIST',
+      accused_risk: accusedObj.risk,
+      vehicle_plate: plate,
+      vehicle_model: 'Bajaj Pulsar 220 (Black)',
+      incident_summary: `Complainant reported parked motorcycle stolen from residential driveway in ${district} during early hours. ANPR network detected vehicle moving with forged plate ${plate}.`,
+      notes: [
+        { id: 1, time: `${dateFiled}, ${timeFiled}`, officer: `${officer} (${station})`, text: `Vehicle theft reported at ${district}. Master key tool marks detected on lock mechanism. Safe City CCTV feed requested.` },
+        { id: 2, time: `${dateFiled}, 04:20`, officer: 'Highway Patrol Unit', text: `Stolen motorcycle spotted near auto chop-shop belt. Suspect ${accusedObj.name} identified on camera.` }
+      ]
+    };
+  }
+
+  // 4. BURGLARY
+  if (crimeTypeRaw === 'burglary') {
+    return {
+      victim_name: victimName,
+      victim_contact: phone,
+      victim_age: `${age} Yrs`,
+      victim_gender: hash % 2 === 0 ? 'Female' : 'Male',
+      victim_address: `${district}, ${station}`,
+      officer_name: officer,
+      division: 'Crimes & Property Division',
+      accused_name: accusedObj.name,
+      accused_alias: accusedObj.alias,
+      accused_status: 'CHARGESHEETED',
+      accused_risk: accusedObj.risk,
+      vehicle_plate: plate,
+      vehicle_model: 'TVS Apache RTR (Matte Black)',
+      incident_summary: `Perpetrators breached rear window grilles of residence in ${district} under ${station}, looting 250g gold ornaments and ₹14.5 Lakhs cash. Fingerprint lifts matched habitual offender.`,
+      notes: [
+        { id: 1, time: `${dateFiled}, ${timeFiled}`, officer: `${officer} (${station})`, text: `Crime scene sealed at ${district}. Fingerprint experts recovered 4 clear latent prints from iron safe handle.` },
+        { id: 2, time: `${dateFiled}, 11:15`, officer: 'Investigating Team', text: `Recovered stolen gold articles from receiver in commercial district. Chargesheet filed in magistrate court.` }
+      ]
+    };
+  }
+
+  // 5. ROBBERY
+  if (crimeTypeRaw === 'robbery') {
+    return {
+      victim_name: victimName,
+      victim_contact: phone,
+      victim_age: `${age} Yrs`,
+      victim_gender: hash % 2 === 0 ? 'Male' : 'Female',
+      victim_address: `${district}, ${station}`,
+      officer_name: officer,
+      division: 'Armed Robbery Special Cell',
+      accused_name: accusedObj.name,
+      accused_alias: accusedObj.alias,
+      accused_status: 'ACTIVE WATCHLIST',
+      accused_risk: accusedObj.risk,
+      vehicle_plate: plate,
+      vehicle_model: 'KTM Duke 390 (Orange/Black)',
+      incident_summary: `Two masked perpetrators on high-powered motorcycle intercepted victim near ${district} at knife-point, forcibly seizing cash bag containing ₹3.5 Lakhs and valuable jewelry before escaping.`,
+      notes: [
+        { id: 1, time: `${dateFiled}, ${timeFiled}`, officer: `${officer} (${station})`, text: `Armed robbery registered. Emergency barricades established at exit corridors. CCTV footage retrieved.` }
+      ]
+    };
+  }
+
+  // 6. CYBERCRIME
+  if (crimeTypeRaw === 'cybercrime') {
+    return {
+      victim_name: victimName,
+      victim_contact: phone,
+      victim_age: `${age} Yrs`,
+      victim_gender: hash % 2 === 0 ? 'Female' : 'Male',
+      victim_address: `${district}, ${station}`,
+      officer_name: officer,
+      division: 'Cyber Crime Wing (CEN Station)',
+      accused_name: accusedObj.name,
+      accused_alias: accusedObj.alias,
+      accused_status: 'CYBER TRACKING',
+      accused_risk: accusedObj.risk,
+      vehicle_plate: plate,
+      vehicle_model: 'Maruti Swift (Pearl White)',
+      incident_summary: `Phishing fraud complaint registered at ${station} after victim in ${district} was tricked into installing a fraudulent banking APK app mimicking official portal. Unauthorised transfer of ₹8.4 Lakhs executed.`,
+      notes: [
+        { id: 1, time: `${dateFiled}, ${timeFiled}`, officer: `${officer} (${station})`, text: `Cyber cell initiated emergency freeze protocol with payment gateway node. Beneficiary IP traced to offshore server.` }
+      ]
+    };
+  }
+
+  // 7. FRAUD
+  if (crimeTypeRaw === 'fraud') {
+    return {
+      victim_name: victimName,
+      victim_contact: phone,
+      victim_age: `${age} Yrs`,
+      victim_gender: hash % 2 === 0 ? 'Male' : 'Female',
+      victim_address: `${district}, ${station}`,
+      officer_name: officer,
+      division: 'Economic Offences Wing (EOW)',
+      accused_name: accusedObj.name,
+      accused_alias: accusedObj.alias,
+      accused_status: 'UNDER INVESTIGATION',
+      accused_risk: accusedObj.risk,
+      vehicle_plate: plate,
+      vehicle_model: 'Honda City (Silver)',
+      incident_summary: `Financial fraud complaint lodged under IPC 420 at ${station}. Suspect solicited investments promising 40% monthly returns using forged government seal, defrauding multiple victims of ₹45 Lakhs.`,
+      notes: [
+        { id: 1, time: `${dateFiled}, ${timeFiled}`, officer: `${officer} (${station})`, text: `Bank account freeze orders issued to RBI payment operators. Document verification under process.` }
+      ]
+    };
+  }
+
+  // 8. DOMESTIC VIOLENCE
+  if (crimeTypeRaw === 'domestic_violence') {
+    return {
+      victim_name: victimName,
+      victim_contact: phone,
+      victim_age: `${age} Yrs`,
+      victim_gender: 'Female',
+      victim_address: `${district}, ${station}`,
+      officer_name: officer,
+      division: 'Women & Child Protection Wing',
+      accused_name: accusedObj.name,
+      accused_alias: accusedObj.alias,
+      accused_status: 'UNDER INVESTIGATION',
+      accused_risk: accusedObj.risk,
+      vehicle_plate: plate,
+      vehicle_model: 'Hyundai i20 (Silver Metallic)',
+      incident_summary: `Domestic altercation and physical harassment complaint reported at ${district} under ${station} at ${timeFiled} hrs. Complainant sustained physical injuries and medical report attached.`,
+      notes: [
+        { id: 1, time: `${dateFiled}, ${timeFiled}`, officer: `${officer} (${station})`, text: `Incident logged under Domestic Protection Act. Medical report filed; victim protection order requested.` }
+      ]
+    };
+  }
+
+  // 9. ASSAULT
+  if (crimeTypeRaw === 'assault') {
+    return {
+      victim_name: victimName,
+      victim_contact: phone,
+      victim_age: `${age} Yrs`,
+      victim_gender: hash % 2 === 0 ? 'Male' : 'Female',
+      victim_address: `${district}, ${station}`,
+      officer_name: officer,
+      division: 'Law & Order Division',
+      accused_name: accusedObj.name,
+      accused_alias: accusedObj.alias,
+      accused_status: 'CHARGESHEETED',
+      accused_risk: accusedObj.risk,
+      vehicle_plate: plate,
+      vehicle_model: 'Mahindra Bolero (White)',
+      incident_summary: `Physical assault and grievous hurt (IPC 324/326) reported near ${district} under ${station}. Suspect engaged in violent altercation using blunt weapon following personal dispute.`,
+      notes: [
+        { id: 1, time: `${dateFiled}, ${timeFiled}`, officer: `${officer} (${station})`, text: `Victim admitted to district hospital. Weapon recovered from crime scene. Suspect taken into custody.` }
+      ]
+    };
+  }
+
+  // 10. SENIOR CITIZEN CRIME
+  if (crimeTypeRaw === 'senior_citizen_crime') {
+    return {
+      victim_name: `Prof. ${victimName} (Retd)`,
+      victim_contact: phone,
+      victim_age: '74 Yrs',
+      victim_gender: 'Male',
+      victim_address: `${district}, ${station}`,
+      officer_name: officer,
+      division: 'Senior Citizen Care & Legal Cell',
+      accused_name: accusedObj.name,
+      accused_alias: accusedObj.alias,
+      accused_status: 'UNDER INVESTIGATION',
+      accused_risk: accusedObj.risk,
+      vehicle_plate: plate,
+      vehicle_model: 'Toyota Etios (White)',
+      incident_summary: `Extortion complaint registered under Senior Citizen Protection Act at ${station}. Suspect coerced victim in ${district} under duress into executing unauthorized power of attorney documents for real estate property.`,
+      notes: [
+        { id: 1, time: `${dateFiled}, ${timeFiled}`, officer: `${officer} (${station})`, text: `Victim statement recorded in presence of legal officer. Registrar office notified to stay document processing.` }
+      ]
+    };
+  }
+
+  // 11. GENERAL / PROPERTY CRIME FALLBACK
   return {
-    victim_name: fir?.victim_name || 'Ramesh Gowda',
-    victim_contact: '+91 98450 ' + Math.floor(10000 + Math.random() * 90000),
-    victim_age: '36 Yrs',
-    victim_gender: 'Male',
-    victim_address: `${station} Jurisdiction, ${district}`,
-    officer_name: fir?.investigation_office || 'Insp. K. Swamy',
-    division: `${district} Sector Division`,
-    accused_name: fir?.accused_name || 'Suspect Under Investigation',
-    accused_alias: 'Prime Accused',
-    accused_status: 'UNDER INVESTIGATION',
-    accused_risk: fir?.risk_score || 78,
-    vehicle_plate: 'KA-01-MJ-8821',
+    victim_name: victimName,
+    victim_contact: phone,
+    victim_age: `${age} Yrs`,
+    victim_gender: hash % 2 === 0 ? 'Male' : 'Female',
+    victim_address: `${district}, ${station}`,
+    officer_name: officer,
+    division: `${station} Sector Division`,
+    accused_name: accusedObj.name,
+    accused_alias: accusedObj.alias,
+    accused_status: fir?.status === 'closed' ? 'CLOSED' : 'UNDER INVESTIGATION',
+    accused_risk: accusedObj.risk,
+    vehicle_plate: plate,
     vehicle_model: 'Motorcycle / Vehicle on Record',
+    incident_summary: `Property offense incident reported at ${district} under ${station} jurisdiction. Complainant filed official statement. Police team secured evidence and logged case details.`,
     notes: [
-      { id: 1, time: fir?.date_filed || '18 Jul 2026', officer: `${fir?.investigation_office || 'Investigating Officer'} (${station})`, text: `FIR registered. Initial scene inspection completed at ${fir?.location_name || station}. Investigation in progress.` }
+      { id: 1, time: `${dateFiled}, ${timeFiled}`, officer: `${officer} (${station})`, text: `FIR registered under IPC sections at ${station}. Initial scene inspection completed and evidence logged.` }
     ]
   };
 }

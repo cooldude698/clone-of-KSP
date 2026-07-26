@@ -63,10 +63,13 @@ function NotFound({ caseNumber }) {
 import { fetchWithFallback } from '@/lib/fetch-with-fallback';
 import { DEMO_FIRS, DEMO_TRAIL } from '@/lib/demo-data';
 
+import { getFIRFromStore } from '@/lib/fir-store';
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function FIRDetailPage() {
   const params     = useParams();
-  const caseNumber = decodeURIComponent(params?.id || '');
+  const rawId      = params?.id;
+  const caseNumber = Array.isArray(rawId) ? rawId.map(decodeURIComponent).join('/') : decodeURIComponent(rawId || '');
 
   const [fir,          setFir]          = useState(null);
   const [suspects,     setSuspects]     = useState([]);
@@ -103,7 +106,45 @@ export default function FIRDetailPage() {
       setLoading(true);
       setNotFound(false);
 
-      const demoCase = DEMO_FIRS.firs.find(f => f.case_number === caseNumber) || DEMO_FIRS.firs[0];
+      const storedFir = getFIRFromStore(caseNumber);
+      let demoCase = storedFir || DEMO_FIRS.firs.find(f => f.case_number === caseNumber);
+
+      if (!demoCase) {
+        const parts = caseNumber.split('/');
+        const stationCode = parts[1] || 'BEN';
+        const numPart = parseInt(parts[3] || '0', 10);
+
+        let cCode = 'vehicle_theft';
+        let cLabel = 'Vehicle Theft';
+
+        if (numPart % 8 === 0 || caseNumber.includes('KAL')) { cCode = 'hit_and_run'; cLabel = 'Hit And Run'; }
+        else if (numPart % 8 === 1 || caseNumber.includes('RAI')) { cCode = 'vehicle_theft'; cLabel = 'Vehicle Theft'; }
+        else if (numPart % 8 === 2 || caseNumber.includes('UDU')) { cCode = 'senior_citizen_crime'; cLabel = 'Senior Citizen Crime'; }
+        else if (numPart % 8 === 3 || caseNumber.includes('CHI')) { cCode = 'burglary'; cLabel = 'Burglary'; }
+        else if (numPart % 8 === 4 || caseNumber.includes('TUM')) { cCode = 'drug_offence'; cLabel = 'Drug Offence'; }
+        else if (numPart % 8 === 5 || caseNumber.includes('HAS') || caseNumber.includes('VIJ')) { cCode = 'domestic_violence'; cLabel = 'Domestic Violence'; }
+        else if (numPart % 8 === 6 || caseNumber.includes('KOP') || caseNumber.includes('BID')) { cCode = 'robbery'; cLabel = 'Robbery'; }
+        else { cCode = 'cybercrime'; cLabel = 'Cybercrime'; }
+
+        demoCase = {
+          case_number: caseNumber,
+          date_filed: "2024-06-01",
+          time_filed: "10:15:00",
+          crime_type_code: cCode,
+          crime_type: cLabel,
+          description: `${cLabel} incident reported at ${stationCode} Police Station jurisdiction area under IPC provisions. Active investigation in progress.`,
+          status: numPart % 3 === 0 ? "open" : numPart % 3 === 1 ? "under_investigation" : "chargesheeted",
+          case_status: numPart % 3 === 0 ? "open" : numPart % 3 === 1 ? "under_investigation" : "chargesheeted",
+          district_name: `${stationCode} District`,
+          police_station: `${stationCode} Sector PS`,
+          location_name: `Near Main Junction, ${stationCode}`,
+          location_lat: 12.9716,
+          location_lng: 77.5946,
+          accused_name: "Suspect Under Investigation",
+          risk_score: 85,
+          investigation_officer: "Insp. Officer In-Charge"
+        };
+      }
 
       const { data } = await fetchWithFallback(
         `firs?case_number=${encodeURIComponent(caseNumber)}&limit=1`,
