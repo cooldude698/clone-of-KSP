@@ -1,12 +1,27 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
 import { UPLOADED_FIRS, UPLOADED_SUSPECTS, persistUploadedStore } from '@/lib/uploadedFirsStore';
 
-const CORS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-};
+const DISK_FILE = path.join(process.cwd(), 'src/lib/uploaded_firs_disk.json');
+
+function readDiskData() {
+  try {
+    if (fs.existsSync(DISK_FILE)) {
+      return JSON.parse(fs.readFileSync(DISK_FILE, 'utf8'));
+    }
+  } catch {}
+  return { firs: [], suspects: [] };
+}
+
+function writeDiskData(data) {
+  try {
+    fs.writeFileSync(DISK_FILE, JSON.stringify(data, null, 2), 'utf8');
+  } catch (e) {
+    console.error('Disk save error:', e);
+  }
+}
 
 export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: CORS });
@@ -131,6 +146,7 @@ export async function POST(req) {
     }
 
     persistUploadedStore(UPLOADED_FIRS, UPLOADED_SUSPECTS);
+    writeDiskData({ firs: UPLOADED_FIRS, suspects: UPLOADED_SUSPECTS });
 
     return NextResponse.json(
       {

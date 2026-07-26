@@ -1,6 +1,21 @@
 import { NextResponse } from 'next/server';
+import fs from 'fs';
+import path from 'path';
 import { UPLOADED_FIRS } from '@/lib/uploadedFirsStore';
 import { DEMO_FIRS } from '@/lib/demo-data';
+
+const DISK_FILE = path.join(process.cwd(), 'src/lib/uploaded_firs_disk.json');
+
+function getDiskFirs() {
+  try {
+    if (fs.existsSync(DISK_FILE)) {
+      const raw = fs.readFileSync(DISK_FILE, 'utf8');
+      const data = JSON.parse(raw);
+      if (Array.isArray(data.firs)) return data.firs;
+    }
+  } catch {}
+  return [];
+}
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -16,7 +31,8 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const caseNumber = searchParams.get('case_number');
 
-  const allFirs = [...UPLOADED_FIRS, ...DEMO_FIRS.firs];
+  const diskFirs = getDiskFirs();
+  const allFirs = [...diskFirs, ...UPLOADED_FIRS, ...DEMO_FIRS.firs];
   const uniqueFirs = [];
   const seen = new Set();
 

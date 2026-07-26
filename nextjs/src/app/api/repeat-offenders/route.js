@@ -1,6 +1,21 @@
 import { NextResponse } from 'next/server';
+import fs from 'fs';
+import path from 'path';
 import { UPLOADED_SUSPECTS } from '@/lib/uploadedFirsStore';
 import { DEMO_REPEAT_OFFENDERS } from '@/lib/demo-data';
+
+const DISK_FILE = path.join(process.cwd(), 'src/lib/uploaded_firs_disk.json');
+
+function getDiskSuspects() {
+  try {
+    if (fs.existsSync(DISK_FILE)) {
+      const raw = fs.readFileSync(DISK_FILE, 'utf8');
+      const data = JSON.parse(raw);
+      if (Array.isArray(data.suspects)) return data.suspects;
+    }
+  } catch {}
+  return [];
+}
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -13,7 +28,8 @@ export async function OPTIONS() {
 }
 
 export async function GET() {
-  const allSuspects = [...UPLOADED_SUSPECTS, ...DEMO_REPEAT_OFFENDERS.suspects];
+  const diskSuspects = getDiskSuspects();
+  const allSuspects = [...diskSuspects, ...UPLOADED_SUSPECTS, ...DEMO_REPEAT_OFFENDERS.suspects];
   const uniqueSuspects = [];
   const seen = new Set();
 
