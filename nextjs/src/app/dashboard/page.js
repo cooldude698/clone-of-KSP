@@ -110,7 +110,15 @@ function StatCard({ id, label, value, change, up, icon: Icon, color, bg, border,
 
       <div className="relative z-10 flex items-end justify-between">
         <div>
-          <p className="text-3xl font-black text-[var(--text-primary)] font-mono tracking-tight group-hover:text-[var(--cyan-accent)] transition-colors">{value}</p>
+          <motion.p
+            key={value}
+            initial={{ opacity: 0.5, y: -3 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="text-3xl font-black text-[var(--text-primary)] font-mono tracking-tight group-hover:text-[var(--cyan-accent)] transition-colors"
+          >
+            {value}
+          </motion.p>
           <p className="text-[11px] font-mono font-bold text-[var(--text-secondary)] mt-1 uppercase tracking-wider">{label}</p>
         </div>
         {sparkline && !noSource && (
@@ -133,16 +141,18 @@ function CachedBadge() {
   );
 }
 
-// ── useLiveCounter ─────────────────────────────────────────────────────────
-function useLiveCounter(baseValue, variance = 2, intervalMs = 10000) {
+// ── useLiveCounter (dynamic 15 sec subtle fluctuation) ─────────────────────
+function useLiveCounter(baseValue, variance = 2, intervalMs = 15000) {
   const [value, setValue] = React.useState(baseValue);
   React.useEffect(() => {
     const id = setInterval(() => {
-      const delta = Math.floor(Math.random() * (variance * 2 + 1)) - variance;
-      setValue(baseValue + delta);
-    }, intervalMs + Math.random() * 5000);
+      // Subtle realistic fluctuation (-variance to +variance, e.g. -1, 0, +1)
+      const choices = [-1, 1, -2, 2, 0];
+      const delta = choices[Math.floor(Math.random() * choices.length)];
+      setValue(prev => Math.max(1, prev + delta));
+    }, intervalMs);
     return () => clearInterval(id);
-  }, [baseValue, variance, intervalMs]);
+  }, [intervalMs]);
   return value;
 }
 
@@ -235,10 +245,10 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('all');
   const [role, setRole] = useState('Inspector');
 
-  const liveFIRs = useLiveCounter(1428, 3, 12000);
+  const liveFIRs = useLiveCounter(1430, 2, 15000);
   const liveCameras = useLiveCounter(348, 1, 15000);
-  const liveOffenders = useLiveCounter(42, 1, 20000);
-  const liveHotspots = useLiveCounter(18, 1, 18000);
+  const liveOffenders = useLiveCounter(42, 1, 15000);
+  const liveHotspots = useLiveCounter(18, 1, 15000);
 
   const [insights, setInsights] = useState(DEMO_AI_INSIGHTS);
   const [insightsLoading, setInsightsLoading] = useState(false);
