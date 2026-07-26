@@ -384,14 +384,14 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-4">
             <motion.button
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
               onClick={() => router.push('/dashboard/analytics')}
-              className="btn-secondary flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all cursor-pointer"
+              className="btn-secondary flex items-center gap-2.5 px-6 py-3 rounded-xl text-sm md:text-base font-medium transition-all cursor-pointer shadow-sm hover:shadow"
             >
-              <BarChart3 className="w-4 h-4 text-[var(--cyan-accent)]" />
+              <BarChart3 className="w-5 h-5 text-[var(--cyan-accent)]" />
               <span>Analytics Report</span>
             </motion.button>
 
@@ -400,9 +400,9 @@ export default function DashboardPage() {
               whileTap={{ scale: 0.96 }}
               onClick={() => fetchDashboardData(true)}
               disabled={refreshing || loading}
-              className="btn-secondary flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-[var(--status-success)] border border-[var(--status-success)]/40 transition-all cursor-pointer disabled:opacity-50"
+              className="btn-secondary flex items-center gap-2.5 px-6 py-3 rounded-xl text-sm md:text-base font-medium text-[var(--status-success)] border border-[var(--status-success)]/40 transition-all cursor-pointer disabled:opacity-50 shadow-sm hover:shadow"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
               <span>{refreshing ? 'Syncing...' : 'Sync Data'}</span>
             </motion.button>
           </div>
