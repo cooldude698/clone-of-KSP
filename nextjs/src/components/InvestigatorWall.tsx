@@ -242,10 +242,34 @@ export default function InvestigatorWall({
 
             <div className="mb-4">
               <span className="text-[9px] text-slate-400 uppercase tracking-widest block mb-2 font-sans font-bold">Official Case Narrative / First Information Report Statement</span>
-              <div className="bg-[#FAF7F2] rounded-xl p-5 border border-slate-200 max-h-60 overflow-y-auto">
-                <p className="text-sm text-slate-700 leading-relaxed font-serif italic text-justify first-letter:text-4xl first-letter:font-black first-letter:float-left first-letter:mr-2 first-letter:mt-0.5 first-letter:text-slate-900">
-                  &quot;{fir.description}&quot;
-                </p>
+              <div className="bg-[#FAF7F2] rounded-xl p-5 border border-slate-200 max-h-60 overflow-y-auto space-y-2">
+                {(() => {
+                  const cleaned = (fir.description || '')
+                    .replace(/={3,}/g, '')
+                    .replace(/-{3,}/g, '')
+                    .replace(/KARNATAKA STATE POLICE \(KSP\) — FIRST INFORMATION REPORT \(FIR\)[\s\S]*?\[Under Section 154 Cr\.P\.C\. \/ Section 173 Bharatiya Nagarik Suraksha Sanhita\]/gi, '')
+                    .trim();
+                  
+                  const lines = cleaned.split('\n').map(l => l.trim()).filter(Boolean);
+                  if (lines.length > 1 && (cleaned.includes('1.') || cleaned.includes(':'))) {
+                    return (
+                      <div className="space-y-2 text-xs font-sans text-slate-800">
+                        {lines.map((l, i) => (
+                          <p key={i} className={l.includes(':') ? 'font-medium' : 'text-slate-600'}>
+                            {l.includes(':') ? <strong>{l.split(':')[0]}: </strong> : null}
+                            {l.includes(':') ? l.slice(l.indexOf(':') + 1) : l}
+                          </p>
+                        ))}
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <p className="text-sm text-slate-700 leading-relaxed font-sans font-medium text-justify">
+                      {cleaned || fir.description}
+                    </p>
+                  );
+                })()}
               </div>
             </div>
 

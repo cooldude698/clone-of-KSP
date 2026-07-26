@@ -64,6 +64,17 @@ export async function POST(req) {
 
     const detectedDistrict = district || 'Bengaluru Urban';
 
+    // Create a clean readable summary for description
+    const cleanedText = fileContent
+      ?.replace(/={3,}/g, '')
+      ?.replace(/-{3,}/g, '')
+      ?.replace(/KARNATAKA STATE POLICE \(KSP\) — FIRST INFORMATION REPORT \(FIR\)[\s\S]*?\[Under Section 154 Cr\.P\.C\. \/ Section 173 Bharatiya Nagarik Suraksha Sanhita\]/gi, '')
+      ?.trim();
+
+    const shortSummary = suspectName 
+      ? `FIR registered at ${policeStation} for ${detectedCrimeType}. Primary Suspect: ${suspectName}. Location: ${locationName}. Offence Brief: ${cleanedText?.slice(0, 300)}...`
+      : cleanedText?.slice(0, 400) || `Uploaded FIR document: ${fileName}`;
+
     const newRecord = {
       case_number: caseNumber,
       suspect_name: suspectName || 'Vikram Malhotra',
@@ -79,7 +90,7 @@ export async function POST(req) {
       case_status: 'under_investigation',
       investigation_office: ioName,
       risk_score: 88,
-      description: fileContent?.slice(0, 1200) || `Uploaded FIR document: ${fileName}`,
+      description: shortSummary,
       full_text: fileContent || '',
       source: 'Uploaded FIR Document',
       file_name: fileName || 'fir_document.pdf',

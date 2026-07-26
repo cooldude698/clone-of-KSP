@@ -195,6 +195,156 @@ function fmtTime(str) {
   } catch { return str; }
 }
 
+function CleanNarrativeFormatter({ rawText }) {
+  if (!rawText) return null;
+
+  // Check if rawText contains ASCII divider borders (=== or ---) or section headers
+  const isStructured = rawText.includes('===') || rawText.includes('SECTION') || rawText.includes('DETAILS:');
+
+  if (!isStructured) {
+    return (
+      <div className="p-4 rounded-xl bg-[#FAF6F0] border border-[#7A90A8]/30 text-sm font-medium text-[#1E2733] leading-relaxed shadow-sm">
+        {rawText}
+      </div>
+    );
+  }
+
+  // Clean ASCII decorative headers
+  let cleaned = rawText
+    .replace(/={3,}/g, '')
+    .replace(/-{3,}/g, '')
+    .replace(/KARNATAKA STATE POLICE \(KSP\) — FIRST INFORMATION REPORT \(FIR\)[\s\S]*?\[Under Section 154 Cr\.P\.C\. \/ Section 173 Bharatiya Nagarik Suraksha Sanhita\]/gi, '')
+    .trim();
+
+  // Split into numbered sections e.g., "1. DISTRICT & POLICE STATION DETAILS:"
+  const sectionSplit = cleaned.split(/(?=\d+\.\s+[A-Z\s&()\/-]+:)/g).filter(Boolean);
+
+  if (sectionSplit.length <= 1) {
+    // Clean out empty lines and present neat key-value or bullet paragraphs
+    const paragraphs = cleaned.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    return (
+      <div className="p-4 rounded-xl bg-[#FAF6F0] border border-[#7A90A8]/30 space-y-2 text-sm text-[#1E2733] leading-relaxed shadow-sm">
+        {paragraphs.map((line, idx) => (
+          <p key={idx} className={line.startsWith('-') || line.startsWith('•') ? 'pl-2 text-xs font-mono text-[#48596D]' : 'font-sans font-medium'}>
+            {line}
+          </p>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {sectionSplit.map((block, idx) => {
+        const titleMatch = block.match(/^(\d+\.\s+)?([^:\n]+):/);
+        const title = titleMatch ? titleMatch[2].trim() : `Section ${idx + 1}`;
+        const content = block.replace(/^(\d+\.\s+)?[^:\n]+:\s*/, '').trim();
+
+        if (!content) return null;
+
+        const titleLower = title.toLowerCase();
+        const lines = content.split('\n').map(s => s.replace(/^-\s*/, '').trim()).filter(Boolean);
+
+        // 1. ACTS & LEGAL SECTIONS
+        if (titleLower.includes('act') || titleLower.includes('legal') || titleLower.includes('section')) {
+          return (
+            <div key={idx} className="p-4 rounded-xl bg-[#FAF6F0] border border-[#7A90A8]/30 space-y-2">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#A68A69] flex items-center gap-1.5">
+                <span>⚖️</span> {title}
+              </span>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {lines.map((it, k) => (
+                  <span key={k} className="px-3 py-1 rounded-lg bg-[#1E2733] text-white font-mono text-xs font-bold shadow-sm">
+                    {it}
+                  </span>
+                ))}
+              </div>
+            </div>
+          );
+        }
+
+        // 2. ACCUSED & SUSPECT PROFILE
+        if (titleLower.includes('accused') || titleLower.includes('suspect')) {
+          return (
+            <div key={idx} className="p-4 rounded-xl bg-[#1E2733] text-white border border-[#1E2733] space-y-2.5 shadow-md">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono font-extrabold uppercase tracking-wider text-[#AECAE8] flex items-center gap-1.5">
+                  <span>👤</span> {title}
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-rose-500/20 border border-rose-400 text-rose-300 font-mono text-[10px] font-bold">
+                  HIGH RISK SUSPECT
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono pt-1">
+                {lines.map((it, k) => {
+                  const parts = it.split(/:\s*(.*)/);
+                  if (parts.length >= 2 && parts[1]) {
+                    return (
+                      <div key={k} className="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800">
+                        <span className="text-slate-400 text-[10px] uppercase block mb-0.5">{parts[0]}</span>
+                        <span className="text-cyan-300 font-bold text-xs">{parts[1]}</span>
+                      </div>
+                    );
+                  }
+                  return <p key={k} className="text-slate-200 col-span-2 leading-relaxed">{it}</p>;
+                })}
+              </div>
+            </div>
+          );
+        }
+
+        // 3. STOLEN ASSETS / SURVEILLANCE LOG / SPECIFICATIONS
+        if (titleLower.includes('stolen') || titleLower.includes('asset') || titleLower.includes('transaction') || titleLower.includes('surveillance') || titleLower.includes('evidence')) {
+          return (
+            <div key={idx} className="p-4 rounded-xl bg-[#FAF6F0] border border-amber-500/40 space-y-2">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-700 flex items-center gap-1.5">
+                <span>🔍</span> {title}
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono pt-1">
+                {lines.map((it, k) => {
+                  const parts = it.split(/:\s*(.*)/);
+                  if (parts.length >= 2 && parts[1]) {
+                    return (
+                      <div key={k} className="p-2.5 rounded-lg bg-[#EFEAE4] border border-[#7A90A8]/30">
+                        <span className="text-[#48596D] text-[10px] uppercase block mb-0.5">{parts[0]}</span>
+                        <span className="text-[#1E2733] font-bold text-xs">{parts[1]}</span>
+                      </div>
+                    );
+                  }
+                  return <p key={k} className="text-[#1E2733] font-medium col-span-2">{it}</p>;
+                })}
+              </div>
+            </div>
+          );
+        }
+
+        // 4. DEFAULT STRUCTURED SECTION CARD
+        return (
+          <div key={idx} className="p-4 rounded-xl bg-[#FAF6F0] border border-[#7A90A8]/30 space-y-2">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1E2733] flex items-center gap-1.5">
+              <span>📌</span> {title}
+            </span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-[#1E2733] font-sans pt-1">
+              {lines.map((l, k) => {
+                const parts = l.split(/:\s*(.*)/);
+                if (parts.length >= 2 && parts[1]) {
+                  return (
+                    <div key={k} className="p-2 rounded-lg bg-[#EFEAE4]/60 border border-[#7A90A8]/20">
+                      <span className="text-[#48596D] text-[10px] uppercase font-mono block mb-0.5">{parts[0]}</span>
+                      <span className="text-[#1E2733] font-semibold">{parts[1]}</span>
+                    </div>
+                  );
+                }
+                return <p key={k} className="text-[#1E2733] leading-relaxed col-span-2 font-medium">{l}</p>;
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function DetailsTab({ fir, detail }) {
   const fields = [
     { label: 'IPC / BNS SECTION', value: fir.ipc_section || (fir.crime_type_code || fir.crime_type || 'IPC 379').toUpperCase().replace(/_/g, ' ') },
@@ -225,12 +375,10 @@ function DetailsTab({ fir, detail }) {
             ))}
           </dl>
 
-          {(fir.description || fir.fir_description || fir.narrative) && (
+          {(fir.description || fir.full_text || fir.fir_description || fir.narrative) && (
             <div className="pt-4 border-t border-[var(--border)]/50">
               <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-2">INCIDENT DESCRIPTION & EVIDENTIARY NARRATIVE</dt>
-              <dd className="text-sm text-[var(--text-primary)] leading-relaxed bg-[var(--surface-0)] rounded-xl p-4 border border-[var(--border)]/40 font-medium">
-                {fir.description || fir.fir_description || fir.narrative}
-              </dd>
+              <CleanNarrativeFormatter rawText={fir.full_text || fir.description || fir.fir_description || fir.narrative} />
             </div>
           )}
         </div>
