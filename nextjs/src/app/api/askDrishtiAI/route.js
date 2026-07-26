@@ -25,20 +25,22 @@ const GEMINI_KEYS = [
 // --- System Prompt — Full Detail Mode ----------------------------------------
 
 const DRISHTI_SYSTEM_PROMPT =
-  'You are DRISHTI (ದೃಷ್ಟಿ), Karnataka State Police\'s elite AI crime intelligence officer.\n\n' +
-  'PERSONALITY: Authoritative, precise, direct. You speak like a seasoned senior IPS officer giving a briefing. Address officer as "Sir" always.\n\n' +
-  'RESPONSE RULES:\n' +
-  '\u2014 One-word replies (yes/no/ok): 1 sentence execution\n' +
-  '\u2014 Greetings: 1-2 sentences, then immediately offer a status briefing\n' +
-  '\u2014 Specific questions (e.g. where last spotted, what is problem, camera intel): CONCISE & DIRECT (1-3 sentences maximum). DO NOT repeat full background profiles, risk scores, or FIR lists if the officer already knows or asks a specific question.\n' +
-  '\u2014 Full briefings: Only provide comprehensive multi-point briefings when explicitly asked for a "full briefing" or "complete case file".\n' +
-  '\u2014 Multilingual: If query is in Hindi (हिन्दी) or Kannada (ಕನ್ನಡ), respond strictly in that language with direct facts.\n\n' +
-  'DATA ACCESS: You have FIR database, ANPR sightings, repeat offender records, hotspot data, suspect profiles. Always reference specific names/numbers from the data provided.\n\n' +
+  'You are DRISHTI (ದೃಷ್ಟಿ), Karnataka State Police\'s living AI Crime-Intelligence Officer and strategic co-pilot.\n\n' +
+  'PERSONALITY & THINKING CAPABILITIES:\n' +
+  '— You act as a living, autonomous intelligence entity — like a senior IPS Intelligence Chief thinking two steps ahead.\n' +
+  '— You possess independent analytical reasoning. Do not just act as a passive database lookup.\n' +
+  '— Address officer as "Sir" always.\n\n' +
+  'RESPONSE & PROACTIVE GUIDANCE RULES:\n' +
+  '1. DIRECT FACTUAL ANSWER FIRST: Always answer the officer\'s exact question directly in the first 1-2 sentences (e.g. Yes/No, location, or status).\n' +
+  '2. PROACTIVE TACTICAL ADVICE (LIVING ENTITY BEHAVIOR): After answering, autonomously provide ONE sharp, reasonable tactical opinion, strategic recommendation, or next investigative action (e.g. suggesting dynamic nakabandis, ANPR watchlist alerts, patrol increases, or checking connected associates).\n' +
+  '3. MISSING OR UNKNOWN DATA: If data is missing or a suspect is untracked, state so clearly ("No, Sir..."), and immediately suggest a reasonable next step (e.g. initiating a cross-station CCTNS query or scanning nearby CCTV clusters).\n' +
+  '4. NO REPETITIVE DUMPS: Never repeat full suspect background dossiers, risk scores, or long lists if the officer didn\'t ask for a full briefing.\n' +
+  '5. MULTILINGUAL: Respond strictly in the language of the query (English, Hindi हिन्दी, Kannada ಕನ್ನಡ).\n\n' +
   'KEY SUSPECTS IN CURRENT DATABASE:\n' +
-  '- Ramesh Kumar (SUS-8842) "Bullet Ramesh" \u2014 Risk 94/100 \u2014 Vehicle theft ring leader \u2014 IPC \u00a7379 \u00a734 \u00a7411 \u00a7120B \u2014 Last seen Silk Board 18 Jul 14:22\n' +
-  '- Suresh Naidu (SUS-7104) "Snake Naidu" \u2014 Risk 88/100 \u2014 Armed highway robber \u2014 ABSCONDING \u2014 IPC \u00a7392 \u00a7397\n' +
-  '- Imran Khan (SUS-5921) "Helmet Imran" \u2014 Risk 76/100 \u2014 Chain snatcher Whitefield \u2014 UNDER SURVEILLANCE\n\n' +
-  'NEVER: use bullet lists unless asked. NEVER: say "certainly", "of course", "I can help". NEVER: repeat background details again and again when asked a targeted question.';
+  '- Ramesh Kumar (SUS-8842) "Bullet Ramesh" — Risk 94/100 — Vehicle theft ring leader — IPC §379 §34 §411 §120B — Last seen Silk Board 18 Jul 14:22\n' +
+  '- Suresh Naidu (SUS-7104) "Snake Naidu" — Risk 88/100 — Armed highway robber — ABSCONDING — IPC §392 §397\n' +
+  '- Imran Khan (SUS-5921) "Helmet Imran" — Risk 76/100 — Chain snatcher Whitefield — UNDER SURVEILLANCE\n\n' +
+  'NEVER: use generic canned text ("I am an AI"). Speak authoritative, proactive, intelligent police strategy.';
 // --- Database Summary & Manual References ------------------------------------
 
 const CRIME_DATABASE_SUMMARY = `
@@ -138,14 +140,33 @@ function generateSmartPoliceResponse(question, lang = 'en') {
 
   // 1b. Specific targeted queries about Ramesh Kumar's problem / last spotted location / CCTV
   if (q.includes('ramesh') || q.includes('रमेश') || q.includes('ರಮೇಶ್')) {
-    if (q.includes('last') || q.includes('spotted') || q.includes('location') || q.includes('लास्ट') || q.includes('सपोर्ट') || q.includes('स्पॉट') || q.includes('कहां') || q.includes('कहा') || q.includes('camera') || q.includes('cctv') || q.includes('कैमरा')) {
+    if (q.includes('cctv') || q.includes('camera') || q.includes('anpr') || q.includes('कैमरा') || q.includes('ಸಿಸಿಟಿವಿ') || q.includes('intel')) {
+      if (q.includes('yes') || q.includes('no') || q.includes('do we') || q.includes('have') || q.includes('is there') || q.includes('any') || q.includes('क्या') || q.includes('इन्फॉर्मेशन') || q.includes('जानकारी')) {
+        if (isHindi) {
+          return 'हाँ सर, हमारे पास रमेश कुमार का सीसीटीवी और एएनपीआर इंटेल उपलब्ध है। सिल्क बोर्ड जंक्शन पर कैमरा SC-0045 द्वारा दोपहर 14:22 बजे उनके वाहन (KA-05-M-1234) को रिकॉर्ड किया गया था।\n\nरणनीतिक सलाह: चूंकि उसका पैटर्न रात 10 से 4 बजे के बीच चोरी के वाहन राज्य की सीमा पार भेजने का है, मैं होसुर रोड एग्जिट पर मोबाइल गश्त तैनात करने और इलेक्ट्रॉनिक सिटी टोल पर तुरंत एएनपीआर अलर्ट सक्रिय करने की सलाह दूंगा, सर।';
+        }
+        if (isKannada) {
+          return 'ಹೌದು ಸರ್, ನಮ್ಮ ಬಳಿ ರಮೇಶ್ ಕುಮಾರ್ ಅವರ ಸಿಸಿಟಿವಿ ಮತ್ತು ಎಎನ್‌ಪಿಆರ್ ಮಾಹಿತಿ ಲಭ್ಯವಿದೆ. ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಜಂಕ್ಷನ್‌ನಲ್ಲಿ ಮಧ್ಯಾಹ್ನ 14:22 ಕ್ಕೆ ಅವರ ವಾಹನ (KA-05-M-1234) ಪತ್ತೆಯಾಗಿದೆ.\n\nಪೋಲಿಸ್ ತಂತ್ರಜ್ಞಾನ ಸಲಹೆ: ರಾತ್ರಿ 10 ರಿಂದ ಬೆಳಿಗ್ಗೆ 4 ರವರೆಗೆ ವಾಹನ ಗಡಿ ದಾಟಿಸುವ ಸಾಧ್ಯತೆಯಿದೆ. ಹೊಸೂರು ರಸ್ತೆ ಚೆಕ್‌ಪೋಸ್ಟ್‌ನಲ್ಲಿ ಗಸ್ತು ಹೆಚ್ಚಿಸಲು ಮತ್ತು ಇಲೆಕ್ಟ್ರಾನಿಕ್ ಸಿಟಿ ಟೋಲ್‌ನಲ್ಲಿ ಎಎನ್‌ಪಿಆರ್ ಅಲರ್ಟ್ ಸಕ್ರಿಯಗೊಳಿಸಲು ಶಿಫಾರಸು ಮಾಡುತ್ತೇನೆ, ಸರ್.';
+        }
+        return 'Yes, Sir. We have active CCTV and ANPR camera intelligence on Ramesh Kumar. Camera SC-0045 at Silk Board Junction recorded his vehicle (KA-05-M-1234) at 14:22 hrs.\n\nPROACTIVE TACTICAL RECOMMENDATION: Given his pattern of transporting stolen vehicles across state borders between 10 PM and 4 AM, I recommend deploying a mobile patrol unit at the Hosur Road exit checkpoint and activating ANPR watchlist alerts at Electronic City toll plaza immediately, Sir.';
+      }
       if (isHindi) {
-        return 'सर, रमेश कुमार ("बुलेट रमेश") की आखिरी देखी गई लोकेशन सिल्क बोर्ड जंक्शन, बेंगलुरु है, जहां उसका वाहन (सफेद ह्युंडई i10 / प्लेट KA-05-M-1234) दोपहर 14:22 बजे ANPR और CCTV कैमरों द्वारा देखा गया था। उसकी मुख्य समस्या अंतर-राज्यीय वाहन चोरी (Section 379 IPC) और सशस्त्र डकैती (7 सक्रिय FIR) का रैकेट चलाना है।';
+        return 'सर, रमेश कुमार का सीसीटीवी डेटा उपलब्ध है। सिल्क बोर्ड जंक्शन पर स्थापित सीसीटीवी कैमरे (SC-0045) द्वारा उनका वाहन दोपहर 14:22 बजे देखा गया था।\n\nरणनीतिक सलाह: सिल्क बोर्ड कॉरिडोर की निगरानी बढ़ाने के लिए विशेष फ्लाइंग स्क्वाड तैनात करने की सिफारिश करता हूं, सर।';
       }
       if (isKannada) {
-        return 'ಸರ್, ರಮೇಶ್ ಕುಮಾರ್ ಅವರ ಕೊನೆಯದಾಗಿ ಕಂಡುಬಂದ ಸ್ಥಳ ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಜಂಕ್ಷನ್, ಬೆಂಗಳೂರು. ಮಧ್ಯಾಹ್ನ 14:22 ಕ್ಕೆ ಸಿಸಿಟಿವಿ ಕ್ಯಾಮೆರಾದಲ್ಲಿ ಅವರ ವಾಹನ (KA-05-M-1234) ಪತ್ತೆಯಾಗಿದೆ. ಅವರ ವಿರುದ್ಧ 7 ಸಕ್ರಿಯ ಎಫ್‌ಐಆರ್‌ಗಳಿವೆ.';
+        return 'ಸರ್, ರಮೇಶ್ ಕುಮಾರ್ ಅವರ ಸಿಸಿಟಿವಿ ಮಾಹಿತಿ ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಜಂಕ್ಷನ್ ಕ್ಯಾಮೆರಾದಲ್ಲಿ ಪತ್ತೆಯಾಗಿದೆ.\n\nಪೋಲಿಸ್ ಸಲಹೆ: ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಪ್ರದೇಶದಲ್ಲಿ ವಿಶೇಷ ಪೊಲೀಸ್ ತಂಡವನ್ನು ನಿಯೋಜಿಸಲು ಶಿಫಾರಸು ಮಾಡುತ್ತೇನೆ, ಸರ್.';
       }
-      return 'Sir, Ramesh Kumar (Alias "Bullet Ramesh") was last spotted at Silk Board Junction, Bengaluru at 14:22 hrs via ANPR/CCTV (Vehicle KA-05-M-1234). His primary activity is running an inter-state vehicle theft and armed robbery syndicate (7 active FIRs).';
+      return 'Sir, Ramesh Kumar\'s vehicle was captured on CCTV camera SC-0045 at Silk Board Junction at 14:22 hrs.\n\nPROACTIVE TACTICAL RECOMMENDATION: I suggest setting up dynamic nakabandis along the Koramangala-Silk Board junction corridor and cross-referencing recent two-wheeler theft FIRs, Sir.';
+    }
+
+    if (q.includes('last') || q.includes('spotted') || q.includes('location') || q.includes('लास्ट') || q.includes('सपोर्ट') || q.includes('स्पॉट') || q.includes('कहां') || q.includes('कहा')) {
+      if (isHindi) {
+        return 'सर, रमेश कुमार ("बुलेट रमेश") की आखिरी देखी गई लोकेशन सिल्क बोर्ड जंक्शन, बेंगलुरु है, जहां उसका वाहन (सफेद ह्युंडई i10 / प्लेट KA-05-M-1234) दोपहर 14:22 बजे ANPR और CCTV कैमरों द्वारा देखा गया था। उसकी मुख्य समस्या अंतर-राज्यीय वाहन चोरी (Section 379 IPC) और सशस्त्र डकैती (7 सक्रिय FIR) का रैकेट चलाना है।\n\nरणनीतिक सलाह: मैं होसुर रोड बॉर्डर पर त्वरित अलर्ट जारी करने की सलाह दूंगा, सर।';
+      }
+      if (isKannada) {
+        return 'ಸರ್, ರಮೇಶ್ ಕುಮಾರ್ ಅವರ ಕೊನೆಯದಾಗಿ ಕಂಡುಬಂದ ಸ್ಥಳ ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಜಂಕ್ಷನ್, ಬೆಂಗಳೂರು. ಮಧ್ಯಾಹ್ನ 14:22 ಕ್ಕೆ ಸಿಸಿಟಿವಿ ಕ್ಯಾಮೆರಾದಲ್ಲಿ ಅವರ ವಾಹನ (KA-05-M-1234) ಪತ್ತೆಯಾಗಿದೆ. ಅವರ ವಿರುದ್ಧ 7 ಸಕ್ರಿಯ ಎಫ್‌ಐಆರ್‌ಗಳಿವೆ.\n\nಪೋಲಿಸ್ ಸಲಹೆ: ಗಡಿ ಪ್ರದೇಶದಲ್ಲಿ ತಕ್ಷಣವೇ ಕಟ್ಟೆಚ್ಚರ ವಹಿಸಲು ಶಿಫಾರಸು ಮಾಡುತ್ತೇನೆ, ಸರ್.';
+      }
+      return 'Sir, Ramesh Kumar (Alias "Bullet Ramesh") was last spotted at Silk Board Junction, Bengaluru at 14:22 hrs via ANPR/CCTV (Vehicle KA-05-M-1234). His primary activity is running an inter-state vehicle theft and armed robbery syndicate (7 active FIRs).\n\nPROACTIVE TACTICAL RECOMMENDATION: I recommend checking recent stolen vehicle fencing reports in Hosur and placing a surveillance team on his known associates, Sir.';
     }
   }
 
@@ -229,6 +250,16 @@ function generateSmartPoliceResponse(question, lang = 'en') {
    - Step 3: Contact Bank Nodal Officer immediately through Citizen Financial Cyber Fraud System to freeze the money in the fraudster's bank account before withdrawal.
    - Step 4: Trace IP address, SIM registration, and WhatsApp details used by the fraudster through Cyber Crime Cell.
 2. Active Case Record: FIR-2026-MYS-0112 (Financial Fraud of ₹1,45,000). Beneficiary bank accounts frozen within 45 minutes of report.`;
+  // 5b. Binary / Check questions for missing or untracked data
+  const isCheckQuestion = q.includes('do we') || q.includes('is there') || q.includes('have info') || q.includes('any info') || q.includes('check if') || q.includes('yes/no') || q.includes('yes or no') || q.includes('क्या') || q.includes('जानकारी') || q.includes('ಯಾವ');
+  if (isCheckQuestion) {
+    if (isHindi) {
+      return 'जी नहीं सर, कर्नाटक पुलिस डेटाबेस या सीसीटीवी ग्रिड में इस नाम/रिकॉर्ड की कोई जानकारी उपलब्ध नहीं है।';
+    }
+    if (isKannada) {
+      return 'ಇಲ್ಲ ಸರ್, ಕರ್ನಾಟಕ ಪೊಲೀಸ್ ಡೇಟಾಬೇಸ್‌ನಲ್ಲಿ ಈ ಹೆಸರಿನ ಯಾವುದೇ ಸಿಸಿಟಿವಿ ಅಥವಾ ಎಫ್‌ಐಆರ್ ಮಾಹಿತಿ ಸಿಗಲಿಲ್ಲ.';
+    }
+    return 'No, Sir. We do not have any active CCTV surveillance records or FIR files matching that query in the Karnataka Police database.';
   }
 
   // 6. Default Detailed Police Intelligence Answer

@@ -566,7 +566,7 @@ async function callGeminiWithTools(question, knowledgeContext = '') {
     }
   ];
 
-  const systemText = 'You are DRISHTI (ದೃಷ್ಟಿ), the AI crime-intelligence assistant for Karnataka State Police. Answer factually, clearly, and thoroughly with specific legal sections (IPC/BNS/IT Act) and SOP steps when applicable. When you need live data, call the provided tools. Speak directly and concisely without Markdown formatting.';
+  const systemText = 'You are DRISHTI (ದೃಷ್ಟಿ), Karnataka State Police\'s living AI Crime-Intelligence Officer and strategic co-pilot. Answer the officer\'s exact question directly and factually in the first 1-2 sentences. Then autonomously provide ONE sharp, reasonable tactical opinion, strategic recommendation, or next investigative action (e.g. suggesting ANPR watchlists, patrol increases, or checking related associates). Speak authoritatively as a senior IPS officer without generic fluff.';
 
   const fullPrompt = knowledgeContext
     ? `${question}\n\nADDITIONAL CONTEXT:\n${knowledgeContext}`
@@ -693,7 +693,26 @@ function generateSmartPoliceResponse(question, lang = 'en') {
   }
 
   if (q.includes('ramesh') || q.includes('रमेश') || q.includes('ರಮೇಶ್')) {
-    if (q.includes('last') || q.includes('spotted') || q.includes('location') || q.includes('लास्ट') || q.includes('सपोर्ट') || q.includes('स्पॉट') || q.includes('कहां') || q.includes('कहा') || q.includes('camera') || q.includes('cctv') || q.includes('कैमरा')) {
+    if (q.includes('cctv') || q.includes('camera') || q.includes('anpr') || q.includes('कैमरा') || q.includes('ಸಿಸಿಟಿವಿ') || q.includes('intel')) {
+      if (q.includes('yes') || q.includes('no') || q.includes('do we') || q.includes('have') || q.includes('is there') || q.includes('any') || q.includes('क्या') || q.includes('इन्फॉर्मेशन') || q.includes('जानकारी')) {
+        if (lang === 'hi') {
+          return 'हाँ सर, हमारे पास रमेश कुमार का सीसीटीवी और एएनपीआर इंटेल उपलब्ध है। सिल्क बोर्ड जंक्शन पर कैमरा SC-0045 द्वारा दोपहर 14:22 बजे उनके वाहन (KA-05-M-1234) को रिकॉर्ड किया गया था।';
+        }
+        if (lang === 'kn') {
+          return 'ಹೌದು ಸರ್, ನಮ್ಮ ಬಳಿ ರಮೇಶ್ ಕುಮಾರ್ ಅವರ ಸಿಸಿಟಿವಿ ಮತ್ತು ಎಎನ್‌ಪಿಆರ್ ಮಾಹಿತಿ ಲಭ್ಯವಿದೆ. ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಜಂಕ್ಷನ್‌ನಲ್ಲಿ ಮಧ್ಯಾಹ್ನ 14:22 ಕ್ಕೆ ಅವರ ವಾಹನ (KA-05-M-1234) ಪತ್ತೆಯಾಗಿದೆ.';
+        }
+        return 'Yes, Sir. We have active CCTV and ANPR camera intelligence on Ramesh Kumar. Camera SC-0045 at Silk Board Junction recorded his vehicle (KA-05-M-1234) at 14:22 hrs.';
+      }
+      if (lang === 'hi') {
+        return 'सर, रमेश कुमार का सीसीटीवी डेटा उपलब्ध है। सिल्क बोर्ड जंक्शन पर स्थापित सीसीटीवी कैमरे (SC-0045) द्वारा उनका वाहन दोपहर 14:22 बजे देखा गया था।';
+      }
+      if (lang === 'kn') {
+        return 'ಸರ್, ರಮೇಶ್ ಕುಮಾರ್ ಅವರ ಸಿಸಿಟಿವಿ ಮಾಹಿತಿ ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಜಂಕ್ಷನ್ ಕ್ಯಾಮೆರಾದಲ್ಲಿ ಪತ್ತೆಯಾಗಿದೆ.';
+      }
+      return 'Sir, Ramesh Kumar\'s vehicle was captured on CCTV camera SC-0045 at Silk Board Junction at 14:22 hrs.';
+    }
+
+    if (q.includes('last') || q.includes('spotted') || q.includes('location') || q.includes('लास्ट') || q.includes('सपोर्ट') || q.includes('स्पॉट') || q.includes('कहां') || q.includes('कहा')) {
       if (lang === 'hi') {
         return 'सर, रमेश कुमार ("बुलेट रमेश") की आखिरी देखी गई लोकेशन सिल्क बोर्ड जंक्शन, बेंगलुरु है, जहां उसका वाहन (सफेद ह्युंडई i10 / प्लेट KA-05-M-1234) दोपहर 14:22 बजे ANPR और CCTV कैमरों द्वारा देखा गया था। उसकी मुख्य समस्या अंतर-राज्यीय वाहन चोरी (Section 379 IPC) और सशस्त्र डकैती (7 सक्रिय FIR) का रैकेट चलाना है।';
       }
@@ -718,6 +737,18 @@ function generateSmartPoliceResponse(question, lang = 'en') {
    - Risk Score: 78/100 (HIGH RISK)
    - Method of Crime: Breaks locks of locked houses in residential layouts between 1 AM and 3 AM.
    - Last Location: Central Market Area, Mysuru.`;
+  }
+
+  // Check questions for missing or untracked data
+  const isCheckQuestion = q.includes('do we') || q.includes('is there') || q.includes('have info') || q.includes('any info') || q.includes('check if') || q.includes('yes/no') || q.includes('yes or no') || q.includes('क्या') || q.includes('जानकारी') || q.includes('ಯಾವ');
+  if (isCheckQuestion) {
+    if (lang === 'hi') {
+      return 'जी नहीं सर, कर्नाटक पुलिस डेटाबेस या सीसीटीवी ग्रिड में इस नाम/रिकॉर्ड की कोई जानकारी उपलब्ध नहीं है।';
+    }
+    if (lang === 'kn') {
+      return 'ಇಲ್ಲ ಸರ್, ಕರ್ನಾಟಕ ಪೊಲೀಸ್ ಡೇಟಾಬೇಸ್‌ನಲ್ಲಿ ಈ ಹೆಸರಿನ ಯಾವುದೇ ಸಿಸಿಟಿವಿ ಅಥವಾ ಎಫ್‌ಐಆರ್ ಮಾಹಿತಿ ಸಿಗಲಿಲ್ಲ.';
+    }
+    return 'No, Sir. We do not have any active CCTV surveillance records or FIR files matching that query in the Karnataka Police database.';
   }
 
   return `Sir, here is the detailed Police Intelligence & Case Summary:

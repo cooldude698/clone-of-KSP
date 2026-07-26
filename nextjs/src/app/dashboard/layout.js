@@ -54,10 +54,34 @@ function detectLocalIntent(query) {
 
   const nav = (path, reply, followUpQuery) => ({ type: 'navigate', path, reply, followUpQuery });
 
-  // 1. CCTV & Surveillance Direct Intent (English, Hindi, Kannada)
+  // Guard: If query is a question or requests Yes/No, DO NOT navigate! Let the AI answer the query.
+  const isQuestion =
+    q.includes('?') || q.includes('do we') || q.includes('is there') || q.includes('have info') ||
+    q.includes('any info') || q.includes('check if') || q.includes('answer in') || q.includes('yes/no') ||
+    q.includes('yes or no') || q.includes('what') || q.includes('where') || q.includes('who') ||
+    q.includes('how') || q.includes('does') || q.includes('क्या') || q.includes('जानकारी') ||
+    q.includes('इन्फॉर्मेशन') || q.includes('ಯಾವ') || q.includes('ಇದೆಯಾ');
+
+  if (isQuestion) {
+    return null;
+  }
+
+  // Explicit Open/View/Navigate action verbs
+  const isOpenAction =
+    q.includes('open') || q.includes('show') || q.includes('view') || q.includes('bring up') ||
+    q.includes('pull up') || q.includes('switch') || q.includes('navigate') || q.includes('go to') ||
+    q.includes('check case') || q.includes('case file') || q.includes('profile') ||
+    q.includes('खोलो') || q.includes('खोल') || q.includes('खोलना') || q.includes('दिखाओ') ||
+    q.includes('दिखाएं') || q.includes('देखना') || q.includes('सीरी') || q.includes('प्रोफाइल') ||
+    q.includes('ले चलो') || q.includes('ओपन') || q.includes('ತೆರೆ') || q.includes('ತೋರಿಸು') ||
+    q.includes('ಪ್ರೊಫೈಲ್');
+
+  // 1. CCTV & Surveillance Direct Intent (requires explicit open/view action verb or page request)
   if (
-    /\b(cctv|surveillance|camera|feed|anpr|watch|सीसीटीवी|सर्विलांस|कैमरा|कैमरे|फीड|ಸಿಸಿಟಿವಿ|ಕ್ಯಾಮೆರಾ|ನಿಗಾ)\b/.test(q) ||
-    q.includes('सीसीटीवी') || q.includes('सर्विलांस') || q.includes('कैमरा') || q.includes('ಸಿಸಿಟಿವಿ') || q.includes('ಕ್ಯಾಮೆರಾ')
+    isOpenAction && (
+      /\b(cctv|surveillance|camera|feed|anpr|watch|सीसीटीवी|सर्विलांस|कैमरा|कैमरे|फीड|ಸಿಸಿಟಿವಿ|ಕ್ಯಾಮೆರಾ|ನಿಗಾ)\b/.test(q) ||
+      q.includes('सीसीटीवी') || q.includes('सर्विलांस') || q.includes('कैमरा') || q.includes('ಸಿಸಿಟಿವಿ') || q.includes('ಕ್ಯಾಮೆರಾ')
+    )
   ) {
     const reply = isHindi
       ? 'सिल्क बोर्ड और बेंगलुरु ग्रिड के सीसीटीवी कैमरे और सर्विलांस सिस्टम खोले जा रहे हैं, सर।'
@@ -67,10 +91,12 @@ function detectLocalIntent(query) {
     return nav('/dashboard/surveillance', reply, null);
   }
 
-  // 2. Crime Map Direct Intent (English, Hindi, Kannada)
+  // 2. Crime Map Direct Intent (requires explicit open/view action verb)
   if (
-    /\b(map|crime map|hotspot|heatmap|location|where.*crime|मैप|क्राइम मैप|नक्शा|लोकेशन|ಮ್ಯಾಪ್|ನಕ್ಷೆ)\b/.test(q) ||
-    q.includes('मैप') || q.includes('नक्शा') || q.includes('ಮ್ಯಾಪ್') || q.includes('ನಕ್ಷೆ')
+    isOpenAction && (
+      /\b(map|crime map|hotspot|heatmap|location|where.*crime|मैप|क्राइम मैप|नक्शा|लोकेशन|ಮ್ಯಾಪ್|ನಕ್ಷೆ)\b/.test(q) ||
+      q.includes('मैप') || q.includes('नक्शा') || q.includes('ಮ್ಯಾಪ್') || q.includes('ನಕ್ಷೆ')
+    )
   ) {
     const reply = isHindi
       ? 'क्राइम मैप और हॉटस्पॉट लोकेशन दिखाई जा रही है, सर।'
@@ -81,13 +107,6 @@ function detectLocalIntent(query) {
   }
 
   // 3. Suspect Profile & Case File Direct Intent
-  const isOpenAction =
-    q.includes('open') || q.includes('show') || q.includes('view') || q.includes('bring up') ||
-    q.includes('pull up') || q.includes('check') || q.includes('case file') || q.includes('profile') ||
-    q.includes('file') || q.includes('खोलो') || q.includes('खोल') || q.includes('खोलना') ||
-    q.includes('दिखाओ') || q.includes('दिखाएं') || q.includes('देखना') || q.includes('सीरी') ||
-    q.includes('प्रोफाइल') || q.includes('ತೆರೆ') || q.includes('ತೋರಿಸು') || q.includes('ಪ್ರೊಫೈಲ್');
-
   if (isOpenAction) {
     if (q.includes('anant') || q.includes('anand') || q.includes('gowda') || q.includes('godwa') || q.includes('buda') || q.includes('guda') || q.includes('goda') || q.includes('आनंद') || q.includes('ಆನಂದ್')) {
       const reply = isHindi ? 'आनंद गौड़ा की संदिग्ध प्रोफाइल खोली जा रही है, सर।' : isKannada ? 'ಆನಂದ್ ಗೌಡ ಅವರ ಶಂಕಿತ ಪ್ರೊಫೈಲ್ ತೆರೆಯಲಾಗುತ್ತಿದೆ, ಸರ್.' : 'Opening suspect profile for Anand Gowda, Sir.';

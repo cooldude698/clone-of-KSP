@@ -453,31 +453,48 @@ export default function ChatPage() {
     // Auto-detect open suspect / FIR / CCTV / Crime map intent and navigate
     const qLower = text.toLowerCase().trim();
 
-    // Direct CCTV / Surveillance check
-    if (qLower.includes('cctv') || qLower.includes('surveillance') || qLower.includes('camera') || qLower.includes('सीसीटीवी') || qLower.includes('सर्विलांस') || qLower.includes('कैमरा')) {
-      const cctvMsg = /[\u0900-\u097F]/.test(text)
-        ? 'सिल्क बोर्ड और शहर ग्रिड के सीसीटीवी कैमरे और सर्विलांस सिस्टम खोले जा रहे हैं, सर।'
-        : 'Opening Surveillance & CCTV live camera feeds, Sir.';
-      setMessages((prev) => [...prev, { role: 'assistant', content: cctvMsg, timestamp: timestamp() }]);
-      speakText(cctvMsg, messages.length + 1);
-      setTimeout(() => { if (typeof window !== 'undefined') window.location.href = '/dashboard/surveillance'; }, 800);
-      setLoading(false);
-      return;
-    }
+    // Guard: If message is a question or requests Yes/No, DO NOT navigate! Let the AI answer.
+    const isQuestion =
+      qLower.includes('?') || qLower.includes('do we') || qLower.includes('is there') || qLower.includes('have info') ||
+      qLower.includes('any info') || qLower.includes('check if') || qLower.includes('answer in') || qLower.includes('yes/no') ||
+      qLower.includes('yes or no') || qLower.includes('what') || qLower.includes('where') || qLower.includes('who') ||
+      qLower.includes('how') || qLower.includes('does') || qLower.includes('क्या') || qLower.includes('जानकारी') ||
+      qLower.includes('इन्फॉर्मेशन') || qLower.includes('ಯಾವ') || qLower.includes('ಇದೆಯಾ');
 
-    // Direct Crime Map check
-    if (qLower.includes('crime map') || qLower.includes('map') || qLower.includes('क्राइम मैप') || qLower.includes('मैप') || qLower.includes('नक्शा')) {
-      const mapMsg = /[\u0900-\u097F]/.test(text)
-        ? 'क्राइम मैप और लोकेशन ट्रैकिंग दिखाई जा रही है, सर।'
-        : 'Opening Crime Map, Sir.';
-      setMessages((prev) => [...prev, { role: 'assistant', content: mapMsg, timestamp: timestamp() }]);
-      speakText(mapMsg, messages.length + 1);
-      setTimeout(() => { if (typeof window !== 'undefined') window.location.href = '/dashboard/map'; }, 800);
-      setLoading(false);
-      return;
-    }
+    const isOpenAction =
+      qLower.includes('open') || qLower.includes('show') || qLower.includes('view') || qLower.includes('bring up') ||
+      qLower.includes('pull up') || qLower.includes('switch') || qLower.includes('navigate') || qLower.includes('go to') ||
+      qLower.includes('check case') || qLower.includes('case file') || qLower.includes('profile') ||
+      qLower.includes('खोलो') || qLower.includes('खोल') || qLower.includes('खोलना') || qLower.includes('दिखाओ') ||
+      qLower.includes('दिखाएं') || qLower.includes('देखना') || qLower.includes('सीरी') || qLower.includes('प्रोफाइल') ||
+      qLower.includes('ले चलो') || qLower.includes('ओपन') || qLower.includes('ತೆರೆ') || qLower.includes('ತೋರಿಸು') ||
+      qLower.includes('ಪ್ರೊಫೈಲ್');
 
-    const isOpenAction = qLower.includes('open') || qLower.includes('show') || qLower.includes('view') || qLower.includes('bring up') || qLower.includes('pull up') || qLower.includes('check') || qLower.includes('case file') || qLower.includes('profile') || qLower.includes('file') || qLower.includes('खोलो') || qLower.includes('खोल') || qLower.includes('खोलना') || qLower.includes('दिखाओ') || qLower.includes('सीरी') || qLower.includes('प्रोफाइल');
+    if (!isQuestion && isOpenAction) {
+      // Direct CCTV / Surveillance check
+      if (qLower.includes('cctv') || qLower.includes('surveillance') || qLower.includes('camera') || qLower.includes('सीसीटीवी') || qLower.includes('सर्विलांस') || qLower.includes('कैमरा')) {
+        const cctvMsg = /[\u0900-\u097F]/.test(text)
+          ? 'सिल्क बोर्ड और शहर ग्रिड के सीसीटीवी कैमरे और सर्विलांस सिस्टम खोले जा रहे हैं, सर।'
+          : 'Opening Surveillance & CCTV live camera feeds, Sir.';
+        setMessages((prev) => [...prev, { role: 'assistant', content: cctvMsg, timestamp: timestamp() }]);
+        speakText(cctvMsg, messages.length + 1);
+        setTimeout(() => { if (typeof window !== 'undefined') window.location.href = '/dashboard/surveillance'; }, 800);
+        setLoading(false);
+        return;
+      }
+
+      // Direct Crime Map check
+      if (qLower.includes('crime map') || qLower.includes('map') || qLower.includes('क्राइम मैप') || qLower.includes('मैप') || qLower.includes('नक्शा')) {
+        const mapMsg = /[\u0900-\u097F]/.test(text)
+          ? 'क्राइम मैप और लोकेशन ट्रैकिंग दिखाई जा रही है, सर।'
+          : 'Opening Crime Map, Sir.';
+        setMessages((prev) => [...prev, { role: 'assistant', content: mapMsg, timestamp: timestamp() }]);
+        speakText(mapMsg, messages.length + 1);
+        setTimeout(() => { if (typeof window !== 'undefined') window.location.href = '/dashboard/map'; }, 800);
+        setLoading(false);
+        return;
+      }
+    }
 
     if (isOpenAction) {
       let targetRoute = null;
