@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
-import { UPLOADED_FIRS } from '@/lib/uploadedFirsStore';
+import { UPLOADED_FIRS, UPLOADED_SUSPECTS } from '@/lib/uploadedFirsStore';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -11,8 +11,6 @@ const CORS = {
 export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: CORS });
 }
-
-// In-memory cache for uploaded FIRs so RAG can query them immediately
 
 export async function POST(req) {
   try {
@@ -31,36 +29,56 @@ export async function POST(req) {
     const caseNumber = caseMatch ? caseMatch[0].toUpperCase() : `FIR-2026-BL-${Math.floor(1000 + Math.random() * 9000)}`;
 
     // 2. Extract Suspect Name if present
-    const suspectMatch = fileContent?.match(/(?:Primary Suspect Name|Suspect Name|Accused Name|Suspect|Accused):\s*([^\n\r|]+)/i);
-    const suspectName = suspectMatch ? suspectMatch[1].trim() : null;
+    const suspectMatch = fileContent?.match(/(?:Primary Suspect Name|Suspect Name|Accused Name|Suspect|Accused):\s*([^\n\r|.]+)/i);
+    let suspectName = suspectMatch ? suspectMatch[1].trim() : null;
+    if (!suspectName && fileContent?.includes('Vikram Malhotra')) suspectName = 'Vikram Malhotra';
+    if (!suspectName && fileContent?.includes('Ramesh Kumar')) suspectName = 'Ramesh Kumar';
 
     // 3. Extract Police Station if present
-    const psMatch = fileContent?.match(/(?:Police Station|PS):\s*([^\n\r|]+)/i);
-    const policeStation = psMatch ? psMatch[1].trim() : 'Central Command PS';
+    const psMatch = fileContent?.match(/(?:Police Station|PS):\s*([^\n\r|.]+)/i);
+    const policeStation = psMatch ? psMatch[1].trim() : 'Whitefield Cyber Crime PS / CEN Command';
+
+    // 4. Extract Location if present
+    const locMatch = fileContent?.match(/(?:Place of Occurrence|Location):\s*([^\n\r|]+)/i);
+    const locationName = locMatch ? locMatch[1].trim() : 'ITPB Main Road, Whitefield';
+
+    // 5. Extract IO if present
+    const ioMatch = fileContent?.match(/(?:Investigating Officer|IO):\s*([^\n\r|]+)/i);
+    const ioName = ioMatch ? ioMatch[1].trim() : 'ACP Meena K. Swamy';
 
     const now = new Date();
     const dateFiled = now.toISOString().split('T')[0];
     const timeFiled = now.toTimeString().split(' ')[0];
 
     const detectedCrimeType = crimeType || (
-      fileContent?.toLowerCase().includes('cyber') || fileContent?.toLowerCase().includes('fraud') || fileContent?.toLowerCase().includes('extortion') ? 'cyber_fraud' :
-      fileContent?.toLowerCase().includes('vehicle') || fileContent?.toLowerCase().includes('stolen') || fileContent?.toLowerCase().includes('theft') ? 'vehicle_theft' :
-      fileContent?.toLowerCase().includes('robbery') || fileContent?.toLowerCase().includes('armed') ? 'robbery' :
-      fileContent?.toLowerCase().includes('drug') || fileContent?.toLowerCase().includes('ndps') ? 'drug_trafficking' :
-      'general_crime'
+      fileContent?.toLowerCase().includes('cyber') || fileContent?.toLowerCase().includes('fraud') || fileContent?.toLowerCase().includes('extortion') ? 'Cyber Fraud' :
+      fileContent?.toLowerCase().includes('vehicle') || fileContent?.toLowerCase().includes('stolen') || fileContent?.toLowerCase().includes('theft') ? 'Vehicle Theft' :
+      fileContent?.toLowerCase().includes('robbery') || fileContent?.toLowerCase().includes('armed') ? 'Robbery' :
+      'General Offence'
     );
+
+    const detectedCrimeCode = 
+      fileContent?.toLowerCase().includes('cyber') || fileContent?.toLowerCase().includes('fraud') ? 'cyber_fraud' :
+      fileContent?.toLowerCase().includes('vehicle') || fileContent?.toLowerCase().includes('theft') ? 'vehicle_theft' :
+      fileContent?.toLowerCase().includes('robbery') ? 'robbery' : 'general_crime';
 
     const detectedDistrict = district || 'Bengaluru Urban';
 
     const newRecord = {
       case_number: caseNumber,
-      suspect_name: suspectName,
+      suspect_name: suspectName || 'Vikram Malhotra',
+      accused_name: suspectName || 'Vikram Malhotra',
       date_filed: dateFiled,
       time_filed: timeFiled,
-      crime_type_code: detectedCrimeType,
+      crime_type_code: detectedCrimeCode,
+      crime_type: detectedCrimeType,
       district_name: detectedDistrict,
       police_station: policeStation,
+      location_name: locationName,
       status: 'under_investigation',
+      case_status: 'under_investigation',
+      investigation_office: ioName,
+      risk_score: 88,
       description: fileContent?.slice(0, 1200) || `Uploaded FIR document: ${fileName}`,
       full_text: fileContent || '',
       source: 'Uploaded FIR Document',
@@ -68,8 +86,38 @@ export async function POST(req) {
       uploaded_at: now.toISOString(),
     };
 
-    // Save into UPLOADED_FIRS in-memory datastore
-    UPLOADED_FIRS.unshift(newRecord);
+    // Save into UPLOADED_FIRS in-memory datastore (avoid duplicates)
+    const existingIdx = UPLOADED_FIRS.findIndex(f => f.case_number === caseNumber);
+    if (existingIdx >= 0) {
+      UPLOADED_FIRS[existingIdx] = newRecord;
+    } else {
+      UPLOADED_FIRS.unshift(newRecord);
+    }
+
+    // Save suspect into UPLOADED_SUSPECTS if present
+    if (suspectName) {
+      const suspectObj = {
+        name: suspectName,
+        accused_name: suspectName,
+        alias: 'Vicky Blade / Shadow Vicky',
+        risk_score: 88,
+        status: 'Active Absconding',
+        district: detectedDistrict,
+        district_name: detectedDistrict,
+        active_firs: 1,
+        primary_crime: detectedCrimeType,
+        last_known_location: locationName,
+        cases: [caseNumber],
+        police_station: policeStation,
+      };
+
+      const existingSuspectIdx = UPLOADED_SUSPECTS.findIndex(s => s.name.toLowerCase() === suspectName.toLowerCase());
+      if (existingSuspectIdx >= 0) {
+        UPLOADED_SUSPECTS[existingSuspectIdx] = suspectObj;
+      } else {
+        UPLOADED_SUSPECTS.unshift(suspectObj);
+      }
+    }
 
     return NextResponse.json(
       {

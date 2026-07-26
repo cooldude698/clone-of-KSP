@@ -638,6 +638,7 @@ export default function ChatPage() {
           body: JSON.stringify({
             question: text,
             lang: activeLang,
+            history: messages.slice(-6),
           }),
         });
         if (res.ok) {

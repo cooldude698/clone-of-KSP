@@ -1,10 +1,6 @@
-/**
- * nextjs/src/lib/demo-data.js
- * Comprehensive, realistic demo fallback dataset for DRISHTI platform.
- */
+import { UPLOADED_FIRS, UPLOADED_SUSPECTS } from './uploadedFirsStore';
 
-export const DEMO_FIRS = {
-  firs: [
+const STATIC_FIRS = [
     {
       case_number: "FIR-2026-BL-4921",
       date_filed: "2026-07-18",
@@ -113,8 +109,15 @@ export const DEMO_FIRS = {
       risk_score: 91,
       investigation_office: "Inspector G. Hegde"
     }
-  ],
-  total_count: 492
+];
+
+export const DEMO_FIRS = {
+  get firs() {
+    return [...UPLOADED_FIRS, ...STATIC_FIRS];
+  },
+  get total_count() {
+    return UPLOADED_FIRS.length + STATIC_FIRS.length;
+  }
 };
 
 export const DEMO_HOTSPOTS = {
@@ -234,9 +237,7 @@ export const DEMO_UNDERREPORTING = {
   ]
 };
 
-export const DEMO_REPEAT_OFFENDERS = {
-  high_risk_count: 38,
-  suspects: [
+const STATIC_SUSPECTS = [
     {
       suspect_id: 'SUS-8842',
       name: 'Ramesh Kumar',
@@ -282,19 +283,27 @@ export const DEMO_REPEAT_OFFENDERS = {
       age: 26,
       gender: 'Male',
       risk_score: 76,
-      status: 'UNDER_SURVEILLANCE',
-      phone: '+91 99001 44512',
+      status: 'ACTIVE_SURVEILLANCE',
+      phone: '+91 96110 44512',
       district_name: 'Bengaluru Urban',
-      primary_modus_operandi: 'Pillion chain snatching. Operates on motorcycle with an accomplice. Targets women pedestrians near ITPL and Whitefield. Helmet always worn to avoid face detection.',
-      last_known_location: 'Marathahalli Bridge — 17 Jul 2026 19:45 hrs',
+      primary_modus_operandi: 'Gold chain snatching targeting women pedestrians near tech parks during evening hours.',
+      last_known_location: 'ITPL Main Road, Whitefield — 16 Jul 2026 09:45 hrs',
       associated_firs: ['FIR-2026-BL-4920'],
-      known_hangouts: ['Whitefield ITPL Road', 'Marathahalli Bridge', 'Bellandur Lake Road'],
-      known_associates: ['Suresh Naidu (SUS-7104)', 'Manoj Reddy (SUS-1190)'],
-      ipc_sections: ['IPC §379', 'IPC §34'],
+      known_hangouts: ['ITPL Main Road', 'Hope Farm Signal'],
+      known_associates: ['Manoj Reddy (SUS-1190)'],
+      ipc_sections: ['IPC §379A', 'IPC §356'],
       anpr_hits: 3,
-      camera_sightings: ['CAM-BLR-0042', 'CAM-BLR-0035'],
-    },
-  ]
+      camera_sightings: ['CAM-BLR-0091'],
+    }
+];
+
+export const DEMO_REPEAT_OFFENDERS = {
+  get high_risk_count() {
+    return 38 + UPLOADED_SUSPECTS.length;
+  },
+  get suspects() {
+    return [...UPLOADED_SUSPECTS, ...STATIC_SUSPECTS];
+  }
 };
 
 export const DEMO_NETWORK_GRAPH = {
