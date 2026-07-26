@@ -8,7 +8,6 @@ import {
   Download,
   Clock,
   Activity,
-  MapPin,
   Camera,
   Radio,
   Shield,
@@ -16,8 +15,10 @@ import {
   AlertTriangle,
   Zap,
   TrendingUp,
-  RefreshCw,
   Eye,
+  Play,
+  Pause,
+  RotateCcw,
 } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -75,9 +76,9 @@ const MOCK_VEHICLE_TRAILS = {
         camera_name: 'Hebbal Flyover Dome ANPR 15',
         lat: 13.0064,
         lng: 77.5787,
-        timestamp: '2026-07-26T14:41:00Z', // 5.2 km in 5 min 15 sec -> ~60 km/h
+        timestamp: '2026-07-26T14:41:00Z',
         plate_detected: 'KA-01-MJ-8821',
-        confidence: 88.2, // Low confidence hop
+        confidence: 88.2,
         sighting_type: 'ANPR Sighting',
         distance_from_crime_km: 7.8,
       },
@@ -87,7 +88,7 @@ const MOCK_VEHICLE_TRAILS = {
         camera_name: 'Silk Board Toll Plaza Checkpost',
         lat: 12.9344,
         lng: 77.6123,
-        timestamp: '2026-07-26T14:46:30Z', // 9.5 km in 5.5 min -> 103 km/h (HIGH SPEED)
+        timestamp: '2026-07-26T14:46:30Z',
         plate_detected: 'KA-01-MJ-8821',
         confidence: 95.5,
         sighting_type: 'Toll Checkpoint',
@@ -132,7 +133,7 @@ const MOCK_VEHICLE_TRAILS = {
         camera_name: 'BTM 2nd Stage CCTV Surveillance',
         lat: 12.9166,
         lng: 77.6101,
-        timestamp: '2026-07-26T12:08:00Z', // 50 min gap over 1.8 km (UNUSUAL GAP)
+        timestamp: '2026-07-26T12:08:00Z',
         plate_detected: 'KA-05-EV-9012',
         confidence: 86.5,
         sighting_type: 'CCTV Surveillance',
@@ -144,7 +145,7 @@ const MOCK_VEHICLE_TRAILS = {
         camera_name: 'Electronics City Expressway Toll',
         lat: 12.8452,
         lng: 77.6602,
-        timestamp: '2026-07-26T12:12:00Z', // 9 km in 4 min -> ~135 km/h (HIGH SPEED)
+        timestamp: '2026-07-26T12:12:00Z',
         plate_detected: 'KA-05-EV-9012',
         confidence: 96.8,
         sighting_type: 'Toll Checkpoint',
@@ -305,6 +306,76 @@ export default function GeoTrailPage() {
   const [highlightedHop, setHighlightedHop] = useState(null);
   const [visibleHopsCount, setVisibleHopsCount] = useState(1);
 
+  // SCRUBBER PLAYBACK STATE & SPEED MULTIPLIER
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [scrubberPercent, setScrubberPercent] = useState(0);
+
+  // PROPORTIONAL TIMESTAMP INTERPOLATION FOR GHOST MARKER
+  const ghostPosition = useMemo(() => {
+    if (!trailData || trailData.length < 2 || scrubberPercent <= 0) return null;
+
+    const tStart = new Date(trailData[0].timestamp).getTime();
+    const tEnd = new Date(trailData[trailData.length - 1].timestamp).getTime();
+    const totalDurationMs = tEnd - tStart;
+
+    if (totalDurationMs <= 0) return null;
+
+    const currentMs = tStart + (scrubberPercent / 100) * totalDurationMs;
+    const currentTimeStr = new Date(currentMs).toLocaleTimeString('en-IN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+
+    let k = 0;
+    for (let i = 0; i < trailData.length - 1; i++) {
+      const tHop = new Date(trailData[i].timestamp).getTime();
+      const tNext = new Date(trailData[i + 1].timestamp).getTime();
+      if (currentMs >= tHop && currentMs <= tNext) {
+        k = i;
+        break;
+      }
+      if (i === trailData.length - 2 && currentMs > tNext) {
+        k = i;
+      }
+    }
+
+    const h1 = trailData[k];
+    const h2 = trailData[Math.min(k + 1, trailData.length - 1)];
+
+    const t1 = new Date(h1.timestamp).getTime();
+    const t2 = new Date(h2.timestamp).getTime();
+
+    let ratio = 0;
+    if (t2 > t1) {
+      ratio = Math.min(1, Math.max(0, (currentMs - t1) / (t2 - t1)));
+    }
+
+    const lat = h1.lat + ratio * (h2.lat - h1.lat);
+    const lng = h1.lng + ratio * (h2.lng - h1.lng);
+
+    return { lat, lng, percent: scrubberPercent, currentTimeStr, activeHop: h1.hop };
+  }, [trailData, scrubberPercent]);
+
+  // PLAYBACK SCRUBBER TIMER EFFECT
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const step = (50 / 8000) * 100 * playbackSpeed;
+    const timer = setInterval(() => {
+      setScrubberPercent((prev) => {
+        if (prev >= 100) {
+          setIsPlaying(false);
+          return 100;
+        }
+        return Math.min(100, prev + step);
+      });
+    }, 50);
+
+    return () => clearInterval(timer);
+  }, [isPlaying, playbackSpeed]);
+
   // Load target trail by plate number
   const loadTrailForPlate = useCallback(async (plateNumber) => {
     const cleanPlate = plateNumber.trim().toUpperCase();
@@ -312,8 +383,9 @@ export default function GeoTrailPage() {
     setLoading(true);
     setNotFound(false);
     setHighlightedHop(null);
+    setScrubberPercent(0);
+    setIsPlaying(false);
 
-    // 1. Check local mock dataset
     const mockEntry = MOCK_VEHICLE_TRAILS[cleanPlate];
 
     try {
@@ -330,7 +402,6 @@ export default function GeoTrailPage() {
         : null;
 
       if (!fallbackPayload) {
-        // Plate not in mock dictionary
         setNotFound(true);
         setTrailData([]);
         setMetadata(null);
@@ -338,7 +409,6 @@ export default function GeoTrailPage() {
         return;
       }
 
-      // 2. Fetch with fallback API pattern
       const { data } = await fetchWithFallback('trail', fallbackPayload, {
         method: 'POST',
         body: { plate: cleanPlate },
@@ -387,7 +457,7 @@ export default function GeoTrailPage() {
     loadTrailForPlate(plateParam);
   }, [loadTrailForPlate]);
 
-  // Step 2.2 — Hop-by-hop delayed trail animation with reduced motion check
+  // Hop-by-hop delayed trail animation with reduced motion check
   useEffect(() => {
     if (!trailData || trailData.length === 0) {
       setVisibleHopsCount(0);
@@ -403,7 +473,6 @@ export default function GeoTrailPage() {
       return;
     }
 
-    // Start with 1 visible hop and increment by 1 every 500ms
     setVisibleHopsCount(1);
     const interval = setInterval(() => {
       setVisibleHopsCount((prev) => {
@@ -425,7 +494,7 @@ export default function GeoTrailPage() {
     }
   };
 
-  // Step 2.4 — Export Trail Report (Text/Blob Download)
+  // Export Trail Report
   const handleExportReport = () => {
     if (!metadata || trailData.length === 0) return;
 
@@ -478,7 +547,6 @@ export default function GeoTrailPage() {
     URL.revokeObjectURL(url);
   };
 
-  // Step 3.4 — Projected Path Calculation
   const projectedPath = useMemo(() => {
     return computeProjectedPath(trailData);
   }, [trailData]);
@@ -551,11 +619,11 @@ export default function GeoTrailPage() {
           </div>
         </EmptyState>
       ) : (
-        /* ── MAIN DUAL-PANEL GRID (MAP + TIMELINE) ─────────────────────────── */
+        /* ── MAIN DUAL-PANEL GRID (MAP + SCRUBBER + TIMELINE) ──────────────── */
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[620px] items-stretch">
-          {/* ── LEFT: LEAFLET MAP DISPLAY (7 COLS) ─────────────────────────── */}
-          <div className="lg:col-span-7 flex flex-col min-h-[480px] lg:min-h-[620px] relative">
-            <Card className="flex-1 p-2 relative overflow-hidden flex flex-col border border-steel-600/50 bg-steel-700/30">
+          {/* ── LEFT: LEAFLET MAP & SCRUBBER PANEL (7 COLS) ─────────────────── */}
+          <div className="lg:col-span-7 flex flex-col min-h-[480px] lg:min-h-[620px] relative space-y-3">
+            <Card className="flex-1 p-2 relative overflow-hidden flex flex-col border border-steel-600/50 bg-steel-700/30 min-h-[450px]">
               {loading && (
                 <div className="absolute inset-0 z-50 bg-void-000/80 backdrop-blur-sm flex flex-col items-center justify-center">
                   <Spinner size="lg" />
@@ -566,62 +634,145 @@ export default function GeoTrailPage() {
               )}
 
               {/* Map Canvas */}
-              <div className="w-full h-full min-h-[450px] rounded-lg overflow-hidden relative">
+              <div className="w-full h-full min-h-[440px] rounded-lg overflow-hidden relative">
                 <TrailMapView
                   trailData={trailData}
                   visibleHopsCount={visibleHopsCount}
                   highlightedHop={highlightedHop}
                   projectedPath={projectedPath}
+                  ghostPosition={ghostPosition}
                   onHopSelect={(h) => setHighlightedHop(h)}
                 />
 
                 {/* Map Overlay Top HUD Badge */}
                 {metadata && (
-                  <div className="absolute top-3 left-3 z-[400] flex flex-wrap items-center gap-2 pointer-events-none">
-                    <div className="bg-void-000/90 backdrop-blur border border-steel-600/60 rounded px-3 py-1.5 shadow-md flex items-center gap-2">
-                      <span className="text-[10px] font-mono text-paper-100/50 uppercase">TARGET:</span>
-                      <span className="text-xs font-mono font-bold text-phosphor-500">
+                  <div className="absolute top-3 left-3 z-[500] flex flex-wrap items-center gap-2 pointer-events-none">
+                    <div className="bg-[#1E2733]/95 backdrop-blur-md border border-[#48596D] rounded-lg px-3 py-1.5 shadow-xl flex items-center gap-2">
+                      <span className="text-[10px] font-mono text-[#EFEAE4]/70 uppercase tracking-wider font-semibold">
+                        TARGET:
+                      </span>
+                      <span className="text-xs font-mono font-bold text-[#4A8B6F]">
                         {searchedPlate}
                       </span>
                     </div>
 
-                    <div className="bg-void-000/90 backdrop-blur border border-steel-600/60 rounded px-3 py-1.5 shadow-md flex items-center gap-3 font-mono text-xs">
+                    <div className="bg-[#1E2733]/95 backdrop-blur-md border border-[#48596D] rounded-lg px-3 py-1.5 shadow-xl flex items-center gap-3 font-mono text-xs">
                       <div>
-                        <span className="text-paper-100/50 text-[10px]">DISTANCE:</span>{' '}
-                        <span className="font-semibold text-paper-100">{metadata.totalDistance} km</span>
+                        <span className="text-[#EFEAE4]/70 text-[10px] font-mono uppercase tracking-wider">
+                          DISTANCE:
+                        </span>{' '}
+                        <span className="font-semibold text-[#EFEAE4] font-mono">
+                          {metadata.totalDistance} km
+                        </span>
                       </div>
-                      <span className="text-paper-100/30">|</span>
+                      <span className="text-[#48596D]">|</span>
                       <div>
-                        <span className="text-paper-100/50 text-[10px]">DURATION:</span>{' '}
-                        <span className="font-semibold text-paper-100">{metadata.duration}m</span>
+                        <span className="text-[#EFEAE4]/70 text-[10px] font-mono uppercase tracking-wider">
+                          DURATION:
+                        </span>{' '}
+                        <span className="font-semibold text-[#EFEAE4] font-mono">
+                          {metadata.duration}m
+                        </span>
                       </div>
                     </div>
                   </div>
                 )}
-
-                {/* Map Legend Overlay */}
-                <div className="absolute bottom-3 left-3 z-[400] bg-void-000/90 backdrop-blur border border-steel-600/60 rounded p-2.5 shadow-md font-mono text-[10px] space-y-1.5 pointer-events-none">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-success-500" />
-                    <span className="text-paper-100/70">Hop 1 (Origin)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-phosphor-500" />
-                    <span className="text-paper-100/70">ANPR / CCTV Hop</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-critical-500" />
-                    <span className="text-paper-100/70">Last Confirmed Sighting</span>
-                  </div>
-                  {projectedPath && (
-                    <div className="flex items-center gap-2 border-t border-steel-600/40 pt-1 mt-1">
-                      <span className="w-2.5 h-2.5 rounded-full bg-warn-500/70 border border-dashed border-warn-500" />
-                      <span className="text-warn-500 font-semibold">Projected Vector</span>
-                    </div>
-                  )}
-                </div>
               </div>
             </Card>
+
+            {/* REPLAY SCRUBBER PANEL */}
+            {trailData.length > 1 && (
+              <Card className="p-3.5 border border-steel-600/50 bg-steel-700/40 space-y-2.5 shrink-0">
+                <div className="flex items-center justify-between font-mono text-xs text-paper-100/70">
+                  <div className="flex items-center gap-2">
+                    <span className="text-phosphor-500 font-bold uppercase tracking-wider text-[11px] font-sans flex items-center gap-1.5">
+                      <Activity className="w-3.5 h-3.5 text-phosphor-500" />
+                      REPLAY VECTOR SCRUBBER
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    {/* Speed Multiplier Buttons */}
+                    <div className="flex items-center gap-1 bg-steel-600/30 p-0.5 rounded border border-steel-600/40">
+                      {[1, 2, 4].map((spd) => (
+                        <button
+                          key={spd}
+                          type="button"
+                          onClick={() => setPlaybackSpeed(spd)}
+                          className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all ${
+                            playbackSpeed === spd
+                              ? 'bg-phosphor-500 text-void-000 font-bold'
+                              : 'text-paper-100/60 hover:text-paper-100'
+                          }`}
+                        >
+                          {spd}x
+                        </button>
+                      ))}
+                    </div>
+
+                    <span className="text-[11px] text-phosphor-500 font-mono font-bold">
+                      {ghostPosition ? `${ghostPosition.currentTimeStr} IST` : '14:22:10 IST'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Scrubber Controls Row */}
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (scrubberPercent >= 100) setScrubberPercent(0);
+                      setIsPlaying(!isPlaying);
+                    }}
+                    className="p-2 rounded bg-steel-600 hover:bg-steel-600/80 text-paper-100 transition-all shrink-0 focus:outline-none focus:border-phosphor-500 active:scale-95 shadow cursor-pointer"
+                    title={isPlaying ? 'Pause Replay' : 'Play Replay'}
+                  >
+                    {isPlaying ? (
+                      <Pause className="w-4 h-4 text-phosphor-500" />
+                    ) : (
+                      <Play className="w-4 h-4 text-phosphor-500 fill-phosphor-500" />
+                    )}
+                  </button>
+
+                  {/* BUTTON 3: RESET BUTTON HANDLER FIX */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      console.log('[GeoTrail Debug] BUTTON 3 CLICKED: Resetting scrubber to start, clearing highlighted hop, resetting visible hops');
+                      setScrubberPercent(0);
+                      setIsPlaying(false);
+                      setHighlightedHop(null);
+                      if (trailData.length > 0) {
+                        setVisibleHopsCount(1);
+                      }
+                    }}
+                    className="p-2 rounded bg-steel-600/50 hover:bg-steel-600 text-paper-100/70 hover:text-paper-100 transition-all shrink-0 cursor-pointer"
+                    title="Reset Trail & Scrubber to Start"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                  </button>
+
+                  {/* Scrubber Progress Slider */}
+                  <div className="flex-1 relative flex items-center">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="0.1"
+                      value={scrubberPercent}
+                      onChange={(e) => setScrubberPercent(parseFloat(e.target.value))}
+                      className="w-full h-2 rounded-lg bg-steel-600/50 appearance-none cursor-pointer accent-phosphor-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-[10px] font-mono text-paper-100/40 px-1">
+                  <span>Start: {new Date(trailData[0].timestamp).toLocaleTimeString('en-IN')} IST</span>
+                  <span>Proportional Timestamp Interpolation</span>
+                  <span>End: {new Date(trailData[trailData.length - 1].timestamp).toLocaleTimeString('en-IN')} IST</span>
+                </div>
+              </Card>
+            )}
           </div>
 
           {/* ── RIGHT: SIGHTINGS TIMELINE & INSIGHTS PANEL (5 COLS) ─────────── */}
@@ -653,7 +804,7 @@ export default function GeoTrailPage() {
               </div>
 
               {/* Hop Timeline List */}
-              <div className="flex-1 overflow-y-auto space-y-3 pr-1 max-h-[500px]">
+              <div className="flex-1 overflow-y-auto space-y-3 pr-1 max-h-[520px]">
                 {trailData.map((hop, idx) => {
                   const prevHop = idx > 0 ? trailData[idx - 1] : null;
                   const { speedKmh, diffMinutes, anomaly } = analyzeHopInsights(hop, prevHop);
@@ -661,13 +812,14 @@ export default function GeoTrailPage() {
                   const CamIcon = camDetails.icon;
                   const isLowConf = hop.confidence < 90;
                   const isHighlighted = highlightedHop === hop.hop;
+                  const isReplayActive = ghostPosition?.activeHop === hop.hop;
 
                   return (
                     <div
                       key={hop.hop}
                       onClick={() => setHighlightedHop(hop.hop)}
                       className={`p-3.5 rounded-lg border transition-all cursor-pointer ${
-                        isHighlighted
+                        isHighlighted || isReplayActive
                           ? 'bg-steel-700 border-phosphor-500 shadow-md ring-1 ring-phosphor-500/40'
                           : 'bg-steel-700/50 border-steel-600/40 hover:border-steel-600'
                       }`}
@@ -726,7 +878,7 @@ export default function GeoTrailPage() {
                       {/* Bottom Row: Confidence & Distance */}
                       <div className="mt-3 pt-2 border-t border-steel-600/30 flex items-center justify-between text-[11px] font-mono">
                         <div className="flex items-center gap-1.5">
-                          <Activity className="w-3 h-3 text-phosphor-500" />
+                          <Activity className="w-3.5 h-3.5 text-phosphor-500" />
                           <Badge variant={isLowConf ? 'warning' : 'success'}>
                             {hop.confidence}% Match {isLowConf ? '(Low Confidence)' : ''}
                           </Badge>
@@ -739,7 +891,7 @@ export default function GeoTrailPage() {
                   );
                 })}
 
-                {/* Step 3.4 — Projected Path Card on Timeline */}
+                {/* Projected Path Card on Timeline */}
                 {projectedPath && (
                   <div className="p-3.5 rounded-lg border border-dashed border-warn-500/40 bg-warn-500/5 space-y-2">
                     <div className="flex items-center justify-between">
