@@ -1,4 +1,4 @@
-require('dotenv').config();
+try { require('dotenv').config(); } catch (e) {}
 const catalyst = require('zcatalyst-sdk-node');
 
 module.exports = async (req, res) => {

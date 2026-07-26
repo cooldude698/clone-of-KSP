@@ -14,9 +14,6 @@
     "@seepine/edge-tts": "^1.4.1",
     "@types/d3": "^7.4.3",
     "@types/leaflet": "^1.9.21",
-    "@types/node": "^20.14.9",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
     "@zcatalyst/nextjs-plugin": "0.0.1-alpha.1",
     "axios": "^1.18.1",
     "clsx": "^2.1.1",
@@ -42,5 +39,10 @@
     "typescript": "^5.5.3",
     "uuid": "^14.0.1",
     "zcatalyst-sdk-node": "^3.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7"
   }
 }

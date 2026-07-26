@@ -14,7 +14,7 @@
  * Sourced using natural keys (accused_full_name and fir_case_number) per spec.
  */
 
-require('dotenv').config();
+try { require('dotenv').config(); } catch (e) {}
 const catalyst = require('zcatalyst-sdk-node');
 
 // ── CORS headers ──────────────────────────────────────────────────────────────

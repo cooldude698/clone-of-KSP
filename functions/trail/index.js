@@ -14,7 +14,7 @@
  * come from ./config/camera-config.json — no hardcoding.
  */
 
-require('dotenv').config();
+try { require('dotenv').config(); } catch (e) {}
 const catalyst = require('zcatalyst-sdk-node');
 
 // ── Config ────────────────────────────────────────────────────────────────────

@@ -89,7 +89,7 @@ if (!global.fetch) {
 }
 // --- END POLYFILL ---
 
-require('dotenv').config();
+try { require('dotenv').config(); } catch (e) {}
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const catalyst = require('zcatalyst-sdk-node');
 const axios = require('axios');

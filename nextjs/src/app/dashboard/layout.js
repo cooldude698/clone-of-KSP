@@ -7,7 +7,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, MessageSquare, Map, GitBranch,
   Camera, BarChart2, LogOut, Shield, ChevronLeft,
-  ChevronRight, AlertTriangle, User, History, Eye, Navigation
+  ChevronRight, AlertTriangle, User, History, Eye, Navigation,
+  Newspaper
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -30,6 +31,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/analytics',    icon: BarChart2,       label: 'Analytics',      id: 'nav-analytics' },
   { href: '/dashboard/logs',         icon: History,         label: 'AI Logs',        id: 'nav-logs' },
   { href: '/dashboard/trail',        icon: Navigation,      label: 'Geo Trail',      id: 'nav-trail' },
+  { href: '/dashboard/news',         icon: Newspaper,       label: 'Live News',      id: 'nav-news' },
 ];
 
 function extractRequestedName(queryText) {

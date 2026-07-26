@@ -13,5 +13,10 @@
     "dotenv": "^17.4.2",
     "next": "^16.2.10",
     "zcatalyst-sdk-node": "^3.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3"
   }
 }

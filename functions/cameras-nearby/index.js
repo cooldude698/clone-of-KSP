@@ -17,7 +17,7 @@
  * ../../camera-intel/config/camera-config.json (loaded once at cold-start).
  */
 
-require('dotenv').config();
+try { require('dotenv').config(); } catch (e) {}
 const catalyst = require('zcatalyst-sdk-node');
 
 // ── Config (loaded once at cold-start, not per-request) ──────────────────────
