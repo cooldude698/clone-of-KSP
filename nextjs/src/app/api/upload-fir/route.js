@@ -26,18 +26,27 @@ export async function POST(req) {
       );
     }
 
-    // Auto-generate case number & metadata from document content
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
-    const caseNumber = `FIR-2026-BL-${randomNum}`;
+    // 1. Smart extraction of Case Number from document content
+    const caseMatch = fileContent?.match(/FIR-[0-9]{4}-[A-Z0-9-]+/i);
+    const caseNumber = caseMatch ? caseMatch[0].toUpperCase() : `FIR-2026-BL-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    // 2. Extract Suspect Name if present
+    const suspectMatch = fileContent?.match(/(?:Primary Suspect Name|Suspect Name|Accused Name|Suspect|Accused):\s*([^\n\r|]+)/i);
+    const suspectName = suspectMatch ? suspectMatch[1].trim() : null;
+
+    // 3. Extract Police Station if present
+    const psMatch = fileContent?.match(/(?:Police Station|PS):\s*([^\n\r|]+)/i);
+    const policeStation = psMatch ? psMatch[1].trim() : 'Central Command PS';
+
     const now = new Date();
     const dateFiled = now.toISOString().split('T')[0];
     const timeFiled = now.toTimeString().split(' ')[0];
 
     const detectedCrimeType = crimeType || (
-      fileContent?.toLowerCase().includes('vehicle') || fileContent?.toLowerCase().includes('stolen') ? 'vehicle_theft' :
-      fileContent?.toLowerCase().includes('robbery') || fileContent?.toLowerCase().includes('gun') ? 'robbery' :
+      fileContent?.toLowerCase().includes('cyber') || fileContent?.toLowerCase().includes('fraud') || fileContent?.toLowerCase().includes('extortion') ? 'cyber_fraud' :
+      fileContent?.toLowerCase().includes('vehicle') || fileContent?.toLowerCase().includes('stolen') || fileContent?.toLowerCase().includes('theft') ? 'vehicle_theft' :
+      fileContent?.toLowerCase().includes('robbery') || fileContent?.toLowerCase().includes('armed') ? 'robbery' :
       fileContent?.toLowerCase().includes('drug') || fileContent?.toLowerCase().includes('ndps') ? 'drug_trafficking' :
-      fileContent?.toLowerCase().includes('cyber') || fileContent?.toLowerCase().includes('fraud') ? 'cyber_fraud' :
       'general_crime'
     );
 
@@ -45,13 +54,15 @@ export async function POST(req) {
 
     const newRecord = {
       case_number: caseNumber,
+      suspect_name: suspectName,
       date_filed: dateFiled,
       time_filed: timeFiled,
       crime_type_code: detectedCrimeType,
       district_name: detectedDistrict,
-      police_station: 'Central Command PS',
+      police_station: policeStation,
       status: 'under_investigation',
-      description: fileContent?.slice(0, 400) || `Uploaded FIR document: ${fileName}`,
+      description: fileContent?.slice(0, 1200) || `Uploaded FIR document: ${fileName}`,
+      full_text: fileContent || '',
       source: 'Uploaded FIR Document',
       file_name: fileName || 'fir_document.pdf',
       uploaded_at: now.toISOString(),

@@ -36,6 +36,7 @@ const DRISHTI_SYSTEM_PROMPT =
   '3. MISSING OR UNKNOWN DATA: If data is missing or a suspect is untracked, state so clearly ("No, Sir..."), and immediately suggest a reasonable next step (e.g. initiating a cross-station CCTNS query or scanning nearby CCTV clusters).\n' +
   '4. NO REPETITIVE DUMPS: Never repeat full suspect background dossiers, risk scores, or long lists if the officer didn\'t ask for a full briefing.\n' +
   '5. MULTILINGUAL: Respond strictly in the language of the query (English, Hindi हिन्दी, Kannada ಕನ್ನಡ).\n\n' +
+  'IMPORTANT DATASTORE RULE: Always check RECENTLY UPLOADED & STORED FIR DOCUMENTS IN CATALYST DATASTORE first! If an FIR case number (e.g. FIR-2026-BL-XXXX), suspect name, or document appears in the uploaded datastore context, IT IS AN ACTIVE REGISTERED CASE IN THE DATABASE. Confirm its existence immediately and provide its full case details, Sir.\n\n' +
   'KEY SUSPECTS IN CURRENT DATABASE:\n' +
   '- Ramesh Kumar (SUS-8842) "Bullet Ramesh" — Risk 94/100 — Vehicle theft ring leader — IPC §379 §34 §411 §120B — Last seen Silk Board 18 Jul 14:22\n' +
   '- Suresh Naidu (SUS-7104) "Snake Naidu" — Risk 88/100 — Armed highway robber — ABSCONDING — IPC §392 §397\n' +
@@ -94,12 +95,23 @@ const POLICE_KNOWLEDGE_BASE = [
 ];
 
 async function fetchLiveDatabaseContext(query) {
-  const q = query.toLowerCase();
   let liveDataStr = '';
 
   try {
     if (UPLOADED_FIRS && UPLOADED_FIRS.length > 0) {
-      liveDataStr += `\n\nRECENTLY UPLOADED & STORED FIR DOCUMENTS IN CATALYST DATASTORE:\n` + JSON.stringify(UPLOADED_FIRS, null, 2);
+      liveDataStr += `*** CRITICAL DATASTORE RECORDS: RECENTLY REGISTERED & INDEXED FIR DOCUMENTS IN CATALYST DATASTORE ***\n`;
+      UPLOADED_FIRS.forEach((rec, idx) => {
+        liveDataStr += `[ACTIVE FIR RECORD #${idx + 1}]\n`;
+        liveDataStr += `- FIR Case Number: ${rec.case_number}\n`;
+        liveDataStr += `- Primary Suspect / Accused: ${rec.suspect_name || 'Under Identification'}\n`;
+        liveDataStr += `- Crime Category: ${rec.crime_type_code}\n`;
+        liveDataStr += `- Police Station: ${rec.police_station}\n`;
+        liveDataStr += `- Registration Date: ${rec.date_filed}\n`;
+        liveDataStr += `- Status: ${rec.status.toUpperCase()}\n`;
+        liveDataStr += `- File Name: ${rec.file_name}\n`;
+        liveDataStr += `- Full Document Text / Details:\n${rec.full_text || rec.description}\n\n`;
+      });
+      liveDataStr += `*** END OF RECENTLY REGISTERED FIR DOCUMENTS ***\n`;
     }
   } catch (e) {
     console.warn('[DRISHTI] Live DB fetch warning:', e.message);
@@ -110,18 +122,20 @@ async function fetchLiveDatabaseContext(query) {
 
 async function findKnowledgeContext(query) {
   const q = query.toLowerCase();
-  let context = CRIME_DATABASE_SUMMARY;
+  let context = '';
+
+  const liveDbData = await fetchLiveDatabaseContext(query);
+  if (liveDbData) {
+    context += liveDbData + '\n\n';
+  }
+
+  context += CRIME_DATABASE_SUMMARY;
 
   const matched = POLICE_KNOWLEDGE_BASE.filter(item =>
     item.keywords.some(kw => q.includes(kw))
   );
   if (matched.length) {
     context += `\n\nOFFICIAL KSP POLICE MANUAL REFERENCE & CONTEXT:\n` + matched.map(m => m.content).join('\n\n');
-  }
-
-  const liveDbData = await fetchLiveDatabaseContext(query);
-  if (liveDbData) {
-    context += liveDbData;
   }
 
   return context;
@@ -137,6 +151,30 @@ function generateSmartPoliceResponse(question, lang = 'en') {
   const q = (question || '').toLowerCase();
   const isHindi = /[\u0900-\u097F]/.test(question) || lang === 'hi';
   const isKannada = /[\u0C80-\u0CFF]/.test(question) || lang === 'kn';
+
+  // 1a. Dynamic check against UPLOADED_FIRS in-memory datastore
+  if (UPLOADED_FIRS && UPLOADED_FIRS.length > 0) {
+    for (const record of UPLOADED_FIRS) {
+      const cNum = (record.case_number || '').toLowerCase();
+      const sName = (record.suspect_name || '').toLowerCase();
+      const fName = (record.file_name || '').toLowerCase();
+
+      if ((cNum && q.includes(cNum)) || (sName && q.includes(sName)) || (fName && q.includes(fName))) {
+        if (isHindi) {
+          return `सर, नया अपलोड किया गया मामला ${record.case_number} डेटाबेस में दर्ज है:\n- मामला संख्या: ${record.case_number}\n- संदिग्ध/आरोपी: ${record.suspect_name || 'जांच के अधीन'}\n- अपराध प्रकार: ${record.crime_type_code}\n- पुलिस स्टेशन: ${record.police_station}\n- स्थिति: ${record.status.replace('_', ' ')}\n\nरणनीतिक सलाह: इस नए दर्ज मामले से संबंधित डिजिटल सर्विलांस और एएनपीआर अलर्ट तुरंत सक्रिय करने की सलाह दूंगा, सर।`;
+        }
+        if (isKannada) {
+          return `ಸರ್, ಹೊಸದಾಗಿ ಅಪ್‌ಲೋಡ್ ಮಾಡಲಾದ ಎಫ್‌ಐಆರ್ ${record.case_number} ಡೇಟಾಬೇಸ್‌ನಲ್ಲಿ ದಾಖಲಾಗಿದೆ:\n- ಪ್ರಕರಣ ಸಂಖ್ಯೆ: ${record.case_number}\n- ಶಂಕಿತ: ${record.suspect_name || 'ತನಿಖೆಯಲ್ಲಿದೆ'}\n- ಅಪರಾಧ ಪ್ರಕಾರ: ${record.crime_type_code}\n- ಠಾಣೆ: ${record.police_station}\n\nಪೋಲಿಸ್ ಸಲಹೆ: ಈ ಪ್ರಕರಣದ ಆಧಾರದ ಮೇಲೆ ತನಿಖೆಯನ್ನು ತಕ್ಷಣ ಪ್ರಾರಂಭಿಸಲು ಶಿಫಾರಸು ಮಾಡುತ್ತೇನೆ, ಸರ್.`;
+        }
+        return `Sir, here is the record for uploaded FIR ${record.case_number}:\n- Case Number: ${record.case_number}\n- Suspect / Accused: ${record.suspect_name || 'Under Identification'}\n- Crime Type: ${record.crime_type_code}\n- Police Station: ${record.police_station}\n- Date Registered: ${record.date_filed}\n- Status: ${record.status.replace('_', ' ').toUpperCase()}\n- Summary: ${record.description.slice(0, 300)}...\n\nPROACTIVE TACTICAL RECOMMENDATION: I recommend cross-referencing this newly indexed complaint against local ANPR watchlist grids and initiating immediate station SOP actions, Sir.`;
+      }
+    }
+
+    if (q.includes('upload') || q.includes('recent fir') || q.includes('new fir') || q.includes('case file') || q.includes('fir-2026')) {
+      const topRecord = UPLOADED_FIRS[0];
+      return `Sir, the latest uploaded case file in our datastore is ${topRecord.case_number}:\n- Case Number: ${topRecord.case_number}\n- Suspect / Accused: ${topRecord.suspect_name || 'Under Identification'}\n- Crime Type: ${topRecord.crime_type_code}\n- Police Station: ${topRecord.police_station}\n- Date Registered: ${topRecord.date_filed}\n- Status: ${topRecord.status.replace('_', ' ').toUpperCase()}\n- Details: ${topRecord.description.slice(0, 350)}...\n\nPROACTIVE TACTICAL RECOMMENDATION: I have added this newly registered FIR to active surveillance watchlists, Sir.`;
+    }
+  }
 
   // 1b. Specific targeted queries about Ramesh Kumar's problem / last spotted location / CCTV
   if (q.includes('ramesh') || q.includes('रमेश') || q.includes('ರಮೇಶ್')) {
@@ -323,7 +361,7 @@ async function callGroq(question, knowledgeContext = '', sessionHistory = []) {
   }
 
   const userContent = knowledgeContext
-    ? `CONTEXT DATA:\n${knowledgeContext}\n\nUSER QUESTION:\n${question}${langInstruction}`
+    ? `CONTEXT DATA:\n${knowledgeContext}\n\nCRITICAL INSTRUCTION: If the user question references an FIR case number (e.g. FIR-2026-BL-XXXX) or suspect name that appears in CRITICAL DATASTORE RECORDS above, YOU MUST STATE THAT THE CASE IS REGISTERED IN THE DATABASE and summarize its exact details and provide proactive recommendations.\n\nUSER QUESTION:\n${question}${langInstruction}`
     : `${question}${langInstruction}`;
 
   const messages = [
