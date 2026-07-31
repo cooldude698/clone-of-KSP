@@ -1,0 +1,65 @@
+================================================================================
+          KARNATAKA STATE POLICE (KSP) — FIRST INFORMATION REPORT (FIR)
+            [Under Section 154 Cr.P.C. / Section 173 Bharatiya Nagarik Suraksha Sanhita]
+================================================================================
+
+1. DISTRICT & POLICE STATION DETAILS:
+   - State: Karnataka
+   - District: Bengaluru Urban (South Division)
+   - Police Station: Madiwala PS / Silk Board TTMC Command
+   - Year: 2026
+   - FIR Case Number: FIR-2026-BL-8842
+   - Date & Time of FIR Registration: 18-JUL-2026 at 16:30:00 IST
+
+2. ACTS & LEGAL SECTIONS:
+   - Section 379 IPC: Theft of Personal Property & Motor Vehicle
+   - Section 392 IPC: Robbery with Force
+   - Section 411 IPC: Dishonestly Receiving / Retaining Stolen Property
+   - Section 120B IPC: Criminal Conspiracy for Inter-State Vehicle Fencing
+
+3. OCCURRENCE OF OFFENCE:
+   - Date & Time From: 18-JUL-2026 at 14:15:00 IST
+   - Place of Occurrence: Silk Board TTMC Parking Bay 3, Hosur Main Road, Bengaluru
+   - Distance & Direction from PS: 1.2 KM South-East from Madiwala Police Station
+   - Geo-Coordinates: Lat 12.9175° N, Lng 77.6215° E
+
+4. COMPLAINANT / INFORMANT DETAILS:
+   - Name: Smt. Sunita Rao
+   - Husband's Name: Sri R. Rao
+   - Occupation: Software Engineer (Koramangala 4th Block, Bengaluru)
+   - Contact Number: +91 98450 XXXXX
+   - Address: #402, Green Avenue, Koramangala 4th Block, Bengaluru - 560034
+
+5. ACCUSED & SUSPECT PROFILE (IDENTIFIED BY ANPR & CCTNS DATASTORE):
+   - Primary Suspect Name: Ramesh Kumar
+   - Alias / Street Name: "Bullet Ramesh"
+   - CCTNS Suspect ID: SUS-8842
+   - Age: 34 Years | Gender: Male
+   - Criminal Risk Score: 85/100 (HIGH RISK REPEAT OFFENDER)
+   - Prior Active FIRs: 7 Registered FIR Cases across Bengaluru Urban
+   - Modus Operandi (MO): Steals parked vehicles near metro/TTMC transit hubs using master duplicate keys, attaches counterfeit license plates, and fences vehicles across Tamil Nadu border via Hosur exit.
+
+6. STOLEN PROPERTY & ASSET SPECIFICATIONS:
+   - Vehicle Make & Model: Hyundai i10 Magna (White)
+   - License Plate Number: KA-05-M-1234 (Counterfeit Fake Plate Attached)
+   - Original Vehicle Plate: KA-01-EA-4921
+   - Chassis Number: CHS-9921-BLR-04
+   - Engine Number: ENG-8842-KSP-99
+   - Estimated Property Market Value: ₹4,50,000/- (Rupees Four Lakh Fifty Thousand Only)
+
+7. SURVEILLANCE & ANPR CAMERA EVIDENCE LOG:
+   - Camera ID: SC-0045 (Silk Board Junction South Approach Pole 4)
+   - ANPR Sightings Timestamp: 18-JUL-2026 at 14:22:15 IST
+   - Detection Status: Flagged on KSP Dynamic Watchlist
+   - Suspect Movement Direction: Heading South-East towards Hosur Road / Electronic City Toll Plaza
+
+8. INVESTIGATION BRIEF & ACTION DIRECTIVES:
+   - Action Taken: FIR Registered under IPC §§ 379, 392, 411, 120B.
+   - CCTNS Data Entry: Completed within 2 hours of registration.
+   - ANPR Alert Status: Triggered across South Bengaluru Traffic Grid.
+   - Dynamic Nakabandi: Mobile Hoysala Units 14 & 22 deployed at Electronic City Toll Exit.
+   - Investigating Officer (IO): Inspector G. V. Patil (Badge # KSP-4092, Madiwala PS).
+
+================================================================================
+                     OFFICIAL DIGITAL SEAL — KARNATAKA STATE POLICE
+================================================================================

@@ -1,0 +1,80 @@
+{
+  "firs": [
+    {
+      "case_number": "FIR-2026-BL-8842",
+      "suspect_name": "Ramesh Kumar",
+      "accused_name": "Ramesh Kumar",
+      "date_filed": "2026-07-26",
+      "time_filed": "22:27:25",
+      "crime_type_code": "vehicle_theft",
+      "crime_type": "Vehicle Theft",
+      "district_name": "Bengaluru Urban",
+      "police_station": "Madiwala PS / Silk Board TTMC Command",
+      "location_name": "Silk Board TTMC Parking Bay 3, Hosur Main Road, Bengaluru",
+      "status": "under_investigation",
+      "case_status": "under_investigation",
+      "investigation_office": "ACP Meena K. Swamy",
+      "risk_score": 88,
+      "description": "FIR registered at Madiwala PS / Silk Board TTMC Command for Vehicle Theft. Primary Suspect: Ramesh Kumar. Location: Silk Board TTMC Parking Bay 3, Hosur Main Road, Bengaluru. Offence Brief: 1. DISTRICT & POLICE STATION DETAILS:\n   - State: Karnataka\n   - District: Bengaluru Urban (South Division)\n   - Police Station: Madiwala PS / Silk Board TTMC Command\n   - Year: 2026\n   - FIR Case Number: FIR-2026-BL-8842\n   - Date & Time of FIR Registration: 18-JUL-2026 at 16:30:00 IST\n\n2. ACTS & L...",
+      "full_text": "================================================================================\n          KARNATAKA STATE POLICE (KSP) — FIRST INFORMATION REPORT (FIR)\n            [Under Section 154 Cr.P.C. / Section 173 Bharatiya Nagarik Suraksha Sanhita]\n================================================================================\n\n1. DISTRICT & POLICE STATION DETAILS:\n   - State: Karnataka\n   - District: Bengaluru Urban (South Division)\n   - Police Station: Madiwala PS / Silk Board TTMC Command\n   - Year: 2026\n   - FIR Case Number: FIR-2026-BL-8842\n   - Date & Time of FIR Registration: 18-JUL-2026 at 16:30:00 IST\n\n2. ACTS & LEGAL SECTIONS:\n   - Section 379 IPC: Theft of Personal Property & Motor Vehicle\n   - Section 392 IPC: Robbery with Force\n   - Section 411 IPC: Dishonestly Receiving / Retaining Stolen Property\n   - Section 120B IPC: Criminal Conspiracy for Inter-State Vehicle Fencing\n\n3. OCCURRENCE OF OFFENCE:\n   - Date & Time From: 18-JUL-2026 at 14:15:00 IST\n   - Place of Occurrence: Silk Board TTMC Parking Bay 3, Hosur Main Road, Bengaluru\n   - Distance & Direction from PS: 1.2 KM South-East from Madiwala Police Station\n   - Geo-Coordinates: Lat 12.9175° N, Lng 77.6215° E\n\n4. COMPLAINANT / INFORMANT DETAILS:\n   - Name: Smt. Sunita Rao\n   - Husband's Name: Sri R. Rao\n   - Occupation: Software Engineer (Koramangala 4th Block, Bengaluru)\n   - Contact Number: +91 98450 XXXXX\n   - Address: #402, Green Avenue, Koramangala 4th Block, Bengaluru - 560034\n\n5. ACCUSED & SUSPECT PROFILE (IDENTIFIED BY ANPR & CCTNS DATASTORE):\n   - Primary Suspect Name: Ramesh Kumar\n   - Alias / Street Name: \"Bullet Ramesh\"\n   - CCTNS Suspect ID: SUS-8842\n   - Age: 34 Years | Gender: Male\n   - Criminal Risk Score: 85/100 (HIGH RISK REPEAT OFFENDER)\n   - Prior Active FIRs: 7 Registered FIR Cases across Bengaluru Urban\n   - Modus Operandi (MO): Steals parked vehicles near metro/TTMC transit hubs using master duplicate keys, attaches counterfeit license plates, and fences vehicles across Tamil Nadu border via Hosur exit.\n\n6. STOLEN PROPERTY & ASSET SPECIFICATIONS:\n   - Vehicle Make & Model: Hyundai i10 Magna (White)\n   - License Plate Number: KA-05-M-1234 (Counterfeit Fake Plate Attached)\n   - Original Vehicle Plate: KA-01-EA-4921\n   - Chassis Number: CHS-9921-BLR-04\n   - Engine Number: ENG-8842-KSP-99\n   - Estimated Property Market Value: ₹4,50,000/- (Rupees Four Lakh Fifty Thousand Only)\n\n7. SURVEILLANCE & ANPR CAMERA EVIDENCE LOG:\n   - Camera ID: SC-0045 (Silk Board Junction South Approach Pole 4)\n   - ANPR Sightings Timestamp: 18-JUL-2026 at 14:22:15 IST\n   - Detection Status: Flagged on KSP Dynamic Watchlist\n   - Suspect Movement Direction: Heading South-East towards Hosur Road / Electronic City Toll Plaza\n\n8. INVESTIGATION BRIEF & ACTION DIRECTIVES:\n   - Action Taken: FIR Registered under IPC §§ 379, 392, 411, 120B.\n   - CCTNS Data Entry: Completed within 2 hours of registration.\n   - ANPR Alert Status: Triggered across South Bengaluru Traffic Grid.\n   - Dynamic Nakabandi: Mobile Hoysala Units 14 & 22 deployed at Electronic City Toll Exit.\n   - Investigating Officer (IO): Inspector G. V. Patil (Badge # KSP-4092, Madiwala PS).\n\n================================================================================\n                     OFFICIAL DIGITAL SEAL — KARNATAKA STATE POLICE\n================================================================================\n",
+      "source": "Uploaded FIR Document",
+      "file_name": "FIR_SAMPLE_BULLET_RAMESH.txt",
+      "uploaded_at": "2026-07-26T16:57:25.057Z"
+    },
+    {
+      "case_number": "FIR-2026-BL-9104",
+      "suspect_name": "Vikram Malhotra",
+      "accused_name": "Vikram Malhotra",
+      "date_filed": "2026-07-22",
+      "time_filed": "13:45:00",
+      "crime_type_code": "cyber_fraud",
+      "crime_type": "Cyber Fraud",
+      "district_name": "Bengaluru Urban",
+      "police_station": "Whitefield Cyber Crime PS / CEN Command",
+      "location_name": "ITPB Main Road, Whitefield Tech Park Corridor, Bengaluru",
+      "status": "under_investigation",
+      "case_status": "under_investigation",
+      "investigation_office": "ACP Meena K. Swamy",
+      "risk_score": 88,
+      "description": "FIR registered at Whitefield Cyber Crime PS for Cyber Fraud. Primary Suspect: Vikram Malhotra (Alias: Vicky Blade / Shadow Vicky). Location: ITPB Main Road, Whitefield. Offence Brief: Spear-phishing tokens deployed to compromise corporate executive credentials, extorting cryptocurrency payments.",
+      "full_text": "================================================================================\n          KARNATAKA STATE POLICE (KSP) — FIRST INFORMATION REPORT (FIR)\n            [Under Section 154 Cr.P.C. / Section 173 Bharatiya Nagarik Suraksha Sanhita]\n================================================================================\n\n1. DISTRICT & POLICE STATION DETAILS:\n   - State: Karnataka\n   - District: Bengaluru Urban (Cyber & Economic Offences Division)\n   - Police Station: Whitefield Cyber Crime PS / CEN Command\n   - Year: 2026\n   - FIR Case Number: FIR-2026-BL-9104\n   - Date & Time of FIR Registration: 22-JUL-2026 at 13:45:00 IST\n\n2. ACTS & LEGAL SECTIONS:\n   - Section 66D IT Act: Punishment for Cheating by Personation using Computer Resource\n   - Section 66E IT Act: Violation of Data Privacy & Unauthorized Credentials Theft\n   - Section 384 IPC: Extortion of Funds\n   - Section 420 IPC: Cheating and Dishonestly Inducing Delivery of Property\n\n3. OCCURRENCE OF OFFENCE:\n   - Date & Time From: 22-JUL-2026 at 11:30:00 IST\n   - Place of Occurrence: ITPB Main Road, Whitefield Tech Park Corridor, Bengaluru\n   - Distance & Direction from PS: 2.5 KM North from Whitefield CEN Police Station\n   - Geo-Coordinates: Lat 12.9860° N, Lng 77.7380° E\n\n4. COMPLAINANT / INFORMANT DETAILS:\n   - Name: Dr. Rajesh V. Nambiar\n   - Father's Name: Sri V. K. Nambiar\n   - Occupation: Vice President of Technology, Apex Cloud Solutions Ltd.\n   - Contact Number: +91 99001 XXXXX\n   - Address: Suite 501, Tech Tower 3, ITPB Main Road, Whitefield, Bengaluru - 560066\n\n5. ACCUSED & SUSPECT PROFILE (IDENTIFIED BY CYBER CELL & CCTNS DATASTORE):\n   - Primary Suspect Name: Vikram Malhotra\n   - Alias / Street Name: \"Vicky Blade\" / \"Shadow Vicky\"\n   - CCTNS Suspect ID: SUS-9104\n   - Age: 29 Years | Gender: Male\n   - Criminal Risk Score: 88/100 (HIGH RISK CYBER & FINANCIAL OFFENDER)\n   - Prior Active FIRs: 4 Active FIR Cases in Bengaluru & Mysuru Cyber Cells\n   - Modus Operandi (MO): Deploys spear-phishing tokens to compromise corporate executive credentials, hijacks active sessions, extorts cryptocurrency payments, and launders funds via decentralized P2P crypto exchanges.\n\n6. STOLEN ASSETS & FRAUDULENT TRANSACTION SPECIFICATIONS:\n   - Extorted Amount / Valuables: ₹14,50,000/- (Rupees Fourteen Lakh Fifty Thousand Only)\n   - Destination Crypto Wallet Address: 0x71C92a83F11B902A7911A0413bC217594\n   - Fraudulent UPI VPA Handle: vicky.malhotra@okicici\n   - Beneficiary Bank Branch: Federal Bank, Indiranagar Branch, Bengaluru\n   - Target System IP Address: 185.220.101.42 (Routed via Encrypted Proxy)\n\n7. SURVEILLANCE & DIGITAL EVIDENCE LOG:\n   - Surveillance Camera ID: CAM-WF-0082 (ITPB Junction Gate 2 Tower Pole)\n   - Suspect Vehicle Detected: Black Yamaha R15 (Registration: KA-03-HA-8820)\n   - Sighting Timestamp: 22-JUL-2026 at 12:05:30 IST\n   - Cyber Tower IPDR Sighting: Connected to Cell Tower ID #WF-4091 within 300m radius of victim location.\n\n8. INVESTIGATION BRIEF & ACTION DIRECTIVES:\n   - Action Taken: FIR Registered under IT Act §§ 66D, 66E & IPC §§ 384, 420.\n   - Bank Account Freeze: Emergency freeze order issued via National Cyber Helpline 1930 portal to stop fund withdrawal.\n   - ANPR Alert Status: Registration KA-03-HA-8820 added to Whitefield ANPR Watchlist grid.\n   - Investigating Officer (IO): ACP Meena K. Swamy (Badge # KSP-5120, Whitefield CEN PS).\n\n================================================================================\n                     OFFICIAL DIGITAL SEAL — KARNATAKA STATE POLICE\n================================================================================",
+      "source": "Uploaded FIR Document",
+      "file_name": "FIR_SAMPLE_VIKRAM_MALHOTRA.txt",
+      "uploaded_at": "2026-07-26T13:45:00.000Z"
+    }
+  ],
+  "suspects": [
+    {
+      "name": "Ramesh Kumar",
+      "accused_name": "Ramesh Kumar",
+      "alias": "Vicky Blade / Shadow Vicky",
+      "risk_score": 88,
+      "status": "Active Absconding",
+      "district": "Bengaluru Urban",
+      "district_name": "Bengaluru Urban",
+      "active_firs": 1,
+      "primary_crime": "Vehicle Theft",
+      "last_known_location": "Silk Board TTMC Parking Bay 3, Hosur Main Road, Bengaluru",
+      "cases": [
+        "FIR-2026-BL-8842"
+      ],
+      "police_station": "Madiwala PS / Silk Board TTMC Command"
+    },
+    {
+      "name": "Vikram Malhotra",
+      "accused_name": "Vikram Malhotra",
+      "alias": "Vicky Blade / Shadow Vicky",
+      "risk_score": 88,
+      "status": "Active Absconding",
+      "district": "Bengaluru Urban",
+      "district_name": "Bengaluru Urban",
+      "active_firs": 1,
+      "primary_crime": "Cyber Fraud & Extortion",
+      "last_known_location": "ITPB Main Road, Whitefield Tech Park Corridor, Bengaluru",
+      "cases": [
+        "FIR-2026-BL-9104"
+      ],
+      "police_station": "Whitefield Cyber Crime PS / CEN Command"
+    }
+  ]
+}

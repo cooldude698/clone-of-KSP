@@ -9,7 +9,10 @@ export default function GeoTrailMockup() {
       {/* Header */}
       <div className="flex items-center justify-between pb-2 border-b border-steel-600/20 shrink-0">
         <span className="text-phosphor-500 font-bold">SUSPECT GEO-TRAIL ANALYSIS</span>
-        <span className="text-paper-100/40 text-[8px] uppercase">Route Live</span>
+        <div className="flex items-center gap-2">
+          <span className="text-paper-100/40 text-[8px] uppercase">Route Live</span>
+          <span className="badge badge-warning font-mono text-[9px] px-2 py-0.5">CASE: GEO-09</span>
+        </div>
       </div>
 
       {/* Map visual content */}

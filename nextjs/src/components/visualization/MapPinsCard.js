@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -20,10 +20,19 @@ function getCenter(locations) {
 }
 
 export default function MapPinsCard({ data, title }) {
+  const containerRef = useRef(null);
   const locations = data?.locations || [];
   const center = getCenter(locations);
   const tileUrl = process.env.NEXT_PUBLIC_MAPS_TILE ||
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+  useEffect(() => {
+    return () => {
+      if (containerRef.current && containerRef.current._leaflet_id) {
+        delete containerRef.current._leaflet_id;
+      }
+    };
+  }, []);
 
   if (locations.length === 0) {
     return (
@@ -41,7 +50,8 @@ export default function MapPinsCard({ data, title }) {
       <div className="px-4 py-3 border-b border-steel-600/40">
         <p className="text-xs font-semibold text-paper-100/80">{title}</p>
       </div>
-      <MapContainer
+      <div ref={containerRef} className="w-full">
+        <MapContainer
         center={center}
         zoom={13}
         style={{ height: '260px', width: '100%' }}
@@ -67,6 +77,7 @@ export default function MapPinsCard({ data, title }) {
           </CircleMarker>
         ))}
       </MapContainer>
+      </div>
       <div className="px-4 py-2 border-t border-steel-600/40 flex flex-wrap gap-3">
         {Object.entries(PIN_COLORS)
           .filter(([k]) => k !== 'default')

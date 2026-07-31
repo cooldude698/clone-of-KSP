@@ -1,6 +1,10 @@
 const dbHelper = require('./db-helper');
 
 module.exports = async (req, res) => {
+    // Compat shim: local catalyst serve passes a plain Node.js http.IncomingMessage
+    if (!req.getMethod || typeof req.getMethod !== 'function') req.getMethod = () => req.method;
+    if (!req.getQueryParams || typeof req.getQueryParams !== 'function') req.getQueryParams = () => req.query || require('url').parse(req.url || '', true).query || {};
+
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');

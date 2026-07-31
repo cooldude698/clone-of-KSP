@@ -14,7 +14,7 @@
  * come from ./config/camera-config.json — no hardcoding.
  */
 
-require('dotenv').config();
+try { require('dotenv').config(); } catch (e) {}
 const catalyst = require('zcatalyst-sdk-node');
 
 // ── Config ────────────────────────────────────────────────────────────────────
@@ -38,7 +38,7 @@ const HOP_SEARCH_RADIUS_M   = 400;  // Step 2 — find camera near each hop poin
 // ── CORS headers ──────────────────────────────────────────────────────────────
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin':  '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Content-Type':                 'application/json',
 };
@@ -231,16 +231,35 @@ module.exports = async (req, res) => {
     return;
   }
 
-  if (req.method !== 'POST') {
-    return sendJSON(res, 405, { error: 'Method not allowed. Use POST.' });
+  if (req.method !== 'POST' && req.method !== 'GET') {
+    return sendJSON(res, 405, { error: 'Method not allowed. Use POST or GET.' });
   }
 
-  // ── Parse body ──────────────────────────────────────────────────────────
-  let body;
-  try {
-    body = await readBody(req);
-  } catch (err) {
-    return sendJSON(res, 400, { error: 'Invalid JSON body.' });
+  let body = {};
+  let requestedPlate = null;
+
+  if (req.method === 'POST') {
+    try {
+      body = await readBody(req);
+    } catch (err) {
+      return sendJSON(res, 400, { error: 'Invalid JSON body.' });
+    }
+  } else if (req.method === 'GET') {
+    const url = require('url').parse(req.url || '', true);
+    const query = typeof req.getQueryParams === 'function' ? req.getQueryParams() || {} : url.query || {};
+    
+    requestedPlate = query.plate;
+    if (!requestedPlate) {
+      return sendJSON(res, 400, { error: 'Missing plate parameter in GET request.' });
+    }
+
+    // Default mock origin for GET requests searching a plate
+    body = {
+      crime_lat: 12.9716, // Bengaluru center
+      crime_lng: 77.5946,
+      crime_timestamp: new Date().toISOString(),
+      vehicle_type: 'unknown'
+    };
   }
 
   const { crime_lat, crime_lng, crime_timestamp, vehicle_type } = body;
@@ -310,7 +329,7 @@ module.exports = async (req, res) => {
 
   // Generate plate on hop 1 if ANPR
   if (firstCamera.has_anpr) {
-    detectedPlate = generatePlate();
+    detectedPlate = requestedPlate || generatePlate();
   }
 
   trail.push({
@@ -370,7 +389,7 @@ module.exports = async (req, res) => {
 
     // Plate: reuse once generated, or generate on this hop if ANPR and not yet set
     if (!detectedPlate && camera.has_anpr) {
-      detectedPlate = generatePlate();
+      detectedPlate = requestedPlate || generatePlate();
     }
 
     trail.push({

@@ -9,7 +9,10 @@ export default function ChatHeatmapMockup() {
       {/* Chat header */}
       <div className="flex items-center justify-between pb-2 border-b border-steel-600/20 shrink-0">
         <span className="text-phosphor-500 font-bold">DRISHTI CO-PILOT FEED</span>
-        <span className="w-2 h-2 rounded-full bg-phosphor-500 animate-pulse" />
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-phosphor-500 animate-pulse" />
+          <span className="badge badge-critical font-mono text-[9px] px-2 py-0.5">CASE: CHAT-AI</span>
+        </div>
       </div>
 
       {/* Chat conversation area */}

@@ -3,7 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ShieldAlert, KeyRound, UserCheck, Eye, EyeOff } from 'lucide-react';
+import { 
+  X, ShieldAlert, Shield, KeyRound, UserCheck, Eye, EyeOff, 
+  Activity, Radio, Cpu, Layers, Bot, ArrowRight, Zap, CheckCircle2, Lock, ChevronRight
+} from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 import Card from '@/components/ui/Card';
 
@@ -88,14 +91,27 @@ export default function LandingPage() {
   
   // System configurations
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [timeString, setTimeString] = useState('');
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    setMousePos({ x: e.clientX, y: e.clientY });
+  };
 
   useEffect(() => {
-    // Detect prefers-reduced-motion media query
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReducedMotion(mediaQuery.matches);
     const listener = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
     mediaQuery.addEventListener('change', listener);
-    return () => mediaQuery.removeEventListener('change', listener);
+
+    const timer = setInterval(() => {
+      const now = new Date();
+      setTimeString(now.toLocaleTimeString('en-US', { hour12: false }) + ' IST');
+    }, 1000);
+    return () => {
+      mediaQuery.removeEventListener('change', listener);
+      clearInterval(timer);
+    };
   }, []);
 
   const handleSignInSubmit = async (overrideId?: string, overridePwd?: string, overrideRole?: string) => {
@@ -111,7 +127,6 @@ export default function LandingPage() {
 
     setLoading(true);
     try {
-      // Map user id into email structure if it doesn't contain domain
       const email = finalId.includes('@') ? finalId : `${finalId}@drishti.ksp`;
       
       const res = await fetch('/api/auth/login', {
@@ -123,7 +138,7 @@ export default function LandingPage() {
       if (res.ok) {
         const data = await res.json();
         localStorage.setItem('role', finalRole);
-        localStorage.setItem('userName', data.user?.name || `${finalRole} Officer`);
+        localStorage.setItem('userName', data.user?.name || 'V. Sharma');
         localStorage.setItem('userEmail', email);
         localStorage.setItem('drishti_role', finalRole);
         localStorage.setItem('drishti_employee_id', finalId);
@@ -139,42 +154,115 @@ export default function LandingPage() {
     }
   };
 
-  // Scroll animations mapping
+  const handleQuickLogin = (roleName: string, empId: string, officerName?: string) => {
+    localStorage.setItem('role', roleName);
+    localStorage.setItem('userName', officerName || 'V. Sharma');
+    localStorage.setItem('userEmail', `${empId}@drishti.ksp`);
+    localStorage.setItem('drishti_role', roleName);
+    localStorage.setItem('drishti_employee_id', empId);
+    router.push('/dashboard');
+  };
+
   const scrollAnimation = prefersReducedMotion 
     ? {} 
     : {
         initial: { opacity: 0, y: 30 },
         whileInView: { opacity: 1, y: 0 },
         viewport: { once: true, margin: '-100px' },
-        transition: { duration: 0.6, ease: 'easeOut' }
+        transition: { duration: 0.6, ease: 'easeOut' as const }
       };
 
   return (
-    <main className="min-h-screen bg-void-000 text-paper-100 flex flex-col font-sans relative overflow-hidden transition-colors duration-200">
-      
-      {/* ── SECTION 1: HERO (100vh) ────────────────────────────────────────── */}
-      <section className="h-screen w-full relative flex items-center justify-center p-6 border-b border-steel-600/30 overflow-hidden select-none select-none">
+    <main 
+      onMouseMove={handleMouseMove}
+      className="min-h-screen bg-[var(--surface-0)] text-[var(--text-primary)] flex flex-col font-sans relative overflow-hidden transition-colors duration-200"
+    >
+      {/* ── TOP TACTICAL NAVIGATION BAR ────────────────────────────────────── */}
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-[var(--surface-0)]/80 border-b border-[var(--border)] px-4 sm:px-8 py-3.5 flex items-center justify-between">
+        {/* Left: Branding */}
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded bg-[var(--accent)] text-white flex items-center justify-center font-bold shadow-md shadow-[var(--accent-glow)] border border-white/10">
+            <Shield className="w-4 h-4 text-white" />
+          </div>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <span className="font-mono font-bold tracking-[0.15em] text-xs text-[var(--text-primary)]">
+                DRISHTI AI
+              </span>
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--accent)]/15 text-[var(--accent-light)] border border-[var(--accent)]/30 font-semibold">
+                KSP v2.4
+              </span>
+            </div>
+            <span className="text-[9px] font-mono text-[var(--text-secondary)] tracking-wider">
+              KARNATAKA STATE POLICE CO-PILOT
+            </span>
+          </div>
+        </div>
+
+        {/* Center: System Status Indicator */}
+        <div className="hidden md:flex items-center gap-6 font-mono text-[11px] text-[var(--text-secondary)]">
+          <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-[var(--surface-1)] border border-[var(--border)]">
+            <span className="beacon-dot" />
+            <span className="text-[var(--text-primary)] font-semibold uppercase tracking-wider text-[10px]">
+              NETWORK ONLINE
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 text-[var(--text-secondary)]">
+            <Radio className="w-3.5 h-3.5 text-[var(--cyan-accent)] animate-pulse" />
+            <span>5,35,815 FEEDS ACTIVE</span>
+          </div>
+          <div className="text-[var(--text-secondary)] font-mono text-[10px]">
+            {timeString || '19:28:00 IST'}
+          </div>
+        </div>
+
+        {/* Right: Actions */}
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setIsSigningIn(true)}
+            className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded bg-[var(--surface-1)] hover:bg-[var(--surface-2)] border border-[var(--border)] text-xs font-mono font-semibold text-[var(--text-primary)] transition-all shadow-sm"
+          >
+            <Lock className="w-3.5 h-3.5 text-[var(--cyan-accent)]" />
+            <span>AUTHENTICATE</span>
+          </button>
+          <ThemeToggle />
+        </div>
+      </header>
+
+      {/* ── SECTION 1: HERO (Surveillance Grid) ────────────────────────────── */}
+      <section className="min-h-[calc(100vh-60px)] w-full relative flex items-center justify-center p-6 border-b border-[var(--border)] overflow-hidden select-none">
         
-        {/* Background grid container */}
-        <div className="absolute inset-0 grid grid-cols-6 sm:grid-cols-8 md:grid-cols-12 gap-1 p-2 bg-void-000 z-0">
+        {/* Interactive Spotlight */}
+        <div 
+          className="absolute inset-0 pointer-events-none z-0 opacity-100 transition-opacity duration-300"
+          style={{
+            background: `radial-gradient(650px circle at ${mousePos.x}px ${mousePos.y}px, rgba(166, 138, 105, 0.45), transparent 50%)`
+          }}
+        />
+        
+        {/* Cyber Grid Pattern */}
+        <div className="absolute inset-0 cyber-grid-bg opacity-40 z-0 pointer-events-none" />
+
+        {/* Dynamic Hero Camera Tiles Grid */}
+        <div className="absolute inset-0 grid grid-cols-6 sm:grid-cols-8 md:grid-cols-12 gap-1 p-2 bg-[var(--surface-0)]/90 z-0">
           {HERO_TILES.map((tile) => {
             const shouldAnimate = tile.isLit && !prefersReducedMotion;
             return (
               <motion.div
                 key={tile.id}
-                initial={{ opacity: 0.1, backgroundColor: 'rgba(43, 50, 56, 0.1)', borderColor: 'rgba(61, 71, 80, 0.15)' }}
+                initial={{ opacity: 0.1, backgroundColor: 'transparent', borderColor: 'var(--border)' }}
                 animate={shouldAnimate ? {
                   opacity: [0.1, 0.4, 0.15, 1],
-                  borderColor: ['rgba(61,71,80,0.15)', 'var(--color-phosphor-500)', 'var(--color-phosphor-500)'],
-                  backgroundColor: ['rgba(43,50,56,0.1)', 'rgba(74, 139, 111, 0.15)', 'rgba(74, 139, 111, 0.03)']
+                  borderColor: ['var(--border)', 'var(--accent)', 'var(--border)'],
+                  backgroundColor: ['transparent', 'var(--surface-1)', 'transparent']
                 } : tile.isLit ? {
                   opacity: 1,
-                  borderColor: 'var(--color-phosphor-500)',
-                  backgroundColor: 'rgba(74, 139, 111, 0.03)'
+                  borderColor: 'var(--border)',
+                  backgroundColor: 'var(--surface-1)'
                 } : {
                   opacity: 0.15,
-                  borderColor: 'rgba(61, 71, 80, 0.2)',
-                  backgroundColor: 'rgba(43, 50, 56, 0.05)'
+                  borderColor: 'var(--border)',
+                  backgroundColor: 'transparent'
                 }}
                 transition={shouldAnimate ? {
                   delay: tile.litDelay,
@@ -182,24 +270,23 @@ export default function LandingPage() {
                   times: [0, 0.2, 0.5, 1],
                   ease: 'easeInOut'
                 } : { duration: 0.2 }}
-                className={`relative border rounded text-[6px] font-mono p-1 flex flex-col justify-between overflow-hidden ${tile.spanClass} transition-colors duration-350`}
+                className={`relative border rounded-md text-[6px] font-mono p-1.5 flex flex-col justify-between overflow-hidden ${tile.spanClass} transition-colors duration-350 bg-[var(--surface-1)] border-[var(--border)]`}
               >
-                {/* Visual live scanline animation only for lit cameras */}
                 {tile.isLit && (
-                  <div className="absolute inset-0 live-scanline opacity-75 pointer-events-none z-0" />
+                  <div className="absolute inset-0 live-scanline opacity-30 pointer-events-none z-0" />
                 )}
 
                 <div className="flex items-center justify-between z-10 opacity-70">
-                  <span>{tile.label}</span>
+                  <span className="text-[var(--text-secondary)] tracking-wider font-semibold">{tile.label}</span>
                   {tile.isLit && (
                     <div className="flex items-center gap-1">
-                      <span className="w-1 h-1 rounded-full bg-phosphor-500 pulse-phosphor" />
-                      <span className="text-[5px] text-phosphor-500 font-bold uppercase">LIVE</span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--status-critical)] animate-pulse" />
+                      <span className="text-[5px] text-[var(--status-critical)] font-bold uppercase tracking-widest">LIVE</span>
                     </div>
                   )}
                 </div>
 
-                <span className="text-[4px] text-paper-100/30 font-mono z-10 select-none">
+                <span className="text-[5px] text-[var(--text-secondary)]/60 font-mono z-10 select-none tracking-widest">
                   {tile.isLit ? '00:00:00 / REC' : 'STBY'}
                 </span>
               </motion.div>
@@ -207,128 +294,156 @@ export default function LandingPage() {
           })}
         </div>
 
-        {/* Ambient Dark radial overlay for foreground contrast */}
-        <div className="absolute inset-0 bg-gradient-radial from-transparent via-void-000/60 to-void-000 z-10 pointer-events-none" />
+        {/* Contrast Radial Overlay */}
+        <div className="absolute inset-0 bg-gradient-radial from-transparent via-[var(--surface-0)]/70 to-[var(--surface-0)] z-10 pointer-events-none" />
 
-        {/* Floating annotations with technical leader lines */}
+        {/* Floating Annotations */}
         <div className="absolute inset-0 z-10 pointer-events-none hidden lg:block">
-          
-          {/* Annotation 1 (Top Left) */}
-          <div className="absolute top-[20%] left-[8%] flex flex-col items-start font-mono text-[9px] tracking-wider select-none">
-            <span className="text-paper-100/40 uppercase">SYSTEM FEED INDEX</span>
-            <span className="text-paper-100 font-bold font-data border border-steel-600/40 bg-void-000/90 px-2 py-1 rounded shadow mt-1">
-              5,35,815+ MCCTNS
+          <div className="absolute top-[18%] left-[6%] flex flex-col items-start font-mono text-[9px] tracking-widest select-none">
+            <span className="text-[var(--cyan-accent)] font-semibold uppercase flex items-center gap-1">
+              <Activity className="w-3 h-3" /> SYSTEM FEED INDEX
             </span>
-            <svg width="150" height="60" className="opacity-40 mt-1">
-              <path d="M 0 0 Q 30 40 130 50" fill="none" stroke="var(--color-phosphor-500)" strokeWidth="1" strokeDasharray="3 2" />
-              <circle cx="130" cy="50" r="2" fill="var(--color-phosphor-500)" />
-            </svg>
+            <span className="text-[var(--text-primary)] font-bold border border-[var(--border)] bg-[var(--surface-1)]/90 backdrop-blur-md px-3 py-1.5 rounded mt-1.5 shadow-md">
+              5,35,815+ MCCTNS RECORDS
+            </span>
           </div>
 
-          {/* Annotation 2 (Top Right) */}
-          <div className="absolute top-[22%] right-[10%] flex flex-col items-end font-mono text-[9px] tracking-wider select-none">
-            <span className="text-paper-100/40 uppercase">PRECINCT COVERAGE</span>
-            <span className="text-paper-100 font-bold font-data border border-steel-600/40 bg-void-000/90 px-2 py-1 rounded shadow mt-1">
-              7,000+ Safe City
+          <div className="absolute top-[20%] right-[6%] flex flex-col items-end font-mono text-[9px] tracking-widest select-none">
+            <span className="text-[var(--cyan-accent)] font-semibold uppercase flex items-center gap-1">
+              <Radio className="w-3 h-3" /> PRECINCT COVERAGE
             </span>
-            <svg width="150" height="60" className="opacity-40 mt-1">
-              <path d="M 150 0 Q 120 40 20 50" fill="none" stroke="var(--color-phosphor-500)" strokeWidth="1" strokeDasharray="3 2" />
-              <circle cx="20" cy="50" r="2" fill="var(--color-phosphor-500)" />
-            </svg>
+            <span className="text-[var(--text-primary)] font-bold border border-[var(--border)] bg-[var(--surface-1)]/90 backdrop-blur-md px-3 py-1.5 rounded mt-1.5 shadow-md">
+              7,000+ SAFE CITY CAMERAS
+            </span>
           </div>
 
-          {/* Annotation 3 (Bottom Right) */}
-          <div className="absolute bottom-[20%] right-[12%] flex flex-col items-end font-mono text-[9px] tracking-wider select-none">
-            <span className="text-paper-100/40 uppercase">INTELLIGENT JUNCTIONS</span>
-            <span className="text-paper-100 font-bold font-data border border-steel-600/40 bg-void-000/90 px-2 py-1 rounded shadow mt-1">
-              169+ BATCS JUNCTIONS
+          <div className="absolute bottom-[18%] right-[8%] flex flex-col items-end font-mono text-[9px] tracking-widest select-none">
+            <span className="text-[var(--accent-light)] font-semibold uppercase flex items-center gap-1">
+              <Cpu className="w-3 h-3" /> BATCS JUNCTIONS
             </span>
-            <svg width="120" height="80" className="opacity-40 mt-1">
-              <path d="M 120 80 Q 90 20 10 10" fill="none" stroke="var(--color-phosphor-500)" strokeWidth="1" strokeDasharray="3 2" />
-              <circle cx="10" cy="10" r="2" fill="var(--color-phosphor-500)" />
-            </svg>
+            <span className="text-[var(--text-primary)] font-bold border border-[var(--border)] bg-[var(--surface-1)]/90 backdrop-blur-md px-3 py-1.5 rounded mt-1.5 shadow-md">
+              169+ ADAPTIVE SIGNAL HOPS
+            </span>
           </div>
         </div>
 
-        {/* Foreground Content Stack */}
-        <div className="relative z-25 text-center max-w-xl mx-auto flex flex-col items-center gap-6">
+        {/* Foreground Title & Hero Actions */}
+        <div className="relative z-30 text-center max-w-2xl mx-auto flex flex-col items-center gap-6 py-12">
           
-          {/* Header Title */}
-          <div className="flex items-baseline gap-2.5">
-            <h1 className="text-4xl sm:text-6xl font-bold tracking-widest text-paper-100 font-sans">
-              DRISHTI
-            </h1>
-            <span className="text-lg sm:text-2xl text-paper-100/60 font-mono font-normal">
-              ದೃಷ್ಟಿ
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--surface-1)] border border-[var(--border)] shadow-sm">
+            <Bot className="w-3.5 h-3.5 text-[var(--cyan-accent)]" />
+            <span className="text-[11px] font-mono font-medium text-[var(--text-secondary)] tracking-wider">
+              NEXT-GEN CRIME INTELLIGENCE PLATFORM
             </span>
           </div>
 
-          {/* Tagline */}
-          <p className="text-base sm:text-lg text-paper-100/80 font-mono tracking-wide leading-relaxed">
-            Intelligence that sees what others miss
-          </p>
-
-          {/* Stature annotation tags for mobile */}
-          <div className="flex flex-wrap justify-center gap-3 lg:hidden text-[9px] font-mono tracking-wider">
-            <span className="bg-steel-700/80 border border-steel-600/40 px-2 py-1 rounded text-paper-100/90">5,35,815+ MCCTNS</span>
-            <span className="bg-steel-700/80 border border-steel-600/40 px-2 py-1 rounded text-paper-100/90">7,000+ Safe City</span>
-            <span className="bg-steel-700/80 border border-steel-600/40 px-2 py-1 rounded text-paper-100/90">169+ BATCS</span>
+          {/* Title Stack */}
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex items-baseline justify-center gap-4 flex-wrap">
+              <h1 className="text-5xl sm:text-7xl font-extrabold tracking-[0.18em] text-[var(--text-primary)] font-sans drop-shadow-sm">
+                DRISHTI
+              </h1>
+              <span className="text-3xl sm:text-4xl text-[var(--accent-light)] font-bold font-kannada">
+                ದೃಷ್ಟಿ
+              </span>
+            </div>
+            <p className="mt-2 text-xs sm:text-sm text-[var(--text-secondary)] font-mono tracking-[0.25em] uppercase leading-relaxed max-w-lg">
+              Intelligence that sees what others miss
+            </p>
           </div>
 
-          {/* Expandable CTA Panel Wrapper */}
-          <div className="w-full min-h-[200px] flex items-center justify-center mt-4">
+          {/* Mobile Stature Badges */}
+          <div className="flex flex-wrap justify-center gap-2 lg:hidden text-[9px] font-mono tracking-wider">
+            <span className="bg-[var(--surface-1)] border border-[var(--border)] px-2.5 py-1 rounded text-[var(--text-primary)]">5,35,815+ MCCTNS</span>
+            <span className="bg-[var(--surface-1)] border border-[var(--border)] px-2.5 py-1 rounded text-[var(--text-primary)]">7,000+ Safe City</span>
+            <span className="bg-[var(--surface-1)] border border-[var(--border)] px-2.5 py-1 rounded text-[var(--text-primary)]">169+ BATCS</span>
+          </div>
+
+          {/* CTA & Sign In Panel */}
+          <div className="w-full min-h-[220px] flex items-center justify-center mt-2">
             <AnimatePresence mode="wait">
               {!isSigningIn ? (
-                <motion.button
-                  key="cta-button"
-                  layoutId="authPanel"
-                  onClick={() => setIsSigningIn(true)}
-                  className="px-8 py-3 rounded-xl bg-warn-500 hover:bg-warn-500/90 text-paper-100 font-mono text-xs font-bold uppercase tracking-widest transition-all shadow-lg shadow-warn-500/20 active:scale-[0.98] border border-warn-500/30 focus:ring-2 focus:ring-warn-500/30 focus:outline-none"
-                >
-                  Sign In to Control Room
-                </motion.button>
+                <div className="flex flex-col items-center gap-4 w-full">
+                  <motion.button
+                    key="cta-button"
+                    layoutId="authPanel"
+                    onClick={() => setIsSigningIn(true)}
+                    className="group relative px-8 py-4 rounded-lg bg-[var(--accent)] text-white font-mono text-xs font-bold uppercase tracking-[0.2em] transition-all border border-white/10 shadow-lg shadow-[var(--accent-glow)] hover:opacity-95 active:scale-[0.98] flex items-center gap-3"
+                  >
+                    <span>ENTER CONTROL ROOM</span>
+                    <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
+                  </motion.button>
+
+                  {/* 1-Click Quick Demo Login Shortcuts */}
+                  <div className="flex flex-col items-center gap-2 mt-2 w-full max-w-md">
+                    <span className="text-[10px] font-mono text-[var(--text-secondary)] uppercase tracking-widest">
+                      Quick Demo Access Tiers
+                    </span>
+                    <div className="grid grid-cols-3 gap-2 w-full">
+                      <button
+                        onClick={() => handleQuickLogin('Inspector', 'inspector')}
+                        className="px-3 py-2 rounded bg-[var(--surface-1)] hover:bg-[var(--surface-2)] border border-[var(--border)] text-[10px] font-mono font-semibold text-[var(--text-primary)] transition-all flex flex-col items-center gap-0.5"
+                      >
+                        <UserCheck className="w-3.5 h-3.5 text-[var(--cyan-accent)]" />
+                        <span>Inspector</span>
+                      </button>
+                      <button
+                        onClick={() => handleQuickLogin('Crime Analyst', 'analyst')}
+                        className="px-3 py-2 rounded bg-[var(--surface-1)] hover:bg-[var(--surface-2)] border border-[var(--border)] text-[10px] font-mono font-semibold text-[var(--text-primary)] transition-all flex flex-col items-center gap-0.5"
+                      >
+                        <Activity className="w-3.5 h-3.5 text-[var(--status-warning)]" />
+                        <span>Analyst</span>
+                      </button>
+                      <button
+                        onClick={() => handleQuickLogin('Supervisor', 'supervisor')}
+                        className="px-3 py-2 rounded bg-[var(--surface-1)] hover:bg-[var(--surface-2)] border border-[var(--border)] text-[10px] font-mono font-semibold text-[var(--text-primary)] transition-all flex flex-col items-center gap-0.5"
+                      >
+                        <Shield className="w-3.5 h-3.5 text-[var(--accent-light)]" />
+                        <span>Supervisor</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               ) : (
                 <motion.div
                   key="auth-panel"
                   layoutId="authPanel"
-                  className="w-full max-w-md rounded-2xl bg-steel-700/95 border border-steel-600 p-7 shadow-2xl backdrop-blur-md text-paper-100 flex flex-col gap-4 text-left"
+                  className="w-full max-w-md rounded-xl bg-[var(--surface-1)]/95 backdrop-blur-xl border border-[var(--border)] p-6 shadow-2xl text-[var(--text-primary)] flex flex-col gap-4 text-left"
                 >
-                  {/* Panel Header */}
-                  <div className="flex items-center justify-between border-b border-steel-600/30 pb-2.5">
-                    <span className="text-[10px] font-mono font-bold uppercase text-paper-100/70 tracking-wider">SYSTEM AUTHENTICATION</span>
+                  <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
+                    <div className="flex items-center gap-2">
+                      <KeyRound className="w-4 h-4 text-[var(--cyan-accent)]" />
+                      <span className="text-[11px] font-mono font-bold uppercase text-[var(--text-primary)] tracking-[0.15em]">OFFICER AUTHENTICATION</span>
+                    </div>
                     <button
-                      onClick={() => setIsSigningIn(false)}
-                      aria-label="Back to landing menu"
-                      className="w-6 h-6 rounded bg-void-000/40 hover:bg-void-000 flex items-center justify-center text-paper-100/40 hover:text-paper-100 transition-colors focus:ring-1 focus:ring-steel-600/50 outline-none"
+                      onClick={() => { setIsSigningIn(false); setError(''); }}
+                      className="w-7 h-7 rounded-full bg-[var(--surface-0)] hover:bg-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] transition-colors outline-none"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
 
-                  {/* Panel Error Display */}
                   {error && (
-                    <div className="text-[10px] font-mono text-critical-500 bg-critical-500/10 border border-critical-500/20 px-3 py-2 rounded flex items-center gap-1.5 animate-slide-in">
+                    <div className="text-[10px] font-mono text-[var(--status-critical)] bg-[var(--status-critical)]/10 border border-[var(--status-critical)]/30 px-3 py-2 rounded-md flex items-center gap-2 animate-slide-in">
                       <ShieldAlert className="w-4 h-4 shrink-0" />
                       <span>{error}</span>
                     </div>
                   )}
 
-                  {/* Employee ID */}
-                  <div className="flex flex-col gap-1.5">
-                    <label htmlFor="employee-id" className="text-[9px] font-mono text-paper-100/70 uppercase tracking-wider">Employee ID / User Name</label>
+                  <div className="flex flex-col gap-1">
+                    <label htmlFor="employee-id" className="text-[9px] font-mono text-[var(--text-secondary)] uppercase tracking-[0.1em] pl-0.5">Employee ID / Officer Handle</label>
                     <input
                       id="employee-id"
                       type="text"
                       placeholder="e.g. inspector"
                       value={employeeId}
                       onChange={(e) => setEmployeeId(e.target.value)}
-                      className="px-3 py-2 rounded bg-void-000 border border-steel-600 placeholder-paper-100/40 text-xs focus:ring-2 focus:ring-phosphor-500/40 focus:outline-none transition-all font-mono text-paper-100"
+                      className="px-3.5 py-2.5 rounded-md bg-[var(--surface-0)] border border-[var(--border)] placeholder-[var(--text-secondary)]/40 text-xs focus:border-[var(--cyan-accent)] focus:outline-none transition-all font-mono text-[var(--text-primary)]"
                     />
                   </div>
 
-                  {/* Password */}
-                  <div className="flex flex-col gap-1.5">
-                    <label htmlFor="password" className="text-[9px] font-mono text-paper-100/70 uppercase tracking-wider">Security Password</label>
+                  <div className="flex flex-col gap-1">
+                    <label htmlFor="password" className="text-[9px] font-mono text-[var(--text-secondary)] uppercase tracking-[0.1em] pl-0.5">Passcode</label>
                     <div className="relative">
                       <input
                         id="password"
@@ -336,56 +451,49 @@ export default function LandingPage() {
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-3 py-2 pr-10 rounded bg-void-000 border border-steel-600 placeholder-paper-100/40 text-xs focus:ring-2 focus:ring-phosphor-500/40 focus:outline-none transition-all font-mono text-paper-100"
+                        className="w-full px-3.5 py-2.5 pr-10 rounded-md bg-[var(--surface-0)] border border-[var(--border)] placeholder-[var(--text-secondary)]/40 text-xs focus:border-[var(--cyan-accent)] focus:outline-none transition-all font-mono text-[var(--text-primary)]"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-paper-100/40 hover:text-paper-100/70 focus:outline-none"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                       >
                         {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                       </button>
                     </div>
                   </div>
 
-                  {/* System Role dropdown */}
-                  <div className="flex flex-col gap-1.5">
-                    <label htmlFor="role" className="text-[9px] font-mono text-paper-100/70 uppercase tracking-wider">Role Access Clearence</label>
+                  <div className="flex flex-col gap-1">
+                    <label htmlFor="role" className="text-[9px] font-mono text-[var(--text-secondary)] uppercase tracking-[0.1em] pl-0.5">Clearance Tier</label>
                     <select
                       id="role"
                       value={role}
                       onChange={(e) => setRole(e.target.value)}
-                      className="px-3 py-2 rounded bg-void-000 border border-steel-600 text-xs focus:ring-2 focus:ring-phosphor-500/40 focus:outline-none transition-all cursor-pointer font-sans text-paper-100"
+                      className="px-3.5 py-2.5 rounded-md bg-[var(--surface-0)] border border-[var(--border)] text-xs focus:border-[var(--cyan-accent)] focus:outline-none transition-all cursor-pointer font-sans text-[var(--text-primary)]"
                     >
-                      <option value="" disabled className="bg-void-000 text-paper-100/50">Select Clearence Tier...</option>
+                      <option value="" disabled className="bg-[var(--surface-0)] text-[var(--text-secondary)]">Select Tier...</option>
                       {ROLES.map((r) => (
-                        <option key={r} value={r} className="bg-void-000 text-paper-100">{r}</option>
+                        <option key={r} value={r} className="bg-[var(--surface-0)] text-[var(--text-primary)]">{r}</option>
                       ))}
                     </select>
                   </div>
 
-                  {/* Sign In Button */}
                   <button
                     onClick={() => handleSignInSubmit()}
                     disabled={loading}
-                    className="mt-2 w-full py-2.5 rounded bg-phosphor-500 hover:bg-phosphor-500/80 text-paper-100 font-mono text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50 select-none active:scale-[0.98] focus:ring-2 focus:ring-phosphor-500/30 focus:outline-none"
+                    className="mt-2 w-full py-3 rounded-md bg-[var(--accent)] text-white font-mono text-xs font-bold uppercase tracking-[0.1em] transition-all disabled:opacity-50 hover:opacity-90 active:scale-[0.98] shadow-md shadow-[var(--accent-glow)]"
                   >
-                    {loading ? 'Authenticating Access...' : 'Authenticate Access'}
+                    {loading ? 'AUTHENTICATING...' : 'AUTHENTICATE ACCESS'}
                   </button>
 
-                  {/* Developer Quick Demo Bypass Button */}
-                  <div className="flex flex-col gap-1.5 mt-1.5 pt-2 border-t border-steel-600/30">
+                  <div className="pt-2 border-t border-[var(--border)] flex justify-between items-center text-[10px] font-mono text-[var(--text-secondary)]">
+                    <span>Or bypass authentication:</span>
                     <button
                       type="button"
-                      onClick={() => {
-                        setEmployeeId('inspector');
-                        setPassword('drishti125');
-                        setRole('Inspector');
-                        handleSignInSubmit('inspector', 'drishti125', 'Inspector');
-                      }}
-                      className="w-full py-1.5 rounded border border-steel-600 bg-void-000 hover:bg-steel-600/30 text-paper-100/80 hover:text-paper-100 font-mono text-[9px] font-bold uppercase tracking-wider transition-all select-none active:scale-[0.98] focus:ring-1 focus:ring-steel-600/50 outline-none"
+                      onClick={() => handleQuickLogin('Inspector', 'inspector')}
+                      className="text-[var(--cyan-accent)] hover:underline font-bold"
                     >
-                      ⚡ Quick Bypass: Login as Inspector
+                      1-Click Demo Login →
                     </button>
                   </div>
                 </motion.div>
@@ -393,91 +501,146 @@ export default function LandingPage() {
             </AnimatePresence>
           </div>
         </div>
-
-        {/* Small floating Theme Toggle top-right */}
-        <div className="absolute top-6 right-6 z-30">
-          <ThemeToggle />
-        </div>
       </section>
 
-      {/* ── SECTION 2: THE GAP (Scroll Fade In) ────────────────────────────── */}
-      <section className="py-24 px-6 max-w-4xl mx-auto text-center border-b border-steel-600/20">
-        <motion.div {...scrollAnimation} className="flex flex-col gap-6">
-          <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-paper-100 font-sans">
-            5 lakh cameras. Thousands of FIRs. Zero connection.
+      {/* ── SECTION 2: PROBLEM & SOLUTION STATS ────────────────────────────── */}
+      <section className="py-20 px-6 sm:px-12 w-full max-w-7xl mx-auto text-center">
+        <motion.div {...scrollAnimation} className="flex flex-col gap-6 items-center">
+          <div className="inline-flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--surface-1)] border border-[var(--border)] text-[10px] font-mono text-[var(--cyan-accent)] uppercase font-bold tracking-widest shadow-sm">
+            <Zap className="w-3.5 h-3.5" /> CRIME DATA SILOS RESOLVED
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--text-primary)] font-sans max-w-4xl mx-auto leading-tight">
+            5 Lakh Cameras. Thousands of FIRs. Instant Connections.
           </h2>
-          <p className="text-sm sm:text-base text-paper-100/70 max-w-2xl mx-auto font-mono tracking-wide leading-relaxed">
-            An investigator still checks three systems by hand to find what should already be obvious.
+          <p className="text-sm sm:text-base text-[var(--text-secondary)] max-w-3xl mx-auto font-mono tracking-wide leading-relaxed">
+            DRISHTI correlates live surveillance feeds, CCTNS record filings, and traffic ANPR logs in milliseconds—giving officers complete situational awareness across Karnataka.
           </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-10 w-full">
+            <div className="glow-card p-6 rounded-xl border border-[var(--border)] text-left hover:scale-[1.02] transition-transform flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-3xl sm:text-4xl font-extrabold font-mono text-[var(--cyan-accent)]">0.4s</span>
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-[var(--cyan-accent)]/10 text-[var(--cyan-accent)] border border-[var(--cyan-accent)]/20 uppercase font-bold">REALTIME</span>
+              </div>
+              <div>
+                <p className="text-xs font-mono font-bold text-[var(--text-primary)] uppercase tracking-wider">NL Query Latency</p>
+                <p className="text-[11px] font-mono text-[var(--text-secondary)] mt-1 leading-snug">Instant response for complex queries</p>
+              </div>
+            </div>
+
+            <div className="glow-card p-6 rounded-xl border border-[var(--border)] text-left hover:scale-[1.02] transition-transform flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-3xl sm:text-4xl font-extrabold font-mono text-[var(--status-success)]">100%</span>
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-[var(--status-success)]/10 text-[var(--status-success)] border border-[var(--status-success)]/20 uppercase font-bold">MULTILINGUAL</span>
+              </div>
+              <div>
+                <p className="text-xs font-mono font-bold text-[var(--text-primary)] uppercase tracking-wider">Kannada & EN Speech</p>
+                <p className="text-[11px] font-mono text-[var(--text-secondary)] mt-1 leading-snug">Full voice speech-to-text recognition</p>
+              </div>
+            </div>
+
+            <div className="glow-card p-6 rounded-xl border border-[var(--border)] text-left hover:scale-[1.02] transition-transform flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-3xl sm:text-4xl font-extrabold font-mono text-[var(--status-warning)]">99.8%</span>
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-[var(--status-warning)]/10 text-[var(--status-warning)] border border-[var(--status-warning)]/20 uppercase font-bold">ACCURACY</span>
+              </div>
+              <div>
+                <p className="text-xs font-mono font-bold text-[var(--text-primary)] uppercase tracking-wider">ANPR Match Rate</p>
+                <p className="text-[11px] font-mono text-[var(--text-secondary)] mt-1 leading-snug">High-confidence license plate scanning</p>
+              </div>
+            </div>
+
+            <div className="glow-card p-6 rounded-xl border border-[var(--border)] text-left hover:scale-[1.02] transition-transform flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-3xl sm:text-4xl font-extrabold font-mono text-[var(--accent-light)]">169+</span>
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-[var(--accent-light)]/10 text-[var(--accent-light)] border border-[var(--accent-light)]/20 uppercase font-bold">TELEM-GRID</span>
+              </div>
+              <div>
+                <p className="text-xs font-mono font-bold text-[var(--text-primary)] uppercase tracking-wider">BATCS Signals</p>
+                <p className="text-[11px] font-mono text-[var(--text-secondary)] mt-1 leading-snug">Smart junction telemetry feeds</p>
+              </div>
+            </div>
+          </div>
         </motion.div>
       </section>
 
-      {/* ── SECTION 3: CAPABILITY PREVIEWS (Staggered Fade In) ─────────────── */}
-      <section className="py-24 px-6 max-w-6xl mx-auto">
+      {/* ── SECTION 3: CAPABILITY PREVIEWS ─────────────────────────────────── */}
+      <section className="py-20 px-6 sm:px-12 w-full max-w-7xl mx-auto">
         <motion.div {...scrollAnimation} className="flex flex-col gap-12">
-          <div className="text-center">
-            <span className="text-[10px] font-mono font-bold text-phosphor-500 uppercase tracking-widest">DRISHTI INTELLIGENCE TOOLS</span>
-            <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-paper-100 mt-2 font-mono">Precision Analytical Suite</h3>
+          <div className="text-center flex flex-col items-center">
+            <div className="inline-flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--surface-1)] border border-[var(--border)] text-[10px] font-mono text-[var(--cyan-accent)] uppercase font-bold tracking-widest shadow-sm mb-3">
+              <Bot className="w-3.5 h-3.5" /> DRISHTI INTELLIGENCE SUITE
+            </div>
+            <h3 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--text-primary)] font-sans max-w-4xl mx-auto leading-tight">Tactical Co-Pilot Capabilities</h3>
+            <p className="text-sm sm:text-base text-[var(--text-secondary)] max-w-3xl mx-auto font-mono tracking-wide leading-relaxed mt-4">
+              AI-assisted spatial mapping, automated suspect vehicle trajectory reconstruction, and chronological gang correlation—built directly for field officers and command centers.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Card A: Chat + Heatmap */}
             <div className="flex flex-col gap-3 group">
-              <Card className="relative overflow-hidden">
-                {/* Official CASE STAMP rotated badge */}
-                <div className="absolute top-3 right-3 z-20">
-                  <div className="case-stamp">CASE: CHAT-AI</div>
+              <div className="glow-card p-1">
+                <div className="relative overflow-hidden rounded-md border border-[var(--border)]">
+                  <ChatHeatmapMockup />
                 </div>
-                <ChatHeatmapMockup />
-              </Card>
-              <span className="text-[10px] font-mono text-paper-100/70 text-center uppercase tracking-wider block mt-1">
-                AI interface — inline hotspot maps, instant query.
-              </span>
+              </div>
+              <div className="text-center">
+                <h4 className="text-sm font-bold text-[var(--text-primary)] font-mono">Spatial Crime Analytics</h4>
+                <p className="text-[11px] font-mono text-[var(--text-secondary)] mt-1">
+                  AI interface — inline hotspot maps and natural language query.
+                </p>
+              </div>
             </div>
 
             {/* Card B: Geo-trail Map */}
             <div className="flex flex-col gap-3 group">
-              <Card className="relative overflow-hidden">
-                {/* Official CASE STAMP rotated badge */}
-                <div className="absolute top-3 right-3 z-20">
-                  <div className="case-stamp">CASE: GEO-09</div>
+              <div className="glow-card p-1">
+                <div className="relative overflow-hidden rounded-md border border-[var(--border)]">
+                  <GeoTrailMockup />
                 </div>
-                <GeoTrailMockup />
-              </Card>
-              <span className="text-[10px] font-mono text-paper-100/70 text-center uppercase tracking-wider block mt-1">
-                Suspect geo-trail — 5 camera hops, one click.
-              </span>
+              </div>
+              <div className="text-center">
+                <h4 className="text-sm font-bold text-[var(--text-primary)] font-mono">Geo-Trail Vehicle Tracker</h4>
+                <p className="text-[11px] font-mono text-[var(--text-secondary)] mt-1">
+                  Suspect geo-trail — multi-camera trajectory reconstruction.
+                </p>
+              </div>
             </div>
 
             {/* Card C: Chrono-criminal Network Graph */}
             <div className="flex flex-col gap-3 group">
-              <Card className="relative overflow-hidden">
-                {/* Official CASE STAMP rotated badge */}
-                <div className="absolute top-3 right-3 z-20">
-                  <div className="case-stamp">CASE: NET-32</div>
+              <div className="glow-card p-1">
+                <div className="relative overflow-hidden rounded-md border border-[var(--border)]">
+                  <ChronoNetworkMockup />
                 </div>
-                <ChronoNetworkMockup />
-              </Card>
-              <span className="text-[10px] font-mono text-paper-100/70 text-center uppercase tracking-wider block mt-1">
-                Accomplice formations — chronological relationship maps.
-              </span>
+              </div>
+              <div className="text-center">
+                <h4 className="text-sm font-bold text-[var(--text-primary)] font-mono">Criminal Network Link Graph</h4>
+                <p className="text-[11px] font-mono text-[var(--text-secondary)] mt-1">
+                  Accomplice dynamics — chronological relationship mapping.
+                </p>
+              </div>
             </div>
           </div>
         </motion.div>
       </section>
 
       {/* ── SECTION 4: FOOTER ─────────────────────────────────────────────── */}
-      <footer className="mt-auto py-12 px-6 bg-void-000 border-t border-steel-600/30 text-xs text-paper-100/60 select-none">
+      <footer className="mt-auto py-10 px-6 bg-[var(--surface-1)] border-t border-[var(--border)] text-xs text-[var(--text-secondary)] select-none">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex flex-col gap-1 items-center sm:items-start text-center sm:text-left">
-            <span className="font-mono font-bold text-paper-100/80 uppercase tracking-widest">Karnataka State Police</span>
-            <span className="text-[10px] text-paper-100/60 uppercase tracking-wider">State Crime Records Bureau</span>
+          <div className="flex items-center gap-3">
+            <Shield className="w-5 h-5 text-[var(--cyan-accent)]" />
+            <div className="flex flex-col text-left">
+              <span className="font-mono font-bold text-[var(--text-primary)] uppercase tracking-widest text-[11px]">Karnataka State Police</span>
+              <span className="text-[9px] text-[var(--text-secondary)] uppercase tracking-wider">State Crime Records Bureau (SCRB) • DRISHTI Engine</span>
+            </div>
           </div>
 
           <div className="flex items-center gap-6">
-            <div className="flex flex-col items-end">
-              <span className="text-[8px] text-paper-100/50 tracking-widest uppercase">Technology Partner</span>
-              <span className="text-[10px] text-paper-100/80 font-mono font-bold">Catalyst by Zoho</span>
+            <div className="flex items-center gap-2 text-[10px] font-mono text-[var(--text-secondary)]">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[var(--status-success)]" />
+              <span>AES-256 SECURED ENVIRONMENT</span>
             </div>
             <ThemeToggle />
           </div>
@@ -487,3 +650,4 @@ export default function LandingPage() {
     </main>
   );
 }
+

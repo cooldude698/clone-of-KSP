@@ -1,7 +1,7 @@
 {
 	"deployment": {
 		"name": "cameras-nearby",
-		"stack": "node24",
+		"stack": "node20",
 		"type": "advancedio",
 		"env_variables": {}
 	},

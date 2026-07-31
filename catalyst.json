@@ -14,15 +14,28 @@
       "underreporting",
       "chat",
       "conversations",
-      "export-pdf"
+      "export-pdf",
+      "askDrishtiAI",
+      "drishtiVoice"
     ],
-    "ignore": [],
+    "ignore": [
+      "**/node_modules/**",
+      "**/.git/**"
+    ],
     "source": "functions"
   },
   "slate": [
     {
       "name": "nextjs",
-      "source": "C:\\Users\\Vedesh\\Documents\\Hackathons\\KSP-DATATHON\\kspdatathon2026-1\\nextjs"
+      "source": "nextjs",
+      "ignore": [
+        "**/node_modules/**",
+        "**/.next/**",
+        "**/.git/**",
+        "**/.cache/**",
+        "**/*.log",
+        "public/videos/**"
+      ]
     }
   ]
 }

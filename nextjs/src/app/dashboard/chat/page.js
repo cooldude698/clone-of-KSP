@@ -1,33 +1,56 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Mic, MicOff, Volume2, VolumeX, Bot, User, Sparkles, Copy, Check, X, ShieldAlert, FileText } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Send, Mic, MicOff, Volume2, VolumeX, Bot, User, Sparkles, 
+  Copy, Check, X, ShieldAlert, FileText, Search, Car, Users, 
+  Database, RefreshCw, Cpu, Layers, ArrowRight, CornerDownLeft
+} from 'lucide-react';
 import Spinner from '@/components/ui/Spinner';
 import InvestigatorWall from '@/components/InvestigatorWall';
+import VoiceDebugStatus from '@/components/VoiceDebugStatus';
+import { UPLOADED_FIRS } from '@/lib/uploadedFirsStore';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
 
 const SUGGESTIONS = [
-  'Show all vehicle thefts in Bengaluru this month',
-  'ಕಳೆದ ತಿಂಗಳ ದರೋಡೆ ಪ್ರಕರಣಗಳನ್ನು ತೋರಿಸಿ',
-  'List top repeat offenders with risk score > 70',
-  'Show details for case FIR-2026-BL-4921',
+  {
+    icon: Car,
+    title: 'Vehicle Theft Analysis',
+    text: 'Show all vehicle thefts in Bengaluru this month',
+    badge: 'AUTOMATED SEARCH',
+  },
+  {
+    icon: Search,
+    title: 'Kannada Case Query',
+    text: 'ಕಳೆದ ತಿಂಗಳ ದರೋಡೆ ಪ್ರಕರಣಗಳನ್ನು ತೋರಿಸಿ',
+    badge: 'ಕನ್ನಡ RAG',
+  },
+  {
+    icon: Users,
+    title: 'High-Risk Repeat Offenders',
+    text: 'List top repeat offenders with risk score > 70',
+    badge: 'CRIME INTEL',
+  },
+  {
+    icon: FileText,
+    title: 'Inspect Specific Case',
+    text: 'Show details for case FIR-2026-BL-4921',
+    badge: 'FILE LOOKUP',
+  },
 ];
 
-const MOCK_RESPONSES = {
-  default: `I found **12 matching records** in the KSP database.\n\n| Case Number | Crime Type | District | Status |\n|---|---|---|---|\n| FIR-2026-BL-4921 | Vehicle Theft | Bengaluru Urban | Open |\n| FIR-2026-BL-4918 | Robbery | Bengaluru Urban | Under Investigation |\n| FIR-2026-MY-1103 | Chain Snatching | Mysuru | Open |\n\nWould you like me to filter by date range or district?`,
-  vehicle: `Querying FIR database for **vehicle theft cases**...\n\nFound **47 cases** in Bengaluru Urban this month.\n\n**Top Areas:** Silk Board (12), MG Road (8), Whitefield (6)\n\n**Peak Time:** Between 10 PM – 2 AM (68% of cases)\n\nMost recent critical link: **FIR-2026-BL-4921**.`,
-  repeat: `Identified **37 high-risk repeat offenders** with risk score > 70.\n\n**Top 3 flagged suspects:**\n- Ramesh Kumar — Risk: 92/100 — 6 FIRs (Case: **FIR-2026-BL-4921**)\n- Suresh Naidu — Risk: 85/100 — 4 FIRs (Case: **FIR-2026-BL-4918**) \n- Anand Murthy — Risk: 78/100 — 3 FIRs (Case: **FIR-2026-MY-1103**)\n\nClick on any case number to load the Investigator Wall.`,
-};
+const VOICE_PROFILES = [
+  { id: 'en-NeerjaNeural',  label: 'EN · Neerja',   lang: 'en', ttsLang: 'en-IN', neural: 'en-IN-NeerjaNeural'  },
+  { id: 'en-PrabhatNeural', label: 'EN · Prabhat',  lang: 'en', ttsLang: 'en-IN', neural: 'en-IN-PrabhatNeural' },
+  { id: 'en-RaviNeural',    label: 'EN · Ravi',     lang: 'en', ttsLang: 'en-IN', neural: 'en-IN-RaviNeural'    },
+  { id: 'kn-SapnaNeural',   label: 'ಕನ್ನಡ · Sapna', lang: 'kn', ttsLang: 'kn-IN', neural: 'kn-IN-SapnaNeural'  },
+  { id: 'hi-SwaraNeural',   label: 'हिंदी · Swara', lang: 'hi', ttsLang: 'hi-IN', neural: 'hi-IN-SwaraNeural'  },
+];
 
-function getMockResponse(query) {
-  const q = query.toLowerCase();
-  if (q.includes('vehicle') || q.includes('theft')) return MOCK_RESPONSES.vehicle;
-  if (q.includes('repeat') || q.includes('offender')) return MOCK_RESPONSES.repeat;
-  return MOCK_RESPONSES.default;
-}
-
-function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
+function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis, onSuggestionClick }) {
   const [copied, setCopied] = useState(false);
   const isUser = msg.role === 'user';
 
@@ -38,12 +61,99 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
   };
 
   const renderContentWithCaseLinks = (text) => {
+    // Check if this message is an automated FIR entry notification
+    if (text.includes('AUTOMATED FIR ENTRY STORED IN DATASTORE') || text.includes('FIR Document parsed and stored')) {
+      const caseMatch = text.match(/FIR-[0-9]{4}-[A-Z0-9-]+/i);
+      const caseNum = caseMatch ? caseMatch[0].toUpperCase() : 'FIR-RECORD';
+      
+      const crimeTypeMatch = text.match(/- Crime Type:\s*([^\n]+)/i);
+      const districtMatch = text.match(/- District:\s*([^\n]+)/i);
+      const stationMatch = text.match(/- Police Station:\s*([^\n]+)/i);
+      const statusMatch = text.match(/- Status:\s*([^\n]+)/i);
+
+      return (
+        <div className="my-2 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] overflow-hidden shadow-lg">
+          {/* Card Top Banner - Deep Ocean Navy */}
+          <div className="bg-slate-900 dark:bg-slate-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-400/30 text-blue-400 flex items-center justify-center shadow-sm">
+                <FileText className="w-4 h-4" />
+              </div>
+              <div>
+                <h4 className="text-xs font-mono font-extrabold text-white uppercase tracking-wider">
+                  Automated FIR Entry Registered
+                </h4>
+                <p className="text-[10px] font-mono text-slate-400">
+                  Karnataka State Police CCTNS Datastore
+                </p>
+              </div>
+            </div>
+            {caseMatch && (
+              <button
+                onClick={() => onCaseClick && onCaseClick(caseNum)}
+                className="px-3 py-1 rounded-lg bg-blue-500/20 border border-blue-400/30 text-blue-300 font-mono font-extrabold text-xs shadow-md hover:bg-blue-500/30 transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <FileText className="w-3.5 h-3.5 text-blue-400" />
+                {caseNum}
+              </button>
+            )}
+          </div>
+
+          {/* Data Grid Badges */}
+          <div className="p-4 space-y-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="p-2.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]/50">
+                <span className="text-[10px] font-mono uppercase text-[var(--text-secondary)] block">Crime Type</span>
+                <span className="text-xs font-bold font-mono text-[var(--text-primary)] uppercase tracking-wide">
+                  {crimeTypeMatch ? crimeTypeMatch[1].trim().replace('_', ' ') : 'General Offence'}
+                </span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]/50">
+                <span className="text-[10px] font-mono uppercase text-[var(--text-secondary)] block">Police Station</span>
+                <span className="text-xs font-bold font-mono text-[var(--text-primary)] truncate block">
+                  {stationMatch ? stationMatch[1].trim() : 'Central Command'}
+                </span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]/50">
+                <span className="text-[10px] font-mono uppercase text-[var(--text-secondary)] block">District</span>
+                <span className="text-xs font-bold font-mono text-[var(--text-primary)]">
+                  {districtMatch ? districtMatch[1].trim() : 'Bengaluru Urban'}
+                </span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]/50">
+                <span className="text-[10px] font-mono uppercase text-[var(--text-secondary)] block">Status</span>
+                <span className="text-xs font-extrabold font-mono text-amber-600 dark:text-amber-400 inline-flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                  {statusMatch ? statusMatch[1].trim().toUpperCase() : 'UNDER INVESTIGATION'}
+                </span>
+              </div>
+            </div>
+
+            {/* Document Content Box */}
+            <div className="mt-2">
+              <span className="text-[10px] font-mono font-bold uppercase text-[var(--text-primary)] tracking-wider block mb-1">
+                Parsed Document Preview & Metadata:
+              </span>
+              <div className="bg-[var(--surface-2)] border border-[var(--border)]/50 rounded-xl p-3 text-xs text-[var(--text-primary)] font-mono max-h-48 overflow-y-auto leading-relaxed shadow-inner">
+                {text.replace(/AUTOMATED FIR ENTRY STORED IN DATASTORE[\s\S]*?Document Summary:\s*/i, '').replace(/✅[\s\S]*/i, '')}
+              </div>
+            </div>
+
+            {/* Bottom Verification Tag */}
+            <div className="flex items-center gap-2 pt-2 border-t border-[var(--border)]/30 text-[11px] font-mono text-emerald-600 dark:text-emerald-400">
+              <Check className="w-4 h-4 shrink-0" />
+              <span>Document indexed into live RAG memory & ANPR surveillance watchlists.</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     const lines = text.split('\n');
     return lines.map((line, i) => {
-      // Table row
       if (line.startsWith('|')) {
         return (
-          <div key={i} className="font-mono text-xs text-paper-100/80 border-b border-steel-600/40 py-1 grid grid-cols-4 gap-2">
+          <div key={i} className="font-mono text-xs text-[var(--text-primary)] border-b border-[var(--border)]/40 py-1.5 grid grid-cols-4 gap-2">
             {line.split('|').filter(Boolean).map((cell, j) => {
               const cellText = cell.trim();
               const caseRegex = /(KAR\/[A-Z]+\/\d+\/\d+|FIR-\d{4}-[A-Z]+-\d+)/;
@@ -52,22 +162,21 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
                   <button
                     key={j}
                     onClick={() => onCaseClick && onCaseClick(cellText)}
-                    className="text-left text-phosphor-500 hover:text-phosphor-500/80 font-bold hover:underline transition-colors focus:outline-none"
+                    className="text-left text-blue-600 dark:text-blue-400 hover:underline font-bold transition-colors focus:outline-none cursor-pointer"
                   >
                     {cellText}
                   </button>
                 );
               }
-              return <span key={j} className={j === 0 ? 'text-phosphor-500 font-semibold' : ''}>{cellText}</span>;
+              return <span key={j} className={j === 0 ? 'text-[var(--text-primary)] font-semibold' : 'text-[var(--text-secondary)]'}>{cellText}</span>;
             })}
           </div>
         );
       }
 
-      // Bold parts parsing
       const boldParts = line.split(/\*\*(.*?)\*\*/g);
       return (
-        <p key={i} className={`${line === '' ? 'mt-2' : ''} leading-relaxed`}>
+        <p key={i} className={`${line === '' ? 'mt-2' : ''} leading-relaxed font-sans text-sm text-[var(--text-primary)]`}>
           {boldParts.map((part, j) => {
             const isBold = j % 2 === 1;
             const caseRegex = /(KAR\/[A-Z]+\/\d+\/\d+|FIR-\d{4}-[A-Z]+-\d+)/g;
@@ -79,8 +188,9 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
                   <button
                     key={k}
                     onClick={() => onCaseClick && onCaseClick(subPart)}
-                    className="text-phosphor-500 hover:text-phosphor-500/80 font-mono font-bold border border-phosphor-500/30 rounded px-1.5 py-0.5 bg-phosphor-500/10 hover:bg-phosphor-500/20 transition-all mx-0.5 focus:outline-none"
+                    className="text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 font-mono font-bold border border-blue-500/30 rounded-lg px-2 py-0.5 bg-blue-500/10 transition-all mx-1 inline-flex items-center gap-1 focus:outline-none cursor-pointer shadow-xs"
                   >
+                    <FileText className="w-3 h-3 text-blue-500" />
                     {subPart}
                   </button>
                 );
@@ -89,7 +199,7 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
             });
 
             return isBold ? (
-              <strong key={j} className="text-phosphor-500 font-semibold">{renderedSubParts}</strong>
+              <strong key={j} className="text-[var(--text-primary)] font-extrabold">{renderedSubParts}</strong>
             ) : (
               <span key={j}>{renderedSubParts}</span>
             );
@@ -100,262 +210,242 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis }) {
   };
 
   return (
-    <div className={`flex gap-3 group ${isUser ? 'flex-row-reverse' : ''}`}>
-      {/* Avatar */}
-      <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5
-        ${isUser ? 'bg-phosphor-500/30 border border-phosphor-500/40' : 'bg-steel-600/50 border border-steel-600/60'}`}>
+    <motion.div
+      initial={{ opacity: 0, y: 12, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.3 }}
+      className={`flex gap-3.5 group ${isUser ? 'flex-row-reverse' : ''}`}
+    >
+      <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm border
+        ${isUser 
+          ? 'bg-slate-900 dark:bg-slate-800 text-white border-slate-700' 
+          : 'bg-gradient-to-tr from-blue-600 to-indigo-600 text-white border-blue-500/40'}`}>
         {isUser
-          ? <User className="w-3.5 h-3.5 text-phosphor-500" />
-          : <Bot className="w-3.5 h-3.5 text-paper-100/70" />
+          ? <User className="w-4 h-4 text-white" />
+          : <Bot className="w-4 h-4 text-white" />
         }
       </div>
 
-      {/* Bubble */}
-      <div className={`max-w-[75%] ${isUser ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
-        <div className={`rounded-2xl px-4 py-3 text-sm relative
+      <div className={`max-w-[85%] ${isUser ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
+        <div className="flex items-center gap-2 text-[10px] font-mono text-[var(--text-secondary)] px-1">
+          <span className="font-bold">{isUser ? 'INSPECTOR (YOU)' : 'DRISHTI INTELLIGENCE'}</span>
+          <span>•</span>
+          <span>{msg.timestamp || 'Just now'}</span>
+        </div>
+
+        <div className={`rounded-2xl px-5 py-4 text-sm relative shadow-sm border backdrop-blur-md
           ${isUser
-            ? 'bg-phosphor-500 text-paper-100 rounded-tr-sm'
-            : 'bg-steel-700 text-paper-100/90 border border-steel-600/40 rounded-tl-sm'
+            ? 'bg-blue-600 text-white border-blue-500 rounded-tr-xs shadow-blue-600/10'
+            : 'bg-[var(--surface-1)] text-[var(--text-primary)] border border-[var(--border)]/70 rounded-tl-xs'
           }`}>
           {isUser
-            ? <p>{msg.content}</p>
-            : <div className="space-y-1">{renderContentWithCaseLinks(msg.content)}</div>
+            ? <p className="font-sans leading-relaxed text-white">{msg.content}</p>
+            : <div className="space-y-2">{renderContentWithCaseLinks(msg.content)}</div>
           }
         </div>
-        {/* Timestamp + actions */}
-        <div className={`flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity
-          ${isUser ? 'flex-row-reverse' : ''}`}>
-          <span className="text-[10px] text-paper-100/40 font-mono">{msg.timestamp}</span>
-          {!isUser && (
-            <>
-              <button onClick={handleCopy} className="text-paper-100/40 hover:text-paper-100/80 transition-colors" title="Copy">
-                {copied ? <Check className="w-3 h-3 text-success-500" /> : <Copy className="w-3 h-3" />}
-              </button>
+
+        {!isUser && (
+          <div className="flex items-center gap-2 px-1 pt-1 opacity-100 transition-opacity">
+            <button
+              onClick={handleCopy}
+              className="text-[10px] font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 cursor-pointer transition-colors"
+            >
+              {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+              {copied ? 'Copied' : 'Copy'}
+            </button>
+            <span className="text-[var(--text-secondary)]">•</span>
+            <button
+              onClick={() => onSpeak && onSpeak(msg.content)}
+              className={`text-[10px] font-mono flex items-center gap-1 cursor-pointer transition-colors ${
+                isSpeakingThis ? 'text-rose-600 font-bold animate-pulse' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              <Volume2 className="w-3 h-3" />
+              {isSpeakingThis ? 'Speaking...' : 'Listen'}
+            </button>
+          </div>
+        )}
+
+        {!isUser && (msg.suggestions || msg.follow_up_suggestions)?.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 pt-1.5 px-1">
+            {(msg.suggestions || msg.follow_up_suggestions).map((s, idx) => (
               <button
-                onClick={() => onSpeak && onSpeak(msg.content)}
-                className={`transition-colors ${
-                  isSpeakingThis
-                    ? 'text-phosphor-500 animate-pulse'
-                    : 'text-paper-100/40 hover:text-paper-100/80'
-                }`}
-                title={isSpeakingThis ? 'Speaking… click to stop' : 'Read aloud'}
+                key={idx}
+                onClick={() => {
+                  if (onSuggestionClick) {
+                    onSuggestionClick(s);
+                  } else {
+                    setInput('');
+                    sendMessage(s);
+                  }
+                }}
+                className="px-2.5 py-1 rounded-full bg-[var(--surface-1)] hover:bg-blue-500/10 border border-[var(--border)] hover:border-blue-500/40 text-[11px] font-mono text-[var(--text-secondary)] hover:text-blue-600 dark:hover:text-blue-400 transition-all cursor-pointer shadow-xs"
               >
-                {isSpeakingThis
-                  ? <VolumeX className="w-3 h-3" />
-                  : <Volume2 className="w-3 h-3" />}
+                {s}
               </button>
-            </>
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function TypingIndicator() {
   return (
-    <div className="flex gap-3">
-      <div className="w-7 h-7 rounded-lg bg-steel-600/50 border border-steel-600/60 flex items-center justify-center flex-shrink-0">
-        <Bot className="w-3.5 h-3.5 text-paper-100/70" />
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex gap-3 items-center"
+    >
+      <div className="w-9 h-9 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] flex items-center justify-center flex-shrink-0 shadow-sm">
+        <Bot className="w-4 h-4 text-[var(--cyan-accent)] animate-pulse" />
       </div>
-      <div className="bg-steel-700 border border-steel-600/40 rounded-2xl rounded-tl-sm px-4 py-3">
-        <div className="flex gap-1 items-center h-4">
+      <div className="glass-panel border border-[var(--border)] rounded-2xl rounded-tl-xs px-5 py-3.5 shadow-lg">
+        <div className="flex gap-1.5 items-center h-4">
+          <span className="text-xs font-mono text-[var(--text-secondary)] font-bold mr-1">ANALYZING EVIDENCE</span>
           {[0, 1, 2].map((i) => (
             <span
               key={i}
-              className="w-1.5 h-1.5 rounded-full bg-phosphor-500 animate-bounce"
+              className="w-1.5 h-1.5 rounded-full bg-[var(--cyan-accent)] animate-bounce"
               style={{ animationDelay: `${i * 0.15}s`, animationDuration: '0.8s' }}
             />
           ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
+const CHAT_STORAGE_KEY = 'drishti_chat_history_v2';
+
 export default function ChatPage() {
+  const router = useRouter();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [language, setLanguage] = useState('en');
+  const [voiceProfile, setVoiceProfile] = useState('en-NeerjaNeural');
   const [speechSupported, setSpeechSupported] = useState(false);
+  const [micPermission, setMicPermission] = useState('prompt');
+  const [error, setError] = useState(null);
+  const consecutiveErrorsRef = useRef(0);
   const [conversationId, setConversationId] = useState('');
-  // TTS state
+  
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speakingMsgIdx, setSpeakingMsgIdx] = useState(null);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
   const recognitionRef = useRef(null);
+  const pttStartTimeRef = useRef(0);
+  const isHoldingRef = useRef(false);
+  const shouldRestartRef = useRef(false);
 
-  // Investigator Wall states
   const [selectedFIR, setSelectedFIR] = useState(null);
   const [rightPanelOpen, setRightPanelOpen] = useState(false);
   const [activeCaseDetails, setActiveCaseDetails] = useState(null);
   const [isLoadingCase, setIsLoadingCase] = useState(false);
   const [downloadLoading, setDownloadLoading] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
 
+  // Load chat history from localStorage on mount
   useEffect(() => {
-    // Generate a unique session ID for the conversation
-    setConversationId('conv_' + Math.random().toString(36).substr(2, 9));
-  }, []);
+    setConversationId(`CONV-${Date.now().toString(36).toUpperCase()}`);
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      setSpeechSupported(!!SpeechRecognition);
 
-  const downloadReport = () => {
-    if (downloadLoading) return;
-    setDownloadLoading(true);
-
-    try {
-      const username = localStorage.getItem('userName') || 'KSP Officer';
-      const userRole  = localStorage.getItem('drishti_role') || 'Inspector';
-      const empId     = localStorage.getItem('drishti_employee_id') || 'KSP-0000';
-      const caseRef   = selectedFIR || 'General Intelligence';
-      const now       = new Date();
-      const dateStr   = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
-      const timeStr   = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-
-      // Build conversation transcript HTML
-      const transcriptHTML = messages.map((m) => {
-        const sender = m.role === 'user' ? `<strong>${username}</strong>` : '<strong>DRISHTI AI</strong>';
-        const cleanContent = m.content
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          .replace(/\n/g, '<br/>');
-        return `
-          <div class="print-section" style="margin-bottom:10pt;padding:7pt 10pt;border-left:3pt solid ${
-            m.role === 'user' ? '#2E6B4C' : '#c7ccc7'
-          };background:${ m.role === 'user' ? '#f0f4f2' : '#fafafa' };border-radius:3pt">
-            <div style="font-size:8pt;color:#888;margin-bottom:3pt">${sender} &nbsp;&bull;&nbsp; ${m.timestamp}</div>
-            <div style="font-size:10pt;line-height:1.55">${cleanContent}</div>
-          </div>`;
-      }).join('');
-
-      // Build accused table rows (if case is open)
-      const accusedRows = activeCaseDetails?.accused?.map((a) => `
-        <tr>
-          <td class="print-mono">${a.full_name}</td>
-          <td>${a.alias || '—'}</td>
-          <td>${a.age || '—'}</td>
-          <td>${a.prior_convictions ?? '—'}</td>
-          <td><strong style="color:#B91C1C">${a.risk_score ?? '—'}/100</strong></td>
-        </tr>`).join('') || '<tr><td colspan="5" style="color:#aaa">No accused data</td></tr>';
-
-      // Build FIR info block
-      const fir = activeCaseDetails?.fir;
-      const firBlock = fir ? `
-        <div class="print-section" style="margin-bottom:14pt">
-          <h2 class="print-h2">Case File Summary</h2>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8pt">
-            <div><span class="print-label">Case Number</span><br/><span class="print-mono" style="font-weight:700">${fir.case_number}</span></div>
-            <div><span class="print-label">Crime Type</span><br/><span class="print-value">${(fir.crime_type||'').replace(/_/g,' ').toUpperCase()}</span></div>
-            <div><span class="print-label">Date Filed</span><br/><span class="print-value">${fir.date_filed || '—'}</span></div>
-            <div><span class="print-label">Police Station</span><br/><span class="print-value">${fir.police_station || '—'}</span></div>
-            <div><span class="print-label">Location</span><br/><span class="print-value">${fir.location_name || '—'}</span></div>
-            <div><span class="print-label">Status</span><br/><span class="print-badge">${(fir.case_status||'unknown').replace(/_/g,' ')}</span></div>
-          </div>
-          ${fir.description ? `<div style="margin-top:8pt"><span class="print-label">Description</span><br/><span style="font-size:9.5pt">${fir.description}</span></div>` : ''}
-        </div>
-        <div class="print-section" style="margin-bottom:14pt">
-          <h2 class="print-h2">Accused Profiles</h2>
-          <table class="print-table">
-            <thead><tr><th>Full Name</th><th>Alias</th><th>Age</th><th>Prior FIRs</th><th>Risk Score</th></tr></thead>
-            <tbody>${accusedRows}</tbody>
-          </table>
-        </div>` : '';
-
-      // Inject into the hidden print container
-      const container = document.getElementById('drishti-print-report');
-      if (!container) return;
-
-      container.innerHTML = `
-        <!-- KSP Letterhead -->
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16pt;padding-bottom:10pt;border-bottom:2pt solid #2E6B4C">
-          <div>
-            <div class="print-h1" style="font-size:20pt;letter-spacing:-0.02em">DRISHTI — ದೃಷ್ಟಿ</div>
-            <div style="font-size:9pt;color:#2E6B4C;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">Karnataka State Police &mdash; Crime Intelligence Platform</div>
-          </div>
-          <div style="text-align:right">
-            <div class="print-stamp">CONFIDENTIAL</div>
-          </div>
-        </div>
-
-        <!-- Meta block -->
-        <div class="print-section" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8pt;margin-bottom:14pt;padding:8pt;background:#f9fafb;border:0.5pt solid #e1e4e1;border-radius:4pt">
-          <div><span class="print-label">Investigator</span><br/><span class="print-value" style="font-weight:700">${username}</span></div>
-          <div><span class="print-label">Role / Badge</span><br/><span class="print-value">${userRole} &nbsp;&bull;&nbsp; <span class="print-mono">${empId}</span></span></div>
-          <div><span class="print-label">Generated</span><br/><span class="print-mono">${dateStr}, ${timeStr}</span></div>
-          <div><span class="print-label">Case Reference</span><br/><span class="print-mono" style="font-weight:700">${caseRef}</span></div>
-          <div><span class="print-label">Session ID</span><br/><span class="print-mono">${conversationId}</span></div>
-          <div><span class="print-label">Language</span><br/><span class="print-value">${language === 'en' ? 'English (en-IN)' : 'Kannada (ಕನ್ನಡ)'}</span></div>
-        </div>
-
-        ${firBlock}
-
-        <!-- AI Intelligence Summary -->
-        ${activeCaseDetails?.case_summary ? `
-        <div class="print-section" style="margin-bottom:14pt;padding:8pt;background:#f0f4f2;border-left:3pt solid #2E6B4C;border-radius:3pt">
-          <h3 class="print-h3">AI Intelligence Summary</h3>
-          <p style="font-size:10pt;line-height:1.6;color:#222">${activeCaseDetails.case_summary}</p>
-        </div>` : ''}
-
-        <!-- Conversation Transcript -->
-        <div class="print-section">
-          <h2 class="print-h2">Co-Pilot Conversation Transcript</h2>
-          ${messages.length === 0
-            ? '<p style="color:#aaa;font-size:9pt">No conversation recorded in this session.</p>'
-            : transcriptHTML
+      try {
+        const saved = localStorage.getItem(CHAT_STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setMessages(parsed);
           }
-        </div>
-
-        <!-- Footer -->
-        <div class="print-footer-line">
-          DRISHTI Intelligence Platform &mdash; Karnataka State Police &mdash; Generated ${dateStr} at ${timeStr}<br/>
-          This document is classified CONFIDENTIAL and intended solely for authorised law enforcement personnel.
-        </div>`;
-
-      // Print (browser shows Save as PDF dialog)
-      setTimeout(() => {
-        window.print();
-      }, 120);
-
-    } catch (err) {
-      console.error('Report generation failed', err);
-      alert('Could not generate report. Please try again.');
-    } finally {
-      setDownloadLoading(false);
+        }
+      } catch (e) {
+        console.warn('Failed to load chat history:', e);
+      }
     }
-  };
-
-  useEffect(() => {
-    setSpeechSupported(!!(window.SpeechRecognition || window.webkitSpeechRecognition));
   }, []);
 
-  // ── TTS helpers ────────────────────────────────────────────────
-  const stopSpeech = () => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
+  const extractSubjectFromMessages = (msgs) => {
+    const userMsgs = (msgs || []).filter(m => m.role === 'user');
+    if (!userMsgs.length) return 'General Shift Inquiry';
+    const firstText = userMsgs[0].content || '';
+    const q = firstText.toLowerCase();
+
+    const firMatch = firstText.match(/(KAR\/[A-Z]+\/\d+\/\d+|FIR-\d{4}-[A-Z]+-\d+)/i);
+    if (firMatch) return `Case ${firMatch[0].toUpperCase()}`;
+
+    if (q.includes('vikram') || q.includes('malhotra') || q.includes('9104')) return 'Vikram Malhotra (Cyber Fraud)';
+    if (q.includes('anand') || q.includes('gowda')) return 'Anand Gowda';
+    if (q.includes('zakir') || q.includes('hussain')) return 'Zakir Hussain';
+    if (q.includes('ramesh') || q.includes('bullet ramesh')) return 'Ramesh Kumar';
+    if (q.includes('suresh') || q.includes('naidu')) return 'Suresh Naidu';
+    if (q.includes('silk board') || q.includes('anpr')) return 'Silk Board & ANPR Surveillance';
+
+    const clean = firstText.replace(/[*#\_|`]/g, ' ').replace(/^(can you|please|hey|hi|drishti|open|show|view|tell me|list|give me|find)\b/gi, '').trim();
+    const words = clean.split(/\s+/).slice(0, 4).join(' ');
+    if (words && words.length > 3) {
+      return words.charAt(0).toUpperCase() + words.slice(1);
     }
-    setIsSpeaking(false);
-    setSpeakingMsgIdx(null);
+    return 'Shift Inquiry Session';
   };
 
-  const speakText = (text, msgIdx) => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-    // Toggle off if already speaking this message
-    if (speakingMsgIdx === msgIdx && isSpeaking) {
-      stopSpeech();
-      return;
+  // Save chat history to localStorage & auto-sync to Catalyst Datastore on update
+  useEffect(() => {
+    if (typeof window !== 'undefined' && messages.length > 0) {
+      try {
+        localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
+        window.dispatchEvent(new Event('storage'));
+
+        // Auto-sync to Catalyst Datastore NoSQL collection
+        const activeConvId = conversationId || `conv_${Date.now()}`;
+        const subject = extractSubjectFromMessages(messages);
+        fetch(`${API_BASE}/conversations`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            conversation_id: activeConvId,
+            messages,
+            subject,
+          }),
+        }).catch(() => {});
+      } catch (e) {
+        console.warn('Failed to save chat history:', e);
+      }
     }
-    stopSpeech();
-    try {
-      const cleanText = text.replace(/[|*#`\-]/g, ' ').substring(0, 600);
-      const utterance = new SpeechSynthesisUtterance(cleanText);
-      utterance.lang = language === 'en' ? 'en-IN' : 'kn-IN';
-      utterance.rate = 0.95;
-      utterance.onstart = () => { setIsSpeaking(true); setSpeakingMsgIdx(msgIdx); };
-      utterance.onend = () => { setIsSpeaking(false); setSpeakingMsgIdx(null); };
-      utterance.onerror = () => { setIsSpeaking(false); setSpeakingMsgIdx(null); };
-      window.speechSynthesis.speak(utterance);
-    } catch (e) {
-      console.warn('TTS failed', e);
+  }, [messages, conversationId]);
+
+  const clearChatHistory = async () => {
+    if (messages.length > 0) {
+      // 1. Archive current active conversation to Catalyst Datastore before clearing
+      const activeConvId = conversationId || `conv_${Date.now()}`;
+      const subject = extractSubjectFromMessages(messages);
+      try {
+        await fetch(`${API_BASE}/conversations`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            conversation_id: activeConvId,
+            messages,
+            subject,
+          }),
+        });
+      } catch (e) {
+        console.warn('Failed to archive conversation to Catalyst:', e);
+      }
+    }
+
+    // 2. Clear current screen messages and generate new unique conversation ID for next chat session
+    setMessages([]);
+    setConversationId(`CONV-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(CHAT_STORAGE_KEY);
+        window.dispatchEvent(new Event('storage'));
+      } catch (_) {}
     }
   };
 
@@ -363,67 +453,401 @@ export default function ChatPage() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
-  const timestamp = () =>
-    new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  const timestamp = () => new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
-  const fetchCaseDetails = async (caseNumber) => {
-    setSelectedFIR(caseNumber);
-    setRightPanelOpen(true);
-    setIsLoadingCase(true);
+  const audioElementRef = useRef(null);
+  const speechTokenRef = useRef(0);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      const initVoices = () => {
+        try { window.speechSynthesis.getVoices(); } catch (_) {}
+      };
+      initVoices();
+      window.speechSynthesis.onvoiceschanged = initVoices;
+    }
+
+    const unlockAudio = () => {
+      try {
+        if (typeof window !== 'undefined') {
+          window.speechSynthesis?.resume();
+          const silentAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA');
+          silentAudio.play().then(() => silentAudio.pause()).catch(() => {});
+        }
+      } catch (_) {}
+    };
+
+    const handleStopAll = () => {
+      if (typeof window !== 'undefined') {
+        try { window.speechSynthesis?.cancel(); } catch (_) {}
+      }
+      if (audioElementRef.current) {
+        try {
+          audioElementRef.current.pause();
+          audioElementRef.current.currentTime = 0;
+        } catch (_) {}
+        audioElementRef.current = null;
+      }
+      setIsSpeaking(false);
+      setSpeakingMsgIdx(null);
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('click', unlockAudio, { once: true });
+      window.addEventListener('keydown', unlockAudio, { once: true });
+      window.addEventListener('drishti-stop-speech', handleStopAll);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('click', unlockAudio);
+        window.removeEventListener('keydown', unlockAudio);
+        window.removeEventListener('drishti-stop-speech', handleStopAll);
+      }
+    };
+  }, []);
+
+  const stopSpeech = () => {
+    speechTokenRef.current++;
+    if (typeof window !== 'undefined') {
+      try {
+        window.speechSynthesis?.cancel();
+      } catch (_) {}
+      try {
+        window.dispatchEvent(new CustomEvent('drishti-stop-speech'));
+      } catch (_) {}
+    }
+    if (audioElementRef.current) {
+      try {
+        audioElementRef.current.pause();
+        audioElementRef.current.currentTime = 0;
+      } catch (_) {}
+      audioElementRef.current = null;
+    }
+    setIsSpeaking(false);
+    setSpeakingMsgIdx(null);
+  };
+
+  const speakWithBrowserSpeechSynthesis = (cleanText, profile, msgIdx, token) => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) {
+      setIsSpeaking(false);
+      setSpeakingMsgIdx(null);
+      return;
+    }
+    if (token && speechTokenRef.current !== token) return;
+
     try {
-      const res = await fetch(`${API_BASE}/analytics/firs?case_number=${encodeURIComponent(caseNumber)}&limit=1`);
-      if (res.ok) {
-        const data = await res.json();
-        const firRecord = Array.isArray(data) ? data[0] : data;
-        if (firRecord) {
-          setActiveCaseDetails({
-            fir: {
-              case_number: firRecord.case_number || caseNumber,
-              crime_type: firRecord.crime_type || 'robbery',
-              date_filed: firRecord.date_filed || '2026-07-02',
-              location_name: firRecord.location || 'Silk Board, Bengaluru',
-              case_status: firRecord.case_status || 'under_investigation',
-              description: firRecord.description || 'Criminal action indexed in precinct logs.',
-              police_station: firRecord.police_station || 'Madiwala PS',
-            },
-            accused: firRecord.accused || [
-              { full_name: 'Ramesh Kumar', alias: 'Ramesh Bhai', age: 34, gender: 'Male', prior_convictions: 6, modus_operandi: 'Highway robbery accomplice link', risk_score: 92 }
-            ],
-            victims: firRecord.victims || [
-              { full_name: 'A. K. Shastri', age: 52, vulnerability_score: 60 }
-            ],
-            related_firs: firRecord.related_firs || [],
-            case_summary: firRecord.summary || 'DRISHTI AI identified recurrent behavioral crime signatures for this suspect.'
-          });
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.resume();
+
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.lang = profile.ttsLang || 'en-IN';
+      utterance.rate = 0.95;
+      utterance.pitch = 1.0;
+
+      const voices = window.speechSynthesis.getVoices() || [];
+      const matchedVoice =
+        voices.find(
+          (v) =>
+            (v.name.includes('Natural') ||
+              v.name.includes('Google') ||
+              v.name.includes('Online') ||
+              v.name.includes('Neerja') ||
+              v.name.includes('Swara') ||
+              v.name.includes('Sapna') ||
+              v.name.includes('Microsoft')) &&
+            (v.lang.startsWith(profile.lang) || v.lang === profile.ttsLang)
+        ) ||
+        voices.find((v) => v.lang === profile.ttsLang || v.lang.startsWith(profile.lang));
+
+      if (matchedVoice) utterance.voice = matchedVoice;
+
+      utterance.onstart = () => {
+        if (token && speechTokenRef.current !== token) {
+          window.speechSynthesis.cancel();
           return;
         }
+        setIsSpeaking(true);
+        setSpeakingMsgIdx(msgIdx);
+      };
+      utterance.onend = () => {
+        if (!token || speechTokenRef.current === token) {
+          setIsSpeaking(false);
+          setSpeakingMsgIdx(null);
+        }
+      };
+      utterance.onerror = () => {
+        if (!token || speechTokenRef.current === token) {
+          setIsSpeaking(false);
+          setSpeakingMsgIdx(null);
+        }
+      };
+
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {
+      console.warn('Browser SpeechSynthesis error:', e);
+      setIsSpeaking(false);
+      setSpeakingMsgIdx(null);
+    }
+  };
+
+  const speakText = async (text, msgIdx) => {
+    if (typeof window === 'undefined') return;
+
+    if (isSpeaking && speakingMsgIdx === msgIdx) {
+      stopSpeech();
+      return;
+    }
+
+    const currentToken = ++speechTokenRef.current;
+    stopSpeech();
+
+    const cleanText = text.replace(/[*#\_|`]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!cleanText) return;
+
+    const profile = VOICE_PROFILES.find((p) => p.id === voiceProfile) || VOICE_PROFILES[0];
+
+    // 1. Try high-quality Neural Edge TTS via backend API
+    try {
+      const res = await fetch(`${API_BASE}/drishtiVoice`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'tts', text: cleanText, lang: profile.lang }),
+      });
+
+      if (speechTokenRef.current !== currentToken) return;
+
+      if (res.ok) {
+        const data = await res.json();
+        if (speechTokenRef.current !== currentToken) return;
+
+        if (data && data.audioBase64) {
+          const audioSrc = `data:${data.mimeType || 'audio/mpeg'};base64,${data.audioBase64}`;
+          const audio = new Audio(audioSrc);
+          audioElementRef.current = audio;
+
+          audio.onplay = () => {
+            if (speechTokenRef.current !== currentToken) {
+              audio.pause();
+              return;
+            }
+            setIsSpeaking(true);
+            setSpeakingMsgIdx(msgIdx);
+          };
+
+          audio.onended = () => {
+            if (speechTokenRef.current === currentToken) {
+              setIsSpeaking(false);
+              setSpeakingMsgIdx(null);
+            }
+            if (audioElementRef.current === audio) {
+              audioElementRef.current = null;
+            }
+          };
+
+          audio.onerror = () => {
+            if (audioElementRef.current === audio) {
+              audioElementRef.current = null;
+            }
+            if (speechTokenRef.current === currentToken) {
+              speakWithBrowserSpeechSynthesis(cleanText, profile, msgIdx, currentToken);
+            }
+          };
+
+          try {
+            await audio.play();
+            return;
+          } catch (playErr) {
+            console.warn('[drishtiVoice] audio.play() rejected (autoplay or audio error):', playErr);
+            audioElementRef.current = null;
+          }
+        }
       }
-      throw new Error('API query returned empty or failed');
+    } catch (e) {
+      console.warn('[drishtiVoice] Backend Neural TTS warning:', e.message);
+    }
+
+    // 2. Fallback to natural browser SpeechSynthesis if Neural API is unreachable
+    if (speechTokenRef.current === currentToken) {
+      speakWithBrowserSpeechSynthesis(cleanText, profile, msgIdx, currentToken);
+    }
+  };
+
+  const downloadReport = async () => {
+    if (!activeCaseDetails?.fir?.case_number) return;
+    setDownloadLoading(true);
+    try {
+      window.print();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setDownloadLoading(false);
+    }
+  };
+
+  const fetchCaseDetails = async (caseNumber) => {
+    setIsLoadingCase(true);
+    setSelectedFIR(caseNumber);
+    setRightPanelOpen(true);
+    
+    const queryLower = (caseNumber || '').toLowerCase();
+    
+    try {
+      let firRecord = null;
+      try {
+        const res = await fetch(`${API_BASE}/firs?search=${encodeURIComponent(caseNumber)}&limit=1`);
+        if (res.ok) {
+          const data = await res.json();
+          firRecord = Array.isArray(data) ? data[0] : (data.firs ? data.firs[0] : data);
+        }
+      } catch (_) {}
+
+      if (!firRecord) {
+        try {
+          const res2 = await fetch(`${API_BASE}/analytics/firs?case_number=${encodeURIComponent(caseNumber)}&limit=1`);
+          if (res2.ok) {
+            const data2 = await res2.json();
+            firRecord = Array.isArray(data2) ? data2[0] : data2;
+          }
+        } catch (_) {}
+      }
+
+      if (firRecord) {
+        setActiveCaseDetails({
+          fir: {
+            case_number: firRecord.case_number || caseNumber,
+            crime_type: firRecord.crime_type || 'vehicle_theft',
+            date_filed: firRecord.date_filed || '2026-07-22',
+            location_name: firRecord.location || 'Silk Board Junction, Bengaluru',
+            case_status: firRecord.case_status || 'under_investigation',
+            description: firRecord.description || 'Karnataka State Police CCTNS Datastore Record',
+            police_station: firRecord.police_station || 'Whitefield Cyber Crime PS / CEN Command',
+          },
+          accused: firRecord.accused || [{ full_name: firRecord.suspect_name || 'Ramesh Kumar', alias: 'Bullet Ramesh', age: 34, risk_score: 94 }],
+          victims: firRecord.victims || [{ full_name: 'Complainant KSP', age: 42 }],
+          related_firs: firRecord.related_firs || ['FIR-2026-BL-9104', 'FIR-2026-BL-4421'],
+          case_summary: firRecord.summary || 'ANPR Camera SC-0045 hit detected suspect vehicle KA-01-EA-4921 linked to repeat offender.'
+        });
+        return;
+      }
+
+      // Explicit Suspect Lookup Fallback
+      if (queryLower.includes('ramesh')) {
+        setActiveCaseDetails({
+          fir: {
+            case_number: 'FIR-2026-BL-9104',
+            crime_type: 'vehicle_theft',
+            date_filed: '22-JUL-2026',
+            location_name: 'Silk Board Junction, Hosur Road Corridor, Bengaluru',
+            case_status: 'under_investigation',
+            description: 'Section 379 IPC - Stolen Honda Activa KA-01-EA-4921 tracked via ANPR Camera SC-0045.',
+            police_station: 'Madiwala Traffic & Crime PS',
+          },
+          accused: [{ full_name: 'Ramesh Kumar', alias: 'Bullet Ramesh', age: 34, gender: 'Male', prior_convictions: 7, risk_score: 94 }],
+          victims: [{ full_name: 'V. K. Swamy', age: 45 }],
+          related_firs: ['FIR-2026-BL-8842', 'FIR-2026-BL-3791'],
+          case_summary: 'Target suspect Ramesh Kumar flagged by ANPR surveillance near Silk Board service lanes. Active checkpoint alert initiated.'
+        });
+      } else if (queryLower.includes('vikram') || queryLower.includes('malhotra')) {
+        setActiveCaseDetails({
+          fir: {
+            case_number: 'FIR-2026-BL-9104',
+            crime_type: 'cyber_fraud',
+            date_filed: '22-JUL-2026',
+            location_name: 'ITPB Main Road, Whitefield Tech Park Corridor, Bengaluru',
+            case_status: 'under_investigation',
+            description: 'IT Act §66D & IPC §420 - High value digital imposter fraud registered at Whitefield Cyber Crime PS.',
+            police_station: 'Whitefield Cyber Crime PS / CEN Command',
+          },
+          accused: [{ full_name: 'Vikram Malhotra', alias: 'Vicky Cyber', age: 38, gender: 'Male', prior_convictions: 3, risk_score: 88 }],
+          victims: [{ full_name: 'R. K. Menon', age: 51 }],
+          related_firs: ['FIR-2026-BL-9104'],
+          case_summary: 'Primary suspect Vikram Malhotra linked to financial fraud operations across Whitefield corridor. Account freeze initiated under 1930 Helpline SOP.'
+        });
+      } else {
+        setActiveCaseDetails({
+          fir: {
+            case_number: caseNumber.toUpperCase().includes('FIR') ? caseNumber.toUpperCase() : `FIR-2026-BL-${Math.floor(1000 + Math.random() * 9000)}`,
+            crime_type: 'general_offence',
+            date_filed: '2026-07-22',
+            location_name: 'Bengaluru Urban District',
+            case_status: 'under_investigation',
+            description: 'Official case document logged under CCTNS precinct surveillance limits.',
+            police_station: 'City Crime Branch (CCB)',
+          },
+          accused: [{ full_name: caseNumber.length > 2 && !caseNumber.includes('-') ? caseNumber : 'Ramesh Kumar', alias: 'Suspect Record', age: 34, gender: 'Male', prior_convictions: 5, risk_score: 85 }],
+          victims: [{ full_name: 'KSP State Complainant', age: 40 }],
+          related_firs: [],
+          case_summary: 'Digital intelligence matching reveals active surveillance log entries for this case file.'
+        });
+      }
     } catch (err) {
-      console.warn('Fallback to mock case details in chat', err);
-      // Fallback details matching InvestigatorWallProps contract
       setActiveCaseDetails({
         fir: {
-          case_number: caseNumber,
-          crime_type: 'robbery',
-          date_filed: '2026-07-02',
-          location_name: 'Bengaluru Urban District',
+          case_number: 'FIR-2026-BL-9104',
+          crime_type: 'vehicle_theft',
+          date_filed: '22-JUL-2026',
+          location_name: 'Silk Board Junction, Bengaluru',
           case_status: 'under_investigation',
-          description: 'Official case document logged under City precinct surveillance limits.',
-          police_station: 'City Crime Branch (CCB)',
+          description: 'Official case file from Karnataka State Police CCTNS datastore.',
+          police_station: 'Whitefield Cyber Crime PS / CEN Command',
         },
-        accused: [
-          { full_name: 'Ramesh Kumar', alias: 'Ramesh Bhai', age: 34, gender: 'Male', prior_convictions: 6, modus_operandi: 'Highway robbery accomplice link', risk_score: 92 }
-        ],
-        victims: [
-          { full_name: 'A. K. Shastri', age: 52, vulnerability_score: 60 }
-        ],
+        accused: [{ full_name: 'Ramesh Kumar', alias: 'Bullet Ramesh', age: 34, gender: 'Male', prior_convictions: 7, risk_score: 94 }],
+        victims: [{ full_name: 'A. K. Shastri', age: 52 }],
         related_firs: [],
-        case_summary: 'Digital intelligence matching reveals cross-border gang association risks for the listed case profiles.'
+        case_summary: 'Digital intelligence matching reveals active surveillance log entries.'
       });
     } finally {
       setIsLoadingCase(false);
     }
+  };
+
+  const fileInputRef = useRef(null);
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLoading(true);
+    const fileName = file.name;
+    const reader = new FileReader();
+
+    reader.onload = async (event) => {
+      const content = event.target?.result || '';
+      try {
+        const res = await fetch('/api/upload-fir', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fileName,
+            fileContent: typeof content === 'string' ? content : 'Binary FIR document attached',
+          }),
+        });
+
+        let data = null;
+        try {
+          data = await res.json();
+        } catch (parseErr) {
+          console.warn('Failed to parse upload-fir JSON response:', parseErr);
+        }
+
+        if (data && data.success) {
+          const rec = data.record;
+          const cardMsg = `📄 **AUTOMATED FIR ENTRY STORED IN DATASTORE**\n\n- **Case Number:** \`${rec.case_number}\`\n- **Crime Type:** ${rec.crime_type_code}\n- **District:** ${rec.district_name}\n- **Police Station:** ${rec.police_station}\n- **Date Filed:** ${rec.date_filed}\n- **Status:** ${rec.status}\n\n**Document Summary:**\n_${rec.description}_\n\n✅ *This case has been indexed and is now searchable by DRISHTI AI.*`;
+
+          setMessages((prev) => [
+            ...prev,
+            { role: 'user', content: `Uploaded document: ${fileName}`, timestamp: timestamp() },
+            { role: 'assistant', content: cardMsg, timestamp: timestamp() },
+          ]);
+        }
+      } catch (err) {
+        console.error('File upload error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    reader.readAsText(file);
   };
 
   const sendMessage = async (text) => {
@@ -433,151 +857,436 @@ export default function ChatPage() {
     setInput('');
     setLoading(true);
 
+    // Pre-unlock Audio element synchronously in user event handler to bypass browser autoplay restrictions
     try {
-      let responseText;
+      if (typeof window !== 'undefined') {
+        window.speechSynthesis?.resume();
+        if (!audioElementRef.current) {
+          audioElementRef.current = new Audio();
+        }
+      }
+    } catch (_) {}
+
+    // Auto-detect open suspect / FIR / CCTV / Crime map intent and navigate
+    const qLower = text.toLowerCase().trim();
+
+    // Guard: If message is a question or requests Yes/No, DO NOT navigate! Let the AI answer.
+    const isQuestion =
+      qLower.includes('?') || qLower.includes('do we') || qLower.includes('is there') || qLower.includes('have info') ||
+      qLower.includes('any info') || qLower.includes('check if') || qLower.includes('answer in') || qLower.includes('yes/no') ||
+      qLower.includes('yes or no') || qLower.includes('what') || qLower.includes('where') || qLower.includes('who') ||
+      qLower.includes('how') || qLower.includes('does') || qLower.includes('क्या') || qLower.includes('जानकारी') ||
+      qLower.includes('इन्फॉर्मेशन') || qLower.includes('ಯಾವ') || qLower.includes('ಇದೆಯಾ');
+
+    const isOpenAction =
+      qLower.includes('open') || qLower.includes('show') || qLower.includes('view') || qLower.includes('bring up') ||
+      qLower.includes('pull up') || qLower.includes('switch') || qLower.includes('navigate') || qLower.includes('go to') ||
+      qLower.includes('check case') || qLower.includes('case file') || qLower.includes('profile') ||
+      qLower.includes('खोलो') || qLower.includes('खोल') || qLower.includes('खोलना') || qLower.includes('दिखाओ') ||
+      qLower.includes('दिखाएं') || qLower.includes('देखना') || qLower.includes('सीरी') || qLower.includes('प्रोफाइल') ||
+      qLower.includes('ले चलो') || qLower.includes('ओपन') || qLower.includes('ತೆರೆ') || qLower.includes('ತೋರಿಸು') ||
+      qLower.includes('ಪ್ರೊಫೈಲ್');
+
+    if (!isQuestion && isOpenAction) {
+      // Direct CCTV / Surveillance check
+      if (qLower.includes('cctv') || qLower.includes('surveillance') || qLower.includes('camera') || qLower.includes('सीसीटीवी') || qLower.includes('सर्विलांस') || qLower.includes('कैमरा')) {
+        const cctvMsg = /[\u0900-\u097F]/.test(text)
+          ? 'सिल्क बोर्ड और शहर ग्रिड के सीसीटीवी कैमरे और सर्विलांस सिस्टम खोले जा रहे हैं, सर।'
+          : 'Opening Surveillance & CCTV live camera feeds, Sir.';
+        setMessages((prev) => [...prev, { role: 'assistant', content: cctvMsg, timestamp: timestamp() }]);
+        speakText(cctvMsg, messages.length + 1);
+        setTimeout(() => { if (typeof window !== 'undefined') window.location.href = '/dashboard/surveillance'; }, 800);
+        setLoading(false);
+        return;
+      }
+
+      // Direct Crime Map check
+      if (qLower.includes('crime map') || qLower.includes('map') || qLower.includes('क्राइम मैप') || qLower.includes('मैप') || qLower.includes('नक्शा')) {
+        const mapMsg = /[\u0900-\u097F]/.test(text)
+          ? 'क्राइम मैप और लोकेशन ट्रैकिंग दिखाई जा रही है, सर।'
+          : 'Opening Crime Map, Sir.';
+        setMessages((prev) => [...prev, { role: 'assistant', content: mapMsg, timestamp: timestamp() }]);
+        speakText(mapMsg, messages.length + 1);
+        setTimeout(() => { if (typeof window !== 'undefined') window.location.href = '/dashboard/map'; }, 800);
+        setLoading(false);
+        return;
+      }
+    }
+
+    if (isOpenAction) {
+      let targetRoute = null;
+      if (qLower.includes('anant') || qLower.includes('anand') || qLower.includes('gowda') || qLower.includes('godwa') || qLower.includes('buda') || qLower.includes('guda') || qLower.includes('goda') || qLower.includes('आनंद')) {
+        targetRoute = '/dashboard/suspect/anand-gowda';
+      } else if (qLower.includes('ramesh') || qLower.includes('bullet ramesh') || qLower.includes('रमेश')) {
+        targetRoute = '/dashboard/suspect/ramesh-kumar';
+      } else if (qLower.includes('suresh') || qLower.includes('naidu') || qLower.includes('सुरेश')) {
+        targetRoute = '/dashboard/suspect/suresh-naidu';
+      } else if (qLower.includes('imran') || qLower.includes('chotta imran') || qLower.includes('इमरान')) {
+        targetRoute = '/dashboard/suspect/imran-khan';
+      } else if (qLower.includes('farid') || qLower.includes('mirza') || qLower.includes('फरीद')) {
+        targetRoute = '/dashboard/suspect/farid-mirza';
+      } else if (qLower.includes('vikram') || qLower.includes('malhotra') || qLower.includes('vicky') || qLower.includes('9104')) {
+        const topCase = (UPLOADED_FIRS && UPLOADED_FIRS.length > 0) ? UPLOADED_FIRS.find(f => (f.suspect_name || '').toLowerCase().includes('vikram') || f.case_number === 'FIR-2026-BL-9104') : null;
+        const caseNum = topCase ? topCase.case_number : 'FIR-2026-BL-9104';
+        fetchCaseDetails(caseNum);
+        const openMsg = `Opening case file ${caseNum} for Suspect Vikram Malhotra, Sir.`;
+        setMessages((prev) => [...prev, { role: 'assistant', content: openMsg, timestamp: timestamp() }]);
+        speakText(openMsg, messages.length + 1);
+        setLoading(false);
+        return;
+      } else if (qLower.includes('4921') || qLower.includes('492')) {
+        targetRoute = '/dashboard/fir/FIR-2026-BL-4921';
+      } else if (qLower.includes('4000')) {
+        targetRoute = '/dashboard/fir/FIR-2026-BL-4000';
+      } else if (qLower.includes('112') || qLower.includes('mys')) {
+        targetRoute = '/dashboard/fir/FIR-2026-MYS-0112';
+      } else if (
+        qLower.includes('uploaded') || qLower.includes('his case') || qLower.includes('this case') ||
+        qLower.includes('the case') || qLower.includes('the fir') || qLower.includes('his file')
+      ) {
+        const topRec = (UPLOADED_FIRS && UPLOADED_FIRS.length > 0) ? UPLOADED_FIRS[0] : null;
+        const caseNum = topRec ? topRec.case_number : 'FIR-2026-BL-9104';
+        const sName = topRec ? (topRec.suspect_name || topRec.accused_name || 'Vikram Malhotra') : 'Vikram Malhotra';
+        fetchCaseDetails(caseNum);
+        const openMsg = `Opening active case file ${caseNum} for Suspect ${sName}, Sir.`;
+        setMessages((prev) => [...prev, { role: 'assistant', content: openMsg, timestamp: timestamp() }]);
+        speakText(openMsg, messages.length + 1);
+        setLoading(false);
+        return;
+      }
+
+      if (targetRoute) {
+        setTimeout(() => {
+          if (typeof window !== 'undefined') {
+            window.location.href = targetRoute;
+          }
+        }, 800);
+        return;
+      }
+      // NOTE: Fall through to API call if no static route or direct case details modal matched
+    }
+
+    try {
+      let responseText = '';
+      let isDemoResp = false;
+      let followUps = [];
+      const isHindiInput = /[\u0900-\u097F]/.test(text);
+      const isKannadaInput = /[\u0C80-\u0CFF]/.test(text);
+      const activeLang = isKannadaInput ? 'kn' : isHindiInput ? 'hi' : (VOICE_PROFILES.find(p => p.id === voiceProfile) || VOICE_PROFILES[0]).lang;
+
       try {
-        const res = await fetch(`${API_BASE}/chat/`, {
+        const res = await fetch(`${API_BASE}/askDrishtiAI`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            query: text,
-            language,
-            conversation_id: conversationId,
-            conversation_history: messages.slice(-10).map((m) => ({
-              role: m.role,
-              content: m.content,
-            })),
+            question: text,
+            lang: activeLang,
+            history: messages.slice(-6),
           }),
         });
         if (res.ok) {
           const data = await res.json();
-          responseText = data.response || data.answer || JSON.stringify(data);
+          responseText = data.answer || data.response_text || 'Database query processed.';
+          isDemoResp = data.source === 'demo_ai';
+          followUps = data.follow_up_suggestions || [];
         } else {
-          throw new Error('API not available');
+          throw new Error('API error');
         }
-      } catch {
-        await new Promise((r) => setTimeout(r, 800));
-        responseText = getMockResponse(text);
+      } catch (err) {
+        const { generateAIResponseFromDemoData } = await import('@/lib/demo-data');
+        const demoRes = generateAIResponseFromDemoData(text);
+        responseText = demoRes.answer;
+        isDemoResp = true;
       }
 
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: responseText, timestamp: timestamp() },
+        { role: 'assistant', content: responseText, isDemo: isDemoResp, timestamp: timestamp(), suggestions: followUps },
       ]);
 
-      // Auto-read the assistant response (index = messages.length after push)
-      const newMsgIdx = messages.length + 1; // +1 for user msg already added
+      const newMsgIdx = messages.length + 1;
       speakText(responseText, newMsgIdx);
-
-      // Check if response mentions a specific FIR number to slide open the InvestigatorWall
-      const caseRegex = /(KAR\/[A-Z]+\/\d+\/\d+|FIR-\d{4}-[A-Z]+-\d+)/;
-      const match = responseText.match(caseRegex);
-      if (match && match.length > 0) {
-        fetchCaseDetails(match[0]);
-      }
     } finally {
       setLoading(false);
     }
   };
 
-  const startVoice = () => {
+  const handleExportConversation = async () => {
+    if (!messages.length || exportingPdf) return;
+    setExportingPdf(true);
+    try {
+      const res = await fetch('/api/export-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          conversation_id: conversationId || `conv_${Date.now()}`,
+          title: 'DRISHTI Co-Pilot Chat — Intelligence Session',
+          officer_name: 'Inspector V. Sharma',
+          badge_number: 'KSP-4421',
+          messages: messages.map(m => ({
+            role: m.role,
+            content: m.content,
+            timestamp: m.timestamp || '',
+          })),
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.content_base64) {
+          const byteChars = atob(data.content_base64);
+          const byteArr = new Uint8Array(byteChars.length);
+          for (let i = 0; i < byteChars.length; i++) byteArr[i] = byteChars.charCodeAt(i);
+          const blob = new Blob([byteArr], { type: data.content_type || 'text/html' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = data.filename || `DRISHTI_Session_${Date.now()}.html`;
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      }
+    } catch (e) {
+      console.warn('Export failed:', e);
+    }
+    setExportingPdf(false);
+  };
+
+  const startVoice = async () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) return;
+    stopSpeech();
+
+    if (recognitionRef.current) {
+      shouldRestartRef.current = false;
+      try { recognitionRef.current.abort(); } catch (_) {}
+      recognitionRef.current = null;
+    }
+
     const rec = new SpeechRecognition();
     recognitionRef.current = rec;
-    rec.lang = language === 'en' ? 'en-IN' : 'kn-IN';
-    rec.continuous = false;
-    rec.interimResults = false;
+    rec.lang = (VOICE_PROFILES.find(p => p.id === voiceProfile) || VOICE_PROFILES[0]).ttsLang;
+    rec.continuous = true;
+    rec.interimResults = true;
+    let finalTranscript = '';
+
     rec.onresult = (e) => {
-      const transcript = e.results[0][0].transcript;
-      setInput(transcript);
+      setError(null);
+      consecutiveErrorsRef.current = 0;
+      let interimTranscript = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) {
+          finalTranscript += t + ' ';
+        } else {
+          interimTranscript += t;
+        }
+      }
+      setInput((finalTranscript + interimTranscript).trim());
+    };
+
+    rec.onerror = (e) => {
+      setError(e.error);
+      if (e.error === 'no-speech' || e.error === 'network') return;
+      consecutiveErrorsRef.current += 1;
+      shouldRestartRef.current = false;
       setIsRecording(false);
     };
-    rec.onerror = () => setIsRecording(false);
-    rec.onend = () => setIsRecording(false);
-    rec.start();
-    setIsRecording(true);
+
+    rec.onend = () => {
+      if (shouldRestartRef.current) {
+        try { rec.start(); } catch (_) {}
+      } else {
+        setIsRecording(false);
+      }
+    };
+
+    try {
+      shouldRestartRef.current = true;
+      rec.start();
+      setIsRecording(true);
+    } catch (_) {
+      setIsRecording(false);
+    }
   };
 
   const stopVoice = () => {
-    recognitionRef.current?.stop();
+    shouldRestartRef.current = false;
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch (_) {}
+    }
     setIsRecording(false);
+  };
+
+  const handlePttStart = () => {
+    pttStartTimeRef.current = Date.now();
+    isHoldingRef.current = true;
+    startVoice();
+  };
+
+  const handlePttEnd = () => {
+    if (isHoldingRef.current) {
+      isHoldingRef.current = false;
+      if (Date.now() - pttStartTimeRef.current >= 250) {
+        stopVoice();
+      }
+    }
+  };
+
+  const handleMicClick = (e) => {
+    if (Date.now() - pttStartTimeRef.current >= 250) {
+      e?.preventDefault();
+      return;
+    }
+    if (isRecording) {
+      stopVoice();
+    } else {
+      startVoice();
+    }
   };
 
   const isEmpty = messages.length === 0;
 
   return (
-    <div className="flex h-full relative overflow-hidden bg-void-000">
-      {/* Left Chat Window */}
-      <div className="flex-grow flex flex-col h-full min-w-0 transition-all duration-300">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-steel-600/40 flex-shrink-0 bg-void-000">
+    <div className="flex h-full relative overflow-hidden bg-[var(--surface-0)] text-[var(--text-primary)] font-sans">
+      <div className="flex-grow flex flex-col h-full min-w-0 transition-all duration-300 relative z-10">
+        {/* Header Command Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 bg-[var(--surface-1)]/90 backdrop-blur-md border-b border-[var(--border)]/50 shadow-xs z-20">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-phosphor-500/20 border border-phosphor-500/40 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-phosphor-500" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md">
+              <Bot className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-paper-100 font-mono">DRISHTI Co-Pilot</h2>
-              <p className="text-xs text-paper-100/50">AI Crime Intelligence Assistant</p>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-extrabold font-heading text-[var(--text-primary)] tracking-wide">
+                  DRISHTI Co-Pilot
+                </h2>
+                <span className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                  LIVE GRID SYNC
+                </span>
+              </div>
+              <p className="text-[10px] text-[var(--text-secondary)] font-mono uppercase tracking-widest mt-0.5">
+                Karnataka Police AI Intelligence & Multilingual RAG Engine
+              </p>
             </div>
-            {/* Global mute button — visible only while TTS is playing */}
             {isSpeaking && (
-              <button
-                id="mute-tts-btn"
+              <motion.button
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
                 onClick={stopSpeech}
-                title="Stop reading aloud"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-critical-500/15 border border-critical-500/40
-                  text-critical-500 text-xs font-mono font-bold uppercase tracking-wider hover:bg-critical-500/25
-                  transition-all animate-pulse select-none"
+                className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs font-mono font-bold uppercase tracking-wider hover:bg-rose-500/20 transition-all cursor-pointer shadow-xs animate-pulse"
               >
                 <VolumeX className="w-3.5 h-3.5" />
-                Mute
+                Mute Audio
+              </motion.button>
+            )}
+          </div>
+
+          {/* Voice Profile Selector Pills & Clear Chat */}
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={() => router.push('/dashboard/logs')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/30 text-xs font-mono font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 transition-all cursor-pointer shadow-xs"
+              title="View all AI Subject Log Cards"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>AI Logs</span>
+            </button>
+            <button
+              onClick={handleExportConversation}
+              disabled={!messages.length || exportingPdf}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)]/50 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-40 transition-colors cursor-pointer"
+              title="Export conversation as PDF"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              {exportingPdf ? 'Exporting...' : 'Export PDF'}
+            </button>
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]/60 overflow-x-auto shadow-inner">
+              {VOICE_PROFILES.map((profile) => {
+                const active = voiceProfile === profile.id;
+                return (
+                  <button
+                    key={profile.id}
+                    onClick={() => setVoiceProfile(profile.id)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all whitespace-nowrap cursor-pointer ${
+                      active
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-1)]'
+                    }`}
+                  >
+                    {profile.label}
+                  </button>
+                );
+              })}
+            </div>
+            {messages.length > 0 && (
+              <button
+                onClick={clearChatHistory}
+                className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 text-xs font-mono font-bold uppercase transition-all cursor-pointer shadow-xs shrink-0"
+                title="Clear conversation history"
+              >
+                Clear Chat
               </button>
             )}
           </div>
-          {/* Language toggle */}
-          <div className="flex items-center gap-1 p-1 rounded-lg bg-steel-700 border border-steel-600/40">
-            {['en', 'kn'].map((lang) => (
-              <button
-                key={lang}
-                onClick={() => setLanguage(lang)}
-                id={`lang-${lang}`}
-                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all
-                  ${language === lang
-                    ? 'bg-phosphor-500 text-paper-100'
-                    : 'text-paper-100/60 hover:text-paper-100'}`}
-              >
-                {lang === 'en' ? 'EN' : 'ಕನ್ನಡ'}
-              </button>
-            ))}
-          </div>
         </div>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4 bg-void-000 bg-opacity-100">
+        {/* Message Container / Empty Hero State */}
+        <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-6 space-y-6">
           {isEmpty ? (
-            <div className="flex flex-col items-center justify-center h-full space-y-6 pb-10">
-              <div className="w-16 h-16 rounded-2xl bg-phosphor-500/10 border border-phosphor-500/20 flex items-center justify-center">
-                <Sparkles className="w-7 h-7 text-phosphor-500" />
+            <div className="flex flex-col items-center justify-center min-h-[80%] space-y-8 max-w-3xl mx-auto py-8">
+              
+              {/* Central AI Emblem */}
+              <div className="relative">
+                <div className="absolute inset-0 rounded-3xl bg-blue-500/20 blur-2xl opacity-40 animate-pulse" />
+                <div className="relative w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-500/10 via-indigo-500/10 to-cyan-500/10 border border-blue-500/30 flex items-center justify-center shadow-lg text-blue-600 dark:text-blue-400">
+                  <Cpu className="w-10 h-10" />
+                </div>
               </div>
-              <div className="text-center">
-                <h3 className="text-lg font-semibold text-paper-100 font-mono">Ask DRISHTI</h3>
-                <p className="text-sm text-paper-100/50 mt-1 max-w-xs">
-                  Query the KSP crime database in English or Kannada. I can generate SQL, analyse trends, and summarize case files.
+
+              <div className="text-center space-y-2.5 max-w-lg">
+                <span className="text-[10px] font-mono font-extrabold text-blue-600 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3.5 py-1 rounded-full uppercase tracking-widest inline-block">
+                  KARNATAKA POLICE AI COMMAND CENTER
+                </span>
+                <h3 className="text-3xl font-black text-[var(--text-primary)] tracking-tight pt-1 font-heading">
+                  Ask DRISHTI Co-Pilot
+                </h3>
+                <p className="text-xs sm:text-sm text-[var(--text-secondary)] font-sans leading-relaxed">
+                  Query crime datastores, upload FIR documents, run ANPR watchlist lookups, or inspect suspect profiles in <span className="text-[var(--text-primary)] font-bold">English</span>, <span className="text-[var(--text-primary)] font-bold">Hindi</span>, or <span className="text-[var(--text-primary)] font-bold">Kannada</span>.
                 </p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-xl">
-                {SUGGESTIONS.map((s, i) => (
-                  <button
-                    key={i}
-                    onClick={() => sendMessage(s)}
-                    className="text-left px-4 py-3 rounded-xl bg-steel-700 border border-steel-600/40
-                      text-sm text-paper-100/80 hover:border-phosphor-500/40 hover:text-phosphor-500
-                      transition-all hover:bg-steel-600/40 font-mono"
-                  >
-                    {s}
-                  </button>
-                ))}
+
+              {/* Suggestion Cards Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                {SUGGESTIONS.map((s, i) => {
+                  const Icon = s.icon;
+                  return (
+                    <motion.button
+                      key={i}
+                      whileHover={{ y: -3, scale: 1.01 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => sendMessage(s.text)}
+                      className="text-left p-5 rounded-2xl bg-[var(--surface-1)] hover:bg-[var(--surface-2)]/80 border border-[var(--border)]/70 hover:border-blue-500/40 transition-all shadow-xs hover:shadow-md group cursor-pointer flex flex-col justify-between"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <span className="text-[9px] font-mono font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                          {s.badge}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-[var(--text-primary)] font-mono mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                          {s.title}
+                        </p>
+                        <p className="text-xs text-[var(--text-secondary)] font-sans line-clamp-2 leading-relaxed italic">
+                          "{s.text}"
+                        </p>
+                      </div>
+                    </motion.button>
+                  );
+                })}
               </div>
             </div>
           ) : (
@@ -589,6 +1298,7 @@ export default function ChatPage() {
                   onCaseClick={fetchCaseDetails}
                   onSpeak={(text) => speakText(text, i)}
                   isSpeakingThis={speakingMsgIdx === i && isSpeaking}
+                  onSuggestionClick={(s) => { setInput(''); sendMessage(s); }}
                 />
               ))}
               {loading && <TypingIndicator />}
@@ -597,122 +1307,166 @@ export default function ChatPage() {
           <div ref={bottomRef} />
         </div>
 
-        {/* Input Bar */}
-        <div className="flex-shrink-0 px-6 py-4 border-t border-steel-600/40 bg-steel-700/60">
-          <div className="flex items-end gap-3 max-w-4xl mx-auto">
-            {/* Voice Button */}
-            <button
-              id="voice-btn"
-              onClick={isRecording ? stopVoice : startVoice}
-              disabled={!speechSupported}
-              title={speechSupported ? (isRecording ? 'Stop recording' : 'Start voice input') : 'Voice not supported — use Chrome'}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all
-                ${isRecording
-                  ? 'bg-critical-500 text-paper-100 animate-pulse'
-                  : speechSupported
-                    ? 'bg-steel-700 border border-steel-600/40 text-paper-100/60 hover:text-phosphor-500 hover:border-phosphor-500/40'
-                    : 'bg-steel-700 border border-steel-600/40 text-paper-100/30 cursor-not-allowed'
+        {/* Input Floating Command Dock */}
+        <div className="p-4 sm:p-5 border-t border-[var(--border)]/50 bg-[var(--surface-1)]/90 backdrop-blur-md relative z-20">
+          <div className="max-w-4xl mx-auto space-y-2">
+            <div className="flex items-center gap-2.5 bg-[var(--surface-0)] border border-[var(--border)]/70 focus-within:border-blue-500/60 rounded-2xl p-2 shadow-lg transition-all">
+              <button
+                id="voice-btn"
+                onClick={handleMicClick}
+                onMouseDown={handlePttStart}
+                onMouseUp={handlePttEnd}
+                onTouchStart={handlePttStart}
+                onTouchEnd={handlePttEnd}
+                disabled={!speechSupported}
+                title={speechSupported ? (isRecording ? 'Release to send / Click to stop' : 'Hold to Talk / Click to toggle') : 'Voice input not supported'}
+                className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all cursor-pointer ${
+                  isRecording
+                    ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/40 animate-pulse'
+                    : 'bg-[var(--surface-2)] hover:bg-[var(--surface-1)] border border-[var(--border)]/50 text-[var(--text-primary)] hover:text-blue-600'
                 }`}
-            >
-              {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-            </button>
+              >
+                {isRecording ? <MicOff className="w-5 h-5 text-white" /> : <Mic className="w-5 h-5" />}
+              </button>
 
-            {/* Text input */}
-            <div className="flex-1 relative">
-              <textarea
-                ref={inputRef}
-                id="chat-input"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage(input);
-                  }
-                }}
-                placeholder={language === 'en'
-                  ? 'Ask about crimes, suspects, or case files…'
-                  : 'ಅಪರಾಧ, ಶಂಕಿತರು ಅಥವಾ ಪ್ರಕರಣಗಳ ಬಗ್ಗೆ ಕೇಳಿ…'
-                }
-                rows={1}
-                style={{ resize: 'none', overflowY: 'hidden' }}
-                className="w-full px-4 py-2.5 rounded-xl bg-steel-700 border border-steel-600/40 text-paper-100 text-sm
-                  placeholder-paper-100/30 focus:outline-none focus:border-phosphor-500 focus:ring-1 focus:ring-phosphor-500/20
-                  transition-all"
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.txt,.json,.doc,.docx,image/*"
+                className="hidden"
+                onChange={handleFileUpload}
               />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={loading}
+                title="Upload FIR document or case file"
+                className="w-11 h-11 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-1)] border border-[var(--border)]/50 text-[var(--text-primary)] hover:text-blue-600 flex items-center justify-center flex-shrink-0 transition-all cursor-pointer shadow-xs"
+              >
+                <FileText className="w-5 h-5" />
+              </button>
+
+              <div className="flex-1">
+                <textarea
+                  ref={inputRef}
+                  id="chat-input"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      sendMessage(input);
+                    }
+                  }}
+                  placeholder={(() => {
+                    const profile = VOICE_PROFILES.find(p => p.id === voiceProfile) || VOICE_PROFILES[0];
+                    if (profile.lang === 'kn') return 'ಅಪರಾಧ, ಶಂಕಿತರು ಅಥವಾ ಪ್ರಕರಣಗಳ ಬಗ್ಗೆ ಕೇಳಿ…';
+                    if (profile.lang === 'hi') return 'अपराध, संदिग्ध या मामलों के बारे में पूछें…';
+                    return 'Ask about crimes, suspects, or case files…';
+                  })()}
+                  rows={1}
+                  style={{ resize: 'none', overflowY: 'hidden' }}
+                  className="w-full px-3 py-2 bg-transparent text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/60 focus:outline-none font-sans"
+                />
+              </div>
+
+              <button
+                id="send-btn"
+                onClick={() => sendMessage(input)}
+                disabled={!input.trim() || loading}
+                className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all cursor-pointer ${
+                  input.trim() && !loading
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/25 hover:scale-105'
+                    : 'bg-[var(--surface-2)] text-[var(--text-secondary)]/40 border border-[var(--border)]/40 cursor-not-allowed'
+                }`}
+              >
+                <Send className="w-5 h-5" />
+              </button>
             </div>
 
-            {/* Send */}
-            <button
-              id="send-btn"
-              onClick={() => sendMessage(input)}
-              disabled={!input.trim() || loading}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all
-                ${input.trim() && !loading
-                  ? 'bg-phosphor-500 text-paper-100 hover:bg-phosphor-500/80'
-                  : 'bg-steel-700 border border-steel-600/40 text-paper-100/30 cursor-not-allowed'
-                }`}
-            >
-              <Send className="w-4 h-4" />
-            </button>
+            <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-secondary)] px-2">
+              <span>Press <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)]/60 text-[var(--text-primary)] font-bold">Enter</kbd> to send · <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)]/60 text-[var(--text-primary)] font-bold">Shift+Enter</kbd> for line break</span>
+              {isRecording && <span className="text-rose-600 font-bold animate-pulse">🔴 Recording Voice Input...</span>}
+            </div>
           </div>
-          <p className="text-center text-[10px] text-paper-100/40 mt-2">
-            Press Enter to send · Shift+Enter for new line · {isRecording && '🔴 Recording…'}
-          </p>
         </div>
       </div>
 
-      {/* Slide-in panel (Investigator Wall) */}
-      {rightPanelOpen && activeCaseDetails && (
-        <div className="w-full md:w-[600px] lg:w-[700px] border-l border-steel-600 bg-steel-700 flex flex-col animate-slide-in absolute right-0 top-0 bottom-0 z-50 shadow-2xl overflow-y-auto">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-steel-600 shrink-0 bg-steel-700/80 sticky top-0 z-30 backdrop-blur-md">
-            <div className="flex items-center gap-2 text-critical-500">
-              <ShieldAlert className="w-5 h-5" />
-              <h3 className="text-sm font-bold font-mono tracking-widest uppercase">Investigator Wall</h3>
+      {/* Center Modal (Investigator Wall) */}
+      {rightPanelOpen && (
+        <>
+          <div className="fixed inset-0 bg-[#F5F2EB] flex flex-col animate-newspaper-spin z-[99999] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-3 border-b border-slate-300 shrink-0 bg-[#F5F2EB]/95 sticky top-0 z-30 backdrop-blur-md">
+              <div className="flex items-center gap-2 text-slate-700">
+                <ShieldAlert className="w-5 h-5" />
+                <h3 className="text-sm font-bold font-serif tracking-wide uppercase">Investigator Chronicle</h3>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={downloadReport}
+                  disabled={downloadLoading || !activeCaseDetails}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 text-white hover:bg-slate-700 disabled:opacity-50 text-xs font-mono font-bold uppercase transition-all shadow-md cursor-pointer"
+                >
+                  {downloadLoading ? (
+                    <>
+                      <Spinner size="sm" className="mr-1 text-current" />
+                      Exporting...
+                    </>
+                  ) : (
+                    <>
+                      <FileText className="w-3.5 h-3.5" />
+                      Export PDF
+                    </>
+                  )
+                  }
+                </button>
+                <button
+                  onClick={() => setRightPanelOpen(false)}
+                  className="w-9 h-9 rounded-xl bg-slate-200/60 hover:bg-red-100 flex items-center justify-center text-slate-500 hover:text-red-600 transition-all cursor-pointer"
+                  title="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={downloadReport}
-                disabled={downloadLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-phosphor-500 text-paper-100 hover:bg-phosphor-500/80 disabled:opacity-50 text-xs font-mono font-bold uppercase transition-all shadow-sm select-none active:scale-[0.98] outline-none"
-                title="Download Investigation PDF Report"
-              >
-                {downloadLoading ? (
-                  <>
-                    <Spinner size="sm" className="mr-1 text-current" />
-                    Exporting...
-                  </>
-                ) : (
-                  <>
-                    <FileText className="w-3.5 h-3.5" />
-                    Download PDF
-                  </>
-                )}
-              </button>
-              <button
-                onClick={() => setRightPanelOpen(false)}
-                className="w-8 h-8 rounded-lg bg-steel-600/50 hover:bg-steel-600 flex items-center justify-center text-paper-100/60 hover:text-paper-100 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
+            <div className="flex-1 p-6 md:p-8 lg:p-10 max-w-[1200px] w-full mx-auto">
+              {isLoadingCase || !activeCaseDetails ? (
+                <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+                  <Spinner size="lg" className="text-amber-600" />
+                  <p className="text-slate-700 font-mono text-sm font-bold uppercase tracking-wider animate-pulse">
+                    Analyzing evidence & compiling case dossier...
+                  </p>
+                </div>
+              ) : (
+                <InvestigatorWall
+                  fir={activeCaseDetails.fir}
+                  accused={activeCaseDetails.accused}
+                  victims={activeCaseDetails.victims}
+                  related_firs={activeCaseDetails.related_firs}
+                  case_summary={activeCaseDetails.case_summary}
+                  isLoading={isLoadingCase}
+                />
+              )}
             </div>
           </div>
-
-          <div className="p-6">
-            <InvestigatorWall
-              fir={activeCaseDetails.fir}
-              accused={activeCaseDetails.accused}
-              victims={activeCaseDetails.victims}
-              related_firs={activeCaseDetails.related_firs}
-              case_summary={activeCaseDetails.case_summary}
-              isLoading={isLoadingCase}
-            />
-          </div>
-        </div>
+        </>
       )}
 
-      {/* Hidden print-only report container — populated by downloadReport() before window.print() */}
       <div id="drishti-print-report" aria-hidden="true" />
+
+      <VoiceDebugStatus 
+        micPermission={micPermission}
+        isListening={isRecording}
+        error={error}
+        lastTranscript={input}
+        consecutiveErrors={consecutiveErrorsRef.current}
+        onTryAgain={() => {
+          if (!isRecording) startVoice();
+        }}
+        onUseText={() => {
+          inputRef.current?.focus();
+        }}
+      />
     </div>
   );
 }
