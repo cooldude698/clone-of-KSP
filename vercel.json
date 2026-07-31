@@ -2,6 +2,6 @@
   "version": 2,
   "buildCommand": "cd nextjs && npm install --legacy-peer-deps && npm run build",
   "outputDirectory": "nextjs/.next",
-  "installCommand": "npm install --legacy-peer-deps",
-  "framework": "nextjs"
+  "installCommand": "cd nextjs && npm install --legacy-peer-deps",
+  "framework": null
 }
