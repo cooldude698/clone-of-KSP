@@ -1,11 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   ArrowLeft, User, Shield, ChevronRight, AlertTriangle,
   FileText, MapPin, Phone, Clock, Activity, Eye,
-  TrendingUp, Zap, Network, CheckCircle, XCircle, AlertCircle
+  TrendingUp, Zap, Network, CheckCircle, XCircle, AlertCircle,
+  Mail, Bell, RefreshCw, Sparkles, CheckCircle2, Send
 } from 'lucide-react';
 import { DEMO_REPEAT_OFFENDERS, DEMO_FIRS, DEMO_TRAIL } from '@/lib/demo-data';
 
@@ -71,7 +73,6 @@ export default function SuspectProfilePage() {
   // Find suspect in demo data or default
   const suspectsList = DEMO_REPEAT_OFFENDERS?.suspects || [];
   
-  // Tier 1: Strict exact ID, exact slug, or exact full name match
   let suspect = suspectsList.find((s) => {
     if (!s || !s.name) return false;
     const sSlug = nameToSlug(s.name);
@@ -84,7 +85,6 @@ export default function SuspectProfilePage() {
     );
   });
 
-  // Tier 2: Match both first and last name if query has 2 words (e.g. "vikram-reddy")
   if (!suspect) {
     suspect = suspectsList.find((s) => {
       if (!s || !s.name) return false;
@@ -100,17 +100,6 @@ export default function SuspectProfilePage() {
     });
   }
 
-  // Tier 3: Match first name token if query is a single word
-  if (!suspect) {
-    suspect = suspectsList.find((s) => {
-      if (!s || !s.name) return false;
-      const sNameLower = s.name.toLowerCase();
-      const querySlugLower = slug.toLowerCase();
-      return querySlugLower.includes(sNameLower.split(' ')[0]);
-    });
-  }
-
-  // Tier 4: Dynamically construct suspect object matching the exact requested name from the URL slug
   if (!suspect) {
     const displayName = slugToName(slug);
     const firsList = DEMO_FIRS?.firs || [];
@@ -137,33 +126,135 @@ export default function SuspectProfilePage() {
     };
   }
 
-  // Get their FIRs
-  const firsList = DEMO_FIRS?.firs || [];
-  const suspectFirs = firsList.filter(
-    (f) => f && suspect?.associated_firs?.includes(f.case_number)
-  );
+  // ── Catalyst Interactive States ──────────────────────────────────────────
+  const [currentRiskScore, setCurrentRiskScore] = useState(suspect.risk_score || 85);
+  const [quickMlData, setQuickMlData] = useState(null);
+  const [isScoring, setIsScoring] = useState(false);
 
-  const risk = getRiskLevel(suspect?.risk_score || 85);
+  const [automlData, setAutomlData] = useState(null);
+  const [isAutoMlLoading, setIsAutoMlLoading] = useState(false);
+
+  const [mailSent, setMailSent] = useState(false);
+  const [mailLoading, setMailLoading] = useState(false);
+
+  const [pushSent, setPushSent] = useState(false);
+  const [pushLoading, setPushLoading] = useState(false);
+
+  // 1. Re-Score with QuickML (Cap #12)
+  const handleQuickMlScoring = async () => {
+    setIsScoring(true);
+    try {
+      const res = await fetch('/server/ml-risk-score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accused_name: suspect.name,
+          fir_count: suspect.associated_firs?.length || 4,
+          prior_convictions: 2,
+          crime_types: ['theft', 'robbery'],
+          district_name: suspect.district_name || 'Bengaluru Urban'
+        })
+      });
+      const data = await res.json();
+      if (data.risk_score) {
+        setCurrentRiskScore(data.risk_score);
+        setQuickMlData(data);
+      }
+    } catch (e) {
+      alert('QuickML scoring failed: ' + e.message);
+    } finally {
+      setIsScoring(false);
+    }
+  };
+
+  // 2. Predict with Zia AutoML (Cap #13)
+  const handleAutoMlPredict = async () => {
+    setIsAutoMlLoading(true);
+    try {
+      const res = await fetch('/server/zia-automl-predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          features: {
+            fir_count: suspect.associated_firs?.length || 4,
+            crime_type_code: 'THEFT',
+            district_name: suspect.district_name || 'Bengaluru Urban',
+            hour_of_crime: 22
+          }
+        })
+      });
+      const data = await res.json();
+      setAutomlData(data);
+    } catch (e) {
+      alert('Zia AutoML predict failed: ' + e.message);
+    } finally {
+      setIsAutoMlLoading(false);
+    }
+  };
+
+  // 3. Dispatch Red Alert Mail (Cap #24)
+  const handleSendMailAlert = async () => {
+    setMailLoading(true);
+    try {
+      const res = await fetch('/server/send-alert-mail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to_email: 'inspector.koramangala@ksp.gov.in',
+          officer_name: 'Inspector Anand Rao',
+          case_number: suspect.associated_firs?.[0] || 'KAR/2026/URGENT',
+          accused_name: `${suspect.name} (${suspect.alias || 'Alias'})`,
+          risk_score: currentRiskScore
+        })
+      });
+      const data = await res.json();
+      if (data.sent) setMailSent(true);
+    } catch (e) {
+      alert('Mail dispatch failed: ' + e.message);
+    } finally {
+      setMailLoading(false);
+    }
+  };
+
+  // 4. Send Push Notification to Patrol (Cap #25)
+  const handleSendPush = async () => {
+    setPushLoading(true);
+    try {
+      const res = await fetch('/server/push-notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: 'PATROL_INTERCEPT_BLR_09',
+          title: `🚨 RED ALERT: ${suspect.name}`,
+          message: `Suspect flagged with ${currentRiskScore}% recidivism risk. High priority intercept required.`
+        })
+      });
+      const data = await res.json();
+      if (data.delivered) setPushSent(true);
+    } catch (e) {
+      alert('Push notification failed: ' + e.message);
+    } finally {
+      setPushLoading(false);
+    }
+  };
+
+  const risk = getRiskLevel(currentRiskScore);
   const status = getStatusBadge(suspect?.status || 'ACTIVE_WATCHLIST');
   const StatusIcon = status.icon;
 
   return (
     <div className="min-h-full bg-void-000 flex flex-col">
-
       {/* ── Page Header ── */}
       <div className="px-6 py-4 border-b border-steel-600/40 bg-steel-700/40 backdrop-blur-sm flex-shrink-0">
-        {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-xs text-paper-100/40 mb-3">
           <Link href="/dashboard" className="hover:text-paper-100 transition-colors">Dashboard</Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/dashboard/network" className="hover:text-paper-100 transition-colors">Network Graph</Link>
+          <Link href="/dashboard/suspect" className="hover:text-paper-100 transition-colors">Suspect Roster</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-paper-100/70">{suspect.name}</span>
         </nav>
 
-        {/* Suspect identity bar */}
         <div className="flex items-center gap-4 flex-wrap">
-          {/* Avatar */}
           <div className={`w-14 h-14 rounded-2xl ${risk.bg} border ${risk.border} flex items-center justify-center flex-shrink-0`}>
             <User className={`w-7 h-7 ${risk.color}`} />
           </div>
@@ -171,14 +262,12 @@ export default function SuspectProfilePage() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 flex-wrap">
               <h1 className="text-xl font-bold text-paper-100">{suspect.name}</h1>
-              {/* Alias */}
               {suspect.alias && (
-                <span className="text-xs text-paper-100/50 font-mono">alias "{suspect.alias}"</span>
+                <span className="text-xs text-paper-100/50 font-mono">alias &quot;{suspect.alias}&quot;</span>
               )}
             </div>
             <div className="flex items-center gap-3 mt-1 flex-wrap">
               <span className="font-mono text-xs text-paper-100/40">{suspect.suspect_id}</span>
-              {/* Status badge */}
               <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest border ${status.color} ${status.bg} ${status.border}`}>
                 <StatusIcon className="w-3 h-3" />
                 {status.label}
@@ -186,11 +275,22 @@ export default function SuspectProfilePage() {
             </div>
           </div>
 
-          {/* Risk score */}
-          <div className={`flex-shrink-0 flex flex-col items-center px-5 py-3 rounded-2xl border ${risk.bg} ${risk.border}`}>
-            <span className={`text-2xl font-bold font-mono ${risk.color}`}>{suspect.risk_score}</span>
-            <span className="text-[9px] uppercase tracking-widest text-paper-100/40 mt-0.5">Risk Score</span>
-            <span className={`text-[9px] font-bold uppercase tracking-wider mt-1 ${risk.color}`}>{risk.label}</span>
+          {/* Risk score & QuickML Re-Score Button */}
+          <div className="flex items-center gap-3">
+            <div className={`flex-shrink-0 flex flex-col items-center px-5 py-3 rounded-2xl border ${risk.bg} ${risk.border}`}>
+              <span className={`text-2xl font-bold font-mono ${risk.color}`}>{currentRiskScore}</span>
+              <span className="text-[9px] uppercase tracking-widest text-paper-100/40 mt-0.5">Risk Score</span>
+              <span className={`text-[9px] font-bold uppercase tracking-wider mt-1 ${risk.color}`}>{risk.label}</span>
+            </div>
+
+            <button
+              onClick={handleQuickMlScoring}
+              disabled={isScoring}
+              className="px-3.5 py-2.5 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-bold shadow-lg transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              <Sparkles className="w-3.5 h-3.5 fill-current" />
+              {isScoring ? 'Scoring with QuickML...' : 'Re-Score via QuickML'}
+            </button>
           </div>
         </div>
       </div>
@@ -201,6 +301,32 @@ export default function SuspectProfilePage() {
 
           {/* ── LEFT COL: Intelligence Cards ── */}
           <div className="md:col-span-2 space-y-5">
+
+            {/* QuickML & Zia AutoML Real-Time Intelligence Card */}
+            {(quickMlData || automlData) && (
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3 font-mono text-xs text-slate-200">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                  <span className="text-amber-400 font-bold flex items-center gap-1.5">
+                    <Zap className="w-4 h-4" /> Catalyst AI Model Evaluation
+                  </span>
+                  <span className="text-[10px] text-slate-400">QuickML & Zia AutoML Native</span>
+                </div>
+
+                {quickMlData && (
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-slate-400">QuickML Recidivism Pipeline:</span>
+                    <span className="text-emerald-400 font-bold">{quickMlData.risk_score}% Risk (Confidence: {(quickMlData.confidence * 100).toFixed(0)}%)</span>
+                  </div>
+                )}
+
+                {automlData && (
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-slate-400">Zia AutoML Escalation Prediction:</span>
+                    <span className="text-rose-400 font-bold">{automlData.prediction} (Prob: {(automlData.probability * 100).toFixed(0)}%)</span>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Modus Operandi */}
             <div className="glass-card rounded-2xl p-5">
@@ -258,9 +384,6 @@ export default function SuspectProfilePage() {
                     </Link>
                   );
                 })}
-                {(!suspect.associated_firs || suspect.associated_firs.length === 0) && (
-                  <p className="text-xs text-paper-100/40 py-4 text-center">No FIRs on record</p>
-                )}
               </div>
             </div>
 
@@ -273,12 +396,10 @@ export default function SuspectProfilePage() {
                 <h2 className="font-semibold text-paper-100 text-sm tracking-wide">Intelligence Timeline</h2>
               </div>
               <div className="relative">
-                {/* Vertical line */}
                 <div className="absolute left-3.5 top-0 bottom-0 w-px bg-steel-600/40" />
                 <div className="space-y-4 pl-9">
                   {DEMO_TIMELINE.map((item, i) => (
                     <div key={i} className="relative">
-                      {/* Dot */}
                       <div className={`absolute -left-[22px] top-1 w-3 h-3 rounded-full border-2 ${
                         item.type === 'alert'
                           ? 'bg-critical-500/30 border-critical-500'
@@ -299,8 +420,54 @@ export default function SuspectProfilePage() {
 
           </div>
 
-          {/* ── RIGHT COL: Quick Intel ── */}
+          {/* ── RIGHT COL: Quick Intel & Multi-Channel Action Buttons ── */}
           <div className="space-y-5">
+
+            {/* Catalyst Dispatch Actions Card */}
+            <div className="p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3 shadow-md">
+              <h2 className="font-bold text-sm text-[var(--foreground)] flex items-center gap-2 pb-2 border-b border-[var(--border)]">
+                <Send className="w-4 h-4 text-blue-500" />
+                Catalyst Intercept Dispatch
+              </h2>
+
+              {/* Zia AutoML Incident Prediction */}
+              <button
+                onClick={handleAutoMlPredict}
+                disabled={isAutoMlLoading}
+                className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs flex items-center justify-center gap-2 border border-amber-500/30 transition-all cursor-pointer disabled:opacity-50"
+              >
+                <Zap className="w-3.5 h-3.5" />
+                {isAutoMlLoading ? 'Predicting Severity...' : 'Predict Escalation (Zia AutoML)'}
+              </button>
+
+              {/* Catalyst Mail Alert Dispatch */}
+              <button
+                onClick={handleSendMailAlert}
+                disabled={mailLoading || mailSent}
+                className={`w-full py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm ${
+                  mailSent
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-blue-600 hover:bg-blue-500 text-white'
+                }`}
+              >
+                <Mail className="w-3.5 h-3.5" />
+                {mailLoading ? 'Sending Catalyst Mail...' : mailSent ? 'SHO Alert Email Sent ✓' : 'Dispatch Red Alert Email (SHO)'}
+              </button>
+
+              {/* Catalyst Push Notification */}
+              <button
+                onClick={handleSendPush}
+                disabled={pushLoading || pushSent}
+                className={`w-full py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm ${
+                  pushSent
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white'
+                }`}
+              >
+                <Bell className="w-3.5 h-3.5" />
+                {pushLoading ? 'Broadcasting Push...' : pushSent ? 'Patrol Push Delivered ✓' : 'Broadcast Intercept Push (Patrol)'}
+              </button>
+            </div>
 
             {/* Contact / Bio */}
             <div className="glass-card rounded-2xl p-5">
@@ -322,15 +489,6 @@ export default function SuspectProfilePage() {
                     <p className={`text-xs font-bold ${risk.color}`}>{risk.label} RISK</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <Zap className="w-3.5 h-3.5 text-paper-100/30 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-[9px] uppercase tracking-widest text-paper-100/30">AI Risk Assessment</p>
-                    <p className="text-xs text-paper-100/60 leading-relaxed">
-                      High recidivism probability. Active cross-district pattern detected. Immediate tracking recommended.
-                    </p>
-                  </div>
-                </div>
               </div>
 
               {/* IPC Sections */}
@@ -344,42 +502,6 @@ export default function SuspectProfilePage() {
                   </div>
                 </div>
               )}
-
-              {/* Known Associates */}
-              {suspect.known_associates?.length > 0 && (
-                <div className="mt-3 p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-                  <p className="text-[10px] font-mono font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-2">Known Associates</p>
-                  <div className="space-y-1">
-                    {suspect.known_associates.map((a, i) => (
-                      <div key={i} className="flex items-center gap-2 text-xs text-[var(--text-primary)] font-mono">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[var(--status-warning)] shrink-0" />
-                        {a}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Last Known Location */}
-              {suspect.last_known_location && (
-                <div className="mt-3 p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-                  <p className="text-[10px] font-mono font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-1">Last Known Location</p>
-                  <p className="text-xs text-[var(--text-primary)] font-mono">{suspect.last_known_location}</p>
-                </div>
-              )}
-
-              {/* ANPR & Camera Hits */}
-              <div className="mt-3 flex gap-2">
-                <div className="flex-1 p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-                  <p className="text-2xl font-black font-mono text-[var(--accent)]">{suspect.anpr_hits || 0}</p>
-                  <p className="text-[9px] font-mono text-[var(--text-secondary)] uppercase tracking-widest mt-0.5">ANPR Hits</p>
-                </div>
-                <div className="flex-1 p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-                  <p className="text-2xl font-black font-mono text-[var(--accent)]">{suspect.camera_sightings?.length || 0}</p>
-                  <p className="text-[9px] font-mono text-[var(--text-secondary)] uppercase tracking-widest mt-0.5">Camera Sightings</p>
-                </div>
-              </div>
-
             </div>
 
             {/* Known Hangouts */}
@@ -397,39 +519,7 @@ export default function SuspectProfilePage() {
                     <p className="text-xs text-paper-100/70">{loc}</p>
                   </div>
                 ))}
-                {(!suspect.known_hangouts || suspect.known_hangouts.length === 0) && (
-                  <p className="text-xs text-paper-100/40 py-2">No locations on record</p>
-                )}
               </div>
-            </div>
-
-            {/* Network connections */}
-            <div className="glass-card rounded-2xl p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <Network className="w-3.5 h-3.5 text-phosphor-500" />
-                <h2 className="font-semibold text-paper-100 text-sm tracking-wide">Network Links</h2>
-              </div>
-              {DEMO_REPEAT_OFFENDERS.suspects
-                .filter(s => s && s.name && s.suspect_id !== suspect.suspect_id)
-                .map((s, idx) => {
-                  const sr = getRiskLevel(s.risk_score);
-                  return (
-                    <Link
-                      key={s.suspect_id ? `${s.suspect_id}-${idx}` : `net-${idx}`}
-                      href={`/dashboard/suspect/${nameToSlug(s.name)}`}
-                      className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-steel-600/20 transition-all group mb-2"
-                    >
-                      <div className={`w-7 h-7 rounded-lg ${sr.bg} border ${sr.border} flex items-center justify-center flex-shrink-0`}>
-                        <User className={`w-3.5 h-3.5 ${sr.color}`} />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs font-semibold text-paper-100/80 truncate">{s.name}</p>
-                        <p className="text-[9px] text-paper-100/40 font-mono">{s.suspect_id}</p>
-                      </div>
-                      <span className={`text-[9px] font-bold font-mono ${sr.color}`}>{s.risk_score}</span>
-                    </Link>
-                  );
-                })}
             </div>
 
             {/* Actions */}

@@ -505,9 +505,37 @@ function CameraInspectionModal({ cam, onClose, onDispatch }) {
     };
   }, [cam.id, suspectData]);
 
-  const handleDispatch = () => {
+  const handleDispatch = async () => {
     setDispatched(true);
     playSurveillanceSound('beep');
+
+    // 1. Catalyst Push Notification to Patrol Units (Cap #25)
+    try {
+      fetch('/server/push-notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: 'PATROL_UNIT_BLR_04',
+          title: `🚨 ANPR MATCH: ${suspectData.name}`,
+          message: `Camera ${cam.id} (${cam.location}) flagged target. Risk: ${suspectData.riskScore}%. Immediate intercept required.`
+        })
+      }).catch(() => {});
+    } catch (_) {}
+
+    // 2. Catalyst Signals Bus Broadcast (Cap #22)
+    try {
+      fetch('/server/on-alert-broadcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          case_number: suspectData.fir || 'KAR/2026/ANPR',
+          accused_name: suspectData.name,
+          district: 'Bengaluru Urban',
+          severity: 'CRITICAL'
+        })
+      }).catch(() => {});
+    } catch (_) {}
+
     if (onDispatch) onDispatch(suspectData);
   };
 

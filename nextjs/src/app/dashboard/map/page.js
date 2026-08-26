@@ -150,7 +150,7 @@ export default function MapPage() {
       if (district  && district  !== 'all') params.set('district',   district);
       if (crime_type && crime_type !== 'all') params.set('crime_type', crime_type);
 
-      const endpoint = `hotspots${params.toString() ? '?' + params.toString() : ''}`;
+      const endpoint = `cache-hotspots${params.toString() ? '?' + params.toString() : ''}`;
       const { data, source } = await fetchWithFallback(endpoint, DEMO_HOTSPOTS);
 
       const rawHotspots = Array.isArray(data) ? data : (data?.hotspots || DEMO_HOTSPOTS.hotspots);
@@ -165,9 +165,8 @@ export default function MapPage() {
       }));
 
       setHotspots(mapped);
-      setUsingCache(source === 'demo');
+      setUsingCache(source === 'catalyst_cache' || data?.source === 'catalyst_cache');
       setLastUpdated(new Date());
-      setUsingCache(false);
       setError(null);
     } catch (err) {
       if (err.name === 'AbortError') return; // Superseded by newer request — ignore

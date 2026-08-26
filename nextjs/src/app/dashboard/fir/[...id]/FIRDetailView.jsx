@@ -941,6 +941,63 @@ function Sidebar({ fir, detail, relatedCases }) {
   const [priority, setPriority] = useState(false);
   const [assigned, setAssigned] = useState(true);
 
+  // Catalyst Circuits state
+  const [circuitLoading, setCircuitLoading] = useState(false);
+  const [circuitResult, setCircuitResult] = useState(null);
+
+  // Catalyst SmartBrowz PDF state
+  const [pdfLoading, setPdfLoading] = useState(false);
+
+  const handleRunCircuit = async () => {
+    setCircuitLoading(true);
+    try {
+      const res = await fetch('/server/investigation-circuit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          case_number: fir.case_number || 'KAR/2026/LIVE',
+          fir_data: {
+            accused_name: detail.accused_name,
+            crime_type: fir.crime_type || 'Theft'
+          }
+        })
+      });
+      const data = await res.json();
+      setCircuitResult(data);
+    } catch (e) {
+      alert('Circuit execution failed: ' + e.message);
+    } finally {
+      setCircuitLoading(false);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    setPdfLoading(true);
+    try {
+      const caseNo = encodeURIComponent(fir.case_number || 'FIR-2026-BL-4921');
+      const res = await fetch(`/server/export-pdf?case=${caseNo}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.pdf_base64) {
+          const blob = new Blob([Uint8Array.from(atob(data.pdf_base64), c => c.charCodeAt(0))], { type: 'application/pdf' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `KSP_${fir.case_number || 'Case'}_Dossier.pdf`;
+          a.click();
+        } else {
+          window.print();
+        }
+      } else {
+        window.print();
+      }
+    } catch (_) {
+      window.print();
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
   const handleAddNote = () => {
     if (!newNote.trim()) return;
     const added = {
@@ -955,6 +1012,57 @@ function Sidebar({ fir, detail, relatedCases }) {
 
   return (
     <aside className="w-full xl:w-80 shrink-0 space-y-4">
+      {/* Catalyst Automation & Workflow Box */}
+      <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 p-4 space-y-2.5 shadow-sm">
+        <div className="flex items-center justify-between pb-2 border-b border-[var(--border)]/40">
+          <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] flex items-center gap-1.5">
+            <Zap className="w-3.5 h-3.5 text-amber-500" />
+            Catalyst Workflows
+          </span>
+          <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400">
+            Cap #16 & #23
+          </span>
+        </div>
+
+        {/* Catalyst SmartBrowz PDF Export Button */}
+        <button
+          onClick={handleExportPdf}
+          disabled={pdfLoading}
+          className="w-full py-2.5 rounded-xl bg-[var(--surface-0)] border border-[var(--border)] hover:border-blue-500/50 text-[var(--text-primary)] text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-50"
+        >
+          <FileText className="w-3.5 h-3.5 text-blue-500" />
+          {pdfLoading ? 'Rendering SmartBrowz PDF...' : 'Export SmartBrowz PDF Dossier'}
+        </button>
+
+        {/* Catalyst Circuits 3-Step Workflow Trigger */}
+        <button
+          onClick={handleRunCircuit}
+          disabled={circuitLoading}
+          className="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md disabled:opacity-50"
+        >
+          <Zap className="w-3.5 h-3.5 fill-current" />
+          {circuitLoading ? 'Executing Investigation Circuit...' : 'Run Catalyst Investigation Circuit'}
+        </button>
+
+        {/* Circuit Result Breakdown */}
+        {circuitResult && (
+          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] font-mono space-y-1.5 text-slate-300">
+            <div className="flex items-center justify-between text-emerald-400 font-bold">
+              <span>Circuit: {circuitResult.status}</span>
+              <span className="text-[10px] text-slate-400">{circuitResult.workflow_id}</span>
+            </div>
+            <div className="space-y-1 pt-1">
+              {(circuitResult.steps_executed || []).map((st, i) => (
+                <div key={i} className="flex items-center justify-between text-[10px]">
+                  <span className="text-slate-400">{st.step}</span>
+                  <span className="text-emerald-400 font-semibold">{st.status}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
       <div className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 p-4 space-y-2.5 shadow-sm">
         <button
           onClick={() => setAssigned(!assigned)}

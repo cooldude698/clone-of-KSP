@@ -445,6 +445,35 @@ export default function LogsPage() {
           </div>
         </div>
 
+        {/* ── Catalyst Cron & DataStore Event Bus Status ── */}
+        <div className="mt-4 p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs font-mono text-slate-200">
+          <div className="flex items-center gap-3">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+            <div>
+              <span className="font-bold text-amber-400">Catalyst Cron (Schedule: 0 0 * * *)</span>
+              <span className="text-slate-400 text-[11px] block">Nightly Crime Risk Recalculator & DataStore Ingestion Triggers Active</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] px-2 py-1 rounded bg-slate-800 text-emerald-400 font-bold border border-slate-700">
+              DataStore Listener: on-fir-insert
+            </span>
+            <button
+              onClick={async () => {
+                try {
+                  const res = await fetch('/server/cron-night-recalc');
+                  if (res.ok) alert('Catalyst Cron Recalculation executed successfully!');
+                } catch (e) {
+                  alert('Cron execute error: ' + e.message);
+                }
+              }}
+              className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-[11px] transition-all cursor-pointer shadow-sm"
+            >
+              Trigger Cron Now
+            </button>
+          </div>
+        </div>
+
         {/* ── Search & Filter Controls ── */}
         <div className="mt-5 flex flex-col md:flex-row items-center gap-3">
           <div className="relative flex-1 w-full">

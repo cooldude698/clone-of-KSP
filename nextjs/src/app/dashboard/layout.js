@@ -30,7 +30,6 @@ const NAV_ITEMS = [
   { href: '/dashboard/map',          icon: Map,             label: 'Crime Map',      id: 'nav-map' },
   { href: '/dashboard/network',      icon: GitBranch,       label: 'Network Graph',  id: 'nav-network' },
   { href: '/dashboard/surveillance', icon: Camera,          label: 'Surveillance',   id: 'nav-surveillance' },
-  { href: '/dashboard/services',     icon: Server,          label: 'Catalyst Hub',   id: 'nav-services' },
   { href: '/dashboard/analytics',    icon: BarChart2,       label: 'Analytics',      id: 'nav-analytics' },
   { href: '/dashboard/logs',         icon: History,         label: 'AI Logs',        id: 'nav-logs' },
   { href: '/dashboard/trail',        icon: Navigation,      label: 'Geo Trail',      id: 'nav-trail' },
