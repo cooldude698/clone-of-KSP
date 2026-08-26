@@ -6,7 +6,7 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "build": "cd nextjs && npm install --legacy-peer-deps && npm run build && cd .. && cp -R nextjs/.next ./ && (cp -R nextjs/public ./public 2>/dev/null || true) && (mkdir -p .next/standalone/.next && cp -R .next/server .next/standalone/.next/ 2>/dev/null || true)",
+    "build": "cd nextjs && npm install --legacy-peer-deps && npm run build && cd .. && cp -R nextjs/.next ./ && (cp -R nextjs/public ./public 2>/dev/null || true) && (mkdir -p .next/standalone/.next && cp -R .next/* .next/standalone/.next/ 2>/dev/null || true)",
     "start": "cd nextjs && npm run start",
     "dev": "cd nextjs && npm run dev"
   },
