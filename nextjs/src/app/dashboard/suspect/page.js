@@ -15,15 +15,19 @@ export default function SuspectWatchlistPage() {
   useEffect(() => {
     async function loadSuspects() {
       setLoading(true);
-      const res = await fetchWithFallback('repeat-offenders', { offenders: DEMO_REPEAT_OFFENDERS });
-      const list = res?.data?.offenders || (Array.isArray(res?.data) ? res.data : DEMO_REPEAT_OFFENDERS);
+      const res = await fetchWithFallback('repeat-offenders', DEMO_REPEAT_OFFENDERS);
+      const raw = res?.data?.suspects || res?.data?.offenders || (Array.isArray(res?.data) ? res.data : DEMO_REPEAT_OFFENDERS?.suspects || []);
+      const list = Array.isArray(raw) ? raw : (raw?.suspects || raw?.offenders || []);
       setSuspects(list);
       setLoading(false);
     }
     loadSuspects();
   }, []);
 
-  const filtered = suspects.filter(s => {
+  const safeSuspects = Array.isArray(suspects) ? suspects : [];
+
+  const filtered = safeSuspects.filter(s => {
+    if (!s) return false;
     const q = search.toLowerCase();
     const matchesSearch =
       (s.name || s.accused_name || '').toLowerCase().includes(q) ||

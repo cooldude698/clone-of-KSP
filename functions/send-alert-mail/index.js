@@ -34,7 +34,7 @@ module.exports = async (req, res) => {
   }
 
   const {
-    to_email = 'inspector.command@ksp.gov.in',
+    to_email = 'antigravitytestung@gmail.com',
     officer_name = 'Station House Officer',
     case_number = 'KAR/2026/URGENT',
     accused_name = 'Unidentified',

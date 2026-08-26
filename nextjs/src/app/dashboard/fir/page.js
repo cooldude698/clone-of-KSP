@@ -28,8 +28,9 @@ export default function FirRegistryPage() {
   useEffect(() => {
     async function loadFirs() {
       setLoading(true);
-      const res = await fetchWithFallback('firs', { firs: DEMO_FIRS });
-      const list = res?.data?.firs || (Array.isArray(res?.data) ? res.data : DEMO_FIRS);
+      const res = await fetchWithFallback('firs', DEMO_FIRS);
+      const raw = res?.data?.firs || (Array.isArray(res?.data) ? res.data : DEMO_FIRS?.firs || []);
+      const list = Array.isArray(raw) ? raw : (raw?.firs || []);
       setFirs(list);
       setLoading(false);
     }
@@ -128,7 +129,10 @@ export default function FirRegistryPage() {
     setStratusUrl('');
   };
 
-  const filtered = firs.filter(f => {
+  const safeFirs = Array.isArray(firs) ? firs : [];
+
+  const filtered = safeFirs.filter(f => {
+    if (!f) return false;
     const q = search.toLowerCase();
     const matchesSearch =
       (f.case_number || '').toLowerCase().includes(q) ||
@@ -142,7 +146,7 @@ export default function FirRegistryPage() {
     return matchesSearch && matchesDistrict && matchesStatus;
   });
 
-  const districts = ['ALL', ...new Set(firs.map(f => f.district_name || f.district).filter(Boolean))];
+  const districts = ['ALL', ...new Set(safeFirs.map(f => f?.district_name || f?.district).filter(Boolean))];
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">

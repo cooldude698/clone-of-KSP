@@ -200,7 +200,7 @@ export default function SuspectProfilePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          to_email: 'inspector.koramangala@ksp.gov.in',
+          to_email: 'antigravitytestung@gmail.com',
           officer_name: 'Inspector Anand Rao',
           case_number: suspect.associated_firs?.[0] || 'KAR/2026/URGENT',
           accused_name: `${suspect.name} (${suspect.alias || 'Alias'})`,
