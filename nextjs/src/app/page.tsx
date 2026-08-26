@@ -6,9 +6,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, ShieldAlert, Shield, KeyRound, UserCheck, Eye, EyeOff, 
   Activity, Radio, Cpu, Layers, Bot, ArrowRight, Zap, CheckCircle2, Lock, ChevronRight
-} from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 import Card from '@/components/ui/Card';
+import DrishtiLogo from '@/components/DrishtiLogo';
 
 // Previews
 import ChatHeatmapMockup from '@/components/landing/ChatHeatmapMockup';
@@ -178,26 +178,9 @@ export default function LandingPage() {
       className="min-h-screen bg-[var(--surface-0)] text-[var(--text-primary)] flex flex-col font-sans relative overflow-hidden transition-colors duration-200"
     >
       {/* ── TOP TACTICAL NAVIGATION BAR ────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-[var(--surface-0)]/80 border-b border-[var(--border)] px-4 sm:px-8 py-3.5 flex items-center justify-between">
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-[var(--surface-0)]/80 border-b border-[var(--border)] px-4 sm:px-8 py-3 flex items-center justify-between">
         {/* Left: Branding */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded bg-[var(--accent)] text-white flex items-center justify-center font-bold shadow-md shadow-[var(--accent-glow)] border border-white/10">
-            <Shield className="w-4 h-4 text-white" />
-          </div>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <span className="font-mono font-bold tracking-[0.15em] text-xs text-[var(--text-primary)]">
-                DRISHTI AI
-              </span>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--accent)]/15 text-[var(--accent-light)] border border-[var(--accent)]/30 font-semibold">
-                KSP v2.4
-              </span>
-            </div>
-            <span className="text-[9px] font-mono text-[var(--text-secondary)] tracking-wider">
-              KARNATAKA STATE POLICE CO-PILOT
-            </span>
-          </div>
-        </div>
+        <DrishtiLogo variant="full" size="sm" href="/" />
 
         {/* Center: System Status Indicator */}
         <div className="hidden md:flex items-center gap-6 font-mono text-[11px] text-[var(--text-secondary)]">

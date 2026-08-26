@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 160" width="100%" height="100%">
+  <!-- Sleek Minimalist Emblem (Left) -->
+  <g transform="translate(10, 20)">
+    <rect width="120" height="120" rx="32" fill="#09090B" />
+    <rect width="118" height="118" x="1" y="1" rx="31" fill="none" stroke="#27272A" stroke-width="1.5" />
+
+    <!-- Minimalist Iris Glyph -->
+    <path 
+      d="M 28 60 C 38 40, 82 40, 92 60 C 82 80, 38 80, 28 60 Z" 
+      fill="none" 
+      stroke="#FAFAFA" 
+      stroke-width="5" 
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <circle cx="60" cy="60" r="15" fill="none" stroke="#FAFAFA" stroke-width="4" />
+    <circle cx="60" cy="60" r="5.5" fill="#FAFAFA" />
+  </g>
+
+  <!-- Sleek Minimalist Typography (Right) -->
+  <g transform="translate(155, 0)">
+    <text x="0" y="78" font-family="'Plus Jakarta Sans', -apple-system, sans-serif" font-size="44" font-weight="800" fill="#09090B" letter-spacing="-0.03em" class="dark-invert">
+      DRISHTI
+    </text>
+    <text x="0" y="108" font-family="'Plus Jakarta Sans', -apple-system, sans-serif" font-size="12" font-weight="600" fill="#71717A" letter-spacing="0.16em">
+      KARNATAKA STATE POLICE
+    </text>
+  </g>
+
+  <style>
+    @media (prefers-color-scheme: dark) {
+      .dark-invert { fill: #FAFAFA; }
+    }
+  </style>
+</svg>

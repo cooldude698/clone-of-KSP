@@ -6,9 +6,11 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, MessageSquare, Map, GitBranch,
-  Camera, BarChart2, LogOut, Shield, ChevronLeft,
-  Newspaper, FileText, Server, Search, ChevronDown, Sparkles
+  Camera, BarChart2, LogOut, Shield, ChevronLeft, ChevronRight,
+  Newspaper, FileText, Server, Search, ChevronDown, Sparkles,
+  User, History, Navigation, Eye, AlertTriangle
 } from 'lucide-react';
+import DrishtiLogo from '@/components/DrishtiLogo';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '@/components/ThemeToggle';
 import useDrishtiVoice from '@/components/DrishtiVoice'; // hook — must be static import
@@ -885,18 +887,12 @@ export default function DashboardLayout({ children }) {
       {/* ── MINIMALIST MODERN SIDEBAR ── */}
       <aside className={`flex flex-col transition-all duration-300 ease-in-out bg-white dark:bg-[#18181B] border-r border-gray-100 dark:border-gray-800 relative z-20 shadow-sm ${collapsed ? 'w-20' : 'w-60'}`}>
         {/* Brand Header */}
-        <div className={`flex items-center gap-3 px-6 py-6 ${collapsed ? 'justify-center px-2' : ''}`}>
-          <div className="w-10 h-10 rounded-2xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center flex-shrink-0 shadow-md">
-            <Eye className="w-5 h-5" />
-          </div>
-          {!collapsed && (
-            <div>
-              <span className="text-gray-900 dark:text-white font-extrabold tracking-tight text-lg">
-                DRISHTI
-              </span>
-              <p className="text-gray-400 text-[10px] font-semibold tracking-wider uppercase">Karnataka Police</p>
-            </div>
-          )}
+        <div className={`flex items-center px-4 py-5 border-b border-gray-100 dark:border-gray-800/60 ${collapsed ? 'justify-center px-2' : ''}`}>
+          <DrishtiLogo
+            variant={collapsed ? 'icon' : 'compact'}
+            size="md"
+            href="/dashboard"
+          />
         </div>
 
         {/* Navigation Items */}
