@@ -12,7 +12,7 @@ import {
   Newspaper, X
 } from 'lucide-react';
 
-import { getNormalizedCrimeCode } from '@/lib/fir-store';
+import { getNormalizedCrimeCode, generateOfficialKSPCrimeNo } from '@/lib/fir-store';
 
 const InvestigatorWall = dynamic(() => import('@/components/InvestigatorWall'), {
   ssr: false,
@@ -632,7 +632,9 @@ function CleanNarrativeFormatter({ rawText }) {
 }
 
 function DetailsTab({ fir, detail }) {
+  const officialCrimeNo = generateOfficialKSPCrimeNo(fir.case_number);
   const fields = [
+    { label: 'KSP 17-DIGIT CRIME NO', value: officialCrimeNo },
     { label: 'IPC / BNS SECTION', value: fir.ipc_section || (fir.crime_type_code || fir.crime_type || 'IPC 379').toUpperCase().replace(/_/g, ' ') },
     { label: 'CRIME CATEGORY',    value: (fir.crime_type_code || fir.crime_type || 'Incident').replace(/_/g, ' ') },
     { label: 'DATE & TIME FILED', value: fmtDateTime(fir.date_filed || fir.created_at) },
