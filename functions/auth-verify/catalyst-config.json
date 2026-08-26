@@ -1,0 +1,10 @@
+{
+  "deployment": {
+    "stack": "node20",
+    "type": "advancedio",
+    "name": "auth-verify"
+  },
+  "execution": {
+    "main": "index.js"
+  }
+}

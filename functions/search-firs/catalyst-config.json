@@ -1,0 +1,10 @@
+{
+  "deployment": {
+    "stack": "node20",
+    "type": "advancedio",
+    "name": "search-firs"
+  },
+  "execution": {
+    "main": "index.js"
+  }
+}

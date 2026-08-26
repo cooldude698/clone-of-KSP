@@ -1,0 +1,10 @@
+{
+  "deployment": {
+    "stack": "node20",
+    "type": "event",
+    "name": "on-fir-insert"
+  },
+  "execution": {
+    "main": "index.js"
+  }
+}

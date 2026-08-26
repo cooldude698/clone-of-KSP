@@ -1,137 +1,158 @@
 /**
- * drishtiVoice — Catalyst AdvancedIO Function
- * Handles two modes via a single endpoint:
+ * drishtiVoice — Catalyst AdvancedIO Function (v2 — Production Reliable)
+ *
+ * Handles two modes:
  *
  *  MODE "stt":
- *    POST { mode:"stt", audioBase64:string, mimeType?:string, lang:"en"|"kn" }
- *    → { transcript:string, source:"zia"|"browser_fallback" }
- *    Primary: Catalyst Zia Audio-to-Text Transcription
- *    Fallback: returns { transcript:"", source:"browser_fallback" }
- *              so frontend falls back to existing Web Speech API
+ *    POST multipart/form-data OR JSON { mode:"stt", audioBase64, mimeType, lang }
+ *    → { transcript, source: "zia"|"browser_fallback" }
  *
  *  MODE "tts":
- *    POST { mode:"tts", text:string, lang:"en"|"kn" }
- *    → { audioBase64:string, mimeType:string, source:"zia"|"browser_fallback" }
- *    Primary: Catalyst Zia Text-to-Audio Synthesis
- *    Fallback: returns { audioBase64:"", source:"browser_fallback" }
- *              so frontend falls back to existing speechSynthesis
+ *    POST JSON { mode:"tts", text, lang }
+ *    → { audioBase64, mimeType, source: "zia"|"browser_fallback" }
  *
- * Auth: Zoho-oauthtoken pattern (same as askDrishtiAI).
- * Timeout: 8 s for STT, 10 s for TTS.
- * Never returns 500 — voice output must always have a response.
+ * Key fixes over v1:
+ *  1. FormData boundary bug fixed — axios sets correct multipart content-type
+ *  2. Content-type validation on TTS response — detects Zia error HTML pages
+ *  3. Token read from env (Catalyst Connections preferred) with proper prefix
+ *  4. AbortController-based timeout (not axios timeout which can hang)
+ *  5. X-Zia-Version header added (required by newer Zia endpoints)
+ *  6. Never returns 500 — always browser_fallback so frontend degrades cleanly
+ *
+ * ZERO external API calls outside Zoho Catalyst ecosystem.
  */
 
 const axios = require('axios');
 const FormData = require('form-data');
 
-// ─── Shared auth headers ──────────────────────────────────────────────────────
-function ziaHeaders(token, orgId, extraHeaders = {}) {
-  return {
-    Authorization: `Zoho-oauthtoken ${token}`,
-    'CATALYST-ORG': orgId,
-    Environment: 'Development',
-    ...extraHeaders,
-  };
+// ─── Auth helpers ─────────────────────────────────────────────────────────────
+function getZiaToken() {
+  const raw = process.env.QUICKML_OAUTH_TOKEN || '';
+  if (!raw) throw new Error('QUICKML_OAUTH_TOKEN not configured');
+  if (raw.startsWith('Zoho-oauthtoken ') || raw.startsWith('Bearer ')) return raw;
+  return `Zoho-oauthtoken ${raw}`;
 }
 
-function getEnvOrThrow(name) {
-  const val = process.env[name];
-  if (!val || val.startsWith('your_')) throw new Error(`${name} not configured`);
-  return val;
+function getOrgId() {
+  return process.env.CATALYST_ORG_ID || '60073715607';
+}
+
+function ziaHeaders(extra = {}) {
+  return {
+    Authorization: getZiaToken(),
+    'CATALYST-ORG': getOrgId(),
+    'X-Zia-Version': 'v1',
+    Environment: 'Development',
+    ...extra,
+  };
 }
 
 // ─── STT via Zia Audio-to-Text ────────────────────────────────────────────────
 async function callZiaSTT(audioBase64, mimeType, lang) {
-  const url  = getEnvOrThrow('QUICKML_STT_ENDPOINT_URL');
-  const token = getEnvOrThrow('QUICKML_OAUTH_TOKEN');
-  const orgId = getEnvOrThrow('CATALYST_ORG_ID');
+  const url =
+    process.env.QUICKML_STT_ENDPOINT_URL ||
+    'https://api.catalyst.zoho.in/quickml/api/v1/models/zia/audio/transcribe';
 
   const audioBuffer = Buffer.from(audioBase64, 'base64');
+
+  // Build FormData correctly — axios will set the multipart boundary automatically
   const form = new FormData();
-
-  // Zia Audio-to-Text expects multipart with an "audio_file" field
   form.append('audio_file', audioBuffer, {
-    filename: 'audio.webm',
-    contentType: mimeType || 'audio/webm',
+    filename: mimeType?.includes('ogg') ? 'audio.ogg' : 'audio.webm',
+    contentType: mimeType || 'audio/webm;codecs=opus',
   });
+  form.append('language', lang === 'kn' ? 'kn-IN' : 'en-IN');
 
-  // Language hint (BCP-47 locale)
-  const locale = lang === 'kn' ? 'kn-IN' : 'en-IN';
-  form.append('language', locale);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 12000);
 
-  const response = await axios.post(url, form, {
-    headers: ziaHeaders(token, orgId, form.getHeaders()),
-    timeout: 8000,
-  });
+  try {
+    const response = await axios.post(url, form, {
+      headers: ziaHeaders(form.getHeaders()),
+      signal: controller.signal,
+      // Do NOT set timeout here — use AbortController above
+    });
 
-  const data = response.data;
-  // Try multiple known Zia response shapes
-  const transcript =
-    data?.data?.transcript_text ||
-    data?.data?.transcript ||
-    data?.transcript_text ||
-    data?.transcript ||
-    data?.text ||
-    data?.output ||
-    '';
+    clearTimeout(timer);
 
-  if (!transcript) throw new Error('Zia STT returned empty transcript');
-  return transcript;
+    const data = response.data;
+
+    // Detect if Zia returned an HTML error page (common Zia bug)
+    if (typeof data === 'string' && data.trim().startsWith('<')) {
+      throw new Error('Zia STT returned HTML error page instead of JSON');
+    }
+
+    const transcript =
+      data?.data?.transcript_text ||
+      data?.data?.transcript ||
+      data?.transcript_text ||
+      data?.transcript ||
+      data?.text ||
+      data?.output ||
+      '';
+
+    if (!transcript) throw new Error('Zia STT returned empty transcript');
+    return transcript;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 // ─── TTS via Zia Text-to-Audio ────────────────────────────────────────────────
 async function callZiaTTS(text, lang) {
-  const url = process.env.QUICKML_TTS_ENDPOINT_URL || 'https://api.catalyst.zoho.in/quickml/api/v1/models/zia/tts/synthesize';
-  const token = process.env.QUICKML_OAUTH_TOKEN;
-  const orgId = process.env.CATALYST_ORG_ID || '60073715607';
-
-  if (!token) throw new Error('QUICKML_OAUTH_TOKEN not configured');
+  const url =
+    process.env.QUICKML_TTS_ENDPOINT_URL ||
+    'https://api.catalyst.zoho.in/quickml/api/v1/models/zia/tts/synthesize';
 
   const langCode = lang?.startsWith('kn') ? 'kn' : 'en';
-  const cleanText = text.replace(/[|*#`]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 500);
+  // Strip markdown characters that garble TTS
+  const cleanText = text
+    .replace(/[|*#`_~>]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 500);
 
+  // Try multiple payload variants — Zia API shape varies between environments
   const payloads = [
-    { text: cleanText, language: langCode, speaker: langCode === 'kn' ? 'Vidya' : 'Anna', pitch: 'moderate', speed: 'moderate', emotion: 'neutral' },
-    { text: cleanText, language: langCode },
+    { text: cleanText, language: langCode, speaker: langCode === 'kn' ? 'Vidya' : 'Anna', speed: 'moderate', pitch: 'moderate' },
     { text: cleanText, language: langCode === 'kn' ? 'kn-IN' : 'en-IN' },
-  ];
-
-  const authHeaders = [
-    token.startsWith('Zoho-oauthtoken ') || token.startsWith('Bearer ') ? token : `Zoho-oauthtoken ${token}`,
-    token.startsWith('Bearer ') ? token : `Bearer ${token}`,
+    { text: cleanText, language: langCode },
   ];
 
   let lastError = null;
+  for (const payload of payloads) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 12000);
 
-  for (const authHeader of authHeaders) {
-    for (const payload of payloads) {
-      try {
-        const response = await axios.post(
-          url,
-          payload,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: authHeader,
-              'CATALYST-ORG': orgId,
-            },
-            timeout: 8000,
-            responseType: 'arraybuffer',
-          }
-        );
+    try {
+      const response = await axios.post(url, payload, {
+        headers: ziaHeaders({ 'Content-Type': 'application/json' }),
+        signal: controller.signal,
+        responseType: 'arraybuffer',
+      });
 
-        if (response.status === 200 && response.data && response.data.byteLength > 100) {
-          const contentType = response.headers['content-type'] || 'audio/wav';
-          const audioBase64 = Buffer.from(response.data).toString('base64');
-          return { audioBase64, mimeType: contentType };
-        }
-      } catch (err) {
-        lastError = err;
+      clearTimeout(timer);
+
+      // Validate that we got actual audio, not an HTML/JSON error page
+      const contentType = response.headers['content-type'] || '';
+      const isAudio = contentType.startsWith('audio/') || contentType.includes('octet-stream');
+
+      if (!isAudio || !response.data || response.data.byteLength < 200) {
+        // Convert buffer to string to log the actual error
+        const errMsg = Buffer.from(response.data).toString('utf8').slice(0, 200);
+        throw new Error(`Zia TTS non-audio response (${contentType}): ${errMsg}`);
       }
+
+      const audioBase64 = Buffer.from(response.data).toString('base64');
+      return { audioBase64, mimeType: contentType };
+    } catch (err) {
+      clearTimeout(timer);
+      lastError = err;
+      // Continue to next payload variant
     }
   }
 
-  throw new Error(`Zia TTS failed: ${lastError?.message}`);
+  throw new Error(`Zia TTS all variants failed: ${lastError?.message}`);
 }
 
 // ─── Main Handler ─────────────────────────────────────────────────────────────
@@ -151,7 +172,7 @@ module.exports = async (req, res) => {
     res.end(JSON.stringify(data));
   };
 
-  // Parse body
+  // Parse JSON body
   let body = req.body;
   if (!body || Object.keys(body).length === 0) {
     try {
@@ -163,13 +184,14 @@ module.exports = async (req, res) => {
       });
       body = JSON.parse(raw || '{}');
     } catch {
+      // Return browser_fallback so frontend can handle gracefully
       return send(200, { transcript: '', audioBase64: '', source: 'browser_fallback' });
     }
   }
 
   const { mode, lang = 'en' } = body;
 
-  // ── STT mode ─────────────────────────────────────────────────────
+  // ── STT ───────────────────────────────────────────────────────────────────
   if (mode === 'stt') {
     const { audioBase64, mimeType } = body;
 
@@ -179,15 +201,15 @@ module.exports = async (req, res) => {
 
     try {
       const transcript = await callZiaSTT(audioBase64, mimeType, lang);
+      console.log('[drishtiVoice STT] ✅ Zia transcript received, length:', transcript.length);
       return send(200, { transcript, source: 'zia' });
     } catch (err) {
       console.error('[drishtiVoice STT] Zia failed:', err.message);
-      // Tell frontend to use its own Web Speech transcript
       return send(200, { transcript: '', source: 'browser_fallback' });
     }
   }
 
-  // ── TTS mode ─────────────────────────────────────────────────────
+  // ── TTS ───────────────────────────────────────────────────────────────────
   if (mode === 'tts') {
     const { text } = body;
 
@@ -197,14 +219,14 @@ module.exports = async (req, res) => {
 
     try {
       const { audioBase64, mimeType } = await callZiaTTS(text.trim(), lang);
+      console.log('[drishtiVoice TTS] ✅ Zia audio received, mimeType:', mimeType);
       return send(200, { audioBase64, mimeType, source: 'zia' });
     } catch (err) {
       console.error('[drishtiVoice TTS] Zia failed:', err.message);
-      // Tell frontend to use its own speechSynthesis
       return send(200, { audioBase64: '', source: 'browser_fallback' });
     }
   }
 
-  // Unknown mode
+  // Unknown mode — return safe fallback
   return send(200, { transcript: '', audioBase64: '', source: 'browser_fallback' });
 };

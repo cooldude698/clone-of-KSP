@@ -1,0 +1,10 @@
+{
+  "name": "zia-automl-predict",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "zcatalyst-sdk-node": "latest",
+    "axios": "^1.7.0",
+    "form-data": "^4.0.0"
+  }
+}

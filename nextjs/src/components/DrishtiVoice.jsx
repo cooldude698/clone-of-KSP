@@ -43,6 +43,12 @@ const useDrishtiVoice = ({
   const lastInterimRef = useRef('');
   const liveTranscriptRef = useRef('');
 
+  // MediaRecorder refs for Zia STT (primary path)
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const mediaStreamRef = useRef(null);
+  const isMediaRecordingRef = useRef(false);
+
   // Fix 1: retry counter for network errors
   const retryCountRef = useRef(0);
   const MAX_RETRIES = 2;
@@ -236,7 +242,31 @@ const useDrishtiVoice = ({
   // PTT session state tracking
   const isPttPressedRef = useRef(false);
 
-  // Start PTT session
+  // ── Send audio to Zia STT via Catalyst Function ────────────────────────────
+  const sendToZiaSTT = useCallback(async (audioBlob, lang) => {
+    try {
+      const arrayBuf = await audioBlob.arrayBuffer();
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuf)));
+      const mimeType = audioBlob.type || 'audio/webm;codecs=opus';
+      const langCode = lang?.startsWith('kn') ? 'kn' : 'en';
+
+      // Call /server/drishtiVoice → proxied to Catalyst Function by next.config.mjs
+      const res = await fetch('/server/drishtiVoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'stt', audioBase64: base64, mimeType, lang: langCode }),
+      });
+      const data = await res.json();
+      if (data.source === 'zia' && data.transcript) {
+        return data.transcript;
+      }
+    } catch (err) {
+      console.warn('[DrishtiVoice] Zia STT call failed:', err.message);
+    }
+    return null; // null = fall through to browser SpeechRecognition
+  }, []);
+
+  // Start PTT session — uses MediaRecorder (primary) with SpeechRecognition as interim display
   const startListening = useCallback(async (lang = 'en-IN') => {
     isPttPressedRef.current = true;
     setIsListening(true);
@@ -256,15 +286,36 @@ const useDrishtiVoice = ({
       }
     }
 
+    // PRIMARY: Start MediaRecorder for Zia STT audio capture
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      mediaStreamRef.current = stream;
+      audioChunksRef.current = [];
+
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : MediaRecorder.isTypeSupported('audio/webm')
+          ? 'audio/webm'
+          : 'audio/ogg';
+
+      const recorder = new MediaRecorder(stream, { mimeType });
+      recorder.ondataavailable = e => { if (e.data.size > 0) audioChunksRef.current.push(e.data); };
+      recorder.start(100); // collect in 100ms chunks
+      mediaRecorderRef.current = recorder;
+      isMediaRecordingRef.current = true;
+    } catch (mrErr) {
+      console.warn('[DrishtiVoice] MediaRecorder failed, using browser SpeechRecognition:', mrErr.message);
+      isMediaRecordingRef.current = false;
+    }
+
+    // SECONDARY: Also run browser SpeechRecognition for live interim transcript display
     if (recognitionRef.current) {
-      // Try the requested language first; fall back to en-IN if unsupported
       const preferredLang = lang || 'en-IN';
       recognitionRef.current.lang = preferredLang;
       try {
         recognitionRef.current.start();
       } catch (e) {
         if (e.name !== 'InvalidStateError') {
-          // Language failed — fall back to en-IN
           recognitionRef.current.lang = 'en-IN';
           try { recognitionRef.current.start(); } catch (_) {}
         }
@@ -272,24 +323,64 @@ const useDrishtiVoice = ({
     }
 
     startVolumeDetection();
-  }, [micPermission, requestMicPermission, startVolumeDetection]); // startVolumeDetection is now conflict-free
+  }, [micPermission, requestMicPermission, startVolumeDetection]);
 
-  // Stop PTT session — returns whatever was captured
-  const stopListeningAndGetTranscript = useCallback(() => {
+  // Stop PTT session — returns transcript (from Zia STT if available, else browser recognition)
+  const stopListeningAndGetTranscript = useCallback(async () => {
     isPttPressedRef.current = false;
+
+    // Stop browser SpeechRecognition (for live display)
     if (recognitionRef.current) {
       try { recognitionRef.current.stop(); } catch (_) {}
     }
     try { stopVolumeDetection(); } catch (_) {}
     setIsListening(false);
-    
+
+    // If MediaRecorder was active, stop it and send to Zia STT
+    if (isMediaRecordingRef.current && mediaRecorderRef.current) {
+      isMediaRecordingRef.current = false;
+      await new Promise(resolve => {
+        const rec = mediaRecorderRef.current;
+        rec.onstop = async () => {
+          // Stop the mic stream
+          if (mediaStreamRef.current) {
+            mediaStreamRef.current.getTracks().forEach(t => t.stop());
+            mediaStreamRef.current = null;
+          }
+          // Try Zia STT with collected audio
+          const chunks = audioChunksRef.current;
+          audioChunksRef.current = [];
+          if (chunks.length > 0) {
+            const mimeType = rec.mimeType || 'audio/webm;codecs=opus';
+            const blob = new Blob(chunks, { type: mimeType });
+            const ziaTranscript = await sendToZiaSTT(blob, langRef.current);
+            if (ziaTranscript) {
+              accumulatedFinalRef.current = ziaTranscript;
+              liveTranscriptRef.current = ziaTranscript;
+              setLiveTranscript(ziaTranscript);
+            }
+          }
+          resolve();
+        };
+        try { rec.stop(); } catch (_) { resolve(); }
+      });
+      mediaRecorderRef.current = null;
+    } else {
+      // Clean up stream if MediaRecorder wasn't running
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach(t => t.stop());
+        mediaStreamRef.current = null;
+      }
+    }
+
+    // Return the best transcript (Zia STT takes priority over browser recognition)
     const captured = (accumulatedFinalRef.current + ' ' + lastInterimRef.current).trim() || liveTranscriptRef.current?.trim() || '';
     accumulatedFinalRef.current = '';
     lastInterimRef.current = '';
     liveTranscriptRef.current = '';
-    setLiveTranscript(''); // clear React state so the live bubble disappears cleanly
+    setLiveTranscript('');
     return captured;
-  }, [stopVolumeDetection]);
+  }, [stopVolumeDetection, sendToZiaSTT]);
 
   // Change 6: improved voice selection — neural/natural voices first
   const findBestVoice = useCallback((lang) => {
@@ -478,10 +569,10 @@ const useDrishtiVoice = ({
       }, 50);
     };
 
-    // Primary path: Neural TTS / Zia via API
+    // Primary path: Zia TTS via Catalyst Function URL (/server/ → Catalyst Functions)
     try {
-      console.log('[DRISHTI VOICE] Requesting Neural TTS...');
-      const res = await fetch('/api/drishtiVoice', {
+      console.log('[DRISHTI VOICE] Requesting Zia TTS via Catalyst Function...');
+      const res = await fetch('/server/drishtiVoice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode: 'tts', text, lang: languageCode }),
@@ -491,24 +582,24 @@ const useDrishtiVoice = ({
       const data = await res.json();
 
       if (currentTtsId !== activeTtsIdRef.current) return;
-      if (data.audioBase64 && (data.source === 'zia' || data.source === 'neural_tts')) {
-        console.log(`[DRISHTI VOICE] ✅ Got audio from ${data.source}, playing...`);
+      if (data.audioBase64 && data.source === 'zia') {
+        console.log('[DRISHTI VOICE] ✅ Zia audio received, playing...');
         try {
-          await playBase64Audio(data.audioBase64, data.mimeType || 'audio/mpeg', data.source);
-          return; // success — done
+          await playBase64Audio(data.audioBase64, data.mimeType || 'audio/wav', data.source);
+          return; // success
         } catch (playErr) {
-          console.warn('[DRISHTI VOICE] Audio playback failed, falling back to Web Speech:', playErr.message);
+          console.warn('[DRISHTI VOICE] Audio playback failed:', playErr.message);
           setIsSpeaking(false);
         }
       } else {
-        console.warn('[DRISHTI VOICE] API returned browser_fallback or empty audio, using Web Speech');
+        console.warn('[DRISHTI VOICE] Zia TTS returned browser_fallback — using Web Speech API');
       }
     } catch (err) {
-      console.warn('[DRISHTI VOICE] TTS API call failed, falling back to Web Speech API:', err.message);
+      console.warn('[DRISHTI VOICE] Zia TTS call failed:', err.message);
     }
 
     if (currentTtsId !== activeTtsIdRef.current) return;
-    // Final fallback: browser Web Speech API
+    // Graceful degradation: browser Web Speech API
     fallbackToBrowserSpeech();
   }, [findBestVoice]);
 

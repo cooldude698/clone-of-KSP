@@ -1,0 +1,10 @@
+{
+  "deployment": {
+    "stack": "node20",
+    "type": "cron",
+    "name": "cron-night-recalc"
+  },
+  "execution": {
+    "main": "index.js"
+  }
+}

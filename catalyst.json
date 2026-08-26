@@ -1,4 +1,12 @@
 {
+  "appsail": [
+    {
+      "name": "drishti-ssr",
+      "source": ".",
+      "dockerfile": "Dockerfile",
+      "build_path": "nextjs"
+    }
+  ],
   "functions": {
     "targets": [
       "drishti_ksp_function",
@@ -16,7 +24,20 @@
       "conversations",
       "export-pdf",
       "askDrishtiAI",
-      "drishtiVoice"
+      "drishtiVoice",
+      "stratus-upload",
+      "cache-hotspots",
+      "search-firs",
+      "ml-risk-score",
+      "zia-automl-predict",
+      "zia-ocr",
+      "auth-verify",
+      "cron-night-recalc",
+      "on-fir-insert",
+      "on-alert-broadcast",
+      "investigation-circuit",
+      "send-alert-mail",
+      "push-notify"
     ],
     "ignore": [
       "**/node_modules/**",

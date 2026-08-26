@@ -1,0 +1,62 @@
+name: DRISHTI — Catalyst Automated CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    name: Build Next.js & Deploy 26 Catalyst Capabilities
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: nextjs/package-lock.json
+
+      - name: 📦 Install Frontend Dependencies
+        working-directory: ./nextjs
+        run: npm ci
+
+      - name: 🔨 Build Next.js Web App (Catalyst Slate / AppSail Artifacts)
+        working-directory: ./nextjs
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+          NODE_ENV: production
+          NEXT_PUBLIC_API_BASE_URL: /server
+          CATALYST_PROJECT_ID: ${{ secrets.CATALYST_PROJECT_ID || '49149000000019001' }}
+        run: npm run build
+
+      - name: 🚀 Install Zoho Catalyst CLI
+        run: npm install -g zcatalyst-cli
+
+      - name: 🔐 Configure Catalyst CI/CD Authentication
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p ~/.zoho-catalyst ~/.catalyst
+          cat > ~/.zoho-catalyst/config.json << EOF
+          {
+            "client_id": "${{ secrets.CATALYST_CLIENT_ID }}",
+            "client_secret": "${{ secrets.CATALYST_CLIENT_SECRET }}",
+            "refresh_token": "${{ secrets.CATALYST_REFRESH_TOKEN }}",
+            "project_id": "${{ secrets.CATALYST_PROJECT_ID || '49149000000019001' }}",
+            "project_key": "${{ secrets.CATALYST_PROJECT_KEY }}",
+            "environment": "development"
+          }
+          EOF
+
+      - name: 🌐 Deploy All 26 Services via Zoho Catalyst CLI
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: catalyst deploy --non-interactive --only functions,slate,appsail
+        working-directory: ${{ github.workspace }}

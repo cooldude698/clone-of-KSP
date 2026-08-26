@@ -1,0 +1,10 @@
+{
+  "deployment": {
+    "stack": "node20",
+    "type": "advancedio",
+    "name": "zia-automl-predict"
+  },
+  "execution": {
+    "main": "index.js"
+  }
+}

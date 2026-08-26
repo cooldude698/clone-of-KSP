@@ -1,0 +1,10 @@
+{
+  "deployment": {
+    "stack": "node20",
+    "type": "event",
+    "name": "on-alert-broadcast"
+  },
+  "execution": {
+    "main": "index.js"
+  }
+}

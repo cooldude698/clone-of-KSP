@@ -1,0 +1,10 @@
+{
+  "deployment": {
+    "stack": "node20",
+    "type": "advancedio",
+    "name": "send-alert-mail"
+  },
+  "execution": {
+    "main": "index.js"
+  }
+}

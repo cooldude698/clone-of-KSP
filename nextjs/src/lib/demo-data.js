@@ -698,10 +698,9 @@ export function generateAIResponseFromDemoData(userQuestion = '') {
 
   // Pattern 3: Repeat Offenders / High-Risk Suspects
   if (q.includes('suspect') || q.includes('offender') || q.includes('repeat') || q.includes('criminal') || q.includes('gang')) {
-    const suspectList = DEMO_REPEAT_OFFENDERS.suspects.map((s, i) => {
-      const hangouts = Array.isArray(s.known_hangouts) ? s.known_hangouts.join(', ') : (s.last_known_location || 'Surveillance Zone');
-      return `${i + 1}) **${s.name}** ("${s.alias}") — Risk Score: **${s.risk_score}/100**\n   • Modus Operandi: ${s.primary_modus_operandi || 'Vehicle Theft & Extortion'}\n   • Known Hangouts: ${hangouts}\n   • Status: ${s.status || 'Active'}`;
-    }).join('\n\n');
+    const suspectList = (DEMO_REPEAT_OFFENDERS.suspects || []).map((s, i) => 
+      `${i + 1}) **${s.name}** ("${s.alias}") — Risk Score: **${s.risk_score}/100**\n   • Modus Operandi: ${s.primary_modus_operandi || 'Vehicle Theft / Robbery'}\n   • Known Hangouts: ${(s.known_hangouts || []).join(', ') || 'Bengaluru Corridor'}\n   • Status: ${s.status || 'Active Watchlist'}`
+    ).join('\n\n');
 
     return {
       answer: `DRISHTI Repeat Offender Matrix identifies **${DEMO_REPEAT_OFFENDERS.high_risk_count} high-risk targets**. Top active suspects:\n\n${suspectList}`,

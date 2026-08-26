@@ -1,121 +1,161 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, UserCheck, Shield, AlertTriangle, ArrowRight, MapPin, Activity } from 'lucide-react';
+import { Users, Search, Filter, ShieldAlert, AlertTriangle, ArrowRight, RefreshCw, Car, MapPin } from 'lucide-react';
+import { fetchWithFallback } from '@/lib/fetch-with-fallback';
 import { DEMO_REPEAT_OFFENDERS } from '@/lib/demo-data';
 
-export default function SuspectDirectoryPage() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [suspects, setSuspects] = useState(DEMO_REPEAT_OFFENDERS.suspects || []);
+export default function SuspectWatchlistPage() {
+  const [suspects, setSuspects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [riskFilter, setRiskFilter] = useState('ALL');
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('drishti_uploaded_suspects');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setSuspects([...parsed, ...(DEMO_REPEAT_OFFENDERS.suspects || [])]);
-        }
-      }
-    } catch (e) {
-      console.warn('Could not parse stored suspects:', e);
+    async function loadSuspects() {
+      setLoading(true);
+      const res = await fetchWithFallback('repeat-offenders', { offenders: DEMO_REPEAT_OFFENDERS });
+      const list = res?.data?.offenders || (Array.isArray(res?.data) ? res.data : DEMO_REPEAT_OFFENDERS);
+      setSuspects(list);
+      setLoading(false);
     }
+    loadSuspects();
   }, []);
 
-  const filteredSuspects = suspects.filter(s => {
-    const q = searchTerm.toLowerCase();
-    return (
-      (s.name && s.name.toLowerCase().includes(q)) ||
-      (s.alias && s.alias.toLowerCase().includes(q)) ||
-      (s.district_name && s.district_name.toLowerCase().includes(q)) ||
-      (s.primary_modus_operandi && s.primary_modus_operandi.toLowerCase().includes(q)) ||
-      (s.last_known_location && s.last_known_location.toLowerCase().includes(q))
-    );
+  const filtered = suspects.filter(s => {
+    const q = search.toLowerCase();
+    const matchesSearch =
+      (s.name || s.accused_name || '').toLowerCase().includes(q) ||
+      (s.alias || '').toLowerCase().includes(q) ||
+      (s.suspect_id || s.id || '').toLowerCase().includes(q) ||
+      (s.primary_crime || s.crime_type || '').toLowerCase().includes(q);
+
+    const score = s.risk_score || s.risk || 50;
+    const matchesRisk =
+      riskFilter === 'ALL' ||
+      (riskFilter === 'HIGH' && score >= 75) ||
+      (riskFilter === 'MEDIUM' && score >= 50 && score < 75) ||
+      (riskFilter === 'LOW' && score < 50);
+
+    return matchesSearch && matchesRisk;
   });
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-navy-700/50 pb-5">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded bg-rose-500/20 text-rose-300 text-xs font-mono font-semibold uppercase tracking-wider">
-              Repeat Offender Roster
-            </span>
-            <span className="text-xs text-gray-400 font-mono">Karnataka State Police</span>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--border)] pb-5">
+        <div className="flex items-center gap-3">
+          <span className="p-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20">
+            <ShieldAlert className="w-6 h-6" />
+          </span>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-[var(--foreground)]">Repeat Offender Watchlist</h1>
+            <p className="text-sm text-[var(--muted-foreground)]">KSP High-Priority Tracked Profiles, Recidivism Risk Ratings & Intelligence Dossiers</p>
           </div>
-          <h1 className="text-3xl font-bold text-white mt-1">High-Risk Suspect Registry</h1>
-          <p className="text-sm text-gray-400">Track syndicate targets, active absconders, and modus operandi profiles</p>
         </div>
+      </div>
 
-        {/* Search Input */}
-        <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+      {/* Search & Filter */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-[var(--surface-1)] p-4 rounded-2xl border border-[var(--border)]">
+        <div className="relative">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
           <input
             type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search Name, Alias, MO, Location..."
-            className="w-full pl-9 pr-4 py-2 bg-navy-900/80 border border-navy-700 rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none focus:border-accent-500 transition-all"
+            placeholder="Search by suspect name, alias, ID, crime type..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 text-sm rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-red-500/30"
           />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Filter className="w-4 h-4 text-[var(--muted-foreground)]" />
+          <select
+            value={riskFilter}
+            onChange={e => setRiskFilter(e.target.value)}
+            className="w-full px-3 py-2 text-sm rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)] focus:outline-none"
+          >
+            <option value="ALL">All Risk Categories</option>
+            <option value="HIGH">High Recidivism Risk (≥ 75%)</option>
+            <option value="MEDIUM">Medium Recidivism Risk (50% – 74%)</option>
+            <option value="LOW">Low Risk (&lt; 50%)</option>
+          </select>
         </div>
       </div>
 
-      {/* Suspect Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredSuspects.map((suspect, index) => {
-          const slug = suspect.name ? suspect.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'suspect';
-          return (
-            <Link
-              key={suspect.name || index}
-              href={`/dashboard/suspect/${slug}`}
-              className="group glass-card p-5 hover:border-rose-500/40 transition-all flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="text-xs font-mono text-gray-400">
-                    TARGET #{index + 1}
-                  </span>
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-bold font-mono">
-                    <AlertTriangle className="w-3 h-3 text-rose-400" />
-                    <span>RISK: {suspect.risk_score}/100</span>
-                  </div>
-                </div>
+      {/* Grid */}
+      {loading ? (
+        <div className="py-16 text-center text-[var(--muted-foreground)] flex items-center justify-center gap-2">
+          <RefreshCw className="w-5 h-5 animate-spin text-red-500" /> Loading suspect database...
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="py-16 text-center text-[var(--muted-foreground)] bg-[var(--surface-1)] rounded-2xl border border-[var(--border)]">
+          No suspects matched your search query.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filtered.map(s => {
+            const rawId = s.suspect_id || s.id || (s.name || '').toLowerCase().replace(/\s+/g, '-');
+            const encodedSlug = encodeURIComponent(rawId);
+            const risk = s.risk_score || s.risk || 60;
+            const hangouts = Array.isArray(s.known_hangouts)
+              ? s.known_hangouts.join(', ')
+              : (s.known_hangouts || 'Bengaluru Transit Corridors');
 
-                <h3 className="text-xl font-bold text-white group-hover:text-rose-300 transition-colors mb-0.5">
-                  {suspect.name}
-                </h3>
-                <p className="text-xs text-rose-400 font-mono mb-3">
-                  Alias: &quot;{suspect.alias || 'Unknown'}&quot;
-                </p>
-
-                <div className="space-y-2 text-xs text-gray-400 bg-navy-950/60 p-3 rounded-lg border border-navy-800">
-                  <div>
-                    <span className="text-gray-500 block mb-0.5">Modus Operandi:</span>
-                    <span className="text-gray-200 font-medium">{suspect.primary_modus_operandi || suspect.primary_crime || 'Vehicle Theft & Burglary'}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500 block mb-0.5">Last Known Location:</span>
-                    <span className="text-gray-300 flex items-start gap-1">
-                      <MapPin className="w-3 h-3 text-accent-400 shrink-0 mt-0.5" />
-                      {suspect.last_known_location || 'Surveillance Zone'}
+            return (
+              <Link
+                key={rawId}
+                href={`/dashboard/suspect/${encodedSlug}`}
+                className="group p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-red-500/40 hover:shadow-xl transition-all flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <span className="font-mono text-xs font-bold text-slate-300 bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700">
+                      {s.suspect_id || rawId}
+                    </span>
+                    <span className={`text-xs px-2.5 py-1 rounded-full font-bold flex items-center gap-1 ${
+                      risk >= 80
+                        ? 'bg-red-500/15 text-red-400 border border-red-500/30'
+                        : risk >= 60
+                          ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                          : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                    }`}>
+                      {risk >= 80 && <AlertTriangle className="w-3 h-3" />}
+                      Risk {risk}%
                     </span>
                   </div>
-                  <div className="flex items-center justify-between pt-1 border-t border-navy-800 text-[11px]">
-                    <span className="text-gray-500">Active FIRs:</span>
-                    <span className="font-bold text-rose-300">{suspect.active_firs || suspect.cases?.length || 1} Cases</span>
+
+                  <h3 className="text-lg font-bold text-[var(--foreground)] group-hover:text-red-400 transition-colors">
+                    {s.name || s.accused_name || 'Suspect Profile'}
+                  </h3>
+                  {s.alias && (
+                    <p className="text-xs text-amber-400 font-medium">Alias: &quot;{s.alias}&quot;</p>
+                  )}
+
+                  <div className="mt-3 space-y-1.5 text-xs text-[var(--muted-foreground)]">
+                    <div className="flex items-center gap-1.5">
+                      <ShieldAlert className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>Primary: <strong className="text-slate-300">{s.primary_crime || s.crime_type || 'Theft / Robbery'}</strong></span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span className="truncate">Hangouts: {hangouts}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="mt-4 pt-3 border-t border-navy-800 flex items-center justify-between text-xs text-rose-400 group-hover:text-rose-300 font-medium">
-                <span>View Full Criminal Profile</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+                <div className="pt-4 mt-4 border-t border-[var(--border)]/50 flex items-center justify-between text-xs text-[var(--muted-foreground)]">
+                  <span>FIR Count: <strong className="text-slate-200">{s.fir_count || s.total_cases || 3}</strong></span>
+                  <span className="flex items-center gap-1 font-medium text-red-400 group-hover:translate-x-0.5 transition-transform">
+                    Dossier <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

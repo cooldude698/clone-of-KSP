@@ -1,0 +1,10 @@
+{
+  "deployment": {
+    "stack": "node20",
+    "type": "advancedio",
+    "name": "stratus-upload"
+  },
+  "execution": {
+    "main": "index.js"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "deployment": {
+    "stack": "node20",
+    "type": "advancedio",
+    "name": "cache-hotspots"
+  },
+  "execution": {
+    "main": "index.js"
+  }
+}

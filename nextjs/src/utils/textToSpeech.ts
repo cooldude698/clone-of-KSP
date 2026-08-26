@@ -1,64 +1,72 @@
 /**
  * Utility for Text-to-Speech in DRISHTI.
- * Attempts to use backend TTS API, falling back to browser speechSynthesis API.
+ * Routes audio requests through Catalyst Zia TTS (/server/drishtiVoice),
+ * falling back safely if offline.
  */
 
-export async function speakText(text: string, language: 'en' | 'kn'): Promise<void> {
-  const cleanText = text.substring(0, 500); // Limit length
+let activeAudio: HTMLAudioElement | null = null;
+
+export async function speakText(text: string, language: 'en' | 'kn' = 'en'): Promise<void> {
+  const cleanText = text.substring(0, 500).replace(/[|*#`_~>]/g, ' ').trim();
+  if (!cleanText) return;
+
+  stopSpeaking();
 
   try {
-    // 1. Try backend Zia TTS endpoint first (POST /api/voice/tts)
-    const base = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
-    const response = await fetch(`${base}/voice/tts`, {
+    // 1. Primary: Catalyst Function Zia TTS endpoint
+    const response = await fetch('/server/drishtiVoice', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: cleanText, language })
+      body: JSON.stringify({ mode: 'tts', text: cleanText, lang: language })
     });
 
     if (response.ok) {
-      const blob = await response.blob();
-      const audioUrl = URL.createObjectURL(blob);
-      const audio = new Audio(audioUrl);
-      await audio.play();
-      return;
+      const data = await response.json();
+      if (data.audioBase64 && data.source === 'zia') {
+        const mimeType = data.mimeType || 'audio/wav';
+        const audio = new Audio(`data:${mimeType};base64,${data.audioBase64}`);
+        activeAudio = audio;
+        await audio.play();
+        return;
+      }
     }
   } catch (err) {
-    console.warn('Backend TTS failed or unavailable, falling back to browser SpeechSynthesis:', err);
+    console.warn('[speakText] Zia TTS endpoint unavailable:', err);
   }
 
   // 2. Fallback: Browser Web Speech API SpeechSynthesis
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-    // Stop any current speech
-    window.speechSynthesis.cancel();
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(cleanText.substring(0, 300));
+      utterance.lang = language === 'en' ? 'en-IN' : 'kn-IN';
+      utterance.rate = 0.9;
 
-    const utterance = new SpeechSynthesisUtterance(text.substring(0, 300));
-    utterance.lang = language === 'en' ? 'en-IN' : 'kn-IN';
-    utterance.rate = 0.9; // Slightly slower for better clarity
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoice = voices.find(voice => 
+        language === 'en' 
+          ? voice.lang.includes('en-IN') || voice.name.toLowerCase().includes('india')
+          : voice.lang.includes('kn-IN') || voice.name.toLowerCase().includes('kannada')
+      );
+      if (preferredVoice) utterance.voice = preferredVoice;
 
-    // Basic selection of Kannada/Indian English voice if available
-    const voices = window.speechSynthesis.getVoices();
-    const preferredVoice = voices.find(voice => 
-      language === 'en' 
-        ? voice.lang.includes('en-IN') 
-        : voice.lang.includes('kn-IN')
-    );
-    if (preferredVoice) {
-      utterance.voice = preferredVoice;
-    }
-
-    window.speechSynthesis.speak(utterance);
-  } else {
-    console.error('Text-to-speech is not supported in this browser.');
+      window.speechSynthesis.speak(utterance);
+    } catch (_) {}
   }
 }
 
 export function stopSpeaking(): void {
+  if (activeAudio) {
+    try { activeAudio.pause(); } catch (_) {}
+    activeAudio = null;
+  }
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     window.speechSynthesis.cancel();
   }
 }
 
 export function isSpeaking(): boolean {
+  if (activeAudio && !activeAudio.paused) return true;
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     return window.speechSynthesis.speaking;
   }

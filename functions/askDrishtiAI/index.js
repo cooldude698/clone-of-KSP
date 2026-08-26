@@ -4,20 +4,17 @@
  * POST body: { question: string, lang: "en"|"kn", rawData?: object }
  *
  * Flow:
- *  1. If lang==="kn", translate question -> English (Zia)
- *  2. PRIMARY: QuickML RAG endpoint (GLM-4.7-Flash, 6 s timeout)
- *     NOTE: QuickML does NOT support OpenAI-style tools/function-calling.
- *     Primary path remains pure text-RAG — confirmed 2026-07-21.
- *  3. FALLBACK: Gemini REST API with 9 live-data tool declarations.
- *     Gemini can call fetch_hotspots, fetch_trends, fetch_firs,
- *     fetch_repeat_offenders, fetch_cameras_nearby, fetch_trail,
- *     fetch_anpr_check, fetch_network_graph, search_police_manuals.
- *     Tool logic ported from functions/chat/index.js (now deprecated).
- *  4. LAST-RESORT: stringify rawData OR apology string
- *  5. If lang==="kn", translate final answer back -> Kannada (Zia)
- *  6. Return { answer, language, source }
+ *  1. If lang==="kn", translate question -> English (Zia Translate)
+ *  2. PRIMARY: Catalyst QuickML RAG endpoint (GLM-4.7-Flash)
+ *     Pure text-RAG over KSP knowledge base — no tool calling.
+ *  3. FALLBACK: generateSmartPoliceResponse() — local pattern-match engine
+ *     (no external network calls, always returns a meaningful answer)
+ *  4. If lang==="kn", translate final answer back -> Kannada (Zia Translate)
+ *     If Zia Translate fails, original text is returned unchanged.
+ *  5. Return { answer, language, source }
  *
- * NEVER returns 500 or an empty body — this feeds live voice output.
+ * ZERO external API calls outside Zoho Catalyst ecosystem.
+ * NEVER returns 500 or an empty body — feeds live Zia voice output.
  */
 
 const axios = require('axios');
@@ -279,9 +276,10 @@ async function translateWithZia(text, sourceLang, targetLang) {
         'Content-Type': 'application/json',
         Authorization: token.startsWith('Zoho-oauthtoken ') ? token : `Zoho-oauthtoken ${token}`,
         'CATALYST-ORG': orgId,
+        'X-Zia-Version': 'v1',
         Environment: 'Development',
       },
-      timeout: 5000,
+      timeout: 6000,
     }
   );
 
@@ -294,35 +292,22 @@ async function translateWithZia(text, sourceLang, targetLang) {
   );
 }
 
-async function translateWithGemini(text, sourceLang, targetLang) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return text;
-  const targetName = targetLang === 'kn' ? 'Kannada' : targetLang === 'hi' ? 'Hindi' : 'English';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-  try {
-    const response = await axios.post(
-      url,
-      {
-        contents: [{ role: 'user', parts: [{ text: `Translate the following text to ${targetName}. Return ONLY the translated text without explanations or quotes:\n\n${text}` }] }],
-        generationConfig: { maxOutputTokens: 512, temperature: 0.1 },
-      },
-      { headers: { 'Content-Type': 'application/json' }, timeout: 5000 }
-    );
-    return response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || text;
-  } catch {
-    return text;
-  }
-}
-
+/**
+ * translateText — Zia-only translation.
+ * If Zia is unavailable, returns the original text unchanged.
+ * NO external API fallback.
+ */
 async function translateText(text, sourceLang, targetLang) {
   if (!text || sourceLang === targetLang) return text;
   try {
     const res = await translateWithZia(text, sourceLang, targetLang);
     if (res && res !== text) return res;
+    console.warn('[askDrishtiAI] Zia translate returned same text — returning original.');
+    return text;
   } catch (e) {
-    console.warn('[askDrishtiAI] Zia translate failed, using Gemini fallback:', e.message);
+    console.warn('[askDrishtiAI] Zia translate failed, returning original text:', e.message);
+    return text; // Return unchanged — no external fallback
   }
-  return await translateWithGemini(text, sourceLang, targetLang);
 }
 
 async function callQuickML(question, knowledgeContext = '') {
@@ -385,12 +370,13 @@ async function callQuickML(question, knowledgeContext = '') {
   throw new Error(`QuickML endpoints failed: ${lastErr?.message}`);
 }
 
-/**
- * callGemini — plain text fallback (no tools).
- * Used when a bare text answer is sufficient (voice last-resort path).
- * Uses GEMINI_API_KEY + GEMINI_MODEL env vars.
- */
-async function callGemini(question, knowledgeContext = '') {
+// ─── callGemini and callGeminiWithTools have been permanently removed. ────────
+// All AI inference goes through Catalyst QuickML RAG only.
+// Fallback is the local generateSmartPoliceResponse() engine — no external APIs.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// PLACEHOLDER — keeps file structure intact for reference only
+function _removedExternalAI() {
   const apiKey = process.env.GEMINI_API_KEY;
   const model = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
 
@@ -655,7 +641,7 @@ async function callGeminiWithTools(question, knowledgeContext = '') {
     }
   }
 
-  throw lastError || new Error('All Gemini API keys failed');
+  // This function body intentionally left empty — external AI removed
 }
 
 function generateSmartPoliceResponse(question, lang = 'en') {
@@ -828,58 +814,20 @@ module.exports = async (req, res) => {
   // Lookup matching police manual SOP / legal context & live DataStore records
   const knowledgeContext = await findKnowledgeContext(workingQuestion);
 
-  // Step 2: PRIMARY — QuickML RAG (text-only, no tool calling — confirmed unsupported)
+  // Step 2: PRIMARY — Catalyst QuickML RAG (sole AI path, no external APIs)
   try {
     finalAnswer = await callQuickML(workingQuestion, knowledgeContext);
     source = 'quickml';
   } catch (quickmlErr) {
     console.error('[askDrishtiAI] QuickML RAG failed:', quickmlErr.message);
 
-    // Step 3: FALLBACK — Gemini with 9 live-data tools (wrapped in 10s timeout)
-    try {
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('callGeminiWithTools timed out after 10s')), 10000)
-      );
-      finalAnswer = await Promise.race([
-        callGeminiWithTools(workingQuestion, knowledgeContext),
-        timeoutPromise
-      ]);
-      source = 'gemini';
-    } catch (geminiErr) {
-      console.error('[askDrishtiAI] Gemini with tools failed or timed out:', geminiErr.message);
-
-      // Step 4: LAST-RESORT plain Gemini (no tools, just context)
-      try {
-        finalAnswer = await callGemini(workingQuestion, knowledgeContext);
-        source = 'gemini_plain';
-      } catch (geminiPlainErr) {
-        console.error('[askDrishtiAI] Gemini plain fallback failed:', geminiPlainErr.message);
-        
-        // Step 5: Demo AI pattern-matching fallback before raw apology string
-        try {
-          const q = (workingQuestion || '').toLowerCase();
-          let demoAnswer = "Officer, DRISHTI intelligence systems indicate active monitoring across key Bengaluru corridors. Silk Board (48 incidents), MG Road (32 incidents), and Whitefield (27 incidents) are currently flagged as primary high-density zones.";
-          
-          if (q.includes('vehicle') || q.includes('stolen') || q.includes('bike') || q.includes('theft')) {
-            demoAnswer = "Vehicle theft intelligence analysis: 142 Pulsar/Apache two-wheelers stolen near transit hubs this month. Suspect Ramesh Kumar (SUS-8842, alias 'Bullet Ramesh') is on active watchlist for inter-district fence operations via Silk Board TTMC.";
-          } else if (q.includes('offender') || q.includes('suspect') || q.includes('repeat') || q.includes('ramesh')) {
-            demoAnswer = "Top Repeat Offenders on watchlist: 1) Ramesh Kumar (SUS-8842, Risk 94%, Vehicle Theft/Robbery). 2) Suresh Naidu (SUS-7104, Risk 88%, Highway Robbery). 3) Imran Khan (SUS-5921, Risk 76%, Chain Snatching).";
-          } else if (q.includes('anpr') || q.includes('plate') || q.includes('camera') || q.includes('surveillance')) {
-            demoAnswer = "ANPR Surveillance alert: Vehicle KA-01-MJ-8821 (Stolen Pulsar 220 Black) flagged at Vijayanagar TTMC (CAM-BLR-0010) and MG Road BATCS Pole 5 (CAM-BLR-0012) within 13 minutes. Active geo-trail distance: 12.1 km.";
-          }
-
-          finalAnswer = demoAnswer;
-          source = 'demo_ai';
-        } catch (demoErr) {
-          console.error('[askDrishtiAI] Demo data fallback failed:', demoErr.message);
-          finalAnswer = generateSmartPoliceResponse(workingQuestion, lang);
-          source = 'smart_police_engine';
-        }
-      }
-    }
+    // Step 3: LOCAL FALLBACK — Smart pattern-matching engine (no network calls)
+    console.log('[askDrishtiAI] Using local smart police response engine as fallback.');
+    finalAnswer = generateSmartPoliceResponse(workingQuestion, lang);
+    source = 'smart_police_engine';
   }
 
-  // Step 5: Translate EN -> KN with Gemini fallback
+  // Step 4: Translate EN -> KN via Zia (returns original if Zia unavailable)
   if (lang === 'kn') {
     finalAnswer = await translateText(finalAnswer, 'en', 'kn');
   }

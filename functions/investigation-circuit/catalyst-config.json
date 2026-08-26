@@ -1,0 +1,10 @@
+{
+  "deployment": {
+    "stack": "node20",
+    "type": "advancedio",
+    "name": "investigation-circuit"
+  },
+  "execution": {
+    "main": "index.js"
+  }
+}

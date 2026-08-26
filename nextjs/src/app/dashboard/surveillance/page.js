@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { fetchWithFallback } from '@/lib/fetch-with-fallback';
 import { DEMO_ANPR_RESULT } from '@/lib/demo-data';
+import { speakText } from '@/utils/textToSpeech';
 import {
   Camera, WifiOff, Eye, MapPin, Maximize2, X,
   ShieldAlert, Search, AlertTriangle, CheckCircle2, ChevronRight,
@@ -79,18 +80,8 @@ function playWebAudioSynth(type) {
 
 // ─── DRISHTI Voice Alert Speech ──────────────────────────────────────────────
 function speakDrishtiAlert(text) {
-  if (typeof window === 'undefined' || !window.speechSynthesis) return;
-  try {
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 1.0;
-    u.pitch = 1.0;
-    u.volume = 1.0;
-    const voices = window.speechSynthesis.getVoices();
-    const bestVoice = voices.find(v => v.lang === 'en-IN' || v.name.toLowerCase().includes('india') || v.name.toLowerCase().includes('google')) || voices[0];
-    if (bestVoice) u.voice = bestVoice;
-    window.speechSynthesis.speak(u);
-  } catch (_) {}
+  if (!text) return;
+  speakText(text, 'en').catch(() => {});
 }
 
 // CCTV Video Mapping — direct GitHub CDN URLs pinned to commit 6b33c15b04de078cc4b0723c051a559d69cd6e64 containing your real KSP project videos!
