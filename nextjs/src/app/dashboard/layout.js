@@ -8,7 +8,7 @@ import {
   LayoutDashboard, MessageSquare, Map, GitBranch,
   Camera, BarChart2, LogOut, Shield, ChevronLeft,
   ChevronRight, AlertTriangle, User, History, Eye, Navigation,
-  Newspaper
+  Newspaper, FileText, Server
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -25,9 +25,12 @@ const DrishtiPanel       = dynamic(() => import('@/components/DrishtiPanel'),   
 const NAV_ITEMS = [
   { href: '/dashboard',              icon: LayoutDashboard, label: 'Overview',       id: 'nav-overview' },
   { href: '/dashboard/chat',         icon: MessageSquare,   label: 'Co-Pilot Chat',  id: 'nav-chat' },
+  { href: '/dashboard/fir',          icon: FileText,        label: 'FIR Registry',   id: 'nav-fir' },
+  { href: '/dashboard/suspect',      icon: User,            label: 'Suspect Roster', id: 'nav-suspect' },
   { href: '/dashboard/map',          icon: Map,             label: 'Crime Map',      id: 'nav-map' },
   { href: '/dashboard/network',      icon: GitBranch,       label: 'Network Graph',  id: 'nav-network' },
   { href: '/dashboard/surveillance', icon: Camera,          label: 'Surveillance',   id: 'nav-surveillance' },
+  { href: '/dashboard/services',     icon: Server,          label: 'Catalyst Hub',   id: 'nav-services' },
   { href: '/dashboard/analytics',    icon: BarChart2,       label: 'Analytics',      id: 'nav-analytics' },
   { href: '/dashboard/logs',         icon: History,         label: 'AI Logs',        id: 'nav-logs' },
   { href: '/dashboard/trail',        icon: Navigation,      label: 'Geo Trail',      id: 'nav-trail' },
