@@ -1,116 +1,69 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 200" width="100%" height="100%">
-  <defs>
-    <!-- Background Canvas Gradient -->
-    <linearGradient id="bgGradFull" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0B0F19" />
-      <stop offset="50%" stop-color="#070A12" />
-      <stop offset="100%" stop-color="#030509" />
-    </linearGradient>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 650 180" width="100%" height="100%">
+  <!-- Left: Black Squircle with White Solar Eye Emblem -->
+  <g transform="translate(15, 15)">
+    <rect width="150" height="150" rx="38" fill="#000000" />
 
-    <!-- Outer 'D' Ribbon Gradient -->
-    <linearGradient id="dRibbonGradFull" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1E293B" />
-      <stop offset="35%" stop-color="#0F172A" />
-      <stop offset="100%" stop-color="#020617" />
-    </linearGradient>
+    <g transform="translate(75, 75) scale(0.28)" fill="#FFFFFF">
+      <!-- Top Center Spike -->
+      <polygon points="0,-191 22,-84 -22,-84" />
+      <!-- Top Left Diagonal Spike -->
+      <polygon points="-104,-131 -48,-68 -82,-44" />
+      <!-- Top Right Diagonal Spike -->
+      <polygon points="104,-131 82,-44 48,-68" />
 
-    <!-- Electric Sapphire Glowing Rim Stroke -->
-    <linearGradient id="sapphireGlowFull" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00F0FF" />
-      <stop offset="45%" stop-color="#38BDF8" />
-      <stop offset="75%" stop-color="#2563EB" />
-      <stop offset="100%" stop-color="#1D4ED8" />
-    </linearGradient>
+      <!-- Bottom Center Spike -->
+      <polygon points="0,191 -22,84 22,84" />
+      <!-- Bottom Left Diagonal Spike -->
+      <polygon points="-104,131 -82,44 -48,68" />
+      <!-- Bottom Right Diagonal Spike -->
+      <polygon points="104,131 48,68 82,44" />
 
-    <!-- Eye Body Glass Gradient -->
-    <linearGradient id="eyeGlassGradFull" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1E293B" />
-      <stop offset="50%" stop-color="#0F172A" />
-      <stop offset="100%" stop-color="#030712" />
-    </linearGradient>
-
-    <!-- Core Pupil Glow -->
-    <radialGradient id="pupilCoreGradFull" cx="45%" cy="45%" r="55%">
-      <stop offset="0%" stop-color="#E0F2FE" />
-      <stop offset="40%" stop-color="#00F0FF" />
-      <stop offset="75%" stop-color="#2563EB" />
-      <stop offset="100%" stop-color="#0F172A" />
-    </radialGradient>
-
-    <!-- Text Gradient -->
-    <linearGradient id="textGradFull" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#FFFFFF" />
-      <stop offset="70%" stop-color="#F1F5F9" />
-      <stop offset="100%" stop-color="#94A3B8" />
-    </linearGradient>
-  </defs>
-
-  <!-- ─── EMBLEM (Left: Center at x=100, y=100) ─── -->
-  <g transform="translate(18, 18)">
-    <rect width="164" height="164" rx="42" fill="url(#bgGradFull)" />
-    <rect width="160" height="160" x="2" y="2" rx="40" fill="none" stroke="#1E293B" stroke-width="1.5" />
-
-    <g transform="translate(82, 82) scale(0.35)">
-      <!-- Outer 'D' Shell -->
+      <!-- Outer Eye Contour Ring -->
       <path 
-        d="M -70 -160 
-           C 40 -160, 165 -90, 165 20 
-           C 165 125, 65 175, -55 175 
-           C -95 175, -125 160, -125 140
-           L -125 70 
-           C -125 65, -115 60, -100 60
-           C -30 60, 95 30, 95 -20
-           C 95 -75, 15 -110, -70 -110
-           Z" 
-        fill="url(#dRibbonGradFull)"
-        stroke="url(#sapphireGlowFull)"
-        stroke-width="8"
-        stroke-linejoin="round"
+        d="M -184 0 
+           C -121 -98, 121 -98, 184 0 
+           C 121 98, -121 98, -184 0 Z
+           M -132 0 
+           C -88 -66, 88 -66, 132 0 
+           C 88 66, -88 66, -132 0 Z" 
+        fill-rule="evenodd" 
       />
 
-      <!-- Inner Eye -->
+      <!-- Inner Eye Wave Crest -->
       <path 
-        d="M -165 -10 
-           C -90 -85, 35 -85, 95 -10 
-           C 35 65, -90 65, -165 -10 Z" 
-        fill="url(#eyeGlassGradFull)" 
-        stroke="url(#sapphireGlowFull)" 
-        stroke-width="9" 
-        stroke-linejoin="round"
+        d="M -128 0 
+           C -84 -60, 84 -60, 128 0 
+           C 84 -20, 34 -24, -20 -14 
+           C -71 -4, -76 30, -30 38 
+           C 12 44, 38 30, 52 18 
+           C 30 44, -10 58, -50 52 
+           C -104 44, -116 16, -128 0 Z" 
       />
-
-      <!-- Iris & Pupil -->
-      <circle cx="-35" cy="-10" r="48" fill="#090D16" stroke="url(#sapphireGlowFull)" stroke-width="6" />
-      <circle cx="-35" cy="-10" r="28" fill="url(#pupilCoreGradFull)" />
-      <circle cx="-45" cy="-20" r="8" fill="#FFFFFF" opacity="0.9" />
     </g>
   </g>
 
-  <!-- ─── TYPOGRAPHY (Right) ─── -->
-  <g transform="translate(210, 0)">
-    <!-- Kannada Script Wordmark + Badge -->
-    <g transform="translate(0, 58)">
-      <text font-family="'Plus Jakarta Sans', sans-serif" font-size="20" font-weight="700" fill="#38BDF8" letter-spacing="1">
+  <!-- Right: Clean Typography -->
+  <g transform="translate(195, 0)">
+    <g transform="translate(0, 55)">
+      <text font-family="'Plus Jakarta Sans', sans-serif" font-size="18" font-weight="700" fill="#38BDF8" letter-spacing="1">
         ದೃಷ್ಟಿ
       </text>
-      <rect x="65" y="-17" width="105" height="22" rx="6" fill="#00F0FF" fill-opacity="0.1" stroke="#00F0FF" stroke-opacity="0.3" stroke-width="1" />
-      <circle cx="76" cy="-6" r="3" fill="#10B981" />
-      <text x="86" y="-5.5" font-family="'Plus Jakarta Sans', sans-serif" font-size="9.5" font-weight="800" fill="#38BDF8" letter-spacing="1">
-        AI CO-PILOT
+      <rect x="62" y="-16" width="96" height="22" rx="6" fill="#38BDF8" fill-opacity="0.1" stroke="#38BDF8" stroke-opacity="0.3" stroke-width="1" />
+      <circle cx="73" cy="-5" r="3" fill="#10B981" />
+      <text x="83" y="-5" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="800" fill="#38BDF8" letter-spacing="1">
+        KSP AI
       </text>
     </g>
 
-    <!-- Main Title: DRISHTI -->
-    <text x="0" y="118" font-family="'Plus Jakarta Sans', -apple-system, sans-serif" font-size="52" font-weight="900" fill="url(#textGradFull)" letter-spacing="4">
+    <text x="0" y="112" font-family="'Plus Jakarta Sans', -apple-system, sans-serif" font-size="50" font-weight="900" fill="#FFFFFF" letter-spacing="4">
       DRISHTI
     </text>
 
-    <!-- Subtitle: Karnataka State Police -->
-    <g transform="translate(2, 148)">
-      <text font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="800" fill="#38BDF8" letter-spacing="3">
+    <g transform="translate(2, 142)">
+      <text font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="800" fill="#38BDF8" letter-spacing="3">
         KARNATAKA STATE POLICE
       </text>
-      <text x="235" y="0" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="600" fill="#64748B" letter-spacing="1.5">
+      <text x="215" y="0" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="600" fill="#71717A" letter-spacing="1.5">
         • TACTICAL INTELLIGENCE
       </text>
     </g>

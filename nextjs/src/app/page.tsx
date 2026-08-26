@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  X, ShieldAlert, Shield, KeyRound, UserCheck, Eye, EyeOff, 
+import {
+  X, ShieldAlert, Shield, KeyRound, UserCheck, Eye, EyeOff,
   Activity, Radio, Cpu, Layers, Bot, ArrowRight, Zap, CheckCircle2, Lock, ChevronRight
+} from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 import Card from '@/components/ui/Card';
-import DrishtiLogo from '@/components/DrishtiLogo';
 
 // Previews
 import ChatHeatmapMockup from '@/components/landing/ChatHeatmapMockup';
@@ -79,7 +79,7 @@ const ROLES = ['Inspector', 'Crime Analyst', 'Supervisor', 'Policymaker'];
 
 export default function LandingPage() {
   const router = useRouter();
-  
+
   // Login Panel States
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [employeeId, setEmployeeId] = useState('');
@@ -88,7 +88,7 @@ export default function LandingPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   // System configurations
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -128,7 +128,7 @@ export default function LandingPage() {
     setLoading(true);
     try {
       const email = finalId.includes('@') ? finalId : `${finalId}@drishti.ksp`;
-      
+
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -163,24 +163,41 @@ export default function LandingPage() {
     router.push('/dashboard');
   };
 
-  const scrollAnimation = prefersReducedMotion 
-    ? {} 
+  const scrollAnimation = prefersReducedMotion
+    ? {}
     : {
-        initial: { opacity: 0, y: 30 },
-        whileInView: { opacity: 1, y: 0 },
-        viewport: { once: true, margin: '-100px' },
-        transition: { duration: 0.6, ease: 'easeOut' as const }
-      };
+      initial: { opacity: 0, y: 30 },
+      whileInView: { opacity: 1, y: 0 },
+      viewport: { once: true, margin: '-100px' },
+      transition: { duration: 0.6, ease: 'easeOut' as const }
+    };
 
   return (
-    <main 
+    <main
       onMouseMove={handleMouseMove}
       className="min-h-screen bg-[var(--surface-0)] text-[var(--text-primary)] flex flex-col font-sans relative overflow-hidden transition-colors duration-200"
     >
       {/* ── TOP TACTICAL NAVIGATION BAR ────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-[var(--surface-0)]/80 border-b border-[var(--border)] px-4 sm:px-8 py-3 flex items-center justify-between">
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-[var(--surface-0)]/80 border-b border-[var(--border)] px-4 sm:px-8 py-3.5 flex items-center justify-between">
         {/* Left: Branding */}
-        <DrishtiLogo variant="full" size="sm" href="/" />
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded bg-[var(--accent)] text-white flex items-center justify-center font-bold shadow-md shadow-[var(--accent-glow)] border border-white/10">
+            <Shield className="w-4 h-4 text-white" />
+          </div>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <span className="font-mono font-bold tracking-[0.15em] text-xs text-[var(--text-primary)]">
+                DRISHTI AI
+              </span>
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--accent)]/15 text-[var(--accent-light)] border border-[var(--accent)]/30 font-semibold">
+                KSP v2.4
+              </span>
+            </div>
+            <span className="text-[9px] font-mono text-[var(--text-secondary)] tracking-wider">
+              KARNATAKA STATE POLICE CO-PILOT
+            </span>
+          </div>
+        </div>
 
         {/* Center: System Status Indicator */}
         <div className="hidden md:flex items-center gap-6 font-mono text-[11px] text-[var(--text-secondary)]">
@@ -201,7 +218,7 @@ export default function LandingPage() {
 
         {/* Right: Actions */}
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={() => setIsSigningIn(true)}
             className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded bg-[var(--surface-1)] hover:bg-[var(--surface-2)] border border-[var(--border)] text-xs font-mono font-semibold text-[var(--text-primary)] transition-all shadow-sm"
           >
@@ -214,15 +231,15 @@ export default function LandingPage() {
 
       {/* ── SECTION 1: HERO (Surveillance Grid) ────────────────────────────── */}
       <section className="min-h-[calc(100vh-60px)] w-full relative flex items-center justify-center p-6 border-b border-[var(--border)] overflow-hidden select-none">
-        
+
         {/* Interactive Spotlight */}
-        <div 
+        <div
           className="absolute inset-0 pointer-events-none z-0 opacity-100 transition-opacity duration-300"
           style={{
             background: `radial-gradient(650px circle at ${mousePos.x}px ${mousePos.y}px, rgba(166, 138, 105, 0.45), transparent 50%)`
           }}
         />
-        
+
         {/* Cyber Grid Pattern */}
         <div className="absolute inset-0 cyber-grid-bg opacity-40 z-0 pointer-events-none" />
 
@@ -312,7 +329,7 @@ export default function LandingPage() {
 
         {/* Foreground Title & Hero Actions */}
         <div className="relative z-30 text-center max-w-2xl mx-auto flex flex-col items-center gap-6 py-12">
-          
+
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--surface-1)] border border-[var(--border)] shadow-sm">
             <Bot className="w-3.5 h-3.5 text-[var(--cyan-accent)]" />
             <span className="text-[11px] font-mono font-medium text-[var(--text-secondary)] tracking-wider">

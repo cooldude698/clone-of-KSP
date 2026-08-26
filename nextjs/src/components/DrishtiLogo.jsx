@@ -4,12 +4,13 @@ import React from 'react';
 import Link from 'next/link';
 
 /**
- * DrishtiLogo — Concept B: Fluid Cyber Eye 'D' Monogram
+ * DrishtiLogo — Exact Solar Eye / Guardian Vision Emblem
  * 
- * Features:
- * - Continuous aerodynamic obsidian 'D' ribbon with glowing sapphire rim
- * - Visionary precision optical iris core
- * - Sleek typography with Kannada accent & Karnataka State Police branding
+ * Props:
+ * - variant: 'icon' | 'compact' | 'full'
+ * - size: 'sm' | 'md' | 'lg'
+ * - href: optional link destination (e.g. '/dashboard' or '/')
+ * - className: custom Tailwind classes
  */
 export function DrishtiLogo({
   variant = 'compact',
@@ -26,73 +27,41 @@ export function DrishtiLogo({
   const currentSize = SIZES[size] || SIZES.md;
 
   const EmblemIcon = (
-    <div className={`relative flex items-center justify-center flex-shrink-0 bg-[#0B0F19] border border-slate-800 shadow-md ${currentSize.icon}`}>
+    <div className={`relative flex items-center justify-center flex-shrink-0 bg-black text-white dark:bg-black dark:text-white border border-gray-800 shadow-sm ${currentSize.icon}`}>
       <svg
         viewBox="0 0 512 512"
         className="w-full h-full p-1"
-        fill="none"
+        fill="currentColor"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <defs>
-          <linearGradient id="dlbRibbon" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#1E293B" />
-            <stop offset="35%" stopColor="#0F172A" />
-            <stop offset="100%" stopColor="#020617" />
-          </linearGradient>
-          <linearGradient id="dlbSapphire" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#00F0FF" />
-            <stop offset="45%" stopColor="#38BDF8" />
-            <stop offset="75%" stopColor="#2563EB" />
-            <stop offset="100%" stopColor="#1D4ED8" />
-          </linearGradient>
-          <linearGradient id="dlbEyeGlass" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#1E293B" />
-            <stop offset="50%" stopColor="#0F172A" />
-            <stop offset="100%" stopColor="#030712" />
-          </linearGradient>
-          <radialGradient id="dlbPupil" cx="45%" cy="45%" r="55%">
-            <stop offset="0%" stopColor="#E0F2FE" />
-            <stop offset="40%" stopColor="#00F0FF" />
-            <stop offset="75%" stopColor="#2563EB" />
-            <stop offset="100%" stopColor="#0F172A" />
-          </radialGradient>
-        </defs>
+        {/* Top Center Spike */}
+        <polygon points="256,65 278,172 234,172" />
+        
+        {/* Top Left Diagonal Spike */}
+        <polygon points="152,125 208,188 174,212" />
+        
+        {/* Top Right Diagonal Spike */}
+        <polygon points="360,125 338,212 304,188" />
 
-        <g transform="translate(256, 256)">
-          {/* Outer 'D' Shell */}
-          <path
-            d="M -70 -160 C 40 -160, 165 -90, 165 20 C 165 125, 65 175, -55 175 C -95 175, -125 160, -125 140 L -125 70 C -125 65, -115 60, -100 60 C -30 60, 95 30, 95 -20 C 95 -75, 15 -110, -70 -110 Z"
-            fill="url(#dlbRibbon)"
-            stroke="url(#dlbSapphire)"
-            strokeWidth="9"
-            strokeLinejoin="round"
-          />
+        {/* Bottom Center Spike */}
+        <polygon points="256,447 234,340 278,340" />
+        
+        {/* Bottom Left Diagonal Spike */}
+        <polygon points="152,387 174,300 208,324" />
+        
+        {/* Bottom Right Diagonal Spike */}
+        <polygon points="360,387 304,324 338,300" />
 
-          {/* Inner Eye */}
-          <path
-            d="M -165 -10 C -90 -85, 35 -85, 95 -10 C 35 65, -90 65, -165 -10 Z"
-            fill="url(#dlbEyeGlass)"
-            stroke="url(#dlbSapphire)"
-            strokeWidth="10"
-            strokeLinejoin="round"
-          />
+        {/* Outer Eye Contour Ring */}
+        <path
+          d="M 72 256 C 135 158, 377 158, 440 256 C 377 354, 135 354, 72 256 Z M 124 256 C 168 190, 344 190, 388 256 C 344 322, 168 322, 124 256 Z"
+          fillRule="evenodd"
+        />
 
-          {/* Iris & Pupil */}
-          <circle cx="-35" cy="-10" r="48" fill="#090D16" stroke="url(#dlbSapphire)" strokeWidth="6" />
-          <circle cx="-35" cy="-10" r="28" fill="url(#dlbPupil)" />
-          <circle cx="-45" cy="-20" r="8" fill="#FFFFFF" opacity="0.95" />
-          <circle cx="-25" cy="-2" r="3.5" fill="#FFFFFF" opacity="0.6" />
-
-          {/* Flare Arc */}
-          <path
-            d="M -125 140 C -70 160, 20 155, 75 110"
-            fill="none"
-            stroke="url(#dlbSapphire)"
-            strokeWidth="5"
-            strokeLinecap="round"
-            opacity="0.8"
-          />
-        </g>
+        {/* Inner Eye Swirling Wave Crest */}
+        <path
+          d="M 128 256 C 172 196, 340 196, 384 256 C 340 236, 290 232, 236 242 C 185 252, 180 286, 226 294 C 268 300, 294 286, 308 274 C 286 300, 246 314, 206 308 C 152 300, 140 272, 128 256 Z"
+        />
       </svg>
     </div>
   );
@@ -134,7 +103,7 @@ export function DrishtiLogo({
 
   if (href) {
     return (
-      <Link href={href} className="inline-flex items-center group transition-transform hover:opacity-90 active:scale-98">
+      <Link href={href} className="inline-flex items-center group transition-opacity hover:opacity-90 active:scale-98">
         {Content}
       </Link>
     );

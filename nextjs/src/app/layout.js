@@ -20,14 +20,6 @@ const googleSans = Plus_Jakarta_Sans({
 export const metadata = {
   title: "DRISHTI ದೃಷ್ಟಿ — Karnataka State Police AI Co-Pilot",
   description: "AI-powered Crime Intelligence platform for Karnataka State Police. Real-time analytics, hotspot mapping, and ANPR surveillance.",
-  icons: {
-    icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-    ],
-    apple: '/icon.svg',
-    shortcut: '/favicon.svg',
-  },
 };
 
 // Inline script that runs synchronously BEFORE any content renders.

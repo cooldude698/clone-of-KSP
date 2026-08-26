@@ -6,11 +6,9 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, MessageSquare, Map, GitBranch,
-  Camera, BarChart2, LogOut, Shield, ChevronLeft, ChevronRight,
-  Newspaper, FileText, Server, Search, ChevronDown, Sparkles,
-  User, History, Navigation, Eye, AlertTriangle
+  Camera, BarChart2, LogOut, Shield, ChevronLeft,
+  Newspaper, FileText, Server, Search, ChevronDown, Sparkles
 } from 'lucide-react';
-import DrishtiLogo from '@/components/DrishtiLogo';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '@/components/ThemeToggle';
 import useDrishtiVoice from '@/components/DrishtiVoice'; // hook — must be static import
@@ -18,23 +16,23 @@ import useDrishtiVoice from '@/components/DrishtiVoice'; // hook — must be sta
 // ── Lazy-loaded heavy components ─────────────────────────────────────────────
 // Deferred so they don't block the initial sidebar + page render.
 // DrishtiOrb/Panel are only needed after the user clicks the orb (interaction-driven).
-const AlertNotification  = dynamic(() => import('@/components/AlertNotification'),  { ssr: false });
-const DrishtiOrb         = dynamic(() => import('@/components/DrishtiOrb'),          { ssr: false });
-const DrishtiPanel       = dynamic(() => import('@/components/DrishtiPanel'),         { ssr: false });
+const AlertNotification = dynamic(() => import('@/components/AlertNotification'), { ssr: false });
+const DrishtiOrb = dynamic(() => import('@/components/DrishtiOrb'), { ssr: false });
+const DrishtiPanel = dynamic(() => import('@/components/DrishtiPanel'), { ssr: false });
 
 
 const NAV_ITEMS = [
-  { href: '/dashboard',              icon: LayoutDashboard, label: 'Overview',       id: 'nav-overview' },
-  { href: '/dashboard/chat',         icon: MessageSquare,   label: 'Co-Pilot Chat',  id: 'nav-chat' },
-  { href: '/dashboard/fir',          icon: FileText,        label: 'FIR Registry',   id: 'nav-fir' },
-  { href: '/dashboard/suspect',      icon: User,            label: 'Suspect Roster', id: 'nav-suspect' },
-  { href: '/dashboard/map',          icon: Map,             label: 'Crime Map',      id: 'nav-map' },
-  { href: '/dashboard/network',      icon: GitBranch,       label: 'Network Graph',  id: 'nav-network' },
-  { href: '/dashboard/surveillance', icon: Camera,          label: 'Surveillance',   id: 'nav-surveillance' },
-  { href: '/dashboard/analytics',    icon: BarChart2,       label: 'Analytics',      id: 'nav-analytics' },
-  { href: '/dashboard/logs',         icon: History,         label: 'AI Logs',        id: 'nav-logs' },
-  { href: '/dashboard/trail',        icon: Navigation,      label: 'Geo Trail',      id: 'nav-trail' },
-  { href: '/dashboard/news',         icon: Newspaper,       label: 'Live News',      id: 'nav-news' },
+  { href: '/dashboard', icon: LayoutDashboard, label: 'Overview', id: 'nav-overview' },
+  { href: '/dashboard/chat', icon: MessageSquare, label: 'Co-Pilot Chat', id: 'nav-chat' },
+  { href: '/dashboard/fir', icon: FileText, label: 'FIR Registry', id: 'nav-fir' },
+  { href: '/dashboard/suspect', icon: User, label: 'Suspect Roster', id: 'nav-suspect' },
+  { href: '/dashboard/map', icon: Map, label: 'Crime Map', id: 'nav-map' },
+  { href: '/dashboard/network', icon: GitBranch, label: 'Network Graph', id: 'nav-network' },
+  { href: '/dashboard/surveillance', icon: Camera, label: 'Surveillance', id: 'nav-surveillance' },
+  { href: '/dashboard/analytics', icon: BarChart2, label: 'Analytics', id: 'nav-analytics' },
+  { href: '/dashboard/logs', icon: History, label: 'AI Logs', id: 'nav-logs' },
+  { href: '/dashboard/trail', icon: Navigation, label: 'Geo Trail', id: 'nav-trail' },
+  { href: '/dashboard/news', icon: Newspaper, label: 'Live News', id: 'nav-news' },
 ];
 
 function extractRequestedName(queryText) {
@@ -91,8 +89,8 @@ function detectLocalIntent(query) {
     const reply = isHindi
       ? 'सिल्क बोर्ड और बेंगलुरु ग्रिड के सीसीटीवी कैमरे और सर्विलांस सिस्टम खोले जा रहे हैं, सर।'
       : isKannada
-      ? 'ಸಿಸಿಟಿವಿ ಮತ್ತು ಕಣ್ಗಾವಲು ವ್ಯವಸ್ಥೆಯನ್ನು ತೆರೆಯಲಾಗುತ್ತಿದೆ, ಸರ್.'
-      : 'Switching to Surveillance & CCTV live feeds, Sir.';
+        ? 'ಸಿಸಿಟಿವಿ ಮತ್ತು ಕಣ್ಗಾವಲು ವ್ಯವಸ್ಥೆಯನ್ನು ತೆರೆಯಲಾಗುತ್ತಿದೆ, ಸರ್.'
+        : 'Switching to Surveillance & CCTV live feeds, Sir.';
     return nav('/dashboard/surveillance', reply, null);
   }
 
@@ -106,8 +104,8 @@ function detectLocalIntent(query) {
     const reply = isHindi
       ? 'क्राइम मैप और हॉटस्पॉट लोकेशन दिखाई जा रही है, सर।'
       : isKannada
-      ? 'ಕ್ರೈಮ್ ಮ್ಯಾಪ್ ತೆರೆಯಲಾಗುತ್ತಿದೆ, ಸರ್.'
-      : 'Opening the Crime Map, Sir.';
+        ? 'ಕ್ರೈಮ್ ಮ್ಯಾಪ್ ತೆರೆಯಲಾಗುತ್ತಿದೆ, ಸರ್.'
+        : 'Opening the Crime Map, Sir.';
     return nav('/dashboard/map', reply, 'Give me a quick briefing on the current hotspots.');
   }
 
@@ -150,8 +148,8 @@ function detectLocalIntent(query) {
       reply: isHindi
         ? `सर, "${targetName}" के लिए कोई संदिग्ध प्रोफ़ाइल या केस फ़ाइल नहीं मिली।`
         : isKannada
-        ? `ಸರ್, "${targetName}" ಗಾಗಿ ಯಾವುದೇ ಶಂಕಿತ ಪ್ರೊಫೈಲ್ ಅಥವಾ ಎಫ್‌ಐಆರ್ ಸಿಗಲಿಲ್ಲ.`
-        : `Sir, no suspect profile or case file found for "${targetName}" in the Karnataka Police database. Please verify the name or FIR number.`
+          ? `ಸರ್, "${targetName}" ಗಾಗಿ ಯಾವುದೇ ಶಂಕಿತ ಪ್ರೊಫೈಲ್ ಅಥವಾ ಎಫ್‌ಐಆರ್ ಸಿಗಲಿಲ್ಲ.`
+          : `Sir, no suspect profile or case file found for "${targetName}" in the Karnataka Police database. Please verify the name or FIR number.`
     };
   }
 
@@ -200,12 +198,12 @@ const getLocale = (l) => (l === 'kn' ? 'kn-IN' : l === 'hi' ? 'hi-IN' : 'en-IN')
 
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
-  const router   = useRouter();
-  const [collapsed,    setCollapsed]    = useState(false);
-  const [role,         setRole]         = useState('Inspector');
-  const [employeeId,   setEmployeeId]   = useState('KSP-0000');
-  const [officerName,  setOfficerName]  = useState('V. Sharma');
-  const [currentTime,  setCurrentTime]  = useState('');
+  const router = useRouter();
+  const [collapsed, setCollapsed] = useState(false);
+  const [role, setRole] = useState('Inspector');
+  const [employeeId, setEmployeeId] = useState('KSP-0000');
+  const [officerName, setOfficerName] = useState('V. Sharma');
+  const [currentTime, setCurrentTime] = useState('');
   const mainContentRef = useRef(null);
 
   // Auto-scroll main content area to top on page navigation
@@ -216,15 +214,15 @@ export default function DashboardLayout({ children }) {
   }, [pathname]);
 
   // ─── Drishti state ───────────────────────────────────────────────
-  const [orbState,         setOrbState]         = useState('idle');
-  const [isPanelOpen,      setIsPanelOpen]      = useState(false);
-  const [response,         setResponse]         = useState(null);
-  const [conversationId,   setConversationId]   = useState(null);
-  const [language,         setLanguage]         = useState('en');
-  const [greetingText,     setGreetingText]     = useState('');
-  const [hasGreeted,       setHasGreeted]       = useState(false);
-  const [sessionLogs,      setSessionLogs]      = useState([]);
-  const [dispatchToast,    setDispatchToast]    = useState(null);
+  const [orbState, setOrbState] = useState('idle');
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [response, setResponse] = useState(null);
+  const [conversationId, setConversationId] = useState(null);
+  const [language, setLanguage] = useState('en');
+  const [greetingText, setGreetingText] = useState('');
+  const [hasGreeted, setHasGreeted] = useState(false);
+  const [sessionLogs, setSessionLogs] = useState([]);
+  const [dispatchToast, setDispatchToast] = useState(null);
   // Status label shown in DrishtiPanel header (overrides the default orbState label)
   const [stateOverrideLabel, setStateOverrideLabel] = useState('');
 
@@ -235,21 +233,21 @@ export default function DashboardLayout({ children }) {
   const [pendingTranscript, setPendingTranscript] = useState('');  // words captured, not yet sent
   const pendingTranscriptRef = useRef(''); // mirror for Enter-key handler (avoids stale closure)
   useEffect(() => { pendingTranscriptRef.current = pendingTranscript; }, [pendingTranscript]);
-  const [orbResponse,       setOrbResponse]       = useState('');  // last AI response text for bubble
-  const [showTypingInput,   setShowTypingInput]   = useState(false); // type-instead input visible
-  const [typingText,        setTypingText]        = useState('');  // text in the typing input
+  const [orbResponse, setOrbResponse] = useState('');  // last AI response text for bubble
+  const [showTypingInput, setShowTypingInput] = useState(false); // type-instead input visible
+  const [typingText, setTypingText] = useState('');  // text in the typing input
 
   // ─── Change 2: Proactive suggestion state ────────────────────────
   const [proactiveSuggestion, setProactiveSuggestion] = useState(null);
   // ref so timers can read latest values without stale closure
-  const isPanelOpenRef  = useRef(false);
+  const isPanelOpenRef = useRef(false);
   const hasInteractedRef = useRef(false);
   const proactiveDismissedUntilRef = useRef(0);
 
   isPanelOpenRef.current = isPanelOpen;
 
   const pttActiveRef = useRef(false);
-  const roleRef      = useRef(role);
+  const roleRef = useRef(role);
   useEffect(() => { roleRef.current = role; }, [role]);
 
   const originalResponseRef = useRef({ text: '', lang: 'en' });
@@ -273,8 +271,8 @@ export default function DashboardLayout({ children }) {
       // Disabled clap wake to prevent random opening
     },
     onSpeakStart: () => setOrbState('speaking'),
-    onSpeakEnd:   () => setOrbState('idle'),
-    onError:      () => {},
+    onSpeakEnd: () => setOrbState('idle'),
+    onError: () => { },
   });
 
   // ─── Change 5: handleQuery with local intent ─────────────────────
@@ -428,7 +426,7 @@ export default function DashboardLayout({ children }) {
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed) && parsed.length > 0) setSessionLogs(parsed);
         }
-      } catch (_) {}
+      } catch (_) { }
     }
 
     const handleOpenOrbWithLogs = (e) => {
@@ -438,11 +436,11 @@ export default function DashboardLayout({ children }) {
         try {
           localStorage.setItem('drishti_session_logs', JSON.stringify(e.detail.messages));
           window.dispatchEvent(new Event('storage'));
-        } catch (_) {}
+        } catch (_) { }
         const lastAssistantMsg = e.detail.messages.slice().reverse().find(m => m.role === 'assistant')?.content;
         if (lastAssistantMsg) {
           setOrbResponse(lastAssistantMsg);
-          try { speak(lastAssistantMsg.replace(/[*#\_|`]/g, ' '), 'en-IN'); } catch (_) {}
+          try { speak(lastAssistantMsg.replace(/[*#\_|`]/g, ' '), 'en-IN'); } catch (_) { }
         }
       }
     };
@@ -462,7 +460,7 @@ export default function DashboardLayout({ children }) {
       try {
         localStorage.setItem('drishti_session_logs', JSON.stringify(sessionLogs));
         window.dispatchEvent(new Event('storage'));
-      } catch (_) {}
+      } catch (_) { }
     }
   }, [sessionLogs]);
 
@@ -527,14 +525,14 @@ export default function DashboardLayout({ children }) {
   const getGreetingForLang = useCallback((lang, role = 'Supervisor') => {
     const h = new Date().getHours();
     const timeKey = h >= 5 && h < 12 ? 'morning' : h >= 12 && h < 17 ? 'afternoon' : h >= 17 && h < 21 ? 'evening' : 'night';
-    
+
     if (lang === 'kn') {
       if (timeKey === 'morning') return `ಶುಭೋದಯ, ${role}. ದೃಷ್ಟಿ ಎಐ ಆನ್‌ಲೈನ್‌ನಲ್ಲಿದೆ. ಇತ್ತೀಚಿನ ಸನ್ನಿವೇಶದ ಮಾಹಿತಿ ಬೇಕೇ?`;
       if (timeKey === 'afternoon') return `ಶುಭ ಮಧ್ಯಾಹ್ನ, ${role}. ದೃಷ್ಟಿ ಸಿದ್ಧವಾಗಿದೆ. ಸ್ಥಿತಿಗತಿ ವರದಿ ಅಥವಾ ನಿರ್ದಿಷ್ಟ ಮಾಹಿತಿ ಬೇಕೇ?`;
       if (timeKey === 'evening') return `ಶುಭ ಸಂಜೆ, ${role}. ನಾನು ಸಹಾಯ ಮಾಡಲು ಸಿದ್ಧನಾಗಿದ್ದೇನೆ. ಇತ್ತೀಚಿನ ವರದಿ ನೀಡಬೇಕೇ?`;
       return `ಶುಭ ರಾತ್ರಿ, ${role}. ನೈಟ್ ಶಿಫ್ಟ್ ಸಕ್ರಿಯವಾಗಿದೆ. ಯಾವುದೇ ಮಾಹಿತಿ ಅಗತ್ಯವಿದ್ದರೆ ತಿಳಿಸಿ.`;
     }
-    
+
     if (lang === 'hi') {
       if (timeKey === 'morning') return `शुभ प्रभात, ${role} जी। दृष्टि एआई ऑनलाइन है। क्या आपको ताज़ा अपडेट चाहिए?`;
       if (timeKey === 'afternoon') return `शुभ दोपहर, ${role} जी। दृष्टि तैयार है। क्या आपको स्थिति की जानकारी चाहिए या कोई विशिष्ट विवरण?`;
@@ -579,7 +577,7 @@ export default function DashboardLayout({ children }) {
       // Select best matching voice for clear pronunciation
       const voices = window.speechSynthesis.getVoices() || [];
       const bestVoice = voices.find(v => v.lang === targetLang) ||
-                        voices.find(v => v.lang.startsWith(targetLang.split('-')[0]));
+        voices.find(v => v.lang.startsWith(targetLang.split('-')[0]));
       if (bestVoice) utt.voice = bestVoice;
 
       window.speechSynthesis.speak(utt);
@@ -793,9 +791,9 @@ export default function DashboardLayout({ children }) {
 
     const down = (e) => {
       if (e.key === 'Control') held.ctrl = true;
-      if (e.key === 'Alt')     held.alt  = true;
-      if (e.key === 'Meta')    held.meta = true;
-      if (e.key === 'Shift')   held.shift = true;
+      if (e.key === 'Alt') held.alt = true;
+      if (e.key === 'Meta') held.meta = true;
+      if (e.key === 'Shift') held.shift = true;
 
       // Strict Ctrl+Alt (Win/Linux) or Cmd+Shift (Mac) PTT
       const trigger = mac ? (held.meta && held.shift) : (held.ctrl && held.alt);
@@ -804,7 +802,7 @@ export default function DashboardLayout({ children }) {
         hasInteractedRef.current = true;
         setProactiveSuggestion(null);
         if (!hasGreeted) { triggerGreeting(); setTimeout(handlePttStart, 500); }
-        else             { handlePttStart(); }
+        else { handlePttStart(); }
       }
 
       // Enter to confirm pending voice transcript
@@ -821,10 +819,10 @@ export default function DashboardLayout({ children }) {
 
     const up = (e) => {
       if (e.key === 'Control') held.ctrl = false;
-      if (e.key === 'Alt')     held.alt  = false;
-      if (e.key === 'Meta')    held.meta = false;
-      if (e.key === 'Shift')   held.shift = false;
-      
+      if (e.key === 'Alt') held.alt = false;
+      if (e.key === 'Meta') held.meta = false;
+      if (e.key === 'Shift') held.shift = false;
+
 
       const released = mac ? (!held.meta || !held.shift) : (!held.ctrl || !held.alt);
       if (modifierPttActive && released) {
@@ -842,12 +840,12 @@ export default function DashboardLayout({ children }) {
     };
 
     window.addEventListener('keydown', down);
-    window.addEventListener('keyup',   up);
-    window.addEventListener('blur',    blur);
+    window.addEventListener('keyup', up);
+    window.addEventListener('blur', blur);
     return () => {
       window.removeEventListener('keydown', down);
-      window.removeEventListener('keyup',   up);
-      window.removeEventListener('blur',    blur);
+      window.removeEventListener('keyup', up);
+      window.removeEventListener('blur', blur);
     };
   }, [isPanelOpen, hasGreeted, triggerGreeting, handlePttStart, handlePttEnd, pendingTranscript, handleConfirmSend, handleCancelTranscript]);
 
@@ -887,12 +885,18 @@ export default function DashboardLayout({ children }) {
       {/* ── MINIMALIST MODERN SIDEBAR ── */}
       <aside className={`flex flex-col transition-all duration-300 ease-in-out bg-white dark:bg-[#18181B] border-r border-gray-100 dark:border-gray-800 relative z-20 shadow-sm ${collapsed ? 'w-20' : 'w-60'}`}>
         {/* Brand Header */}
-        <div className={`flex items-center px-4 py-5 border-b border-gray-100 dark:border-gray-800/60 ${collapsed ? 'justify-center px-2' : ''}`}>
-          <DrishtiLogo
-            variant={collapsed ? 'icon' : 'compact'}
-            size="md"
-            href="/dashboard"
-          />
+        <div className={`flex items-center gap-3 px-6 py-6 ${collapsed ? 'justify-center px-2' : ''}`}>
+          <div className="w-10 h-10 rounded-2xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center flex-shrink-0 shadow-md">
+            <Eye className="w-5 h-5" />
+          </div>
+          {!collapsed && (
+            <div>
+              <span className="text-gray-900 dark:text-white font-extrabold tracking-tight text-lg">
+                DRISHTI
+              </span>
+              <p className="text-gray-400 text-[10px] font-semibold tracking-wider uppercase">Karnataka Police</p>
+            </div>
+          )}
         </div>
 
         {/* Navigation Items */}
@@ -902,12 +906,12 @@ export default function DashboardLayout({ children }) {
             return (
               <Link key={href} href={href} prefetch={true} id={id}
                 className={`flex items-center transition-all duration-150 group relative text-sm font-semibold rounded-2xl
-                  ${collapsed 
-                    ? 'w-12 h-12 justify-center mx-auto' 
+                  ${collapsed
+                    ? 'w-12 h-12 justify-center mx-auto'
                     : 'gap-3.5 px-4 py-3'
                   }
-                  ${active 
-                    ? 'bg-black text-white dark:bg-white dark:text-black shadow-sm' 
+                  ${active
+                    ? 'bg-black text-white dark:bg-white dark:text-black shadow-sm'
                     : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/60'}`}
                 title={collapsed ? label : undefined}
               >
@@ -1113,7 +1117,7 @@ export default function DashboardLayout({ children }) {
                   className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all border border-white/10"
                   title="Read Aloud"
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><path d="M15.54 8.46a5 5 0 0 1 0 7.07" /><path d="M19.07 4.93a10 10 0 0 1 0 14.14" /></svg>
                 </button>
                 <button
                   onClick={() => {
