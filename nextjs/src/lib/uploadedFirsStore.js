@@ -95,6 +95,8 @@ const INITIAL_VIKRAM_SUSPECT = {
   district_name: 'Bengaluru Urban',
   active_firs: 1,
   primary_crime: 'Cyber Fraud & Extortion',
+  primary_modus_operandi: 'Cyber Fraud & Extortion',
+  known_hangouts: ['ITPB Main Road', 'Hope Farm Signal', 'Whitefield Tech Park'],
   last_known_location: 'ITPB Main Road, Whitefield Tech Park Corridor, Bengaluru',
   cases: ['FIR-2026-BL-9104'],
   police_station: 'Whitefield Cyber Crime PS / CEN Command'

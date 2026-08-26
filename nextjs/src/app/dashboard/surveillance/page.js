@@ -654,13 +654,14 @@ function CameraInspectionModal({ cam, onClose, onDispatch }) {
                   <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 grid grid-cols-2 gap-3 text-xs">
                     <div>
                       <span className="text-[10px] font-bold text-slate-500 uppercase block mb-0.5">FIR Case File</span>
-                      {suspectData.fir.startsWith('FIR') ? (
-                        <Link href={`/dashboard/fir/${suspectData.fir}`} className="font-bold text-blue-400 hover:underline flex items-center gap-1">
-                          {suspectData.fir} <ExternalLink className="w-3 h-3" />
-                        </Link>
-                      ) : (
-                        <span className="font-bold text-white">{suspectData.fir}</span>
-                      )}
+                      {(() => {
+                        const firNum = suspectData.fir || suspectData.case_number || 'FIR-2026-BL-9104';
+                        return (
+                          <Link href={`/dashboard/fir/${firNum}`} className="font-bold text-blue-400 hover:underline flex items-center gap-1">
+                            {firNum} <ExternalLink className="w-3 h-3" />
+                          </Link>
+                        );
+                      })()}
                     </div>
                     <div>
                       <span className="text-[10px] font-bold text-slate-500 uppercase block mb-0.5">IPC Offense</span>
@@ -964,8 +965,8 @@ export default function SurveillancePage() {
                 </div>
                 <div>
                   <span className="text-[10px] text-text-secondary block">FIR Case File</span>
-                  <Link href={`/dashboard/fir/${plateResult.fir_case_number}`} className="font-semibold text-accent hover:underline">
-                    {plateResult.fir_case_number || 'FIR-2026-MYS-0112'}
+                  <Link href={`/dashboard/fir/${plateResult.fir_case_number || plateResult.case_number || 'FIR-2026-MYS-0112'}`} className="font-semibold text-accent hover:underline">
+                    {plateResult.fir_case_number || plateResult.case_number || 'FIR-2026-MYS-0112'}
                   </Link>
                 </div>
               </div>
