@@ -6,8 +6,9 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, MessageSquare, Map, GitBranch,
-  Camera, BarChart2, LogOut, Shield, ChevronLeft,
-  Newspaper, FileText, Server, Search, ChevronDown, Sparkles
+  Camera, BarChart2, LogOut, Shield, ChevronLeft, ChevronRight,
+  Newspaper, FileText, Server, Search, ChevronDown, Sparkles,
+  User, History, Navigation, Eye
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '@/components/ThemeToggle';
