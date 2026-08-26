@@ -5,9 +5,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Catalyst Serverless Functions base URL
-// In production (Catalyst Slate), requests to /server/* must be proxied to the
-// Catalyst Functions runtime. Set CATALYST_FUNCTIONS_URL in the Slate env config.
-// Locally, Next.js API routes at /api/* handle these requests.
 const CATALYST_FUNCTIONS_URL =
   process.env.CATALYST_FUNCTIONS_URL ||
   'https://api.catalyst.zoho.in/baas/v1/project/49149000000019001/function';
@@ -24,9 +21,11 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'framer-motion', 'recharts', 'date-fns'],
+  },
   async rewrites() {
     if (isProd) {
-      // Production: /server/{function-name} → Catalyst Function execution endpoint
       return [
         {
           source: '/server/:funcName/:path*',
@@ -34,7 +33,6 @@ const nextConfig = {
         },
       ];
     }
-    // Local dev: /server/* → /api/* (Next.js API routes simulate the Functions)
     return [
       {
         source: '/server/:path*',

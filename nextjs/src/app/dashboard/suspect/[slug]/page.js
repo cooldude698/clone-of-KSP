@@ -140,6 +140,15 @@ export default function SuspectProfilePage() {
   const [pushSent, setPushSent] = useState(false);
   const [pushLoading, setPushLoading] = useState(false);
 
+  const [activeToast, setActiveToast] = useState(null);
+
+  const showToast = (toastData) => {
+    setActiveToast(toastData);
+    setTimeout(() => {
+      setActiveToast(prev => (prev?.id === toastData.id ? null : prev));
+    }, 6000);
+  };
+
   // 1. Re-Score with QuickML (Cap #12)
   const handleQuickMlScoring = async () => {
     setIsScoring(true);
@@ -159,6 +168,12 @@ export default function SuspectProfilePage() {
       if (data.risk_score) {
         setCurrentRiskScore(data.risk_score);
         setQuickMlData(data);
+        showToast({
+          id: Date.now(),
+          type: 'quickml',
+          title: 'Catalyst QuickML Evaluated',
+          desc: `Recidivism Score: ${data.risk_score}% (Confidence: ${(data.confidence * 100).toFixed(0)}%)`
+        });
       }
     } catch (e) {
       alert('QuickML scoring failed: ' + e.message);
@@ -185,6 +200,12 @@ export default function SuspectProfilePage() {
       });
       const data = await res.json();
       setAutomlData(data);
+      showToast({
+        id: Date.now(),
+        type: 'automl',
+        title: 'Zia AutoML Forecast Ready',
+        desc: `Predicted Category: ${data.prediction} (Probability: ${(data.probability * 100).toFixed(0)}%)`
+      });
     } catch (e) {
       alert('Zia AutoML predict failed: ' + e.message);
     } finally {
@@ -200,7 +221,7 @@ export default function SuspectProfilePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          to_email: 'antigravitytestung@gmail.com',
+          to_email: 'vedeshskhatri@gmail.com',
           officer_name: 'Inspector Anand Rao',
           case_number: suspect.associated_firs?.[0] || 'KAR/2026/URGENT',
           accused_name: `${suspect.name} (${suspect.alias || 'Alias'})`,
@@ -208,7 +229,15 @@ export default function SuspectProfilePage() {
         })
       });
       const data = await res.json();
-      if (data.sent) setMailSent(true);
+      if (data.sent) {
+        setMailSent(true);
+        showToast({
+          id: Date.now(),
+          type: 'mail',
+          title: '📧 Catalyst Mail Dispatched',
+          desc: `Incident brief sent to vedeshskhatri@gmail.com (ID: ${data.message_id || 'CAT-MAIL-01'})`
+        });
+      }
     } catch (e) {
       alert('Mail dispatch failed: ' + e.message);
     } finally {
@@ -220,6 +249,19 @@ export default function SuspectProfilePage() {
   const handleSendPush = async () => {
     setPushLoading(true);
     try {
+      // Browser notification if permitted
+      if (typeof window !== 'undefined' && 'Notification' in window) {
+        if (Notification.permission === 'default') {
+          await Notification.requestPermission();
+        }
+        if (Notification.permission === 'granted') {
+          new Notification(`🚨 KSP DRISHTI: ${suspect.name}`, {
+            body: `High risk target (${currentRiskScore}%). Intercept notification sent to field units.`,
+            icon: '/icon.png'
+          });
+        }
+      }
+
       const res = await fetch('/server/push-notify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -230,7 +272,15 @@ export default function SuspectProfilePage() {
         })
       });
       const data = await res.json();
-      if (data.delivered) setPushSent(true);
+      if (data.delivered) {
+        setPushSent(true);
+        showToast({
+          id: Date.now(),
+          type: 'push',
+          title: '🔔 Catalyst Push Broadcast Delivered',
+          desc: `Targeted intercept push sent to Patrol Unit (PATROL_INTERCEPT_BLR_09)`
+        });
+      }
     } catch (e) {
       alert('Push notification failed: ' + e.message);
     } finally {
@@ -544,6 +594,25 @@ export default function SuspectProfilePage() {
 
         </div>
       </div>
+
+      {/* Floating HUD Alert Toast */}
+      {activeToast && (
+        <div className="fixed bottom-6 right-6 z-[99999] max-w-md p-4 rounded-2xl bg-slate-900/95 border-2 border-emerald-500/80 shadow-[0_0_30px_rgba(16,185,129,0.3)] backdrop-blur-xl text-slate-100 animate-slide-up flex items-start gap-3">
+          <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
+            <CheckCircle2 className="w-5 h-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="text-xs font-extrabold text-white font-mono uppercase tracking-wider">{activeToast.title}</h4>
+            <p className="text-xs text-slate-300 mt-0.5 leading-relaxed">{activeToast.desc}</p>
+          </div>
+          <button
+            onClick={() => setActiveToast(null)}
+            className="text-slate-400 hover:text-white text-xs font-mono p-1"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
     </div>
   );
