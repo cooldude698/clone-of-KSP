@@ -7,7 +7,7 @@ import {
   Search, MapPin, FileText, Camera, Shield,
   ArrowUpDown, ChevronDown, MoreVertical, Wifi,
   Cpu, Car, Laptop, Home, ShieldAlert, Activity,
-  Users, CheckCircle2, AlertCircle, ArrowUpRight
+  Users, CheckCircle2, AlertCircle, ArrowUpRight, Sparkles
 } from 'lucide-react';
 import { fetchWithFallback, invalidateCache } from '@/lib/fetch-with-fallback';
 import { DEMO_FIRS, DEMO_HOTSPOTS, DEMO_REPEAT_OFFENDERS } from '@/lib/demo-data';
@@ -133,38 +133,36 @@ export default function DashboardPage() {
           {/* 4-CARD BALANCED INTELLIGENCE GRID */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
             
-            {/* CARD 1: AI SYNDICATE PATTERN ALERT (DARK HERO) */}
-            <div className="rounded-3xl bg-[#18181B] text-white p-5 shadow-lg relative overflow-hidden flex flex-col justify-between group hover:border-gray-700 transition-all border border-gray-800">
-              <div className="absolute -right-8 -top-8 w-28 h-28 bg-amber-500/10 rounded-full blur-xl" />
-              
-              <div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-[10px] font-bold text-amber-300">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                    <span>AI PATTERN ALERT</span>
-                  </div>
-                  <span className="text-[10px] text-gray-400 font-semibold">Koramangala 5th</span>
+            {/* CARD 1: AI SYNDICATE PATTERN ALERT */}
+            <Link
+              href="/dashboard/network"
+              className="rounded-3xl bg-white dark:bg-[#18181B] border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-700 transition-all flex flex-col justify-between group cursor-pointer"
+            >
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center shadow-xs">
+                  <Sparkles className="w-5 h-5" />
                 </div>
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300">
+                  AI Pattern Alert
+                </span>
+              </div>
 
-                <h3 className="text-sm font-bold text-white tracking-tight mt-3">
+              <div className="my-2">
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                   Night Chain-Snatching Syndicate
                 </h3>
                 <p className="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed">
-                  3 clustered incidents in 48h. Black Pulsar <span className="text-amber-300 font-mono font-semibold">KA-01-MJ-8821</span> flagged on ANPR 14m ago.
+                  3 clustered incidents in 48h · Pulsar KA-01-MJ-8821 flagged on ANPR 14m ago.
                 </p>
               </div>
 
-              <div className="pt-3 mt-2 border-t border-gray-800 flex items-center justify-between">
-                <span className="text-[10px] text-amber-400 font-bold">92% High Threat</span>
-                <Link
-                  href="/dashboard/network"
-                  className="flex items-center gap-1 text-xs font-bold text-white hover:text-amber-300 transition-colors"
-                >
-                  <span>Inspect Syndicate Graph</span>
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </Link>
+              <div className="pt-2.5 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                <span className="text-xs font-bold text-amber-600 dark:text-amber-400">92% High Threat</span>
+                <span className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1">
+                  Syndicate Graph <ArrowUpRight className="w-3.5 h-3.5" />
+                </span>
               </div>
-            </div>
+            </Link>
 
             {/* CARD 2: CRITICAL HOTSPOT PATROL ADVISORY */}
             <Link
@@ -175,18 +173,22 @@ export default function DashboardPage() {
                 <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center shadow-xs">
                   <MapPin className="w-5 h-5" />
                 </div>
-                <span className="text-[9px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-300">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-300">
                   Critical Hotspot
                 </span>
               </div>
 
               <div className="my-2">
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white">Koramangala 5th Block</h3>
-                <p className="text-xs text-gray-400 mt-0.5">34 Incidents · 8 Burglary · 12 Snatching</p>
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                  Koramangala 5th Block
+                </h3>
+                <p className="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed">
+                  34 Incidents · 8 Burglary · 12 Snatching recorded this cycle.
+                </p>
               </div>
 
-              <div className="pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                <span className="text-xs font-extrabold text-rose-600 dark:text-rose-400">Patrol Advisory Active</span>
+              <div className="pt-2.5 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                <span className="text-xs font-bold text-rose-600 dark:text-rose-400">Patrol Advisory Active</span>
                 <span className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1">
                   Crime Map <ArrowUpRight className="w-3.5 h-3.5" />
                 </span>
@@ -202,18 +204,22 @@ export default function DashboardPage() {
                 <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center shadow-xs">
                   <Users className="w-5 h-5" />
                 </div>
-                <span className="text-[9px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300">
                   Live Sighting
                 </span>
               </div>
 
               <div className="my-2">
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white">Vicky "The Snake" (Repeat)</h3>
-                <p className="text-xs text-gray-400 mt-0.5">ANPR Hit 14m ago · Indiranagar 100ft Rd</p>
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                  Vicky &ldquo;The Snake&rdquo; (Repeat)
+                </h3>
+                <p className="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed">
+                  ANPR Hit 14m ago · Indiranagar 100ft Rd · Active Non-Bailable Warrant.
+                </p>
               </div>
 
-              <div className="pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                <span className="text-xs font-extrabold text-amber-600 dark:text-amber-400">Active Non-Bailable Warrant</span>
+              <div className="pt-2.5 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                <span className="text-xs font-bold text-amber-600 dark:text-amber-400">Active Warrant</span>
                 <span className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1">
                   Track Suspect <ArrowUpRight className="w-3.5 h-3.5" />
                 </span>
@@ -229,18 +235,22 @@ export default function DashboardPage() {
                 <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shadow-xs">
                   <Camera className="w-5 h-5" />
                 </div>
-                <span className="text-[9px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">
                   99.4% Online
                 </span>
               </div>
 
               <div className="my-2">
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white">12,500+ ANPR Nodes</h3>
-                <p className="text-xs text-gray-400 mt-0.5">14 PCR Patrol Units Synchronized</p>
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  12,500+ ANPR Nodes
+                </h3>
+                <p className="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed">
+                  14 PCR Patrol Units Synchronized across Bengaluru City Grid.
+                </p>
               </div>
 
-              <div className="pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400">Surveillance Grid</span>
+              <div className="pt-2.5 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">Surveillance Grid</span>
                 <span className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1">
                   View Feed <ArrowUpRight className="w-3.5 h-3.5" />
                 </span>
@@ -254,14 +264,28 @@ export default function DashboardPage() {
         <div className="lg:col-span-4 rounded-3xl bg-white dark:bg-[#18181B] border border-gray-100 dark:border-gray-800 p-6 shadow-sm flex flex-col justify-between h-full">
           <div>
             <div className="flex items-center justify-between text-gray-400">
-              <p className="text-xs font-medium text-gray-400">Cases Resolved This Month</p>
+              <p className="text-xs font-medium text-gray-400">
+                {timeFilter === 'Day' ? 'Cases Resolved Today' :
+                 timeFilter === 'Week' ? 'Cases Resolved This Week' :
+                 timeFilter === 'Year' ? 'Cases Resolved This Year' :
+                 'Cases Resolved This Month'}
+              </p>
               <button className="text-gray-400 hover:text-gray-900 dark:hover:text-white">
                 <MoreVertical className="w-4 h-4" />
               </button>
             </div>
             
             <p className="text-3xl font-extrabold text-gray-900 dark:text-white mt-1 tracking-tight">
-              84.5% <span className="text-sm font-medium text-gray-400 font-normal">/ 152 Dossiers</span>
+              {timeFilter === 'Day' ? '92.0%' :
+               timeFilter === 'Week' ? '88.2%' :
+               timeFilter === 'Year' ? '81.4%' :
+               '84.5%'}
+              <span className="text-sm font-medium text-gray-400 font-normal ml-1.5">
+                / {timeFilter === 'Day' ? '12 Dossiers' :
+                   timeFilter === 'Week' ? '48 Dossiers' :
+                   timeFilter === 'Year' ? '1,840 Dossiers' :
+                   '152 Dossiers'}
+              </span>
             </p>
 
             {/* Time Filter Pills */}
@@ -281,7 +305,7 @@ export default function DashboardPage() {
               ))}
             </div>
 
-            {/* SMOOTH CURVED SVG BEZIER SPLINE CHART */}
+            {/* DYNAMIC SMOOTH CURVED SVG BEZIER SPLINE CHART */}
             <div className="relative mt-5 h-28 w-full">
               <svg viewBox="0 0 300 100" className="w-full h-full overflow-visible" preserveAspectRatio="none">
                 <defs>
@@ -291,45 +315,129 @@ export default function DashboardPage() {
                   </linearGradient>
                 </defs>
                 
-                {/* Area fill */}
+                {/* Dynamic Area fill */}
                 <path
-                  d="M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45 L 300,100 L 0,100 Z"
+                  d={
+                    timeFilter === 'Day'
+                      ? 'M 0,80 C 40,75 70,60 100,48 C 130,35 160,55 190,30 C 220,15 240,25 260,18 C 280,15 290,22 300,18 L 300,100 L 0,100 Z'
+                      : timeFilter === 'Week'
+                      ? 'M 0,72 C 30,60 60,75 90,42 C 120,25 150,52 180,32 C 210,14 230,28 250,20 C 275,15 290,28 300,22 L 300,100 L 0,100 Z'
+                      : timeFilter === 'Year'
+                      ? 'M 0,85 C 40,72 80,60 120,48 C 160,38 200,28 240,18 C 260,14 275,12 300,10 L 300,100 L 0,100 Z'
+                      : 'M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45 L 300,100 L 0,100 Z'
+                  }
                   fill="url(#chartGradient)"
+                  className="transition-all duration-500"
                 />
 
-                {/* Stroke curve */}
+                {/* Dynamic Stroke curve */}
                 <path
-                  d="M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45"
+                  d={
+                    timeFilter === 'Day'
+                      ? 'M 0,80 C 40,75 70,60 100,48 C 130,35 160,55 190,30 C 220,15 240,25 260,18 C 280,15 290,22 300,18'
+                      : timeFilter === 'Week'
+                      ? 'M 0,72 C 30,60 60,75 90,42 C 120,25 150,52 180,32 C 210,14 230,28 250,20 C 275,15 290,28 300,22'
+                      : timeFilter === 'Year'
+                      ? 'M 0,85 C 40,72 80,60 120,48 C 160,38 200,28 240,18 C 260,14 275,12 300,10'
+                      : 'M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45'
+                  }
                   fill="none"
                   stroke="#18181B"
                   strokeWidth="2.5"
                   strokeLinecap="round"
+                  className="transition-all duration-500"
                 />
 
                 {/* Active Indicator Line & Node */}
-                <line x1="230" y1="12" x2="230" y2="100" stroke="#E5E7EB" strokeWidth="1.5" strokeDasharray="3 3" />
-                <circle cx="230" cy="12" r="4" fill="#FFFFFF" stroke="#18181B" strokeWidth="2.5" />
+                {timeFilter === 'Day' && (
+                  <>
+                    <line x1="260" y1="18" x2="260" y2="100" stroke="#E5E7EB" strokeWidth="1.5" strokeDasharray="3 3" />
+                    <circle cx="260" cy="18" r="4" fill="#FFFFFF" stroke="#18181B" strokeWidth="2.5" />
+                  </>
+                )}
+                {timeFilter === 'Week' && (
+                  <>
+                    <line x1="210" y1="14" x2="210" y2="100" stroke="#E5E7EB" strokeWidth="1.5" strokeDasharray="3 3" />
+                    <circle cx="210" cy="14" r="4" fill="#FFFFFF" stroke="#18181B" strokeWidth="2.5" />
+                  </>
+                )}
+                {timeFilter === 'Month' && (
+                  <>
+                    <line x1="230" y1="12" x2="230" y2="100" stroke="#E5E7EB" strokeWidth="1.5" strokeDasharray="3 3" />
+                    <circle cx="230" cy="12" r="4" fill="#FFFFFF" stroke="#18181B" strokeWidth="2.5" />
+                  </>
+                )}
+                {timeFilter === 'Year' && (
+                  <>
+                    <line x1="275" y1="12" x2="275" y2="100" stroke="#E5E7EB" strokeWidth="1.5" strokeDasharray="3 3" />
+                    <circle cx="275" cy="12" r="4" fill="#FFFFFF" stroke="#18181B" strokeWidth="2.5" />
+                  </>
+                )}
               </svg>
 
-              {/* Active Oct/Present Tag */}
-              <div className="absolute top-[88px] left-[73%] -translate-x-1/2 px-2 py-0.5 rounded-full bg-black text-white text-[9px] font-bold shadow-sm">
-                Oct
+              {/* Dynamic Active Tag */}
+              <div
+                className={`absolute px-2 py-0.5 rounded-full bg-black text-white text-[9px] font-bold shadow-sm transition-all duration-300 ${
+                  timeFilter === 'Day' ? 'top-[82px] left-[84%] -translate-x-1/2' :
+                  timeFilter === 'Week' ? 'top-[82px] left-[68%] -translate-x-1/2' :
+                  timeFilter === 'Year' ? 'top-[82px] left-[89%] -translate-x-1/2' :
+                  'top-[88px] left-[73%] -translate-x-1/2'
+                }`}
+              >
+                {timeFilter === 'Day' ? '20:00' :
+                 timeFilter === 'Week' ? 'Fri' :
+                 timeFilter === 'Year' ? '2026' :
+                 'Oct'}
               </div>
             </div>
 
-            {/* Months Axis Labels */}
+            {/* Dynamic Axis Labels */}
             <div className="flex items-center justify-between text-[10px] text-gray-400 font-semibold mt-4 px-1">
-              <span>May</span>
-              <span>June</span>
-              <span>July</span>
-              <span>Aug</span>
-              <span>Sep</span>
-              <span className="text-black dark:text-white font-bold">Oct</span>
-              <span>Nov</span>
+              {timeFilter === 'Day' ? (
+                <>
+                  <span>00:00</span>
+                  <span>04:00</span>
+                  <span>08:00</span>
+                  <span>12:00</span>
+                  <span>16:00</span>
+                  <span className="text-black dark:text-white font-bold">20:00</span>
+                  <span>Now</span>
+                </>
+              ) : timeFilter === 'Week' ? (
+                <>
+                  <span>Mon</span>
+                  <span>Tue</span>
+                  <span>Wed</span>
+                  <span>Thu</span>
+                  <span className="text-black dark:text-white font-bold">Fri</span>
+                  <span>Sat</span>
+                  <span>Sun</span>
+                </>
+              ) : timeFilter === 'Year' ? (
+                <>
+                  <span>2020</span>
+                  <span>2021</span>
+                  <span>2022</span>
+                  <span>2023</span>
+                  <span>2024</span>
+                  <span>2025</span>
+                  <span className="text-black dark:text-white font-bold">2026</span>
+                </>
+              ) : (
+                <>
+                  <span>May</span>
+                  <span>June</span>
+                  <span>July</span>
+                  <span>Aug</span>
+                  <span>Sep</span>
+                  <span className="text-black dark:text-white font-bold">Oct</span>
+                  <span>Nov</span>
+                </>
+              )}
             </div>
           </div>
 
-          {/* BOTTOM DARK TARGET CARD (MATCHING INSPO GAUGE WIDGET) */}
+          {/* BOTTOM DARK TARGET CARD */}
           <div className="mt-4 p-4 rounded-2xl bg-[#18181B] text-white flex items-center justify-between shadow-lg">
             <div>
               <p className="text-[10px] text-gray-400 font-medium">Plan for 2026</p>
@@ -348,7 +456,12 @@ export default function DashboardPage() {
                 />
                 <path
                   className="text-white"
-                  strokeDasharray="75, 100"
+                  strokeDasharray={`${
+                    timeFilter === 'Day' ? 92 :
+                    timeFilter === 'Week' ? 88 :
+                    timeFilter === 'Year' ? 81 :
+                    75
+                  }, 100`}
                   strokeWidth="4"
                   strokeLinecap="round"
                   stroke="currentColor"
@@ -356,7 +469,12 @@ export default function DashboardPage() {
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
               </svg>
-              <span className="absolute text-[10px] font-black text-white">75%</span>
+              <span className="absolute text-[10px] font-black text-white">
+                {timeFilter === 'Day' ? '92%' :
+                 timeFilter === 'Week' ? '88%' :
+                 timeFilter === 'Year' ? '81%' :
+                 '75%'}
+              </span>
             </div>
           </div>
         </div>
@@ -401,6 +519,13 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Table Column Header */}
+        <div className="hidden sm:grid grid-cols-12 items-center px-4 py-2.5 text-[11px] font-mono font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-gray-800 gap-4">
+          <div className="col-span-6">Case & Incident</div>
+          <div className="col-span-3">Date Filed</div>
+          <div className="col-span-3 text-right pr-9">Status / Case ID</div>
+        </div>
+
         {/* List Rows */}
         <div className="divide-y divide-gray-50 dark:divide-gray-800/60">
           {displayedFIRs.map((fir, idx) => {
@@ -413,12 +538,12 @@ export default function DashboardPage() {
               <div
                 key={idx}
                 onClick={() => router.push(`/dashboard/fir/${fir.case_number}`)}
-                className="group flex items-center justify-between py-4 px-2 hover:bg-gray-50/70 dark:hover:bg-gray-800/30 rounded-2xl transition-colors cursor-pointer"
+                className="group grid grid-cols-12 items-center py-3.5 px-3 hover:bg-gray-50/80 dark:hover:bg-gray-800/30 rounded-2xl transition-colors cursor-pointer gap-4"
               >
                 {/* Left: Squircle Icon + Title */}
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className="w-11 h-11 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform text-gray-900 dark:text-white">
-                    <CrimeIcon className="w-5 h-5" />
+                <div className="col-span-12 sm:col-span-6 flex items-center gap-3.5 min-w-0">
+                  <div className="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform text-gray-900 dark:text-white">
+                    <CrimeIcon className="w-4 h-4" />
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-bold text-gray-900 dark:text-white truncate">
@@ -430,13 +555,13 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                {/* Middle: Date */}
-                <div className="hidden sm:block text-xs font-medium text-gray-400">
+                {/* Middle: Date (Rock solid column alignment) */}
+                <div className="hidden sm:flex sm:col-span-3 items-center text-xs font-mono font-medium text-gray-500 dark:text-gray-400">
                   {fmtDate(fir.date_filed)}
                 </div>
 
                 {/* Right: Case Number & Status */}
-                <div className="flex items-center gap-4">
+                <div className="col-span-12 sm:col-span-3 flex items-center justify-end gap-3">
                   <div className="text-right">
                     <p className="text-xs font-bold font-mono text-gray-900 dark:text-white">
                       {fir.case_number}
@@ -453,7 +578,7 @@ export default function DashboardPage() {
                       e.stopPropagation();
                       router.push(`/dashboard/fir/${fir.case_number}`);
                     }}
-                    className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="p-1.5 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
                     <MoreVertical className="w-4 h-4" />
                   </button>

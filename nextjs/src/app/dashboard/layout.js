@@ -887,7 +887,7 @@ export default function DashboardLayout({ children }) {
       {/* ── MINIMALIST MODERN SIDEBAR ── */}
       <aside className={`flex flex-col transition-all duration-300 ease-in-out bg-white dark:bg-[#18181B] border-r border-gray-100 dark:border-gray-800 relative z-20 shadow-sm ${collapsed ? 'w-20' : 'w-60'}`}>
         {/* Brand Header */}
-        <div className={`flex items-center px-5 py-6 ${collapsed ? 'justify-center px-2' : ''}`}>
+        <div className={`flex items-center px-4 py-5 ${collapsed ? 'justify-center px-2' : 'pr-6'}`}>
           <DrishtiLogo variant={collapsed ? 'icon' : 'compact'} size="md" href="/dashboard" />
         </div>
 

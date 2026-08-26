@@ -7,11 +7,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Send, Mic, MicOff, Volume2, VolumeX, Bot, User, Sparkles, 
   Copy, Check, X, ShieldAlert, FileText, Search, Car, Users, 
-  Database, RefreshCw, Cpu, Layers, ArrowRight, CornerDownLeft
+  Database, RefreshCw, Cpu, Layers, ArrowRight, CornerDownLeft, Globe,
+  ChevronDown, ChevronUp
 } from 'lucide-react';
 import Spinner from '@/components/ui/Spinner';
 import InvestigatorWall from '@/components/InvestigatorWall';
 import VoiceDebugStatus from '@/components/VoiceDebugStatus';
+import { DrishtiEmblem } from '@/components/DrishtiLogo';
 import { UPLOADED_FIRS } from '@/lib/uploadedFirsStore';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
@@ -51,6 +53,136 @@ const VOICE_PROFILES = [
   { id: 'hi-SwaraNeural',   label: 'हिंदी · Swara', lang: 'hi', ttsLang: 'hi-IN', neural: 'hi-IN-SwaraNeural'  },
 ];
 
+function FormattedText({ text, onCaseClick, maxLines = 15 }) {
+  const [expanded, setExpanded] = useState(false);
+
+  if (!text) return null;
+
+  // Split lines
+  const lines = text.split('\n');
+  const isLong = lines.length > maxLines;
+  const displayLines = isLong && !expanded ? lines.slice(0, maxLines) : lines;
+
+  const renderInline = (lineStr) => {
+    // Clean raw markdown artifact stars/underscores: e.g. **** _text_ -> text
+    const cleanedLine = lineStr
+      .replace(/\*{3,}/g, '')
+      .replace(/_{2,}/g, '')
+      .replace(/^[\s*_]+/, '')
+      .replace(/[\s*_]+$/, '');
+
+    const boldParts = cleanedLine.split(/\*\*(.*?)\*\*/g);
+
+    return boldParts.map((part, j) => {
+      const isBold = j % 2 === 1;
+      const singleCaseRegex = /^(KAR\/[A-Z0-9]+\/\d+\/\d+|FIR-\d{4}-[A-Z0-9]+-\d+)$/i;
+      const caseSplitRegex = /(KAR\/[A-Z0-9]+\/\d+\/\d+|FIR-\d{4}-[A-Z0-9]+-\d+)/g;
+      const subParts = part.split(caseSplitRegex);
+
+      const renderedSubParts = subParts.map((subPart, k) => {
+        if (singleCaseRegex.test(subPart)) {
+          return (
+            <Link
+              key={k}
+              href={`/dashboard/fir/${encodeURIComponent(subPart)}`}
+              className="text-sky-600 dark:text-sky-400 hover:bg-sky-500/10 font-mono font-bold border border-sky-500/25 rounded px-1.5 py-0.5 bg-sky-500/5 transition-all mx-0.5 inline-flex items-center gap-1 focus:outline-none cursor-pointer text-xs"
+            >
+              <FileText className="w-3 h-3 text-sky-500" />
+              {subPart}
+            </Link>
+          );
+        }
+        return subPart;
+      });
+
+      return isBold ? (
+        <strong key={j} className="text-gray-950 dark:text-white font-semibold">{renderedSubParts}</strong>
+      ) : (
+        <span key={j}>{renderedSubParts}</span>
+      );
+    });
+  };
+
+  return (
+    <div className="space-y-1 text-[13px] leading-relaxed font-sans text-gray-800 dark:text-gray-200">
+      {displayLines.map((line, i) => {
+        const trimmed = line.trim();
+        if (!trimmed) {
+          return <div key={i} className="h-1" />;
+        }
+
+        // Table row
+        if (trimmed.startsWith('|')) {
+          const cells = trimmed.split('|').filter(Boolean);
+          return (
+            <div key={i} className="font-mono text-[11.5px] text-gray-800 dark:text-gray-200 border-b border-gray-100 dark:border-zinc-800 py-1 grid grid-cols-4 gap-1.5">
+              {cells.map((cell, j) => {
+                const cellText = cell.trim();
+                const caseRegex = /(KAR\/[A-Z0-9]+\/\d+\/\d+|FIR-\d{4}-[A-Z0-9]+-\d+)/;
+                if (caseRegex.test(cellText)) {
+                  return (
+                    <button
+                      key={j}
+                      onClick={() => onCaseClick && onCaseClick(cellText)}
+                      className="text-left text-sky-600 dark:text-sky-400 hover:underline font-bold transition-colors focus:outline-none cursor-pointer truncate"
+                    >
+                      {cellText}
+                    </button>
+                  );
+                }
+                return (
+                  <span key={j} className={j === 0 ? 'text-gray-950 dark:text-white font-medium truncate' : 'text-gray-500 dark:text-gray-400 truncate'}>
+                    {cellText}
+                  </span>
+                );
+              })}
+            </div>
+          );
+        }
+
+        // Bullet point item
+        if (trimmed.startsWith('- ') || trimmed.startsWith('* ') || trimmed.startsWith('• ')) {
+          return (
+            <div key={i} className="flex items-start gap-1.5 pl-0.5 py-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-500 mt-1.5 flex-shrink-0" />
+              <div className="flex-1 leading-snug">
+                {renderInline(trimmed.replace(/^[-*•]\s*/, ''))}
+              </div>
+            </div>
+          );
+        }
+
+        return (
+          <p key={i} className="leading-snug py-0.5">
+            {renderInline(line)}
+          </p>
+        );
+      })}
+
+      {isLong && (
+        <div className="pt-1">
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-xs font-semibold text-sky-600 dark:text-sky-400 transition-colors cursor-pointer"
+          >
+            {expanded ? (
+              <>
+                <span>Show less</span>
+                <ChevronUp className="w-3 h-3" />
+              </>
+            ) : (
+              <>
+                <span>Read more ({lines.length - maxLines} more lines)</span>
+                <ChevronDown className="w-3 h-3" />
+              </>
+            )}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis, onSuggestionClick }) {
   const [copied, setCopied] = useState(false);
   const isUser = msg.role === 'user';
@@ -72,194 +204,142 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis, onSuggestion
       const stationMatch = text.match(/- Police Station:\s*([^\n]+)/i);
       const statusMatch = text.match(/- Status:\s*([^\n]+)/i);
 
+      const cleanedPreview = text
+        .replace(/AUTOMATED FIR ENTRY STORED IN DATASTORE[\s\S]*?Document Summary:\s*/i, '')
+        .replace(/✅[\s\S]*/i, '')
+        .replace(/^\s*[\*_#]+\s*/gm, '')
+        .trim();
+
       return (
-        <div className="my-2 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] overflow-hidden shadow-lg">
-          {/* Card Top Banner - Deep Ocean Navy */}
-          <div className="bg-slate-900 dark:bg-slate-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-400/30 text-blue-400 flex items-center justify-center shadow-sm">
-                <FileText className="w-4 h-4" />
+        <div className="my-1 rounded-xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 overflow-hidden shadow-xs max-w-full sm:max-w-[520px]">
+          {/* Card Top Banner */}
+          <div className="bg-gray-950 dark:bg-black px-3 py-2 flex items-center justify-between border-b border-gray-800">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-sky-500/20 text-sky-400 flex items-center justify-center">
+                <FileText className="w-3 h-3" />
               </div>
               <div>
-                <h4 className="text-xs font-mono font-extrabold text-white uppercase tracking-wider">
+                <h4 className="text-xs font-bold text-white tracking-tight">
                   Automated FIR Entry Registered
                 </h4>
-                <p className="text-[10px] font-mono text-slate-400">
-                  Karnataka State Police CCTNS Datastore
+                <p className="text-[9.5px] text-gray-400 font-mono">
+                  Karnataka Police CCTNS Datastore
                 </p>
               </div>
             </div>
             {caseMatch && (
               <button
                 onClick={() => onCaseClick && onCaseClick(caseNum)}
-                className="px-3 py-1 rounded-lg bg-blue-500/20 border border-blue-400/30 text-blue-300 font-mono font-extrabold text-xs shadow-md hover:bg-blue-500/30 transition-all cursor-pointer flex items-center gap-1.5"
+                className="px-2 py-0.5 rounded bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 font-mono font-bold text-[11px] transition-all cursor-pointer flex items-center gap-1"
               >
-                <FileText className="w-3.5 h-3.5 text-blue-400" />
+                <FileText className="w-3 h-3 text-sky-400" />
                 {caseNum}
               </button>
             )}
           </div>
 
           {/* Data Grid Badges */}
-          <div className="p-4 space-y-3">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <div className="p-2.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]/50">
-                <span className="text-[10px] font-mono uppercase text-[var(--text-secondary)] block">Crime Type</span>
-                <span className="text-xs font-bold font-mono text-[var(--text-primary)] uppercase tracking-wide">
+          <div className="p-2.5 space-y-2 bg-white dark:bg-zinc-900">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+              <div className="p-1.5 rounded-lg bg-gray-50 dark:bg-zinc-800/60 border border-gray-100 dark:border-zinc-700/60">
+                <span className="text-[8.5px] font-mono uppercase text-gray-400 block font-medium">Crime Type</span>
+                <span className="text-[11px] font-bold text-gray-900 dark:text-white uppercase tracking-tight block truncate">
                   {crimeTypeMatch ? crimeTypeMatch[1].trim().replace('_', ' ') : 'General Offence'}
                 </span>
               </div>
-              <div className="p-2.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]/50">
-                <span className="text-[10px] font-mono uppercase text-[var(--text-secondary)] block">Police Station</span>
-                <span className="text-xs font-bold font-mono text-[var(--text-primary)] truncate block">
+              <div className="p-1.5 rounded-lg bg-gray-50 dark:bg-zinc-800/60 border border-gray-100 dark:border-zinc-700/60">
+                <span className="text-[8.5px] font-mono uppercase text-gray-400 block font-medium">Police Station</span>
+                <span className="text-[11px] font-bold text-gray-900 dark:text-white truncate block">
                   {stationMatch ? stationMatch[1].trim() : 'Central Command'}
                 </span>
               </div>
-              <div className="p-2.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]/50">
-                <span className="text-[10px] font-mono uppercase text-[var(--text-secondary)] block">District</span>
-                <span className="text-xs font-bold font-mono text-[var(--text-primary)]">
+              <div className="p-1.5 rounded-lg bg-gray-50 dark:bg-zinc-800/60 border border-gray-100 dark:border-zinc-700/60">
+                <span className="text-[8.5px] font-mono uppercase text-gray-400 block font-medium">District</span>
+                <span className="text-[11px] font-bold text-gray-900 dark:text-white truncate block">
                   {districtMatch ? districtMatch[1].trim() : 'Bengaluru Urban'}
                 </span>
               </div>
-              <div className="p-2.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]/50">
-                <span className="text-[10px] font-mono uppercase text-[var(--text-secondary)] block">Status</span>
-                <span className="text-xs font-extrabold font-mono text-amber-600 dark:text-amber-400 inline-flex items-center gap-1">
+              <div className="p-1.5 rounded-lg bg-gray-50 dark:bg-zinc-800/60 border border-gray-100 dark:border-zinc-700/60">
+                <span className="text-[8.5px] font-mono uppercase text-gray-400 block font-medium">Status</span>
+                <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 inline-flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                  {statusMatch ? statusMatch[1].trim().toUpperCase() : 'UNDER INVESTIGATION'}
+                  {statusMatch ? statusMatch[1].trim().toUpperCase() : 'INVESTIGATING'}
                 </span>
               </div>
             </div>
 
             {/* Document Content Box */}
-            <div className="mt-2">
-              <span className="text-[10px] font-mono font-bold uppercase text-[var(--text-primary)] tracking-wider block mb-1">
+            <div className="mt-1">
+              <span className="text-[9.5px] font-mono font-bold uppercase text-gray-400 tracking-wider block mb-1">
                 Parsed Document Preview & Metadata:
               </span>
-              <div className="bg-[var(--surface-2)] border border-[var(--border)]/50 rounded-xl p-3 text-xs text-[var(--text-primary)] font-mono max-h-48 overflow-y-auto leading-relaxed shadow-inner">
-                {text.replace(/AUTOMATED FIR ENTRY STORED IN DATASTORE[\s\S]*?Document Summary:\s*/i, '').replace(/✅[\s\S]*/i, '')}
+              <div className="bg-gray-50 dark:bg-zinc-800/40 border border-gray-200/70 dark:border-zinc-700/60 rounded-lg p-2 text-xs">
+                <FormattedText text={cleanedPreview} onCaseClick={onCaseClick} maxLines={15} />
               </div>
             </div>
 
             {/* Bottom Verification Tag */}
-            <div className="flex items-center gap-2 pt-2 border-t border-[var(--border)]/30 text-[11px] font-mono text-emerald-600 dark:text-emerald-400">
-              <Check className="w-4 h-4 shrink-0" />
-              <span>Document indexed into live RAG memory & ANPR surveillance watchlists.</span>
+            <div className="flex items-center gap-1.5 pt-1 border-t border-gray-100 dark:border-zinc-800 text-[10.5px] text-emerald-600 dark:text-emerald-400 font-medium">
+              <Check className="w-3 h-3 shrink-0" />
+              <span>Document indexed into live RAG memory & ANPR watchlists.</span>
             </div>
           </div>
         </div>
       );
     }
 
-    const lines = text.split('\n');
-    return lines.map((line, i) => {
-      if (line.startsWith('|')) {
-        return (
-          <div key={i} className="font-mono text-xs text-[var(--text-primary)] border-b border-[var(--border)]/40 py-1.5 grid grid-cols-4 gap-2">
-            {line.split('|').filter(Boolean).map((cell, j) => {
-              const cellText = cell.trim();
-              const caseRegex = /(KAR\/[A-Z]+\/\d+\/\d+|FIR-\d{4}-[A-Z]+-\d+)/;
-              if (caseRegex.test(cellText)) {
-                return (
-                  <button
-                    key={j}
-                    onClick={() => onCaseClick && onCaseClick(cellText)}
-                    className="text-left text-blue-600 dark:text-blue-400 hover:underline font-bold transition-colors focus:outline-none cursor-pointer"
-                  >
-                    {cellText}
-                  </button>
-                );
-              }
-              return <span key={j} className={j === 0 ? 'text-[var(--text-primary)] font-semibold' : 'text-[var(--text-secondary)]'}>{cellText}</span>;
-            })}
-          </div>
-        );
-      }
-
-      const boldParts = line.split(/\*\*(.*?)\*\*/g);
-      return (
-        <p key={i} className={`${line === '' ? 'mt-2' : ''} leading-relaxed font-sans text-sm text-[var(--text-primary)]`}>
-          {boldParts.map((part, j) => {
-            const isBold = j % 2 === 1;
-            const singleCaseRegex = /^(KAR\/[A-Z]+\/\d+\/\d+|FIR-\d{4}-[A-Z]+-\d+)$/i;
-            const caseSplitRegex = /(KAR\/[A-Z]+\/\d+\/\d+|FIR-\d{4}-[A-Z]+-\d+)/g;
-            const subParts = part.split(caseSplitRegex);
-
-            const renderedSubParts = subParts.map((subPart, k) => {
-              if (singleCaseRegex.test(subPart)) {
-                return (
-                  <Link
-                    key={k}
-                    href={`/dashboard/fir/${encodeURIComponent(subPart)}`}
-                    className="text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 font-mono font-bold border border-blue-500/30 rounded-lg px-2 py-0.5 bg-blue-500/10 transition-all mx-1 inline-flex items-center gap-1 focus:outline-none cursor-pointer shadow-xs hover:scale-105"
-                  >
-                    <FileText className="w-3 h-3 text-blue-500" />
-                    {subPart}
-                  </Link>
-                );
-              }
-              return subPart;
-            });
-
-            return isBold ? (
-              <strong key={j} className="text-[var(--text-primary)] font-extrabold">{renderedSubParts}</strong>
-            ) : (
-              <span key={j}>{renderedSubParts}</span>
-            );
-          })}
-        </p>
-      );
-    });
+    return <FormattedText text={text} onCaseClick={onCaseClick} maxLines={15} />;
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12, scale: 0.98 }}
+      initial={{ opacity: 0, y: 6, scale: 0.99 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.3 }}
-      className={`flex gap-3.5 group ${isUser ? 'flex-row-reverse' : ''}`}
+      transition={{ duration: 0.15 }}
+      className={`flex gap-2.5 group ${isUser ? 'flex-row-reverse' : ''}`}
     >
-      <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm border
-        ${isUser 
-          ? 'bg-slate-900 dark:bg-slate-800 text-white border-slate-700' 
-          : 'bg-gradient-to-tr from-blue-600 to-indigo-600 text-white border-blue-500/40'}`}>
+      <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 shadow-xs border ${
+        isUser 
+          ? 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 border-gray-200 dark:border-zinc-700' 
+          : 'bg-black dark:bg-white text-white dark:text-black border-black/10 dark:border-white/20 p-1.5'}`}>
         {isUser
-          ? <User className="w-4 h-4 text-white" />
-          : <Bot className="w-4 h-4 text-white" />
+          ? <User className="w-3.5 h-3.5 text-gray-700 dark:text-zinc-200" />
+          : <DrishtiEmblem className="w-full h-full" color="currentColor" />
         }
       </div>
 
-      <div className={`max-w-[85%] ${isUser ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
-        <div className="flex items-center gap-2 text-[10px] font-mono text-[var(--text-secondary)] px-1">
-          <span className="font-bold">{isUser ? 'INSPECTOR (YOU)' : 'DRISHTI INTELLIGENCE'}</span>
-          <span>•</span>
+      <div className={`max-w-[85%] sm:max-w-[560px] ${isUser ? 'items-end' : 'items-start'} flex flex-col gap-0.5`}>
+        <div className="flex items-center gap-1.5 text-[9.5px] font-mono text-gray-400 dark:text-gray-500 px-1">
+          <span className="font-semibold">{isUser ? 'Inspector (You)' : 'DRISHTI Co-Pilot'}</span>
+          <span>·</span>
           <span>{msg.timestamp || 'Just now'}</span>
         </div>
 
-        <div className={`rounded-2xl px-5 py-4 text-sm relative shadow-sm border backdrop-blur-md
-          ${isUser
-            ? 'bg-blue-600 text-white border-blue-500 rounded-tr-xs shadow-blue-600/10'
-            : 'bg-[var(--surface-1)] text-[var(--text-primary)] border border-[var(--border)]/70 rounded-tl-xs'
-          }`}>
+        <div className={`rounded-2xl text-[13px] relative shadow-xs border ${
+          isUser
+            ? 'max-w-[85%] sm:max-w-[420px] bg-gray-950 dark:bg-white text-white dark:text-gray-950 border-gray-900 dark:border-white rounded-tr-xs px-3.5 py-2'
+            : 'bg-white dark:bg-[#18181B] text-gray-900 dark:text-gray-100 border-gray-200/80 dark:border-gray-800/80 rounded-tl-xs p-3'
+        }`}>
           {isUser
-            ? <p className="font-sans leading-relaxed text-white">{msg.content}</p>
-            : <div className="space-y-2">{renderContentWithCaseLinks(msg.content)}</div>
+            ? <p className="font-sans leading-relaxed whitespace-pre-wrap break-words">{msg.content}</p>
+            : <div className="space-y-1.5">{renderContentWithCaseLinks(msg.content)}</div>
           }
         </div>
 
         {!isUser && (
-          <div className="flex items-center gap-2 px-1 pt-1 opacity-100 transition-opacity">
+          <div className="flex items-center gap-3 px-1 pt-0.5 opacity-80 group-hover:opacity-100 transition-opacity">
             <button
               onClick={handleCopy}
-              className="text-[10px] font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 cursor-pointer transition-colors"
+              className="text-[10px] font-mono text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex items-center gap-1 cursor-pointer transition-colors"
             >
-              {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+              {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
               {copied ? 'Copied' : 'Copy'}
             </button>
-            <span className="text-[var(--text-secondary)]">•</span>
+            <span className="text-gray-300 dark:text-gray-700">·</span>
             <button
               onClick={() => onSpeak && onSpeak(msg.content)}
               className={`text-[10px] font-mono flex items-center gap-1 cursor-pointer transition-colors ${
-                isSpeakingThis ? 'text-rose-600 font-bold animate-pulse' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                isSpeakingThis ? 'text-rose-500 font-bold animate-pulse' : 'text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
               }`}
             >
               <Volume2 className="w-3 h-3" />
@@ -281,7 +361,7 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis, onSuggestion
                     sendMessage(s);
                   }
                 }}
-                className="px-2.5 py-1 rounded-full bg-[var(--surface-1)] hover:bg-blue-500/10 border border-[var(--border)] hover:border-blue-500/40 text-[11px] font-mono text-[var(--text-secondary)] hover:text-blue-600 dark:hover:text-blue-400 transition-all cursor-pointer shadow-xs"
+                className="px-2.5 py-1 rounded-full bg-white dark:bg-zinc-800/80 hover:bg-sky-50 dark:hover:bg-sky-950/30 border border-gray-200 dark:border-zinc-700 hover:border-sky-500/40 text-[11px] font-medium text-gray-600 dark:text-gray-300 hover:text-sky-600 dark:hover:text-sky-400 transition-all cursor-pointer shadow-xs"
               >
                 {s}
               </button>
@@ -296,20 +376,20 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis, onSuggestion
 function TypingIndicator() {
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       className="flex gap-3 items-center"
     >
-      <div className="w-9 h-9 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] flex items-center justify-center flex-shrink-0 shadow-sm">
-        <Bot className="w-4 h-4 text-[var(--cyan-accent)] animate-pulse" />
+      <div className="w-8 h-8 rounded-xl bg-black dark:bg-white text-white dark:text-black border border-black/10 dark:border-white/20 flex items-center justify-center flex-shrink-0 p-1.5 shadow-xs">
+        <DrishtiEmblem className="w-full h-full" color="currentColor" />
       </div>
-      <div className="glass-panel border border-[var(--border)] rounded-2xl rounded-tl-xs px-5 py-3.5 shadow-lg">
+      <div className="bg-white dark:bg-[#18181B] border border-gray-200/80 dark:border-gray-800 rounded-2xl rounded-tl-xs px-4 py-2.5 shadow-xs">
         <div className="flex gap-1.5 items-center h-4">
-          <span className="text-xs font-mono text-[var(--text-secondary)] font-bold mr-1">ANALYZING EVIDENCE</span>
+          <span className="text-xs font-mono text-gray-400 font-bold mr-1">ANALYZING EVIDENCE</span>
           {[0, 1, 2].map((i) => (
             <span
               key={i}
-              className="w-1.5 h-1.5 rounded-full bg-[var(--cyan-accent)] animate-bounce"
+              className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-bounce"
               style={{ animationDelay: `${i * 0.15}s`, animationDuration: '0.8s' }}
             />
           ))}
@@ -1149,25 +1229,25 @@ export default function ChatPage() {
   const isEmpty = messages.length === 0;
 
   return (
-    <div className="flex h-full relative overflow-hidden bg-[var(--surface-0)] text-[var(--text-primary)] font-sans">
+    <div className="flex h-full relative overflow-hidden bg-[#F8F9FB] dark:bg-[#09090B] text-gray-900 dark:text-gray-100 font-sans">
       <div className="flex-grow flex flex-col h-full min-w-0 transition-all duration-300 relative z-10">
         {/* Header Command Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 bg-[var(--surface-1)]/90 backdrop-blur-md border-b border-[var(--border)]/50 shadow-xs z-20">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-3.5 bg-white/80 dark:bg-[#18181B]/80 backdrop-blur-md border-b border-gray-200/80 dark:border-gray-800 shadow-xs z-20">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md">
-              <Bot className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 rounded-xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center p-1.5 shadow-xs flex-shrink-0">
+              <DrishtiEmblem className="w-full h-full" color="currentColor" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-extrabold font-heading text-[var(--text-primary)] tracking-wide">
+                <h2 className="text-sm font-bold text-gray-900 dark:text-white font-sans tracking-tight">
                   DRISHTI Co-Pilot
                 </h2>
-                <span className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                  LIVE GRID SYNC
+                <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 text-[9px] font-mono px-2 py-0.5 rounded-full font-bold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  LIVE GRID
                 </span>
               </div>
-              <p className="text-[10px] text-[var(--text-secondary)] font-mono uppercase tracking-widest mt-0.5">
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">
                 Karnataka Police AI Intelligence & Multilingual RAG Engine
               </p>
             </div>
@@ -1176,143 +1256,141 @@ export default function ChatPage() {
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 onClick={stopSpeech}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs font-mono font-bold uppercase tracking-wider hover:bg-rose-500/20 transition-all cursor-pointer shadow-xs animate-pulse"
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs font-semibold hover:bg-rose-100 transition-all cursor-pointer shadow-xs animate-pulse ml-2"
               >
                 <VolumeX className="w-3.5 h-3.5" />
-                Mute Audio
+                <span>Mute</span>
               </motion.button>
             )}
           </div>
 
-          {/* Voice Profile Selector Pills & Clear Chat */}
-          <div className="flex items-center gap-2.5">
+          {/* Action Buttons & Compact Language Selector */}
+          <div className="flex items-center gap-2">
             <button
               onClick={() => router.push('/dashboard/logs')}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/30 text-xs font-mono font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 transition-all cursor-pointer shadow-xs"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-zinc-800 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-zinc-700 border border-gray-200 dark:border-zinc-700 transition-all cursor-pointer shadow-xs"
               title="View all AI Subject Log Cards"
             >
-              <FileText className="w-3.5 h-3.5" />
+              <FileText className="w-3.5 h-3.5 text-gray-500" />
               <span>AI Logs</span>
             </button>
             <button
               onClick={handleExportConversation}
               disabled={!messages.length || exportingPdf}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)]/50 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-40 transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-zinc-800 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-zinc-700 border border-gray-200 dark:border-zinc-700 disabled:opacity-40 transition-colors cursor-pointer shadow-xs"
               title="Export conversation as PDF"
             >
-              <FileText className="w-3.5 h-3.5" />
-              {exportingPdf ? 'Exporting...' : 'Export PDF'}
+              <FileText className="w-3.5 h-3.5 text-gray-500" />
+              <span>{exportingPdf ? 'Exporting...' : 'PDF'}</span>
             </button>
-            <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]/60 overflow-x-auto shadow-inner">
-              {VOICE_PROFILES.map((profile) => {
-                const active = voiceProfile === profile.id;
-                return (
-                  <button
-                    key={profile.id}
-                    onClick={() => setVoiceProfile(profile.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all whitespace-nowrap cursor-pointer ${
-                      active
-                        ? 'bg-blue-600 text-white shadow-sm'
-                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-1)]'
-                    }`}
-                  >
+
+            {/* Compact Voice Profile Dropdown */}
+            <div className="relative flex items-center">
+              <select
+                value={voiceProfile}
+                onChange={(e) => setVoiceProfile(e.target.value)}
+                className="px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-xs font-semibold text-gray-700 dark:text-gray-200 cursor-pointer focus:outline-none"
+                title="Select Speech Voice & Language"
+              >
+                {VOICE_PROFILES.map((profile) => (
+                  <option key={profile.id} value={profile.id} className="bg-white dark:bg-zinc-900 text-gray-900 dark:text-white">
                     {profile.label}
-                  </button>
-                );
-              })}
+                  </option>
+                ))}
+              </select>
             </div>
+
             {messages.length > 0 && (
               <button
                 onClick={clearChatHistory}
-                className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 text-xs font-mono font-bold uppercase transition-all cursor-pointer shadow-xs shrink-0"
+                className="px-2.5 py-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-semibold transition-all cursor-pointer shrink-0"
                 title="Clear conversation history"
               >
-                Clear Chat
+                Clear
               </button>
             )}
           </div>
         </div>
 
         {/* Message Container / Empty Hero State */}
-        <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-6 space-y-6">
-          {isEmpty ? (
-            <div className="flex flex-col items-center justify-center min-h-[80%] space-y-8 max-w-3xl mx-auto py-8">
-              
-              {/* Central AI Emblem */}
-              <div className="relative">
-                <div className="absolute inset-0 rounded-3xl bg-blue-500/20 blur-2xl opacity-40 animate-pulse" />
-                <div className="relative w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-500/10 via-indigo-500/10 to-cyan-500/10 border border-blue-500/30 flex items-center justify-center shadow-lg text-blue-600 dark:text-blue-400">
-                  <Cpu className="w-10 h-10" />
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-5 space-y-4">
+          <div className="max-w-3xl lg:max-w-4xl mx-auto w-full space-y-4">
+            {isEmpty ? (
+              <div className="flex flex-col items-center justify-center min-h-[65vh] space-y-6 text-center max-w-xl mx-auto py-6">
+                
+                {/* Central AI Emblem */}
+                <div className="w-14 h-14 rounded-2xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center p-3 shadow-md">
+                  <DrishtiEmblem className="w-full h-full" color="currentColor" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <span className="text-[9px] font-mono font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800/40 px-3 py-0.5 rounded-full uppercase tracking-widest inline-block">
+                    Karnataka Police AI Command
+                  </span>
+                  <h3 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight font-sans">
+                    How can DRISHTI assist today?
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-sans leading-relaxed max-w-md mx-auto">
+                    Query CCTNS crime datastores, parse FIR documents, inspect suspects, or run ANPR lookups in <span className="font-semibold text-gray-800 dark:text-gray-200">English</span>, <span className="font-semibold text-gray-800 dark:text-gray-200">ಕನ್ನಡ</span>, or <span className="font-semibold text-gray-800 dark:text-gray-200">हिंदी</span>.
+                  </p>
+                </div>
+
+                {/* Suggestion Cards Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full text-left">
+                  {SUGGESTIONS.map((s, i) => {
+                    const Icon = s.icon;
+                    return (
+                      <motion.button
+                        key={i}
+                        whileHover={{ y: -2 }}
+                        whileTap={{ scale: 0.99 }}
+                        onClick={() => sendMessage(s.text)}
+                        className="p-3.5 rounded-xl bg-white dark:bg-[#18181B] hover:bg-gray-50 dark:hover:bg-zinc-800/80 border border-gray-200/80 dark:border-gray-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all shadow-xs group cursor-pointer flex flex-col justify-between"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 flex items-center justify-center group-hover:scale-105 transition-transform">
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <span className="text-[8.5px] font-mono font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800/40 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                            {s.badge}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-gray-900 dark:text-white font-sans mb-0.5">
+                            {s.title}
+                          </p>
+                          <p className="text-[11px] text-gray-500 dark:text-gray-400 font-sans line-clamp-2 leading-relaxed">
+                            &ldquo;{s.text}&rdquo;
+                          </p>
+                        </div>
+                      </motion.button>
+                    );
+                  })}
                 </div>
               </div>
-
-              <div className="text-center space-y-2.5 max-w-lg">
-                <span className="text-[10px] font-mono font-extrabold text-blue-600 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3.5 py-1 rounded-full uppercase tracking-widest inline-block">
-                  KARNATAKA POLICE AI COMMAND CENTER
-                </span>
-                <h3 className="text-3xl font-black text-[var(--text-primary)] tracking-tight pt-1 font-heading">
-                  Ask DRISHTI Co-Pilot
-                </h3>
-                <p className="text-xs sm:text-sm text-[var(--text-secondary)] font-sans leading-relaxed">
-                  Query crime datastores, upload FIR documents, run ANPR watchlist lookups, or inspect suspect profiles in <span className="text-[var(--text-primary)] font-bold">English</span>, <span className="text-[var(--text-primary)] font-bold">Hindi</span>, or <span className="text-[var(--text-primary)] font-bold">Kannada</span>.
-                </p>
-              </div>
-
-              {/* Suggestion Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-                {SUGGESTIONS.map((s, i) => {
-                  const Icon = s.icon;
-                  return (
-                    <motion.button
-                      key={i}
-                      whileHover={{ y: -3, scale: 1.01 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => sendMessage(s.text)}
-                      className="text-left p-5 rounded-2xl bg-[var(--surface-1)] hover:bg-[var(--surface-2)]/80 border border-[var(--border)]/70 hover:border-blue-500/40 transition-all shadow-xs hover:shadow-md group cursor-pointer flex flex-col justify-between"
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-                          <Icon className="w-5 h-5" />
-                        </div>
-                        <span className="text-[9px] font-mono font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                          {s.badge}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold text-[var(--text-primary)] font-mono mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                          {s.title}
-                        </p>
-                        <p className="text-xs text-[var(--text-secondary)] font-sans line-clamp-2 leading-relaxed italic">
-                          "{s.text}"
-                        </p>
-                      </div>
-                    </motion.button>
-                  );
-                })}
-              </div>
-            </div>
-          ) : (
-            <>
-              {messages.map((msg, i) => (
-                <MessageBubble
-                  key={i}
-                  msg={msg}
-                  onCaseClick={fetchCaseDetails}
-                  onSpeak={(text) => speakText(text, i)}
-                  isSpeakingThis={speakingMsgIdx === i && isSpeaking}
-                  onSuggestionClick={(s) => { setInput(''); sendMessage(s); }}
-                />
-              ))}
-              {loading && <TypingIndicator />}
-            </>
-          )}
-          <div ref={bottomRef} />
+            ) : (
+              <>
+                {messages.map((msg, i) => (
+                  <MessageBubble
+                    key={i}
+                    msg={msg}
+                    onCaseClick={fetchCaseDetails}
+                    onSpeak={(text) => speakText(text, i)}
+                    isSpeakingThis={speakingMsgIdx === i && isSpeaking}
+                    onSuggestionClick={(s) => { setInput(''); sendMessage(s); }}
+                  />
+                ))}
+                {loading && <TypingIndicator />}
+              </>
+            )}
+            <div ref={bottomRef} />
+          </div>
         </div>
 
         {/* Input Floating Command Dock */}
-        <div className="p-4 sm:p-5 border-t border-[var(--border)]/50 bg-[var(--surface-1)]/90 backdrop-blur-md relative z-20">
-          <div className="max-w-4xl mx-auto space-y-2">
-            <div className="flex items-center gap-2.5 bg-[var(--surface-0)] border border-[var(--border)]/70 focus-within:border-blue-500/60 rounded-2xl p-2 shadow-lg transition-all">
+        <div className="p-3 sm:p-4 border-t border-gray-200/80 dark:border-gray-800 bg-white/90 dark:bg-[#18181B]/90 backdrop-blur-md relative z-20">
+          <div className="max-w-3xl lg:max-w-4xl mx-auto space-y-1.5">
+            <div className="flex items-center gap-2 bg-[#F4F5F8] dark:bg-[#111317] border border-gray-200 dark:border-zinc-800 focus-within:border-gray-400 dark:focus-within:border-zinc-600 rounded-2xl p-1.5 px-2.5 shadow-sm transition-all">
               <button
                 id="voice-btn"
                 onClick={handleMicClick}
@@ -1322,13 +1400,13 @@ export default function ChatPage() {
                 onTouchEnd={handlePttEnd}
                 disabled={!speechSupported}
                 title={speechSupported ? (isRecording ? 'Release to send / Click to stop' : 'Hold to Talk / Click to toggle') : 'Voice input not supported'}
-                className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all cursor-pointer ${
+                className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all cursor-pointer ${
                   isRecording
-                    ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/40 animate-pulse'
-                    : 'bg-[var(--surface-2)] hover:bg-[var(--surface-1)] border border-[var(--border)]/50 text-[var(--text-primary)] hover:text-blue-600'
+                    ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30 animate-pulse'
+                    : 'bg-white dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 border border-gray-200/80 dark:border-zinc-700 text-gray-700 dark:text-gray-200'
                 }`}
               >
-                {isRecording ? <MicOff className="w-5 h-5 text-white" /> : <Mic className="w-5 h-5" />}
+                {isRecording ? <MicOff className="w-4 h-4 text-white" /> : <Mic className="w-4 h-4" />}
               </button>
 
               <input
@@ -1343,9 +1421,9 @@ export default function ChatPage() {
                 onClick={() => fileInputRef.current?.click()}
                 disabled={loading}
                 title="Upload FIR document or case file"
-                className="w-11 h-11 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-1)] border border-[var(--border)]/50 text-[var(--text-primary)] hover:text-blue-600 flex items-center justify-center flex-shrink-0 transition-all cursor-pointer shadow-xs"
+                className="w-8 h-8 rounded-xl bg-white dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 border border-gray-200/80 dark:border-zinc-700 text-gray-700 dark:text-gray-200 flex items-center justify-center flex-shrink-0 transition-all cursor-pointer shadow-xs"
               >
-                <FileText className="w-5 h-5" />
+                <FileText className="w-4 h-4" />
               </button>
 
               <div className="flex-1">
@@ -1368,7 +1446,7 @@ export default function ChatPage() {
                   })()}
                   rows={1}
                   style={{ resize: 'none', overflowY: 'hidden' }}
-                  className="w-full px-3 py-2 bg-transparent text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/60 focus:outline-none font-sans"
+                  className="w-full px-2 py-1.5 bg-transparent text-gray-900 dark:text-gray-100 text-[13.5px] placeholder-gray-400 focus:outline-none font-sans"
                 />
               </div>
 
@@ -1376,18 +1454,18 @@ export default function ChatPage() {
                 id="send-btn"
                 onClick={() => sendMessage(input)}
                 disabled={!input.trim() || loading}
-                className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all cursor-pointer ${
+                className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all cursor-pointer ${
                   input.trim() && !loading
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/25 hover:scale-105'
-                    : 'bg-[var(--surface-2)] text-[var(--text-secondary)]/40 border border-[var(--border)]/40 cursor-not-allowed'
+                    ? 'bg-black dark:bg-white text-white dark:text-black hover:opacity-90 active:scale-95 shadow-xs'
+                    : 'bg-gray-200 dark:bg-zinc-800 text-gray-400 dark:text-zinc-600 cursor-not-allowed opacity-50'
                 }`}
               >
-                <Send className="w-5 h-5" />
+                <Send className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-secondary)] px-2">
-              <span>Press <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)]/60 text-[var(--text-primary)] font-bold">Enter</kbd> to send · <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)]/60 text-[var(--text-primary)] font-bold">Shift+Enter</kbd> for line break</span>
+            <div className="flex items-center justify-between text-[10px] font-mono text-gray-400 dark:text-gray-500 px-2">
+              <span>Press <kbd className="px-1 py-0.5 rounded bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 font-bold">Enter</kbd> to send · <kbd className="px-1 py-0.5 rounded bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 font-bold">Shift+Enter</kbd> for line break</span>
               {isRecording && <span className="text-rose-600 font-bold animate-pulse">🔴 Recording Voice Input...</span>}
             </div>
           </div>

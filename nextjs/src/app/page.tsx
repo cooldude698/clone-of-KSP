@@ -395,18 +395,7 @@ export default function LandingPage() {
                   className="w-full max-w-md rounded-2xl bg-[var(--surface-1)]/95 backdrop-blur-xl border border-[var(--border)] p-6 shadow-2xl text-[var(--text-primary)] flex flex-col gap-4 text-left"
                 >
                   <div className="flex items-center justify-between border-b border-[var(--border)] pb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-black border border-gray-800 flex items-center justify-center p-1.5 shadow-md flex-shrink-0">
-                        <DrishtiEmblem className="w-full h-full" color="#FFFFFF" />
-                      </div>
-                      <div className="flex flex-col leading-tight">
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-bold tracking-tight text-sm text-[var(--text-primary)] font-sans">DRISHTI</span>
-                          <span className="text-xs font-bold text-sky-500 font-sans">ದೃಷ್ಟಿ</span>
-                        </div>
-                        <span className="text-[10px] font-mono text-[var(--text-secondary)] tracking-wider uppercase">Officer Authentication</span>
-                      </div>
-                    </div>
+                    <DrishtiLogo variant="compact" size="md" />
                     <button
                       onClick={() => { setIsSigningIn(false); setError(''); }}
                       className="w-8 h-8 rounded-full bg-[var(--surface-0)] hover:bg-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors outline-none cursor-pointer"
