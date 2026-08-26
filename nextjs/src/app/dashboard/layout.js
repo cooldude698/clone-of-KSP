@@ -7,8 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, MessageSquare, Map, GitBranch,
   Camera, BarChart2, LogOut, Shield, ChevronLeft,
-  ChevronRight, AlertTriangle, User, History, Eye, Navigation,
-  Newspaper, FileText, Server
+  Newspaper, FileText, Server, Search, ChevronDown, Sparkles
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -203,6 +202,7 @@ export default function DashboardLayout({ children }) {
   const [collapsed,    setCollapsed]    = useState(false);
   const [role,         setRole]         = useState('Inspector');
   const [employeeId,   setEmployeeId]   = useState('KSP-0000');
+  const [officerName,  setOfficerName]  = useState('V. Sharma');
   const [currentTime,  setCurrentTime]  = useState('');
   const mainContentRef = useRef(null);
 
@@ -853,6 +853,9 @@ export default function DashboardLayout({ children }) {
   useEffect(() => {
     setRole(localStorage.getItem('drishti_role') || 'Inspector');
     setEmployeeId(localStorage.getItem('drishti_employee_id') || 'KSP-0000');
+    let rawName = localStorage.getItem('userName') || localStorage.getItem('drishti_user_name') || 'V. Sharma';
+    rawName = rawName.replace(/^(Inspector General|Sub-Inspector|Inspector|Officer|SI|DySP|SP|DSP)\s*/i, '').trim();
+    if (rawName) setOfficerName(rawName);
   }, []);
 
   useEffect(() => {
@@ -879,58 +882,43 @@ export default function DashboardLayout({ children }) {
   return (
     <div className="flex h-screen bg-void-000 overflow-hidden">
 
-      {/* ── SIDEBAR ── */}
-      <aside className={`flex flex-col transition-all duration-300 ease-in-out bg-[var(--surface-1)] border-r border-[var(--border)] relative z-20 shadow-2xl ${collapsed ? 'w-16' : 'w-64'}`}>
+      {/* ── MINIMALIST MODERN SIDEBAR ── */}
+      <aside className={`flex flex-col transition-all duration-300 ease-in-out bg-white dark:bg-[#18181B] border-r border-gray-100 dark:border-gray-800 relative z-20 shadow-sm ${collapsed ? 'w-20' : 'w-60'}`}>
         {/* Brand Header */}
-        <div className={`flex items-center gap-3 px-5 py-5 border-b border-[var(--border-subtle)] ${collapsed ? 'justify-center px-2' : ''}`}>
-          <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[#1E2733] text-white flex items-center justify-center flex-shrink-0 group/logo overflow-hidden border border-[var(--accent)]/40 shadow-lg">
-            {/* Cybernetic scanning line */}
-            <div className="absolute inset-x-0 h-0.5 bg-emerald-400/80 top-0 animate-[scan_2s_ease-in-out_infinite]" />
-            <Eye className="w-5 h-5 text-white z-10 transition-transform duration-300 group-hover/logo:scale-110" />
-            
-            {/* Corner brackets */}
-            <span className="absolute top-0.5 left-0.5 w-1.5 h-1.5 border-t border-l border-white/50" />
-            <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 border-t border-r border-white/50" />
-            <span className="absolute bottom-0.5 left-0.5 w-1.5 h-1.5 border-b border-l border-white/50" />
-            <span className="absolute bottom-0.5 right-0.5 w-1.5 h-1.5 border-b border-r border-white/50" />
+        <div className={`flex items-center gap-3 px-6 py-6 ${collapsed ? 'justify-center px-2' : ''}`}>
+          <div className="w-10 h-10 rounded-2xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center flex-shrink-0 shadow-md">
+            <Eye className="w-5 h-5" />
           </div>
           {!collapsed && (
-            <div className="relative">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[var(--text-primary)] font-black tracking-widest text-base font-headline">DRISHTI</span>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500/50" />
-              </div>
-              <p className="text-[var(--text-secondary)] text-[10px] font-mono tracking-wider uppercase">KSP TACTICAL AI</p>
+            <div>
+              <span className="text-gray-900 dark:text-white font-extrabold tracking-tight text-lg">
+                DRISHTI
+              </span>
+              <p className="text-gray-400 text-[10px] font-semibold tracking-wider uppercase">Karnataka Police</p>
             </div>
           )}
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex-1 px-2 py-5 space-y-2 overflow-y-auto">
+        <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
           {NAV_ITEMS.map(({ href, icon: Icon, label, id }) => {
             const active = isActive(href);
             return (
               <Link key={href} href={href} prefetch={true} id={id}
-                className={`flex items-center transition-all group relative font-mono text-xs font-bold
+                className={`flex items-center transition-all duration-150 group relative text-sm font-semibold rounded-2xl
                   ${collapsed 
-                    ? 'w-10 h-10 justify-center mx-auto rounded-xl' 
-                    : 'gap-3 px-3.5 py-3 rounded-xl'
+                    ? 'w-12 h-12 justify-center mx-auto' 
+                    : 'gap-3.5 px-4 py-3'
                   }
                   ${active 
-                    ? 'bg-[var(--accent)] text-white shadow-lg shadow-[var(--accent-glow)]' 
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-2)]'}`}
+                    ? 'bg-black text-white dark:bg-white dark:text-black shadow-sm' 
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/60'}`}
                 title={collapsed ? label : undefined}
               >
-                {!collapsed && active && (
-                  <motion.div
-                    layoutId="activeNavHighlight"
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-white rounded-r-full shadow-sm"
-                  />
-                )}
-                <Icon className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110 ${active ? 'text-white' : 'text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]'}`} />
-                {!collapsed && <span className="tracking-wide text-xs">{label}</span>}
+                <Icon className={`w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-105 ${active ? 'text-white dark:text-black' : 'text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'}`} />
+                {!collapsed && <span className="tracking-normal">{label}</span>}
                 {collapsed && (
-                  <div className="absolute left-full ml-3 px-3 py-1.5 rounded-lg bg-[var(--surface-1)] border border-[var(--border)] shadow-2xl text-xs font-mono font-bold text-[var(--text-primary)] whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50">
+                  <div className="absolute left-full ml-3 px-3 py-1.5 rounded-xl bg-gray-900 text-white shadow-xl text-xs font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50">
                     {label}
                   </div>
                 )}
@@ -940,58 +928,77 @@ export default function DashboardLayout({ children }) {
         </nav>
 
         {/* User Profile Footer */}
-        <div className={`p-4 border-t border-[var(--border-subtle)] bg-[var(--surface-0)]/50 ${collapsed ? 'flex flex-col items-center gap-2' : ''}`}>
+        <div className={`p-4 border-t border-gray-100 dark:border-gray-800 ${collapsed ? 'flex flex-col items-center gap-2' : ''}`}>
           {!collapsed && (
-            <div className="flex items-center gap-3 p-2.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] mb-3 shadow-sm">
-              <div className="w-8 h-8 rounded-lg bg-[var(--surface-2)] flex items-center justify-center flex-shrink-0 border border-[var(--border)]">
-                <User className="w-4 h-4 text-[var(--text-primary)]" />
+            <div className="flex items-center gap-3 p-2.5 rounded-2xl bg-gray-50 dark:bg-gray-800/50 mb-2">
+              <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-xs text-gray-700 dark:text-gray-200">
+                VS
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-extrabold font-mono text-[var(--text-primary)] truncate">{employeeId}</p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  <span className="text-[9px] font-mono font-bold text-[var(--text-secondary)] uppercase tracking-widest">{role}</span>
-                </div>
+                <p className="text-xs font-bold text-gray-900 dark:text-white truncate">Insp. {officerName || 'V. Sharma'}</p>
+                <p className="text-[10px] text-gray-400 font-medium truncate">{employeeId || 'KSP-4092'}</p>
               </div>
             </div>
           )}
           <button id="logout-btn" onClick={handleLogout}
-            className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg text-paper-100/40 hover:text-paper-100 hover:bg-steel-600/10 transition-all text-sm ${collapsed ? 'justify-center' : ''}`}
+            className={`flex items-center gap-2 w-full px-3 py-2 rounded-xl text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all text-xs font-semibold ${collapsed ? 'justify-center' : ''}`}
             title={collapsed ? 'Logout' : undefined}>
             <LogOut className="w-4 h-4 flex-shrink-0" />
-            {!collapsed && <span>Logout</span>}
+            {!collapsed && <span>Sign Out</span>}
           </button>
         </div>
 
         <button onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-steel-700 border border-steel-600 flex items-center justify-center text-paper-100/50 hover:text-paper-100 transition-all z-30 shadow-sm"
-          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+          className="absolute -right-3 top-8 w-6 h-6 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:text-gray-800 transition-all z-30 shadow-sm cursor-pointer"
+          title={collapsed ? 'Expand' : 'Collapse'}>
           {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
         </button>
       </aside>
 
-      {/* ── MAIN ── */}
-      <div className="flex-1 flex flex-col overflow-hidden min-w-0 bg-void-000 border-l border-steel-600">
+      {/* ── MAIN CONTENT WRAPPER ── */}
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0 bg-[#F4F5F8] dark:bg-[#09090B]">
+        {/* ── CLEAN DRIBBLE-STYLE TOP HEADER ── */}
         <header className="flex items-center justify-between px-8 py-5 bg-transparent flex-shrink-0 z-10 relative">
-          <div>
-            <h1 className="text-xl font-semibold text-paper-100 tracking-tight">
-              {NAV_ITEMS.find(n => isActive(n.href))?.label || 'Dashboard'}
-            </h1>
-            <p className="text-[11px] text-paper-100/40 tracking-wider uppercase mt-1">Karnataka State Police</p>
+          {/* Minimalist Rounded Pill Search */}
+          <div className="relative w-72 sm:w-80">
+            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search cases, suspects, FIRs..."
+              className="w-full pl-10 pr-4 py-2.5 rounded-full bg-white dark:bg-[#18181B] border border-gray-200/80 dark:border-gray-800 text-xs text-gray-800 dark:text-gray-200 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/5 shadow-xs transition-all"
+            />
           </div>
+
+          {/* Right Section: Language, Alert Bell, Profile */}
           <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5">
-              <span className="text-[12px] font-medium text-paper-100/60">{currentTime}</span>
+            {/* Language Selector */}
+            <div className="hidden sm:flex items-center gap-1 text-xs font-semibold text-gray-600 dark:text-gray-300 cursor-pointer hover:text-black">
+              <span>EN</span>
+              <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
             </div>
-            <ThemeToggle />
+
+            {/* AI Assistant Quick Trigger */}
+            <button
+              onClick={openPanel}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-black text-white dark:bg-white dark:text-black text-xs font-bold hover:opacity-90 shadow-sm transition-all cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Drishti AI</span>
+            </button>
+
+            {/* Notification Bell */}
             <AlertNotification />
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-steel-600/20 bg-steel-600/10">
-              <User className="w-3.5 h-3.5 text-paper-100/40" />
-              <span className="text-[10px] text-paper-100/60 tracking-widest uppercase font-semibold">{role}</span>
+
+            {/* Profile Avatar */}
+            <div className="flex items-center gap-2.5 pl-2">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-gray-700 to-gray-900 text-white font-bold text-xs flex items-center justify-center shadow-sm">
+                VS
+              </div>
             </div>
           </div>
         </header>
-        <main ref={mainContentRef} className="flex-1 overflow-auto bg-void-000">{children}</main>
+
+        <main ref={mainContentRef} className="flex-1 overflow-auto px-4 sm:px-8 pb-8">{children}</main>
       </div>
 
       {/* ── DRISHTI SIDE PANEL ── */}

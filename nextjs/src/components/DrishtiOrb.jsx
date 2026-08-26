@@ -1,94 +1,43 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
+import { useTheme } from 'next-themes';
+import { AgentAudioVisualizerAura } from '@/components/agents-ui/agent-audio-visualizer-aura';
 
 const cn = (...classes) => classes.filter(Boolean).join(' ');
 
-// Thresholds for responsiveness
-const SIZE_THRESHOLD_SMALL = 50;
-const SIZE_THRESHOLD_TINY = 30;
-const SIZE_THRESHOLD_MEDIUM = 100;
-
-// Balanced blur and contrast multipliers for high-quality organic color fusion
-const BLUR_MULTIPLIER_SMALL = 0.03;
-const BLUR_MIN_SMALL = 2;
-const BLUR_MULTIPLIER_LARGE = 0.07; // ~12px blur for 180px size - perfect liquid blending
-const BLUR_MIN_LARGE = 8;
-
-const CONTRAST_MULTIPLIER_SMALL = 0.01;
-const CONTRAST_MIN_SMALL = 1.2;
-const CONTRAST_MULTIPLIER_LARGE = 0.018; // Sharp but smooth boundary
-const CONTRAST_MIN_LARGE = 2.4;
-
-const DOT_SIZE_MULTIPLIER_SMALL = 0.003;
-const DOT_SIZE_MIN_SMALL = 0.04;
-const DOT_SIZE_MULTIPLIER_LARGE = 0.006;
-const DOT_SIZE_MIN_LARGE = 0.08;
-
-const SHADOW_MULTIPLIER_SMALL = 0.02;
-const SHADOW_MIN_SMALL = 2;
-const SHADOW_MULTIPLIER_LARGE = 0.04;
-const SHADOW_MIN_LARGE = 8;
-
-const MASK_RADIUS_TINY = "0%";
-const MASK_RADIUS_SMALL = "10%";
-const MASK_RADIUS_MEDIUM = "20%";
-const MASK_RADIUS_LARGE = "30%";
-
-const CONTRAST_TINY = 1.2;
-const CONTRAST_MULTIPLIER_FINAL = 1.3;
-const CONTRAST_MIN_FINAL = 1.5;
-
-// Deep space background with high-vibrancy neon colors for maximum color fusion
-const STATE_MAPPING = {
-  idle: {
-    size: "105px",
-    compactSize: "45px",
-    colors: {
-      bg: "#040817",
-      c1: "oklch(60% 0.22 260)",
-      c2: "oklch(55% 0.2 295)",
-      c3: "oklch(50% 0.18 325)"
-    },
-    animationDuration: 12,
-    glowColor: 'rgba(99, 102, 241, 0.22)',
+// Exact color and colorShift specifications from user requirements
+const AURA_STATE_CONFIG = {
+  connecting: {
+    color: '#2bff00',
+    colorShift: 0.62,
+    state: 'connecting',
   },
   listening: {
-    size: "138px",
-    compactSize: "45px",
-    colors: {
-      bg: "#020f13",
-      c1: "oklch(70% 0.25 140)",
-      c2: "oklch(76% 0.22 175)",
-      c3: "oklch(65% 0.2 205)"
-    },
-    animationDuration: 4.0,
-    glowColor: 'rgba(16, 185, 129, 0.32)',
-  },
-  thinking: {
-    size: "120px",
-    compactSize: "45px",
-    colors: {
-      bg: "#0d0a08",
-      c1: "oklch(68% 0.25 45)",
-      c2: "oklch(74% 0.26 75)",
-      c3: "oklch(78% 0.22 95)"
-    },
-    animationDuration: 2.8,
-    glowColor: 'rgba(251, 191, 36, 0.24)',
+    color: '#0066ff',
+    colorShift: 0.83,
+    state: 'listening',
   },
   speaking: {
-    size: "124px",
-    compactSize: "45px",
-    colors: {
-      bg: "#050718",
-      c1: "oklch(70% 0.22 215)",
-      c2: "oklch(62% 0.25 260)",
-      c3: "oklch(68% 0.26 320)"
-    },
-    animationDuration: 5.0,
-    glowColor: 'rgba(34, 211, 238, 0.26)',
-  }
+    color: '#00ff09',
+    colorShift: 0.3,
+    state: 'speaking',
+  },
+  thinking: {
+    color: '#ff0026',
+    colorShift: 0.18,
+    state: 'thinking',
+  },
+  processing: {
+    color: '#ff0026',
+    colorShift: 0.18,
+    state: 'thinking',
+  },
+  idle: {
+    color: '#0066ff',
+    colorShift: 0.83,
+    state: 'listening',
+  },
 };
 
 const DrishtiOrb = ({
@@ -99,11 +48,8 @@ const DrishtiOrb = ({
   onTouchStart,
   onTouchEnd,
   className,
-  /** compact: when true renders at 60px with no label text (used when panel is open) */
   compact = false,
-  /** audioLevel: 0–1, drives reactive size and speed boost */
   audioLevel = 0,
-  // NEW props:
   pendingTranscript = '',
   orbResponse = '',
   onConfirmSend,
@@ -124,6 +70,11 @@ const DrishtiOrb = ({
 }) => {
   const [isClient, setIsClient] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
+  const { resolvedTheme } = useTheme();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     if (!liveTranscript && !pendingTranscript && !orbResponse) {
@@ -146,7 +97,7 @@ const DrishtiOrb = ({
   const currentPos = React.useRef({ x: 0, y: 0 });
   const hasMoved = React.useRef(false);
 
-  // Mouse drag handlers
+  // Drag handlers
   const handleMouseDown = (e) => {
     if (
       e.target.tagName === 'INPUT' ||
@@ -158,42 +109,32 @@ const DrishtiOrb = ({
     isDragging.current = true;
     hasMoved.current = false;
     dragStart.current = {
-      x: e.clientX,
-      y: e.clientY
+      x: e.clientX - activePosition.current.x,
+      y: e.clientY - activePosition.current.y
     };
-    
+
+    const handleMouseMove = (moveEvent) => {
+      if (!isDragging.current) return;
+      const dx = moveEvent.clientX - dragStart.current.x;
+      const dy = moveEvent.clientY - dragStart.current.y;
+      if (Math.abs(dx - activePosition.current.x) > 3 || Math.abs(dy - activePosition.current.y) > 3) {
+        hasMoved.current = true;
+      }
+      currentPos.current = { x: dx, y: dy };
+      setPosition({ x: dx, y: dy });
+    };
+
+    const handleMouseUp = () => {
+      isDragging.current = false;
+      activePosition.current = currentPos.current;
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
   };
 
-  const handleMouseMove = (e) => {
-    if (!isDragging.current) return;
-    const dx = e.clientX - dragStart.current.x;
-    const dy = e.clientY - dragStart.current.y;
-    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
-      hasMoved.current = true;
-    }
-    currentPos.current = {
-      x: activePosition.current.x + dx,
-      y: activePosition.current.y + dy
-    };
-    setPosition(currentPos.current);
-  };
-
-  const handleMouseUp = () => {
-    if (isDragging.current) {
-      activePosition.current = currentPos.current;
-      isDragging.current = false;
-      setPosition({ ...activePosition.current });
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('drishti_orb_position', JSON.stringify(activePosition.current));
-      }
-    }
-    window.removeEventListener('mousemove', handleMouseMove);
-    window.removeEventListener('mouseup', handleMouseUp);
-  };
-
-  // Touch drag handlers
   const handleTouchStart = (e) => {
     if (
       e.target.tagName === 'INPUT' ||
@@ -202,248 +143,80 @@ const DrishtiOrb = ({
     ) {
       return;
     }
+    const touch = e.touches[0];
     isDragging.current = true;
     hasMoved.current = false;
     dragStart.current = {
-      x: e.touches[0].clientX,
-      y: e.touches[0].clientY
+      x: touch.clientX - activePosition.current.x,
+      y: touch.clientY - activePosition.current.y
     };
 
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    window.addEventListener('touchend', handleTouchEnd);
-  };
-
-  const handleTouchMove = (e) => {
-    if (!isDragging.current) return;
-    e.preventDefault();
-    const dx = e.touches[0].clientX - dragStart.current.x;
-    const dy = e.touches[0].clientY - dragStart.current.y;
-    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
-      hasMoved.current = true;
-    }
-    currentPos.current = {
-      x: activePosition.current.x + dx,
-      y: activePosition.current.y + dy
-    };
-    setPosition(currentPos.current);
-  };
-
-  const handleTouchEnd = () => {
-    if (isDragging.current) {
-      activePosition.current = currentPos.current;
-      isDragging.current = false;
-      setPosition({ ...activePosition.current });
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('drishti_orb_position', JSON.stringify(activePosition.current));
+    const handleTouchMove = (moveEvent) => {
+      if (!isDragging.current) return;
+      const moveTouch = moveEvent.touches[0];
+      const dx = moveTouch.clientX - dragStart.current.x;
+      const dy = moveTouch.clientY - dragStart.current.y;
+      if (Math.abs(dx - activePosition.current.x) > 3 || Math.abs(dy - activePosition.current.y) > 3) {
+        hasMoved.current = true;
       }
-    }
-    window.removeEventListener('touchmove', handleTouchMove);
-    window.removeEventListener('touchend', handleTouchEnd);
+      currentPos.current = { x: dx, y: dy };
+      setPosition({ x: dx, y: dy });
+    };
+
+    const handleTouchEnd = () => {
+      isDragging.current = false;
+      activePosition.current = currentPos.current;
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+
+    window.addEventListener('touchmove', handleTouchMove);
+    window.addEventListener('touchend', handleTouchEnd);
   };
 
   const handleOrbClick = (e) => {
     if (hasMoved.current) {
-      e.preventDefault();
       e.stopPropagation();
       return;
     }
     onClick?.(e);
   };
 
-  useEffect(() => {
-    setIsClient(true);
-    if (typeof window !== 'undefined') {
-      const saved = sessionStorage.getItem('drishti_orb_position');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          // Safety check: ensure coordinates are within current viewport bounds
-          const maxWidth = window.innerWidth || 1200;
-          const maxHeight = window.innerHeight || 800;
-          if (
-            parsed &&
-            typeof parsed.x === 'number' &&
-            typeof parsed.y === 'number' &&
-            Math.abs(parsed.x) < maxWidth &&
-            Math.abs(parsed.y) < maxHeight
-          ) {
-            setPosition(parsed);
-            activePosition.current = parsed;
-            currentPos.current = parsed;
-          } else {
-            sessionStorage.removeItem('drishti_orb_position');
-            setPosition({ x: 0, y: 0 });
-          }
-        } catch (err) {
-          sessionStorage.removeItem('drishti_orb_position');
-          setPosition({ x: 0, y: 0 });
-        }
-      }
-    }
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-      window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, []);
+  // Determine current Aura configuration based on effective state
+  const effectiveState = isListening ? 'listening' : state;
+  const config = AURA_STATE_CONFIG[effectiveState] || AURA_STATE_CONFIG.idle;
 
   if (!isClient) return null;
 
-  const currentConfig = STATE_MAPPING[state] || STATE_MAPPING.idle;
-  const { colors, animationDuration } = currentConfig;
-
-  // Use compact size (60px) when compact mode; otherwise the state-based size
-  const size = compact ? currentConfig.compactSize : currentConfig.size;
-  const sizeValue = Number.parseInt(size.replace("px", ""), 10);
-
-  // Change 1: audio-reactive boost
-  const boost = 1 + (audioLevel * 0.35);
-  const boostedSize = `${sizeValue * boost}px`;
-  const boostedDuration = animationDuration / (1 + audioLevel * 1.5);
-
-  // Responsive calculations based on size
-  const blurAmount =
-    sizeValue < SIZE_THRESHOLD_SMALL
-      ? Math.max(sizeValue * BLUR_MULTIPLIER_SMALL, BLUR_MIN_SMALL)
-      : Math.max(sizeValue * BLUR_MULTIPLIER_LARGE, BLUR_MIN_LARGE);
-
-  const contrastAmount =
-    sizeValue < SIZE_THRESHOLD_SMALL
-      ? Math.max(sizeValue * CONTRAST_MULTIPLIER_SMALL, CONTRAST_MIN_SMALL)
-      : Math.max(sizeValue * CONTRAST_MULTIPLIER_LARGE, CONTRAST_MIN_LARGE);
-
-  const dotSize =
-    sizeValue < SIZE_THRESHOLD_SMALL
-      ? Math.max(sizeValue * DOT_SIZE_MULTIPLIER_SMALL, DOT_SIZE_MIN_SMALL)
-      : Math.max(sizeValue * DOT_SIZE_MULTIPLIER_LARGE, DOT_SIZE_MIN_LARGE);
-
-  const shadowSpread =
-    sizeValue < SIZE_THRESHOLD_SMALL
-      ? Math.max(sizeValue * SHADOW_MULTIPLIER_SMALL, SHADOW_MIN_SMALL)
-      : Math.max(sizeValue * SHADOW_MULTIPLIER_LARGE, SHADOW_MIN_LARGE);
-
-  const getMaskRadius = (value) => {
-    if (value < SIZE_THRESHOLD_TINY) return MASK_RADIUS_TINY;
-    if (value < SIZE_THRESHOLD_SMALL) return MASK_RADIUS_SMALL;
-    if (value < SIZE_THRESHOLD_MEDIUM) return MASK_RADIUS_MEDIUM;
-    return MASK_RADIUS_LARGE;
-  };
-
-  const maskRadius = getMaskRadius(sizeValue);
-
-  const getFinalContrast = (value) => {
-    if (value < SIZE_THRESHOLD_TINY) return CONTRAST_TINY;
-    if (value < SIZE_THRESHOLD_SMALL) {
-      return Math.max(
-        contrastAmount * CONTRAST_MULTIPLIER_FINAL,
-        CONTRAST_MIN_FINAL
-      );
-    }
-    return contrastAmount;
-  };
-
-  const finalContrast = getFinalContrast(sizeValue);
-
-  // Compact mode: inline element (no fixed positioning), no label
+  // ── COMPACT MODE (when docked or mini) ──
   if (compact) {
     return (
-      <div className={cn("flex flex-col items-center select-none", className)}>
-        <div className="relative flex items-center justify-center">
-
-          {/* Outer ambient glow halo */}
-          <div
-            className="absolute rounded-full pointer-events-none"
-            style={{
-              inset: '-14px',
-              background: `radial-gradient(circle, ${currentConfig.glowColor || 'rgba(99,102,241,0.15)'} 0%, transparent 72%)`,
-              animation: state === 'idle'
-                ? 'orbHaloBreath 2.5s ease-in-out infinite'
-                : state === 'listening'
-                ? 'orbHaloBreath 0.85s ease-in-out infinite'
-                : state === 'speaking'
-                ? 'orbHaloBreath 1.4s ease-in-out infinite'
-                : 'orbHaloBreath 1.8s ease-in-out infinite alternate',
-            }}
-          />
-
-          {/* 3 fast listening rings */}
-          {state === 'listening' && (
-            <>
-              <div className="absolute inset-0 rounded-full border-2 border-emerald-400/70"
-                style={{ animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite' }} />
-              <div className="absolute rounded-full border border-emerald-400/40"
-                style={{ inset: '-8px', animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite', animationDelay: '0.28s' }} />
-              <div className="absolute rounded-full border border-emerald-300/20"
-                style={{ inset: '-16px', animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite', animationDelay: '0.56s' }} />
-            </>
-          )}
-
-          {/* Thinking — rotating orbit ring */}
-          {state === 'thinking' && (
-            <div className="absolute rounded-full border-2 border-amber-400/30 border-t-amber-400"
-              style={{ inset: '-6px', animation: 'spin 1.1s linear infinite' }} />
-          )}
-
-          <div
-            data-state={state}
-            onClick={onClick}
-            onMouseDown={onMouseDown}
-            onMouseUp={onMouseUp}
-            onTouchStart={onTouchStart}
-            onTouchEnd={onTouchEnd}
-            className={cn(
-              "siri-orb cursor-pointer transition-all duration-500 hover:scale-105 active:scale-95 relative shadow-xl shadow-black/20"
-            )}
-            style={{
-              width: boostedSize,
-              height: boostedSize,
-              "--bg": colors.bg,
-              "--c1": colors.c1,
-              "--c2": colors.c2,
-              "--c3": colors.c3,
-              "--animation-duration": `${boostedDuration}s`,
-              "--blur-amount": `${blurAmount}px`,
-              "--contrast-amount": finalContrast,
-              "--dot-size": `${dotSize}px`,
-              "--shadow-spread": `${shadowSpread}px`,
-              "--mask-radius": maskRadius,
-            }}
-          >
-            <style>{`
-              @property --angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
-              @property --c1 { syntax: "<color>"; inherits: true; initial-value: oklch(60% 0.22 260); }
-              @property --c2 { syntax: "<color>"; inherits: true; initial-value: oklch(55% 0.2 295); }
-              @property --c3 { syntax: "<color>"; inherits: true; initial-value: oklch(50% 0.18 325); }
-              @property --bg { syntax: "<color>"; inherits: true; initial-value: #040817; }
-              .siri-orb { display:grid; grid-template-areas:"stack"; overflow:hidden; border-radius:50% !important; clip-path:circle(50% at 50% 50%) !important; isolation:isolate; position:relative; background:var(--bg); outline:none !important; box-shadow:none !important; -webkit-tap-highlight-color:transparent; transition:--c1 0.8s ease-in-out,--c2 0.8s ease-in-out,--c3 0.8s ease-in-out,--bg 0.8s ease-in-out,width 0.08s ease-out,height 0.08s ease-out; }
-              .siri-orb:focus, .siri-orb:active, .siri-orb:hover, .siri-orb:focus-visible { outline:none !important; box-shadow:none !important; border:none !important; }
-              .siri-orb::before,.siri-orb::after { content:""; display:block; grid-area:stack; width:100%; height:100%; border-radius:50% !important; clip-path:circle(50% at 50% 50%) !important; }
-              .siri-orb::before { background: conic-gradient(from calc(var(--angle)*2) at 25% 70%,var(--c3),transparent 20% 80%,var(--c3)),conic-gradient(from calc(var(--angle)*2) at 45% 75%,var(--c2),transparent 30% 60%,var(--c2)),conic-gradient(from calc(var(--angle)*-3) at 80% 20%,var(--c1),transparent 40% 60%,var(--c1)),conic-gradient(from calc(var(--angle)*2) at 15% 5%,var(--c2),transparent 10% 90%,var(--c2)),conic-gradient(from calc(var(--angle)*1) at 20% 80%,var(--c1),transparent 10% 90%,var(--c1)),conic-gradient(from calc(var(--angle)*-2) at 85% 10%,var(--c3),transparent 20% 80%,var(--c3)); filter:blur(var(--blur-amount)) contrast(var(--contrast-amount)); animation:rotate var(--animation-duration) linear infinite; }
-              .siri-orb[data-state="idle"]::before { animation:rotate var(--animation-duration) linear infinite,breathe 2.5s ease-in-out infinite; }
-              .siri-orb::after { background-image:radial-gradient(circle at center,rgba(255,255,255,0.35) var(--dot-size),transparent var(--dot-size)); background-size:calc(var(--dot-size)*2.5) calc(var(--dot-size)*2.5); mix-blend-mode:overlay; }
-              .siri-orb[style*="--mask-radius: 0%"]::after { mask-image:none; }
-              .siri-orb:not([style*="--mask-radius: 0%"])::after { mask-image:radial-gradient(black var(--mask-radius),transparent 75%); }
-              @keyframes rotate { to { --angle:360deg; } }
-              @keyframes breathe { 0%,100% { opacity:0.7; transform:scale(0.94); } 50% { opacity:1; transform:scale(1.06); } }
-              @keyframes orbHaloBreath { 0%,100% { opacity:0.35; transform:scale(0.85); } 50% { opacity:1; transform:scale(1.15); } }
-              @keyframes fastPing { 0% { transform:scale(1); opacity:0.9; } 100% { transform:scale(2.6); opacity:0; } }
-              @keyframes spin { to { transform:rotate(360deg); } }
-              @media (prefers-reduced-motion:reduce) { .siri-orb::before { animation:none; } }
-            `}</style>
-          </div>
-        </div>
+      <div
+        className={cn(
+          "relative flex items-center justify-center cursor-pointer select-none transition-transform hover:scale-105 active:scale-95",
+          className
+        )}
+        onClick={handleOrbClick}
+      >
+        <AgentAudioVisualizerAura
+          size="sm"
+          color={config.color}
+          colorShift={config.colorShift}
+          state={config.state}
+          themeMode={resolvedTheme === 'light' ? 'light' : 'dark'}
+          className="w-14 h-14"
+        />
       </div>
     );
   }
 
-  // Full mode: fixed bottom-right with label
+  // ── FULL FLOATING AURA ORB MODE ──
   return (
     <div
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
       className={cn(
-        "fixed bottom-16 right-8 z-[9999] flex flex-col items-center select-none gap-2.5 cursor-grab",
+        "fixed bottom-6 right-6 z-[9999] flex flex-col items-center select-none gap-2 cursor-grab",
         isDragging.current && "cursor-grabbing"
       )}
       style={{
@@ -452,81 +225,67 @@ const DrishtiOrb = ({
       }}
     >
 
-      {/* ── TRANSCRIPT / RESPONSE BUBBLE — appears above orb ── */}
+      {/* ── TRANSCRIPT / RESPONSE BUBBLE ── */}
       {!isDismissed && (liveTranscript || pendingTranscript || orbResponse) && (
-        <div className="w-64 rounded-2xl overflow-hidden mb-1.5 animate-fade-in shadow-2xl relative">
-          {/* subtle glow behind bubble */}
-          <div className="absolute inset-0 bg-white/5 blur-xl pointer-events-none" />
+        <div className="w-72 rounded-2xl overflow-hidden mb-1 animate-fade-in shadow-2xl relative">
           <div
             style={{
-              background: 'rgba(5, 5, 5, 0.65)',
+              background: 'rgba(10, 10, 15, 0.75)',
               backdropFilter: 'blur(24px)',
             }}
-            className="px-5 py-4 border border-white/10 rounded-2xl relative z-10"
+            className="px-4 py-3.5 border border-white/10 rounded-2xl relative z-10 text-white"
           >
             {/* Live transcript while listening */}
             {liveTranscript && !pendingTranscript && (
               <div>
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-[9px] text-emerald-400 uppercase tracking-widest font-bold font-mono">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                    <span className="text-[9px] text-blue-400 uppercase tracking-widest font-bold font-mono">
                       Listening
                     </span>
                   </div>
                   <button
                     onClick={handleDismissBubble}
-                    className="text-white/40 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center p-1 rounded-full cursor-pointer"
-                    title="Cancel & Dismiss"
+                    className="text-white/40 hover:text-white hover:bg-white/10 p-1 rounded-full cursor-pointer"
+                    title="Dismiss"
                   >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="18" y1="6" x2="6" y2="18"/>
-                      <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
+                    ✕
                   </button>
                 </div>
-                <p className="text-white/75 text-sm leading-relaxed italic">
-                  {liveTranscript}
+                <p className="text-xs text-white/90 italic font-medium leading-relaxed">
+                  "{liveTranscript}"
                 </p>
               </div>
             )}
 
-            {/* Pending transcript — waiting for user to confirm */}
+            {/* Pending transcript confirmation */}
             {pendingTranscript && (
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                    <span className="text-[9px] text-blue-400 uppercase tracking-widest font-bold font-mono">
-                      Ready to send
-                    </span>
-                  </div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[9px] text-blue-400 uppercase tracking-widest font-bold font-mono">
+                    Did you say:
+                  </span>
                   <button
                     onClick={handleDismissBubble}
-                    className="text-white/40 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center p-1 rounded-full cursor-pointer"
-                    title="Cancel & Dismiss"
+                    className="text-white/40 hover:text-white hover:bg-white/10 p-1 rounded-full cursor-pointer"
                   >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="18" y1="6" x2="6" y2="18"/>
-                      <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
+                    ✕
                   </button>
                 </div>
-                <p className="text-white/90 text-sm leading-relaxed mb-3">
-                  {pendingTranscript}
+                <p className="text-xs text-white font-medium mb-3 leading-relaxed">
+                  "{pendingTranscript}"
                 </p>
-                {/* Confirm / Cancel buttons */}
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
                   <button
-                    onClick={onConfirmSend}
-                    className="flex-1 py-2 rounded-xl bg-white text-black text-[10px] uppercase font-bold tracking-widest transition-all hover:bg-white/90 flex items-center justify-center gap-2"
+                    onClick={(e) => { e.stopPropagation(); onConfirmSend?.(); }}
+                    className="flex-1 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all shadow-md"
                   >
-                    <span>Send</span>
-                    <span className="opacity-40 text-xs">↵</span>
+                    Send Query
                   </button>
                   <button
-                    onClick={handleDismissBubble}
-                    className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/50 hover:text-white text-[10px] uppercase font-bold tracking-widest transition-all border border-white/10"
+                    onClick={(e) => { e.stopPropagation(); onCancelTranscript?.(); }}
+                    className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white/70 text-[10px] font-bold rounded-lg transition-all"
                   >
                     Cancel
                   </button>
@@ -534,37 +293,25 @@ const DrishtiOrb = ({
               </div>
             )}
 
-            {/* Orb response — shown after AI replies, when no pending transcript */}
-            {orbResponse && !pendingTranscript && !liveTranscript && (
+            {/* Voice response bubble */}
+            {!liveTranscript && !pendingTranscript && orbResponse && (
               <div>
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
                     <span className="text-[9px] text-cyan-400 uppercase tracking-widest font-bold font-mono">
-                      Drishti
+                      DRISHTI INTELLIGENCE
                     </span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    {onReadAloud && (
-                      <button
-                        onClick={onReadAloud}
-                        className="text-white/40 hover:text-white transition-colors flex items-center justify-center p-1 rounded-full hover:bg-white/10"
-                        title="Read Aloud"
-                      >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-                      </button>
-                    )}
-                    <button
-                      onClick={handleDismissBubble}
-                      className="text-white/40 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center p-1 rounded-full cursor-pointer"
-                      title="Cancel / Close Speech Bubble"
-                    >
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                    </button>
-                  </div>
+                  <button
+                    onClick={handleDismissBubble}
+                    className="text-white/40 hover:text-white hover:bg-white/10 p-1 rounded-full cursor-pointer"
+                  >
+                    ✕
+                  </button>
                 </div>
-                <p className="text-white/80 text-sm leading-relaxed">
-                  {orbResponse.length > 180 ? orbResponse.slice(0, 180) + '…' : orbResponse}
+                <p className="text-xs text-white/95 leading-relaxed font-normal">
+                  {orbResponse}
                 </p>
               </div>
             )}
@@ -572,202 +319,101 @@ const DrishtiOrb = ({
         </div>
       )}
 
-      {/* ── TYPING INPUT — appears above orb when showTypingInput is true ── */}
-      {showTypingInput && (
-        <div
-          style={{
-            background: 'rgba(5, 5, 5, 0.7)',
-            backdropFilter: 'blur(24px)',
-          }}
-          className="w-64 rounded-2xl border border-white/10 shadow-2xl px-3 py-2 flex items-center gap-2 mb-1.5 animate-fade-in"
-        >
-          <input
-            autoFocus
-            type="text"
-            value={typingText}
-            onChange={e => onTypingChange?.(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter' && typingText.trim()) {
-                e.preventDefault();
-                onTypingSubmit?.();
-              }
-              if (e.key === 'Escape') onToggleTyping?.();
-            }}
-            placeholder="TYPE QUERY..."
-            className="flex-1 bg-transparent text-white text-[11px] tracking-widest placeholder-white/20 outline-none uppercase font-mono"
-          />
-          <button
-            onClick={() => typingText.trim() && onTypingSubmit?.()}
-            disabled={!typingText.trim()}
-            className="w-8 h-8 rounded-full bg-white hover:bg-white/90 disabled:opacity-20 disabled:bg-white/10 disabled:text-white text-black flex items-center justify-center transition-all flex-shrink-0"
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-            </svg>
-          </button>
-        </div>
-      )}
-
-      {/* ── ORB CONTAINER ── */}
-      <div className="relative flex flex-col items-center justify-center">
-        {/* Outer ambient glow halo — the heartbeat */}
-        <div
-          className="absolute rounded-full pointer-events-none"
-          style={{
-            inset: state === 'idle' ? '-24px' : '-16px',
-            background: `radial-gradient(circle, ${currentConfig.glowColor || 'rgba(99,102,241,0.15)'} 0%, transparent 68%)`,
-            animation: state === 'idle'
-              ? 'orbHaloBreath 2.5s ease-in-out infinite'
-              : state === 'listening'
-              ? 'orbHaloBreath 0.85s ease-in-out infinite'
-              : state === 'speaking'
-              ? 'orbHaloBreath 1.4s ease-in-out infinite'
-              : 'orbHaloBreath 1.8s ease-in-out infinite alternate',
-            opacity: state === 'idle' ? 0.8 : 1,
-          }}
+      {/* ── AURA AUDIO VISUALIZER ── */}
+      <div
+        onClick={handleOrbClick}
+        onMouseDown={onMouseDown}
+        onMouseUp={onMouseUp}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+        className={cn(
+          "cursor-pointer transition-transform duration-300 hover:scale-105 active:scale-95 relative flex items-center justify-center w-28 h-28 sm:w-32 sm:h-32",
+          className
+        )}
+      >
+        <AgentAudioVisualizerAura
+          size="lg"
+          color={config.color}
+          colorShift={config.colorShift}
+          state={config.state}
+          themeMode={resolvedTheme === 'light' ? 'light' : 'dark'}
+          className="w-full h-full"
         />
-
-        {/* 3 fast-ping listening rings */}
-        {state === 'listening' && (
-          <>
-            <div className="absolute inset-0 rounded-full border-2 border-emerald-400/80"
-              style={{ animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite' }} />
-            <div className="absolute rounded-full border-2 border-emerald-400/50"
-              style={{ inset: '-9px', animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite', animationDelay: '0.28s' }} />
-            <div className="absolute rounded-full border border-emerald-300/25"
-              style={{ inset: '-18px', animation: 'fastPing 0.85s cubic-bezier(0,0,0.2,1) infinite', animationDelay: '0.56s' }} />
-          </>
-        )}
-
-        {/* Thinking — spinning orbit ring */}
-        {state === 'thinking' && (
-          <div className="absolute rounded-full border-2 border-amber-400/30 border-t-amber-400"
-            style={{ inset: '-8px', animation: 'spin 1.1s linear infinite' }} />
-        )}
-
-        {/* The Actual Orb */}
-        <div
-          data-state={state}
-          onClick={handleOrbClick}
-          onMouseDown={onMouseDown}
-          onMouseUp={onMouseUp}
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
-          className={cn(
-            "siri-orb cursor-pointer transition-all duration-500 hover:scale-105 active:scale-95 relative outline-none ring-0 border-none select-none rounded-full",
-            className
-          )}
-          style={{
-            width: boostedSize,
-            height: boostedSize,
-            "--bg": colors.bg,
-            "--c1": colors.c1,
-            "--c2": colors.c2,
-            "--c3": colors.c3,
-            "--animation-duration": `${boostedDuration}s`,
-            "--blur-amount": `${blurAmount}px`,
-            "--contrast-amount": finalContrast,
-            "--dot-size": `${dotSize}px`,
-            "--shadow-spread": `${shadowSpread}px`,
-            "--mask-radius": maskRadius,
-          }}
-        >
-          <style>{`
-            @property --angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
-            @property --c1 { syntax: "<color>"; inherits: true; initial-value: oklch(60% 0.22 260); }
-            @property --c2 { syntax: "<color>"; inherits: true; initial-value: oklch(55% 0.2 295); }
-            @property --c3 { syntax: "<color>"; inherits: true; initial-value: oklch(50% 0.18 325); }
-            @property --bg { syntax: "<color>"; inherits: true; initial-value: #040817; }
-            .siri-orb { display:grid; grid-template-areas:"stack"; overflow:hidden; border-radius:50% !important; clip-path:circle(50% at 50% 50%) !important; isolation:isolate; position:relative; background:var(--bg); outline:none !important; box-shadow:none !important; -webkit-tap-highlight-color:transparent; transition:--c1 0.8s ease-in-out,--c2 0.8s ease-in-out,--c3 0.8s ease-in-out,--bg 0.8s ease-in-out,width 0.08s ease-out,height 0.08s ease-out; }
-            .siri-orb:focus, .siri-orb:active, .siri-orb:hover, .siri-orb:focus-visible { outline:none !important; box-shadow:none !important; border:none !important; }
-            .siri-orb::before,.siri-orb::after { content:""; display:block; grid-area:stack; width:100%; height:100%; border-radius:50% !important; clip-path:circle(50% at 50% 50%) !important; }
-            .siri-orb::before { background: conic-gradient(from calc(var(--angle)*2) at 25% 70%,var(--c3),transparent 20% 80%,var(--c3)),conic-gradient(from calc(var(--angle)*2) at 45% 75%,var(--c2),transparent 30% 60%,var(--c2)),conic-gradient(from calc(var(--angle)*-3) at 80% 20%,var(--c1),transparent 40% 60%,var(--c1)),conic-gradient(from calc(var(--angle)*2) at 15% 5%,var(--c2),transparent 10% 90%,var(--c2)),conic-gradient(from calc(var(--angle)*1) at 20% 80%,var(--c1),transparent 10% 90%,var(--c1)),conic-gradient(from calc(var(--angle)*-2) at 85% 10%,var(--c3),transparent 20% 80%,var(--c3)); filter:blur(var(--blur-amount)) contrast(var(--contrast-amount)); animation:rotate var(--animation-duration) linear infinite; }
-            .siri-orb[data-state="idle"]::before { animation:rotate var(--animation-duration) linear infinite,breathe 2.5s ease-in-out infinite; }
-            .siri-orb::after { background-image:radial-gradient(circle at center,rgba(255,255,255,0.35) var(--dot-size),transparent var(--dot-size)); background-size:calc(var(--dot-size)*2.5) calc(var(--dot-size)*2.5); mix-blend-mode:overlay; }
-            .siri-orb[style*="--mask-radius: 0%"]::after { mask-image:none; }
-            .siri-orb:not([style*="--mask-radius: 0%"])::after { mask-image:radial-gradient(black var(--mask-radius),transparent 75%); }
-            @keyframes rotate { to { --angle:360deg; } }
-            @keyframes breathe { 0%,100% { opacity:0.7; transform:scale(0.94); } 50% { opacity:1; transform:scale(1.06); } }
-            @keyframes orbHaloBreath { 0%,100% { opacity:0.35; transform:scale(0.85); } 50% { opacity:1; transform:scale(1.16); } }
-            @keyframes fastPing { 0% { transform:scale(1); opacity:0.9; } 100% { transform:scale(2.6); opacity:0; } }
-            @keyframes spin { to { transform:rotate(360deg); } }
-            @media (prefers-reduced-motion:reduce) { .siri-orb::before { animation:none; } }
-          `}</style>
-        </div>
       </div>
 
-      {/* ── SOUND WAVE BARS ── */}
-      {state === 'speaking' && (
-        <div className="flex items-center justify-center gap-[3px] h-6 my-1.5">
-          {[0.4, 0.7, 1.0, 0.85, 0.6, 0.9, 0.5, 0.75, 0.45, 0.8].map((h, i) => (
-            <div
-              key={i}
-              style={{
-                width: '3px',
-                height: `${(h + audioLevel * 0.5) * 16}px`,
-                borderRadius: '2px',
-                background: `rgba(6, 182, 212, ${0.5 + audioLevel * 0.5})`,
-                animation: `soundBar 0.${4 + (i % 4)}s ease-in-out infinite alternate`,
-                animationDelay: `${i * 0.07}s`,
-                transition: 'height 0.08s ease-out',
-              }}
-            />
-          ))}
-          <style>{`
-            @keyframes soundBar {
-              from { transform: scaleY(0.3); opacity: 0.5; }
-              to   { transform: scaleY(1.0); opacity: 1.0; }
-            }
-          `}</style>
-        </div>
-      )}
-
-      {/* ── DISTINCT FLOATING CONTROLS PILL — stacked vertically below orb ── */}
-      <div className="flex items-center gap-2 bg-white/95 backdrop-blur-xl border border-slate-200 px-3 py-1.5 rounded-full shadow-xl animate-fade-in mt-1.5">
-        {/* PTT BUTTON */}
+      {/* ── FLOATING CONTROLS PILL ── */}
+      <div className="flex items-center gap-2 bg-white/95 dark:bg-[#18181B]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-800 px-3 py-1.5 rounded-full shadow-xl animate-fade-in mt-1">
+        {/* PTT HOLD TO TALK BUTTON */}
         <button
           onMouseDown={(e) => { e.preventDefault(); onPttStart?.(); }}
           onMouseUp={(e) => { e.preventDefault(); onPttEnd?.(); }}
           onMouseLeave={isListening ? (e) => { e.preventDefault(); onPttEnd?.(); } : undefined}
           onTouchStart={(e) => { e.preventDefault(); onPttStart?.(); }}
           onTouchEnd={(e) => { e.preventDefault(); onPttEnd?.(); }}
-          className={`px-4 py-2 rounded-full text-[9px] uppercase font-bold tracking-[0.2em] select-none transition-all duration-300 flex items-center gap-1.5 h-8
+          className={`px-3.5 py-1.5 rounded-full text-[10px] uppercase font-bold tracking-wider select-none transition-all duration-200 flex items-center gap-1.5 h-7 cursor-pointer
             ${isListening
-              ? 'bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)] scale-105'
-              : 'bg-slate-100 hover:bg-slate-200 border border-slate-200 text-[#1E2733]/85 hover:text-[#1E2733]'}`}
+              ? 'bg-blue-600 text-white shadow-md scale-105'
+              : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200'}`}
         >
           {isListening && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
-          {isListening ? 'LISTENING…' : 'HOLD TO TALK'}
+          {isListening ? 'Listening…' : 'Hold to Talk'}
         </button>
 
-        {/* TYPE INSTEAD BUTTON */}
+        {/* Keyboard Input Trigger */}
         <button
-          onClick={onToggleTyping}
-          className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-300
-            ${showTypingInput
-              ? 'bg-[#1E2733] text-white border-transparent shadow-md'
-              : 'bg-slate-100 hover:bg-slate-200 border border-transparent text-[#1E2733]/60 hover:text-[#1E2733]'}`}
-          title="Type text message"
+          onClick={(e) => { e.stopPropagation(); onToggleTyping?.(); }}
+          className={`p-1.5 rounded-full transition-all cursor-pointer ${
+            showTypingInput
+              ? 'bg-blue-600 text-white'
+              : 'text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
+          }`}
+          title="Type query"
         >
-          {showTypingInput ? (
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-          ) : (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h16v10H4z"/><path d="M8 11h.01"/><path d="M12 11h.01"/><path d="M16 11h.01"/><path d="M7 14h10"/></svg>
-          )}
+          ⌨
         </button>
 
-        {/* PERMANENT MUTE BUTTON */}
+        {/* Mute Toggle */}
         <button
-          onClick={onToggleMute}
-          className={`w-8 h-8 rounded-full border flex items-center justify-center text-xs transition-all duration-300
-            ${isMuted
-              ? 'bg-red-500 text-white border-transparent shadow-md'
-              : 'bg-slate-100 hover:bg-slate-200 border border-transparent text-[#1E2733]/60 hover:text-[#1E2733]'}`}
-          title={isMuted ? "Unmute Spoken Audio (Alt+M)" : "Permanently Mute Spoken Audio (Alt+M)"}
+          onClick={(e) => { e.stopPropagation(); onToggleMute?.(); }}
+          className={`p-1.5 rounded-full transition-all cursor-pointer ${
+            isMuted
+              ? 'bg-rose-500/20 text-rose-500'
+              : 'text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
+          }`}
+          title={isMuted ? 'Unmute voice' : 'Mute voice'}
         >
           {isMuted ? '🔇' : '🔊'}
         </button>
       </div>
+
+      {/* Typing input popup when keyboard clicked */}
+      {showTypingInput && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onTypingSubmit?.(typingText);
+          }}
+          className="mt-2 w-72 flex items-center gap-1.5 bg-white dark:bg-[#18181B] border border-gray-200 dark:border-gray-800 rounded-full px-3 py-1.5 shadow-xl animate-fade-in"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <input
+            type="text"
+            value={typingText}
+            onChange={(e) => onTypingChange?.(e.target.value)}
+            placeholder="Ask Drishti AI..."
+            autoFocus
+            className="flex-1 text-xs bg-transparent text-gray-900 dark:text-white focus:outline-none placeholder:text-gray-400"
+          />
+          <button
+            type="submit"
+            className="w-6 h-6 rounded-full bg-black dark:bg-white text-white dark:text-black flex items-center justify-center text-xs font-bold hover:opacity-80"
+          >
+            ↑
+          </button>
+        </form>
+      )}
+
     </div>
   );
 };
