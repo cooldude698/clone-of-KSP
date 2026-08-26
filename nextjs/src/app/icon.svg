@@ -1,74 +1,107 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
   <defs>
-    <!-- Executive Midnight Gradient -->
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0F172A" />
+    <!-- Background Canvas Gradient -->
+    <linearGradient id="bgGradB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B0F19" />
+      <stop offset="50%" stop-color="#070A12" />
+      <stop offset="100%" stop-color="#030509" />
+    </linearGradient>
+
+    <!-- Outer 'D' Ribbon Gradient -->
+    <linearGradient id="dRibbonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B" />
+      <stop offset="35%" stop-color="#0F172A" />
       <stop offset="100%" stop-color="#020617" />
     </linearGradient>
 
-    <!-- Facet 1: Primary Royal Cobalt -->
-    <linearGradient id="facetPrimary" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#38BDF8" />
+    <!-- Electric Sapphire Glowing Rim Stroke -->
+    <linearGradient id="sapphireGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F0FF" />
+      <stop offset="45%" stop-color="#38BDF8" />
+      <stop offset="75%" stop-color="#2563EB" />
       <stop offset="100%" stop-color="#1D4ED8" />
     </linearGradient>
 
-    <!-- Facet 2: Deep Indigo Glass -->
-    <linearGradient id="facetDeep" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#2563EB" />
-      <stop offset="100%" stop-color="#1E1B4B" />
+    <!-- Eye Body Glass Gradient -->
+    <linearGradient id="eyeGlassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B" />
+      <stop offset="50%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#030712" />
     </linearGradient>
 
-    <!-- Facet 3: Titanium Highlight -->
-    <linearGradient id="facetHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#60A5FA" />
-      <stop offset="100%" stop-color="#0284C7" />
-    </linearGradient>
-
-    <!-- Core Eye Luminous Glow -->
-    <radialGradient id="coreLight" cx="50%" cy="50%" r="50%">
+    <!-- Core Pupil Glow -->
+    <radialGradient id="pupilCoreGrad" cx="45%" cy="45%" r="55%">
       <stop offset="0%" stop-color="#E0F2FE" />
-      <stop offset="60%" stop-color="#38BDF8" />
-      <stop offset="100%" stop-color="#0284C7" />
+      <stop offset="40%" stop-color="#00F0FF" />
+      <stop offset="75%" stop-color="#2563EB" />
+      <stop offset="100%" stop-color="#0F172A" />
     </radialGradient>
+
+    <!-- Soft Glow Filter -->
+    <filter id="sapphireFilter" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
   </defs>
 
-  <!-- Container Base -->
-  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" />
-  <rect width="506" height="506" x="3" y="3" rx="125" fill="none" stroke="#334155" stroke-width="3" opacity="0.5" />
+  <!-- Squircle Base Frame -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGradB)" />
+  <rect width="506" height="506" x="3" y="3" rx="125" fill="none" stroke="#1E293B" stroke-width="3" opacity="0.6" />
 
-  <!-- ─── ICONIC GEOMETRIC DRISHTI APERTURE ─── -->
-  <!-- Interlocking geometric shield & lens facets forming the signature 'D' of Drishti -->
+  <!-- ─── CONCEPT B: FLUID CYBER EYE 'D' MONOGRAM ─── -->
   <g transform="translate(256, 256)">
-    <!-- Outer Shield / Hex-Lens Geometry -->
     
-    <!-- Top-Left Facet -->
-    <path 
-      d="M 0 -150 L 120 -80 C 135 -70, 145 -55, 145 -35 L 145 0 L 60 0 L 60 -45 L 0 -80 Z" 
-      fill="url(#facetHighlight)" 
-    />
+    <!-- Outer 'D' Curved Shell (The Back Spine & Outer Loop) -->
+    <g filter="url(#sapphireFilter)">
+      <!-- Outer Rim Glow Path -->
+      <path 
+        d="M -70 -160 
+           C 40 -160, 165 -90, 165 20 
+           C 165 125, 65 175, -55 175 
+           C -95 175, -125 160, -125 140
+           L -125 70 
+           C -125 65, -115 60, -100 60
+           C -30 60, 95 30, 95 -20
+           C 95 -75, 15 -110, -70 -110
+           Z" 
+        fill="url(#dRibbonGrad)"
+        stroke="url(#sapphireGlow)"
+        stroke-width="7"
+        stroke-linejoin="round"
+      />
+    </g>
 
-    <!-- Bottom-Right Facet Curve (forming the 'D' loop) -->
-    <path 
-      d="M 145 0 L 145 35 C 145 95, 95 145, 30 145 L -100 145 L -100 70 L 20 70 C 55 70, 75 50, 75 15 L 75 0 Z" 
-      fill="url(#facetPrimary)" 
-    />
+    <!-- Inner Aerodynamic Eye Contour (Sweeping beak / aperture) -->
+    <g filter="url(#sapphireFilter)">
+      <path 
+        d="M -165 -10 
+           C -90 -85, 35 -85, 95 -10 
+           C 35 65, -90 65, -165 -10 Z" 
+        fill="url(#eyeGlassGrad)" 
+        stroke="url(#sapphireGlow)" 
+        stroke-width="8" 
+        stroke-linejoin="round"
+      />
+    </g>
 
-    <!-- Left Tactical Spine (Vertical Law Enforcement Pillar) -->
-    <path 
-      d="M -100 -145 L -35 -145 L -35 145 L -100 145 Z" 
-      fill="url(#facetDeep)" 
-    />
+    <!-- Eye Iris Ring -->
+    <circle cx="-35" cy="-10" r="48" fill="#090D16" stroke="url(#sapphireGlow)" stroke-width="5" />
 
-    <!-- Diagonal Optical Ray Bridge -->
-    <path 
-      d="M -35 -145 L 0 -150 L -35 -85 Z" 
-      fill="#60A5FA" 
-      opacity="0.8"
-    />
+    <!-- Luminous Central Pupil Core -->
+    <circle cx="-35" cy="-10" r="28" fill="url(#pupilCoreGrad)" />
+    
+    <!-- High-Tech Specular Highlight -->
+    <circle cx="-45" cy="-20" r="8" fill="#FFFFFF" opacity="0.9" />
+    <circle cx="-25" cy="-2" r="3.5" fill="#FFFFFF" opacity="0.6" />
 
-    <!-- Precision Central Optical Lens / All-Seeing Iris Core -->
-    <circle cx="20" cy="0" r="38" fill="#020617" stroke="#38BDF8" stroke-width="8" />
-    <circle cx="20" cy="0" r="18" fill="url(#coreLight)" />
-    <circle cx="14" cy="-6" r="5" fill="#FFFFFF" opacity="0.95" />
+    <!-- Bottom Tail Flare Arc -->
+    <path 
+      d="M -125 140 C -70 160, 20 155, 75 110" 
+      fill="none" 
+      stroke="url(#sapphireGlow)" 
+      stroke-width="4" 
+      stroke-linecap="round"
+      opacity="0.75"
+    />
   </g>
 </svg>
