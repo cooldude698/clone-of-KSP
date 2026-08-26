@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 import Card from '@/components/ui/Card';
+import DrishtiLogo, { DrishtiEmblem } from '@/components/DrishtiLogo';
 
 // Previews
 import ChatHeatmapMockup from '@/components/landing/ChatHeatmapMockup';
@@ -180,24 +181,7 @@ export default function LandingPage() {
       {/* ── TOP TACTICAL NAVIGATION BAR ────────────────────────────────────── */}
       <header className="sticky top-0 z-50 backdrop-blur-md bg-[var(--surface-0)]/80 border-b border-[var(--border)] px-4 sm:px-8 py-3.5 flex items-center justify-between">
         {/* Left: Branding */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded bg-[var(--accent)] text-white flex items-center justify-center font-bold shadow-md shadow-[var(--accent-glow)] border border-white/10">
-            <Shield className="w-4 h-4 text-white" />
-          </div>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <span className="font-mono font-bold tracking-[0.15em] text-xs text-[var(--text-primary)]">
-                DRISHTI AI
-              </span>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--accent)]/15 text-[var(--accent-light)] border border-[var(--accent)]/30 font-semibold">
-                KSP v2.4
-              </span>
-            </div>
-            <span className="text-[9px] font-mono text-[var(--text-secondary)] tracking-wider">
-              KARNATAKA STATE POLICE CO-PILOT
-            </span>
-          </div>
-        </div>
+        <DrishtiLogo variant="full" size="md" href="/" />
 
         {/* Center: System Status Indicator */}
         <div className="hidden md:flex items-center gap-6 font-mono text-[11px] text-[var(--text-secondary)]">
@@ -408,18 +392,26 @@ export default function LandingPage() {
                 <motion.div
                   key="auth-panel"
                   layoutId="authPanel"
-                  className="w-full max-w-md rounded-xl bg-[var(--surface-1)]/95 backdrop-blur-xl border border-[var(--border)] p-6 shadow-2xl text-[var(--text-primary)] flex flex-col gap-4 text-left"
+                  className="w-full max-w-md rounded-2xl bg-[var(--surface-1)]/95 backdrop-blur-xl border border-[var(--border)] p-6 shadow-2xl text-[var(--text-primary)] flex flex-col gap-4 text-left"
                 >
-                  <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
-                    <div className="flex items-center gap-2">
-                      <KeyRound className="w-4 h-4 text-[var(--cyan-accent)]" />
-                      <span className="text-[11px] font-mono font-bold uppercase text-[var(--text-primary)] tracking-[0.15em]">OFFICER AUTHENTICATION</span>
+                  <div className="flex items-center justify-between border-b border-[var(--border)] pb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-black border border-gray-800 flex items-center justify-center p-1.5 shadow-md flex-shrink-0">
+                        <DrishtiEmblem className="w-full h-full" color="#FFFFFF" />
+                      </div>
+                      <div className="flex flex-col leading-tight">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-bold tracking-tight text-sm text-[var(--text-primary)] font-sans">DRISHTI</span>
+                          <span className="text-xs font-bold text-sky-500 font-sans">ದೃಷ್ಟಿ</span>
+                        </div>
+                        <span className="text-[10px] font-mono text-[var(--text-secondary)] tracking-wider uppercase">Officer Authentication</span>
+                      </div>
                     </div>
                     <button
                       onClick={() => { setIsSigningIn(false); setError(''); }}
-                      className="w-7 h-7 rounded-full bg-[var(--surface-0)] hover:bg-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] transition-colors outline-none"
+                      className="w-8 h-8 rounded-full bg-[var(--surface-0)] hover:bg-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors outline-none cursor-pointer"
                     >
-                      <X className="w-3.5 h-3.5" />
+                      <X className="w-4 h-4" />
                     </button>
                   </div>
 
@@ -630,7 +622,9 @@ export default function LandingPage() {
       <footer className="mt-auto py-10 px-6 bg-[var(--surface-1)] border-t border-[var(--border)] text-xs text-[var(--text-secondary)] select-none">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <Shield className="w-5 h-5 text-[var(--cyan-accent)]" />
+            <div className="w-8 h-8 rounded-xl bg-black border border-gray-800 flex items-center justify-center p-1 shadow-sm">
+              <DrishtiEmblem className="w-full h-full" color="#FFFFFF" />
+            </div>
             <div className="flex flex-col text-left">
               <span className="font-mono font-bold text-[var(--text-primary)] uppercase tracking-widest text-[11px]">Karnataka State Police</span>
               <span className="text-[9px] text-[var(--text-secondary)] uppercase tracking-wider">State Crime Records Bureau (SCRB) • DRISHTI Engine</span>
