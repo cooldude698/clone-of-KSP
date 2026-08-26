@@ -26,15 +26,20 @@ export const metadata = {
 const themeScript = `
 (function() {
   try {
-    localStorage.setItem('theme', 'light');
-    document.documentElement.classList.remove('dark');
+    var stored = localStorage.getItem('theme');
+    if (stored === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      localStorage.setItem('theme', 'dark');
+      document.documentElement.classList.add('dark');
+    }
   } catch(e) {}
 })();
 `;
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${montserrat.variable} ${googleSans.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${montserrat.variable} ${googleSans.variable} dark`} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -45,8 +50,7 @@ export default function RootLayout({ children }) {
       <body className="bg-void-000 text-paper-100 font-sans antialiased transition-colors duration-200">
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
-          forcedTheme="light"
+          defaultTheme="dark"
           enableSystem={false}
         >
           {children}
