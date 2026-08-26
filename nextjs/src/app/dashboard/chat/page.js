@@ -179,20 +179,21 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis, onSuggestion
         <p key={i} className={`${line === '' ? 'mt-2' : ''} leading-relaxed font-sans text-sm text-[var(--text-primary)]`}>
           {boldParts.map((part, j) => {
             const isBold = j % 2 === 1;
-            const caseRegex = /(KAR\/[A-Z]+\/\d+\/\d+|FIR-\d{4}-[A-Z]+-\d+)/g;
-            const subParts = part.split(caseRegex);
+            const singleCaseRegex = /^(KAR\/[A-Z]+\/\d+\/\d+|FIR-\d{4}-[A-Z]+-\d+)$/i;
+            const caseSplitRegex = /(KAR\/[A-Z]+\/\d+\/\d+|FIR-\d{4}-[A-Z]+-\d+)/g;
+            const subParts = part.split(caseSplitRegex);
 
             const renderedSubParts = subParts.map((subPart, k) => {
-              if (caseRegex.test(subPart)) {
+              if (singleCaseRegex.test(subPart)) {
                 return (
-                  <button
+                  <Link
                     key={k}
-                    onClick={() => onCaseClick && onCaseClick(subPart)}
-                    className="text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 font-mono font-bold border border-blue-500/30 rounded-lg px-2 py-0.5 bg-blue-500/10 transition-all mx-1 inline-flex items-center gap-1 focus:outline-none cursor-pointer shadow-xs"
+                    href={`/dashboard/fir/${encodeURIComponent(subPart)}`}
+                    className="text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 font-mono font-bold border border-blue-500/30 rounded-lg px-2 py-0.5 bg-blue-500/10 transition-all mx-1 inline-flex items-center gap-1 focus:outline-none cursor-pointer shadow-xs hover:scale-105"
                   >
                     <FileText className="w-3 h-3 text-blue-500" />
                     {subPart}
-                  </button>
+                  </Link>
                 );
               }
               return subPart;

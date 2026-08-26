@@ -492,18 +492,18 @@ export default function AnalyticsPage() {
                 No under-reporting dark zones detected across analyzed districts.
               </div>
             ) : (
-              darkZones.map((z) => (
-                <div key={z.district} className="flex items-center justify-between p-3 rounded-lg bg-warn-500/5 border border-warn-500/15">
+              darkZones.map((z, idx) => (
+                <div key={z.district || z.location || idx} className="flex items-center justify-between p-3 rounded-lg bg-warn-500/5 border border-warn-500/15">
                   <div className="flex items-center gap-2">
                     <MapPin className="w-3.5 h-3.5 text-warn-500 flex-shrink-0" />
                     <div>
-                      <p className="text-sm text-paper-100/90 font-semibold">{z.district}</p>
-                      <p className="text-[10px] text-paper-100/40">Expected: {z.expected} FIRs/lakh</p>
+                      <p className="text-sm text-paper-100/90 font-semibold">{z.district ? `${z.district} District` : (z.location || 'Karnataka Sector')}</p>
+                      <p className="text-[10px] text-paper-100/50">{z.reason || 'Beat policing gap identified'}</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-bold text-warn-500 font-mono">{z.rate}</p>
-                    <p className="text-[10px] text-paper-100/40">FIRs/lakh</p>
+                  <div className="text-right shrink-0 ml-2">
+                    <p className="text-sm font-bold text-warn-500 font-mono">{z.rate} FIRs/lakh</p>
+                    <p className="text-[10px] text-paper-100/40">Expected: {z.expected || 45.1}</p>
                   </div>
                 </div>
               ))

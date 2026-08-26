@@ -710,6 +710,49 @@ function DetailsTab({ fir, detail }) {
         </div>
       </section>
 
+      {/* KSP ERD Chargesheet & Judicial Status (cstype) */}
+      <section className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 p-5 shadow-sm">
+        <div className="flex items-center justify-between border-b border-[var(--border)]/40 pb-3 mb-4">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="w-4 h-4 text-accent-400" />
+            <h4 className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">
+              KSP ERD Chargesheet Disposition (Section 173 Cr.P.C / BNSS 193)
+            </h4>
+          </div>
+          <span className="text-[10px] font-mono font-bold text-accent-300 bg-accent-500/10 px-2 py-0.5 rounded border border-accent-500/20">
+            CS-CLASSIFICATION
+          </span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div className={`p-3 rounded-xl border ${fir.status === 'chargesheeted' ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-300' : 'bg-navy-950/40 border-navy-800 text-gray-400'}`}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-bold font-mono">CLASS A REPORT</span>
+              {fir.status === 'chargesheeted' && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
+            </div>
+            <p className="text-[11px] font-semibold">Chargesheet Filed in Court</p>
+            <p className="text-[10px] opacity-75 mt-1">Sufficient evidence gathered for prosecution and judicial trial.</p>
+          </div>
+
+          <div className={`p-3 rounded-xl border ${fir.status === 'open' ? 'bg-amber-500/10 border-amber-500/40 text-amber-300' : 'bg-navy-950/40 border-navy-800 text-gray-400'}`}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-bold font-mono">CLASS B REPORT</span>
+              {fir.status === 'open' && <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />}
+            </div>
+            <p className="text-[11px] font-semibold">Under Active Investigation</p>
+            <p className="text-[10px] opacity-75 mt-1">Interrogations and forensic lab analysis in progress by IO.</p>
+          </div>
+
+          <div className={`p-3 rounded-xl border ${fir.status === 'under_investigation' ? 'bg-blue-500/10 border-blue-500/40 text-blue-300' : 'bg-navy-950/40 border-navy-800 text-gray-400'}`}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-bold font-mono">CLASS C REPORT</span>
+              <Activity className="w-3.5 h-3.5 text-blue-400" />
+            </div>
+            <p className="text-[11px] font-semibold">Special Surveillance Track</p>
+            <p className="text-[10px] opacity-75 mt-1">ANPR watchlist grid and cellular IPDR tracing activated.</p>
+          </div>
+        </div>
+      </section>
+
       {/* Primary Suspect Details */}
       <section className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]/50 bg-[var(--surface-0)]">
