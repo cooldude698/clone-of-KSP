@@ -2,11 +2,12 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Search, FileText, Shield, ArrowRight, Clock, AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { STATIC_FIRS } from '@/lib/demo-data';
+import { DEMO_FIRS } from '@/lib/demo-data';
 
 export default function FIRDirectoryPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [firs, setFirs] = useState(STATIC_FIRS || []);
+  const staticFirs = DEMO_FIRS?.firs || [];
+  const [firs, setFirs] = useState(staticFirs);
 
   useEffect(() => {
     try {
@@ -14,7 +15,7 @@ export default function FIRDirectoryPage() {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setFirs([...parsed, ...(STATIC_FIRS || [])]);
+          setFirs([...parsed, ...staticFirs]);
         }
       }
     } catch (e) {
