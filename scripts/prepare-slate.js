@@ -116,4 +116,17 @@ for (const cfg of configs) {
   }
 }
 
+// 7. Clean caches to ensure lean zip packaging
+const caches = [
+  path.join(rootNext, 'cache'),
+  path.join(standaloneNext, 'cache'),
+  path.join(nextDir, '.next', 'cache')
+];
+for (const c of caches) {
+  if (fs.existsSync(c)) {
+    fs.rmSync(c, { recursive: true, force: true });
+  }
+}
+
 console.log('--- Slate Build Prepared Successfully with all OpenNext Manifests ---');
+
