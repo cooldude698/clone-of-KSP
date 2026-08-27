@@ -376,7 +376,7 @@ async function callQuickML(question, knowledgeContext = '') {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // PLACEHOLDER — keeps file structure intact for reference only
-function _removedExternalAI() {
+async function _removedExternalAI() {
   const apiKey = process.env.GEMINI_API_KEY;
   const model = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
 

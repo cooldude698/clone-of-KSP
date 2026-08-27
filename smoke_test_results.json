@@ -1,0 +1,406 @@
+{
+  "apiRoutes": [
+    {
+      "path": "/api/firs",
+      "status": 200,
+      "ok": true,
+      "elapsed": "155ms",
+      "summary": "firs, total_count, filters_applied"
+    },
+    {
+      "path": "/api/hotspots",
+      "status": 200,
+      "ok": true,
+      "elapsed": "30ms",
+      "summary": "hotspots, total_count"
+    },
+    {
+      "path": "/api/trends",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1315ms",
+      "summary": "trend_data, seasonal_insight, overall_trend, average_per_period, spike_periods"
+    },
+    {
+      "path": "/api/repeat-offenders",
+      "status": 200,
+      "ok": true,
+      "elapsed": "621ms",
+      "summary": "high_risk_count, suspects"
+    },
+    {
+      "path": "/api/victim-vulnerability",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1435ms",
+      "summary": "top_risk_profiles, high_risk_windows, recommendation"
+    },
+    {
+      "path": "/api/underreporting",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1395ms",
+      "summary": "dark_zones, state_average_rate_per_lakh, total_districts_analyzed"
+    },
+    {
+      "path": "/api/cameras-nearby?lat=12.9716&lng=77.5946&radius=5",
+      "status": 200,
+      "ok": true,
+      "elapsed": "512ms",
+      "summary": "status, total, cameras"
+    },
+    {
+      "path": "/api/trail?suspect_id=Ramesh_Kumar",
+      "status": 400,
+      "ok": false,
+      "elapsed": "1668ms",
+      "summary": "error"
+    },
+    {
+      "path": "/api/anpr-check",
+      "status": 400,
+      "ok": false,
+      "elapsed": "2507ms",
+      "summary": "error"
+    },
+    {
+      "path": "/api/network-graph-data",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1411ms",
+      "summary": "nodes, edges, date_range, source"
+    },
+    {
+      "path": "/api/askDrishtiAI",
+      "status": 200,
+      "ok": true,
+      "elapsed": "2645ms",
+      "summary": "answer, spokenAnswer, language, source, stats, follow_up_suggestions"
+    },
+    {
+      "path": "/api/chat",
+      "status": 500,
+      "ok": false,
+      "elapsed": "2036ms",
+      "summary": "Text/HTML"
+    }
+  ],
+  "uiPages": [
+    {
+      "page": "/dashboard",
+      "status": 500,
+      "ok": false,
+      "elapsed": "44ms"
+    },
+    {
+      "page": "/dashboard/fir",
+      "status": 500,
+      "ok": false,
+      "elapsed": "1388ms"
+    },
+    {
+      "page": "/dashboard/fir/new",
+      "status": 500,
+      "ok": false,
+      "elapsed": "1539ms"
+    },
+    {
+      "page": "/dashboard/hotspots",
+      "status": 500,
+      "ok": false,
+      "elapsed": "32ms"
+    },
+    {
+      "page": "/dashboard/trends",
+      "status": 500,
+      "ok": false,
+      "elapsed": "24ms"
+    },
+    {
+      "page": "/dashboard/repeat-offenders",
+      "status": 500,
+      "ok": false,
+      "elapsed": "35ms"
+    },
+    {
+      "page": "/dashboard/victim-vulnerability",
+      "status": 500,
+      "ok": false,
+      "elapsed": "23ms"
+    },
+    {
+      "page": "/dashboard/underreporting",
+      "status": 500,
+      "ok": false,
+      "elapsed": "23ms"
+    },
+    {
+      "page": "/dashboard/map",
+      "status": 500,
+      "ok": false,
+      "elapsed": "36ms"
+    },
+    {
+      "page": "/dashboard/trail",
+      "status": 500,
+      "ok": false,
+      "elapsed": "729ms"
+    },
+    {
+      "page": "/dashboard/network",
+      "status": 500,
+      "ok": false,
+      "elapsed": "41ms"
+    },
+    {
+      "page": "/dashboard/chat",
+      "status": 500,
+      "ok": false,
+      "elapsed": "484ms"
+    },
+    {
+      "page": "/dashboard/statutes",
+      "status": 500,
+      "ok": false,
+      "elapsed": "1678ms"
+    },
+    {
+      "page": "/dashboard/hierarchy",
+      "status": 500,
+      "ok": false,
+      "elapsed": "725ms"
+    }
+  ],
+  "catalystFunctions": [
+    {
+      "fn": "drishti_ksp_function",
+      "status": 200,
+      "ok": true,
+      "elapsed": "611ms"
+    },
+    {
+      "fn": "cameras-nearby",
+      "status": 400,
+      "ok": false,
+      "elapsed": "674ms"
+    },
+    {
+      "fn": "trail",
+      "status": 400,
+      "ok": false,
+      "elapsed": "600ms"
+    },
+    {
+      "fn": "anpr-check",
+      "status": 405,
+      "ok": false,
+      "elapsed": "685ms"
+    },
+    {
+      "fn": "network-graph-data",
+      "status": 500,
+      "ok": false,
+      "elapsed": "769ms"
+    },
+    {
+      "fn": "firs",
+      "status": 200,
+      "ok": true,
+      "elapsed": "643ms"
+    },
+    {
+      "fn": "hotspots",
+      "status": 200,
+      "ok": true,
+      "elapsed": "566ms"
+    },
+    {
+      "fn": "trends",
+      "status": 200,
+      "ok": true,
+      "elapsed": "577ms"
+    },
+    {
+      "fn": "repeat-offenders",
+      "status": 200,
+      "ok": true,
+      "elapsed": "535ms"
+    },
+    {
+      "fn": "victim-vulnerability",
+      "status": 200,
+      "ok": true,
+      "elapsed": "523ms"
+    },
+    {
+      "fn": "underreporting",
+      "status": 200,
+      "ok": true,
+      "elapsed": "571ms"
+    },
+    {
+      "fn": "chat",
+      "status": 404,
+      "ok": false,
+      "elapsed": "47ms"
+    },
+    {
+      "fn": "conversations",
+      "status": 404,
+      "ok": false,
+      "elapsed": "39ms"
+    },
+    {
+      "fn": "askDrishtiAI",
+      "status": 404,
+      "ok": false,
+      "elapsed": "49ms"
+    },
+    {
+      "fn": "drishtiVoice",
+      "status": 404,
+      "ok": false,
+      "elapsed": "46ms"
+    },
+    {
+      "fn": "cache-hotspots",
+      "status": 404,
+      "ok": false,
+      "elapsed": "55ms"
+    },
+    {
+      "fn": "search-firs",
+      "status": 404,
+      "ok": false,
+      "elapsed": "44ms"
+    },
+    {
+      "fn": "ml-risk-score",
+      "status": 404,
+      "ok": false,
+      "elapsed": "42ms"
+    }
+  ],
+  "datasets": [
+    {
+      "file": "Accused.csv",
+      "size": "83.9 KB",
+      "rows": 2500
+    },
+    {
+      "file": "Act.csv",
+      "size": "0.3 KB",
+      "rows": 5
+    },
+    {
+      "file": "ActSectionAssociation.csv",
+      "size": "42.9 KB",
+      "rows": 2500
+    },
+    {
+      "file": "CaseCategory.csv",
+      "size": "0.1 KB",
+      "rows": 4
+    },
+    {
+      "file": "CaseMaster.csv",
+      "size": "559.3 KB",
+      "rows": 2500
+    },
+    {
+      "file": "CaseStatusMaster.csv",
+      "size": "0.1 KB",
+      "rows": 4
+    },
+    {
+      "file": "CasteMaster.csv",
+      "size": "0.1 KB",
+      "rows": 4
+    },
+    {
+      "file": "ChargesheetDetails.csv",
+      "size": "68.7 KB",
+      "rows": 2500
+    },
+    {
+      "file": "ComplainantDetails.csv",
+      "size": "114.0 KB",
+      "rows": 2500
+    },
+    {
+      "file": "Court.csv",
+      "size": "0.3 KB",
+      "rows": 4
+    },
+    {
+      "file": "CrimeHead.csv",
+      "size": "0.2 KB",
+      "rows": 4
+    },
+    {
+      "file": "CrimeSubHead.csv",
+      "size": "0.3 KB",
+      "rows": 6
+    },
+    {
+      "file": "Designation.csv",
+      "size": "0.2 KB",
+      "rows": 4
+    },
+    {
+      "file": "District.csv",
+      "size": "0.2 KB",
+      "rows": 6
+    },
+    {
+      "file": "Employee.csv",
+      "size": "0.4 KB",
+      "rows": 4
+    },
+    {
+      "file": "GravityOffence.csv",
+      "size": "0.1 KB",
+      "rows": 2
+    },
+    {
+      "file": "OccupationMaster.csv",
+      "size": "0.2 KB",
+      "rows": 6
+    },
+    {
+      "file": "Rank.csv",
+      "size": "0.2 KB",
+      "rows": 6
+    },
+    {
+      "file": "ReligionMaster.csv",
+      "size": "0.1 KB",
+      "rows": 5
+    },
+    {
+      "file": "Section.csv",
+      "size": "0.5 KB",
+      "rows": 8
+    },
+    {
+      "file": "State.csv",
+      "size": "0.1 KB",
+      "rows": 1
+    },
+    {
+      "file": "Unit.csv",
+      "size": "0.4 KB",
+      "rows": 8
+    },
+    {
+      "file": "UnitType.csv",
+      "size": "0.2 KB",
+      "rows": 4
+    },
+    {
+      "file": "Victim.csv",
+      "size": "87.2 KB",
+      "rows": 2500
+    }
+  ]
+}
