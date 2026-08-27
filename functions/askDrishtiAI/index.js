@@ -678,6 +678,55 @@ function generateSmartPoliceResponse(question, lang = 'en') {
    - Activate ANPR camera watchlists for black Honda Activa (KA-01-EA-4921).`;
   }
 
+  // Polite / Conversational / Acknowledgement intent check
+  if (
+    q.includes('thank') || q === 'okay thank u' || q === 'okay thank you' || q === 'thanks' ||
+    q === 'ok thanks' || q === 'thx' || q === 'thank you sir' || q === 'thanks sir'
+  ) {
+    if (isHindi) return 'आपका स्वागत है, सर! मैं सक्रिय मोड में हूँ। यदि आपको किसी केस फ़ाइल की जाँच, ANPR स्कैन या स्टेशन SOP सहायता की आवश्यकता है, तो मुझे बताएं।';
+    if (isKannada) return 'ನಿಮಗೆ ಸ್ವಾಗತ, ಸರ್! ಧನ್ಯವಾದಗಳು. ನಿಮಗೆ ಯಾವುದೇ ಪ್ರಕರಣದ ಮಾಹಿತಿ ಅಥವಾ ತನಿಖಾ ಸಹಾಯ ಬೇಕಿದ್ದಲ್ಲಿ ತಿಳಿಸಿ, ಸರ್.';
+    return 'You are welcome, Inspector! DRISHTI AI is on active standby. Let me know whenever you need to inspect case files, run ANPR scans, or check crime SOPs for your shift, Sir.';
+  }
+
+  // Time & Shift Queries (Dynamic live IST clock)
+  if (q.includes('time') || q.includes('clock') || q.includes('ಸಮಯ') || q.includes('ಗಂಟೆ') || q.includes('समय') || q.includes('वक्त') || q.includes('बजा')) {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
+    const hour = parseInt(now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', hour12: false }), 10);
+    const shift = (hour >= 20 || hour < 6) ? 'Night Patrol Shift (ರಾತ್ರಿ ಗಸ್ತು)' : (hour < 14) ? 'Morning Duty Shift (ಬೆಳಗಿನ ಕರ್ತವ್ಯ)' : 'Evening Patrol Shift (ಸಂಜೆ ಗಸ್ತು)';
+    if (isKannada) {
+      return `ಸರ್, ಪ್ರಸ್ತುತ ಸಮಯ ${timeStr} (IST). ಪ್ರಸ್ತುತ ${shift} ಸಕ್ರಿಯವಾಗಿದೆ. ಕಂಟ್ರೋಲ್ ರೂಮ್ ಮತ್ತು ಸಿಸಿಟಿವಿ ಜಾಲ ಸಾಮಾನ್ಯ ಸ್ಥಿತಿಯಲ್ಲಿದೆ. ನಿಮಗೆ ಯಾವುದಾದರೂ ತುರ್ತು ಪ್ರಕರಣದ ವಿವರ ಬೇಕೇ, ಸರ್?`;
+    }
+    if (isHindi) {
+      return `सर, वर्तमान समय ${timeStr} IST है। वर्तमान में ${shift} सक्रिय है। स्टेशन कंट्रोल रूम और एएनपीआर सर्विलांस ग्रिड चालू हैं। क्या आपको किसी केस या संदिग्ध की जानकारी चाहिए, सर?`;
+    }
+    return `Sir, the current time is ${timeStr} IST. The ${shift} is currently active across Karnataka Police command stations. How can I assist you with your duty roster or active cases, Sir?`;
+  }
+
+  // Date & Calendar Queries
+  if (q.includes('date') || q.includes('today') || q.includes('ದಿನಾಂಕ') || q.includes('ತಾರೀಖು') || q.includes('ತಾರೀಕು') || q.includes('तारीख') || q.includes('दिनांक') || q.includes('दिन कौन')) {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    if (isKannada) {
+      return `ಸರ್, ಇಂದು ${dateStr}. ಪೊಲೀಸ್ ಸಿಸಿಟಿಎನ್‌ಎಸ್ ಮತ್ತು ಎಫ್‌ಐಆರ್ ದಾಖಲೆಗಳು ನವೀಕರಿಸಲ್ಪಟ್ಟಿವೆ, ಸರ್.`;
+    }
+    if (isHindi) {
+      return `सर, आज ${dateStr} है। सभी पुलिस डेटाबेस और लाइव केस फाइलें अपडेटेड हैं, सर।`;
+    }
+    return `Sir, today is ${dateStr}. CCTNS and all station case logs are synchronized, Sir.`;
+  }
+
+  // Identity / Who Are You Queries
+  if (q.includes('who are you') || q.includes('your name') || q.includes('ಯಾರು ನೀವು') || q.includes('ನಿಮ್ಮ ಹೆಸರು') || q.includes('ನೀವು ಯಾರು') || q.includes('ಕೃತಕ ಬುದ್ಧಿಮತ್ತೆ') || q.includes('आप कौन हैं') || q.includes('तुम्हारा नाम')) {
+    if (isKannada) {
+      return `ನನ್ನ ಹೆಸರು ದೃಷ್ಟಿ (DRISHTI AI). ನಾನು ಕರ್ನಾಟಕ ರಾಜ್ಯ ಪೊಲೀಸ್ ಇಲಾಖೆಯ ಅಧಿಕೃತ ಕೃತಕ ಬುದ್ಧಿಮತ್ತೆ ಗುಪ್ತಚರ ಸಹಾಯಕ. ನಾನು ತನಿಖಾಧಿಕಾರಿಗಳಿಗೆ ಲೈವ್ ಎಫ್.ಐ.ಆರ್ ಹುಡುಕಾಟ, ಸಿಸಿಟಿವಿ ಮತ್ತು ಎಎನ್‌ಪಿಆರ್ ವಾಹನ ಟ್ರ್ಯಾಕಿಂಗ್, ಅಪರಾಧ ಜಾಲ ವಿಶ್ಲೇಷಣೆ ಮತ್ತು ಸ್ಟೇಷನ್ ಎಸ್.ಒ.ಪಿ ಮಾರ್ಗದರ್ಶನದಲ್ಲಿ ಸಹಾಯ ಮಾಡುತ್ತೇನೆ, ಸರ್.`;
+    }
+    if (isHindi) {
+      return `मेरा नाम दृष्टि (DRISHTI AI) है। मैं कर्नाटक राज्य पुलिस की आधिकारिक एआई खुफिया सहायक हूं। मैं जांच अधिकारियों को लाइव एफआईआर खोज, सीसीटीवी और एएनपीआर वाहन ट्रैकिंग, आपराधिक नेटवर्क विश्लेषण और स्टेशन एसओपी में सहायता करती हूं, सर।`;
+    }
+    return `I am DRISHTI (Digital Real-Time Intelligence & Surveillance for Tactical Investigation), the official AI intelligence officer for Karnataka State Police. I assist investigating officers with live FIR intelligence, ANPR camera vehicle tracking, criminal syndicate graphs, and tactical station SOPs, Sir.`;
+  }
+
   if (q.includes('ramesh') || q.includes('रमेश') || q.includes('ರಮೇಶ್')) {
     if (q.includes('cctv') || q.includes('camera') || q.includes('anpr') || q.includes('कैमरा') || q.includes('ಸಿಸಿಟಿವಿ') || q.includes('intel')) {
       if (q.includes('yes') || q.includes('no') || q.includes('do we') || q.includes('have') || q.includes('is there') || q.includes('any') || q.includes('क्या') || q.includes('इन्फॉर्मेशन') || q.includes('जानकारी')) {
