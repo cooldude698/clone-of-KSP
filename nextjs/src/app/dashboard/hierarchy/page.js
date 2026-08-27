@@ -136,99 +136,95 @@ export default function HierarchyPage() {
         </div>
       </div>
 
-      {/* Overview Stat Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs">
-          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest font-mono">Jurisdiction Units</p>
-          <p className="text-2xl font-black text-zinc-950 dark:text-white mt-1">5 Police Stations</p>
-          <p className="text-[11px] text-zinc-500 font-mono mt-0.5">Law & Order + CEN Commands</p>
+      {/* Overview Stat Bar - Compact & Focused */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div className="p-3 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xs">
+          <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest font-mono">Jurisdiction</p>
+          <p className="text-base font-black text-zinc-950 dark:text-white mt-0.5">5 Stations</p>
+          <p className="text-[10px] text-zinc-500 font-mono">Law & Order + CEN</p>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs">
-          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest font-mono">KGID Personnel</p>
-          <p className="text-2xl font-black text-zinc-950 dark:text-white mt-1">42 Active Officers</p>
-          <p className="text-[11px] text-zinc-500 font-mono mt-0.5">SHOs, PIs & Sub-Inspectors</p>
+        <div className="p-3 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xs">
+          <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest font-mono">Personnel</p>
+          <p className="text-base font-black text-zinc-950 dark:text-white mt-0.5">42 Officers</p>
+          <p className="text-[10px] text-zinc-500 font-mono">SHOs & Inspectors</p>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs">
-          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest font-mono">Sessions Courts</p>
-          <p className="text-2xl font-black text-zinc-950 dark:text-white mt-1">4 Trial Benches</p>
-          <p className="text-[11px] text-zinc-500 font-mono mt-0.5">Designated judicial forums</p>
+        <div className="p-3 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xs">
+          <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest font-mono">Courts</p>
+          <p className="text-base font-black text-zinc-950 dark:text-white mt-0.5">4 Benches</p>
+          <p className="text-[10px] text-zinc-500 font-mono">Sessions Forums</p>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs">
-          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest font-mono">Surveillance Grid</p>
-          <p className="text-2xl font-black text-zinc-950 dark:text-white mt-1">76 ANPR Feeds</p>
-          <p className="text-[11px] text-zinc-500 font-mono mt-0.5">Real-time plate intercepts</p>
+        <div className="p-3 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xs">
+          <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest font-mono">Surveillance</p>
+          <p className="text-base font-black text-zinc-950 dark:text-white mt-0.5">76 ANPR Feeds</p>
+          <p className="text-[10px] text-zinc-500 font-mono">Live Intercepts</p>
         </div>
       </div>
 
-      {/* Station Cards Grid - Ultra Clean, Minimal, No Nested Lasagna Boxes */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      {/* Station Cards Grid - Compact, Sleek, 3-Column */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
         {filteredUnits.map((unit) => (
           <div
             key={unit.unitId}
-            className="group p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all duration-150 flex flex-col justify-between"
+            className="group p-4 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all duration-150 flex flex-col justify-between"
           >
             <div>
               {/* Top Row: Unit Badge + Type + Total Cases */}
-              <div className="flex items-start justify-between gap-3 mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-[10px] font-black uppercase tracking-wider bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 px-2.5 py-1 rounded-md">
+              <div className="flex items-start justify-between gap-2 mb-1.5">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono text-[9px] font-black uppercase tracking-wider bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 px-2 py-0.5 rounded">
                     UNIT #{String(unit.unitId).padStart(4, '0')}
                   </span>
-                  <span className="font-mono text-xs text-zinc-500 dark:text-zinc-400 font-bold">
+                  <span className="font-mono text-[10px] text-zinc-500 dark:text-zinc-400 font-bold truncate max-w-[120px]">
                     {unit.type}
                   </span>
                 </div>
-                <div className="text-right">
-                  <span className="font-mono text-xs font-black text-zinc-950 dark:text-white">
-                    {unit.casesTotal} Cases
-                  </span>
-                </div>
+                <span className="font-mono text-[11px] font-black text-zinc-950 dark:text-white shrink-0">
+                  {unit.casesTotal} Cases
+                </span>
               </div>
 
               {/* Station Name */}
-              <h2 className="text-lg font-black text-zinc-950 dark:text-white tracking-tight mt-1 mb-2">
+              <h2 className="text-sm font-black text-zinc-950 dark:text-white tracking-tight leading-snug line-clamp-1 mb-1.5">
                 {unit.name}
               </h2>
 
-              {/* Jurisdiction & Court Meta (Clean single-line flow, no nested gray boxes) */}
-              <div className="text-xs text-zinc-500 dark:text-zinc-400 font-mono space-y-1 pb-4 mb-4 border-b border-zinc-100 dark:border-zinc-800">
-                <p className="flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+              {/* Jurisdiction & Court Meta */}
+              <div className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono space-y-0.5 pb-2.5 mb-2.5 border-b border-zinc-100 dark:border-zinc-800">
+                <p className="flex items-center gap-1 truncate">
+                  <MapPin className="w-3 h-3 text-zinc-400 shrink-0" />
                   <span className="font-bold text-zinc-800 dark:text-zinc-200">{unit.district}</span>
-                  <span>·</span>
-                  <span>{unit.state}</span>
                 </p>
-                <p className="flex items-center gap-1.5">
-                  <Scale className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-                  <span>Trial Court: <span className="font-semibold text-zinc-800 dark:text-zinc-200">{unit.court.split(',')[0]}</span></span>
+                <p className="flex items-center gap-1 truncate">
+                  <Scale className="w-3 h-3 text-zinc-400 shrink-0" />
+                  <span className="truncate">{unit.court.split(',')[0]}</span>
                 </p>
               </div>
 
               {/* Assigned Command Personnel */}
-              <div className="space-y-2">
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest font-mono block">
-                  Command Officers ({unit.activeOfficers.length})
+              <div className="space-y-1.5">
+                <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest font-mono block">
+                  Command ({unit.activeOfficers.length})
                 </span>
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {unit.activeOfficers.map((officer) => (
                     <div
                       key={officer.id}
-                      className="flex items-center justify-between py-2 px-3 rounded-xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-100 dark:border-zinc-800/80 text-xs"
+                      className="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-100 dark:border-zinc-800/80 text-[11px]"
                     >
-                      <div>
-                        <p className="font-bold text-zinc-950 dark:text-white">{officer.name}</p>
-                        <p className="text-[11px] text-zinc-500 font-mono mt-0.5">
-                          {officer.designation} · {officer.rank}
+                      <div className="min-w-0 pr-2">
+                        <p className="font-bold text-zinc-950 dark:text-white truncate">{officer.name}</p>
+                        <p className="text-[10px] text-zinc-500 font-mono truncate">
+                          {officer.designation}
                         </p>
                       </div>
-                      <div className="text-right font-mono">
-                        <span className="text-[11px] font-bold text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-900 px-2 py-0.5 rounded border border-zinc-200 dark:border-zinc-800">
+                      <div className="text-right font-mono shrink-0">
+                        <span className="text-[10px] font-bold text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-900 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-800">
                           {officer.kgid}
                         </span>
-                        <p className="text-[10px] text-zinc-400 mt-0.5">Appt: {officer.appointment}</p>
+                        <p className="text-[9px] text-zinc-400 mt-0.5">{officer.appointment}</p>
                       </div>
                     </div>
                   ))}
@@ -237,12 +233,12 @@ export default function HierarchyPage() {
             </div>
 
             {/* Bottom Surveillance Meta */}
-            <div className="pt-3.5 mt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-xs font-mono text-zinc-500">
+            <div className="pt-2.5 mt-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[10px] font-mono text-zinc-500">
               <span className="flex items-center gap-1">
-                <Camera className="w-3.5 h-3.5 text-zinc-400" />
-                {unit.anprCamerasCount} ANPR Cameras
+                <Camera className="w-3 h-3 text-zinc-400" />
+                {unit.anprCamerasCount} Cameras
               </span>
-              <span>{unit.activeWatchlistPlates} Watchlist Targets</span>
+              <span>{unit.activeWatchlistPlates} Targets</span>
             </div>
           </div>
         ))}

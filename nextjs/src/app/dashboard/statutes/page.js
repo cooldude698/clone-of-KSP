@@ -159,25 +159,25 @@ export default function StatutesPage() {
         </div>
       </div>
 
-      {/* Grid of Section Cards - Clean, Authoritative Swiss Legal Design */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {/* Grid of Section Cards - Clean, Compact Swiss Legal Design */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
         {filteredStatutes.map((item, idx) => (
           <div
             key={idx}
-            className="group p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all duration-150 flex flex-col justify-between"
+            className="group p-4 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all duration-150 flex flex-col justify-between"
           >
             <div>
               {/* Header Badge */}
-              <div className="flex items-start justify-between gap-2 mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-black uppercase tracking-wider bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 px-2.5 py-1 rounded-md">
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono text-[9px] font-black uppercase tracking-wider bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 px-2 py-0.5 rounded">
                     {item.actCode} § {item.section}
                   </span>
-                  <span className="font-mono text-[11px] text-zinc-500 font-semibold">
+                  <span className="font-mono text-[10px] text-zinc-500 font-semibold">
                     {item.gravity}
                   </span>
                 </div>
-                <span className={`font-mono text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
+                <span className={`font-mono text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
                   item.bailable ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300' : 'bg-rose-500 text-white dark:bg-rose-600'
                 }`}>
                   {item.bailable ? 'Bailable' : 'Non-Bailable'}
@@ -185,36 +185,36 @@ export default function StatutesPage() {
               </div>
 
               {/* Title & Description */}
-              <div className="space-y-1 mb-3">
-                <h2 className="text-base font-black text-zinc-950 dark:text-white tracking-tight">
+              <div className="space-y-0.5 mb-2">
+                <h2 className="text-sm font-black text-zinc-950 dark:text-white tracking-tight leading-snug line-clamp-1">
                   {item.title}
                 </h2>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono leading-relaxed">
+                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono line-clamp-1">
                   {item.actName}
                 </p>
               </div>
 
-              {/* Legal Classification & Penalty (Clean typographic spec, no gray lasagna boxes) */}
-              <div className="space-y-2 text-xs font-mono py-3 my-2 border-y border-zinc-100 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 block">Offence Category</span>
-                  <p className="font-semibold text-zinc-900 dark:text-zinc-100">{item.crimeHead} · {item.crimeSubHead}</p>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 block">Statutory Penalty</span>
-                  <p className="font-medium text-zinc-800 dark:text-zinc-200 leading-relaxed">{item.maxPunishment}</p>
-                </div>
+              {/* Legal Classification & Penalty */}
+              <div className="space-y-1 text-[11px] font-mono py-2 my-1.5 border-y border-zinc-100 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300">
+                <p className="truncate">
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-400 mr-1.5">Category:</span>
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">{item.crimeHead} · {item.crimeSubHead}</span>
+                </p>
+                <p className="line-clamp-2">
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-400 mr-1.5">Penalty:</span>
+                  <span className="font-medium text-zinc-800 dark:text-zinc-200">{item.maxPunishment}</span>
+                </p>
               </div>
             </div>
 
             {/* Footer Stats */}
-            <div className="pt-3 flex items-center justify-between text-xs font-mono">
+            <div className="pt-2 flex items-center justify-between text-[11px] font-mono">
               <div>
-                <span className="text-[10px] text-zinc-400 uppercase tracking-wider block">Conviction Rate</span>
+                <span className="text-[9px] text-zinc-400 uppercase tracking-wider block">Conviction Rate</span>
                 <span className="font-black text-zinc-950 dark:text-white">{item.avgConvictionRate}</span>
               </div>
               <div className="text-right">
-                <span className="text-[10px] text-zinc-400 uppercase tracking-wider block">Active Charges</span>
+                <span className="text-[9px] text-zinc-400 uppercase tracking-wider block">Active Charges</span>
                 <span className="font-black text-zinc-950 dark:text-white">{item.totalCasesActive} Cases</span>
               </div>
             </div>
