@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 
 import { getNormalizedCrimeCode, generateOfficialKSPCrimeNo } from '@/lib/fir-store';
+import { getSuspectMedia } from '@/lib/suspect-media';
 
 const InvestigatorWall = dynamic(() => import('@/components/InvestigatorWall'), {
   ssr: false,
@@ -753,47 +754,66 @@ function DetailsTab({ fir, detail }) {
         </div>
       </section>
 
-      {/* Primary Suspect Details */}
-      <section className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]/50 bg-[var(--surface-0)]">
-          <div className="flex items-center gap-2.5">
-            <Users className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-            <h3 className="font-bold text-[var(--text-primary)] text-xs uppercase tracking-wider font-heading">
-              Primary Accused / Suspect Dossier
-            </h3>
-          </div>
-          <span className="text-[10px] font-bold text-rose-600 bg-rose-50 dark:bg-rose-900/20 px-2.5 py-0.5 rounded border border-rose-300 dark:border-rose-700 uppercase">
-            {detail.accused_status}
-          </span>
-        </div>
-        <div className="p-5">
-          <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            <div>
-              <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Accused Name</dt>
-              <dd className="text-sm font-extrabold text-[var(--text-primary)]">{detail.accused_name}</dd>
+      {/* Primary Accused / Suspect Card */}
+      {(() => {
+        const accusedMedia = getSuspectMedia(detail.accused_name || detail.accused_alias);
+        return (
+          <section className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]/50 bg-[var(--surface-0)]">
+              <div className="flex items-center gap-2.5">
+                <Users className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                <h3 className="font-bold text-[var(--text-primary)] text-xs uppercase tracking-wider font-heading">
+                  Primary Accused / Suspect Dossier
+                </h3>
+              </div>
+              <span className="text-[10px] font-bold text-rose-600 bg-rose-50 dark:bg-rose-900/20 px-2.5 py-0.5 rounded border border-rose-300 dark:border-rose-700 uppercase">
+                {detail.accused_status}
+              </span>
             </div>
-            <div>
-              <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Known Alias</dt>
-              <dd className="text-sm font-bold text-rose-600 dark:text-rose-400 font-mono">&quot;{detail.accused_alias}&quot;</dd>
+            <div className="p-5">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+                <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shrink-0 shadow-xs">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={accusedMedia.mugshot}
+                    alt={detail.accused_name}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  <span className="absolute bottom-1 right-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white" />
+                </div>
+
+                <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 flex-1">
+                  <div>
+                    <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Accused Name</dt>
+                    <dd className="text-sm font-extrabold text-[var(--text-primary)]">{detail.accused_name}</dd>
+                    <span className="text-[10px] font-mono font-bold text-emerald-600">ANPR: {accusedMedia.confidence}</span>
+                  </div>
+                  <div>
+                    <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Known Alias</dt>
+                    <dd className="text-sm font-bold text-rose-600 dark:text-rose-400 font-mono">&quot;{detail.accused_alias || accusedMedia.alias}&quot;</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Risk Score</dt>
+                    <dd className="text-sm font-extrabold text-rose-600">{detail.accused_risk} / 100</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Action</dt>
+                    <dd className="text-xs">
+                      <Link
+                        href={`/dashboard/suspect/${detail.accused_name.toLowerCase().replace(/\s+/g, '-')}`}
+                        className="font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                      >
+                        Open Full Dossier →
+                      </Link>
+                    </dd>
+                  </div>
+                </dl>
+              </div>
             </div>
-            <div>
-              <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Risk Score</dt>
-              <dd className="text-sm font-extrabold text-rose-600">{detail.accused_risk} / 100</dd>
-            </div>
-            <div>
-              <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Action</dt>
-              <dd className="text-xs">
-                <Link
-                  href={`/dashboard/suspect/${detail.accused_name.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-                >
-                  Open Full Dossier →
-                </Link>
-              </dd>
-            </div>
-          </dl>
-        </div>
-      </section>
+          </section>
+        );
+      })()}
 
       {/* FIR Lodged By Officer */}
       <section className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">

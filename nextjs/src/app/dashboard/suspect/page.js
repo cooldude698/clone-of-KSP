@@ -2,86 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Users, Search, Filter, ShieldAlert, AlertTriangle, ArrowRight,
   RefreshCw, Car, MapPin, Bookmark, UserCheck, Shield, Eye,
-  Fingerprint, Siren, Radio, CheckCircle, FileText
+  Fingerprint, Siren, Radio, CheckCircle, FileText, Camera
 } from 'lucide-react';
 import { fetchWithFallback } from '@/lib/fetch-with-fallback';
 import { DEMO_REPEAT_OFFENDERS } from '@/lib/demo-data';
-
-// Tactical avatar helper with distinct styles per crime/threat
-function getSuspectVisualProfile(suspect) {
-  const name = suspect.name || suspect.accused_name || 'Suspect';
-  const risk = suspect.risk_score || suspect.risk || 50;
-  const crime = (suspect.primary_crime || suspect.crime_type || '').toLowerCase();
-  
-  const parts = name.trim().split(/\s+/);
-  const initials = parts.length > 1
-    ? (parts[0][0] + parts[1][0]).toUpperCase()
-    : (name.slice(0, 2) || 'SP').toUpperCase();
-
-  // Pick unique icon & badge style based on crime category
-  if (crime.includes('cyber') || crime.includes('fraud')) {
-    return {
-      initials,
-      icon: Radio,
-      badge: 'Cyber Intel',
-      avatarBg: 'bg-indigo-50 dark:bg-indigo-950/60',
-      avatarBorder: 'border-indigo-200 dark:border-indigo-900/60',
-      avatarText: 'text-indigo-600 dark:text-indigo-400',
-      ringColor: 'ring-indigo-500/30',
-    };
-  }
-  if (crime.includes('vehicle') || crime.includes('theft')) {
-    return {
-      initials,
-      icon: Car,
-      badge: 'Auto Ring',
-      avatarBg: 'bg-blue-50 dark:bg-blue-950/60',
-      avatarBorder: 'border-blue-200 dark:border-blue-900/60',
-      avatarText: 'text-blue-600 dark:text-blue-400',
-      ringColor: 'ring-blue-500/30',
-    };
-  }
-  if (crime.includes('robbery') || crime.includes('extortion') || crime.includes('assault')) {
-    return {
-      initials,
-      icon: Siren,
-      badge: 'Violent Crime',
-      avatarBg: 'bg-rose-50 dark:bg-rose-950/60',
-      avatarBorder: 'border-rose-200 dark:border-rose-900/60',
-      avatarText: 'text-rose-600 dark:text-rose-400',
-      ringColor: 'ring-rose-500/30',
-    };
-  }
-  if (crime.includes('drug') || crime.includes('narcotics')) {
-    return {
-      initials,
-      icon: Fingerprint,
-      badge: 'Narcotics Syndicate',
-      avatarBg: 'bg-purple-50 dark:bg-purple-950/60',
-      avatarBorder: 'border-purple-200 dark:border-purple-900/60',
-      avatarText: 'text-purple-600 dark:text-purple-400',
-      ringColor: 'ring-purple-500/30',
-    };
-  }
-
-  // Default tactical profile
-  return {
-    initials,
-    icon: UserCheck,
-    badge: 'Surveillance Target',
-    avatarBg: 'bg-neutral-100 dark:bg-neutral-800',
-    avatarBorder: 'border-neutral-200 dark:border-neutral-700',
-    avatarText: 'text-neutral-700 dark:text-neutral-300',
-    ringColor: 'ring-neutral-500/20',
-  };
-}
+import { getSuspectMedia } from '@/lib/suspect-media';
 
 function formatStatus(status = '') {
   const s = String(status).trim().replace(/_/g, ' ');
-  if (!s) return 'Active Watchlist';
+  if (!s) return 'Active Surveillance';
   if (/abscond/i.test(s)) return 'Absconding Warrant';
   if (/watchlist/i.test(s)) return 'Active Surveillance';
   if (/arrest|custody/i.test(s)) return 'In Police Custody';
@@ -237,7 +170,7 @@ export default function SuspectWatchlistPage() {
         </div>
       </div>
 
-      {/* Grid of Job-Card Style Suspect Cards */}
+      {/* Grid of Tactical Police Intelligence Dossier Cards */}
       {loading ? (
         <div className="py-16 text-center text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2 font-medium text-xs">
           <RefreshCw className="w-4 h-4 animate-spin text-rose-500" /> Querying KSP Intelligence Datastore...
@@ -250,49 +183,67 @@ export default function SuspectWatchlistPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map(s => {
             const rawId = s.suspect_id || s.id || (s.name || '').toLowerCase().replace(/\s+/g, '-');
-            const officialId = s.suspect_id || (rawId.startsWith('SUS-') ? rawId : `SUS-${rawId.slice(0, 4).toUpperCase()}`);
+            const media = getSuspectMedia(s);
+            const officialId = s.suspect_id || media.cctns_id || `SUS-${rawId.slice(0, 4).toUpperCase()}`;
             const encodedSlug = encodeURIComponent(s.suspect_id || rawId);
             const risk = s.risk_score || s.risk || 60;
-            const hangouts = Array.isArray(s.known_hangouts)
-              ? s.known_hangouts.join(', ')
-              : (s.known_hangouts || s.last_known_location || 'Bengaluru Transit Corridors');
             const isTracked = trackedSuspects.has(rawId) || trackedSuspects.has(s.suspect_id);
-            const profile = getSuspectVisualProfile(s);
-            const Icon = profile.icon;
             const statusFormatted = formatStatus(s.status);
             const isAbsconding = statusFormatted.toLowerCase().includes('abscond');
+            const alias = s.alias || media.alias;
+            const primaryCrime = s.primary_crime || s.crime_type || media.primary_crime;
+            const lastLocation = s.last_known_location || media.last_seen;
 
             return (
               <div
                 key={rawId}
-                className="group rounded-[32px] bg-white dark:bg-[#18181B] border border-gray-100 dark:border-gray-800 p-6 sm:p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none hover:shadow-[0_16px_40px_rgb(0,0,0,0.08)] transition-all duration-300 flex flex-col justify-between h-full"
+                className="group rounded-3xl bg-white dark:bg-[#18181B] border border-gray-200/90 dark:border-gray-800 p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200 flex flex-col justify-between h-full"
               >
                 <div>
-                  {/* TOP ROW: Tactical Avatar & Category Badge + Tracked Button */}
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-12 h-12 rounded-2xl ${profile.avatarBg} border ${profile.avatarBorder} flex items-center justify-center font-black text-sm ${profile.avatarText} shadow-xs relative`}>
-                        {profile.initials}
-                        {risk >= 80 && (
-                          <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-rose-500 border-2 border-white dark:border-[#18181B]" />
-                        )}
+                  {/* TOP ROW: Authentic Biometric Mugshot + Track Pill Button */}
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="flex items-center gap-3.5">
+                      {/* Realistic Mugshot with Tactical Overlay */}
+                      <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shrink-0 shadow-xs">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={media.mugshot}
+                          alt={s.name || 'Suspect'}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                        />
+                        {/* Biometric Status Indicator */}
+                        <span className={`absolute bottom-1 right-1 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-[#18181B] ${
+                          isAbsconding ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'
+                        }`} />
                       </div>
+
                       <div>
-                        <span className="text-[11px] font-bold text-gray-800 dark:text-gray-200 block leading-tight">
-                          {profile.badge}
-                        </span>
-                        <span className="text-[10px] text-gray-400 font-mono font-medium">
-                          {officialId}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-md">
+                            {officialId}
+                          </span>
+                          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5">
+                            <Camera className="w-3 h-3" /> {media.confidence}
+                          </span>
+                        </div>
+                        <h3 className="font-extrabold text-base text-gray-900 dark:text-white tracking-tight leading-snug group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors mt-0.5">
+                          {s.name || s.accused_name || 'Suspect Profile'}
+                        </h3>
+                        {alias && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium italic">
+                            aka &ldquo;{alias}&rdquo;
+                          </p>
+                        )}
                       </div>
                     </div>
 
                     <button
                       onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleTrackSuspect(rawId); }}
-                      className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-[11px] font-bold transition-all cursor-pointer ${
+                      className={`flex items-center gap-1 px-3 py-1.5 rounded-full border text-[11px] font-bold transition-all cursor-pointer shrink-0 ${
                         isTracked
                           ? 'bg-black text-white dark:bg-white dark:text-black border-transparent shadow-xs'
-                          : 'bg-gray-50 dark:bg-gray-800/80 border-gray-200/80 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                          : 'bg-gray-50 dark:bg-gray-800/80 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                       }`}
                     >
                       <span>{isTracked ? 'Tracked' : 'Track'}</span>
@@ -300,46 +251,43 @@ export default function SuspectWatchlistPage() {
                     </button>
                   </div>
 
-                  {/* Suspect Name & Alias */}
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-extrabold text-lg text-gray-900 dark:text-white tracking-tight leading-snug group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
-                        {s.name || s.accused_name || 'Suspect Profile'}
-                      </h3>
+                  {/* Modus Operandi / Primary Crime Brief */}
+                  <div className="space-y-2.5 my-3">
+                    <div className="p-3 rounded-2xl bg-gray-50/80 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800/80 space-y-1">
+                      <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                        <span>Primary Offence</span>
+                        <span>{s.fir_count || s.total_cases || s.active_firs || 3} Linked FIRs</span>
+                      </div>
+                      <p className="text-xs font-bold text-gray-800 dark:text-gray-200 leading-snug">
+                        {primaryCrime}
+                      </p>
                     </div>
 
-                    {s.alias && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium italic">
-                        aka &ldquo;{s.alias}&rdquo;
-                      </p>
-                    )}
-
-                    {/* Tag Pills Row */}
-                    <div className="flex flex-wrap items-center gap-2 pt-3 pb-1">
-                      <span className={`px-3 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 ${
-                        risk >= 80
-                          ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400'
-                          : risk >= 60
-                            ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400'
-                            : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400'
-                      }`}>
-                        {risk >= 80 && <AlertTriangle className="w-3 h-3" />}
-                        Risk {risk}%
-                      </span>
-
-                      <span className="px-3 py-1 rounded-full bg-gray-100/90 dark:bg-gray-800 text-[11px] font-semibold text-gray-700 dark:text-gray-300">
-                        {s.fir_count || s.total_cases || s.active_firs || 3} Active FIRs
-                      </span>
-
-                      <span className="px-3 py-1 rounded-full bg-gray-100/90 dark:bg-gray-800 text-[11px] font-semibold text-gray-700 dark:text-gray-300 truncate max-w-[140px]">
-                        {s.primary_crime || s.crime_type || 'Vehicle Theft'}
-                      </span>
+                    {/* Threat Assessment Gauge Bar */}
+                    <div>
+                      <div className="flex items-center justify-between text-[11px] font-bold mb-1">
+                        <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                          <ShieldAlert className="w-3.5 h-3.5 text-rose-500" />
+                          Recidivism Threat
+                        </span>
+                        <span className={`font-mono ${risk >= 80 ? 'text-rose-600 dark:text-rose-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                          {risk}%
+                        </span>
+                      </div>
+                      <div className="w-full h-2 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            risk >= 80 ? 'bg-rose-500' : risk >= 60 ? 'bg-amber-500' : 'bg-emerald-500'
+                          }`}
+                          style={{ width: `${risk}%` }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Bottom Row: Status / Area + View Dossier Button */}
-                <div className="pt-5 mt-4 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
+                {/* Bottom Row: Status / Last Sighted + View Dossier Button */}
+                <div className="pt-4 mt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
                   <div className="min-w-0 pr-3">
                     <div className="flex items-center gap-1.5">
                       <span className={`w-2 h-2 rounded-full shrink-0 ${isAbsconding ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`} />
@@ -349,13 +297,13 @@ export default function SuspectWatchlistPage() {
                     </div>
                     <div className="text-[11px] text-gray-400 font-medium flex items-center gap-1 mt-0.5">
                       <MapPin className="w-3 h-3 text-gray-400 shrink-0" />
-                      <span className="truncate max-w-[130px]">{hangouts.split(',')[0]}</span>
+                      <span className="truncate max-w-[140px]">{lastLocation.split(',')[0]}</span>
                     </div>
                   </div>
 
                   <Link
                     href={`/dashboard/suspect/${encodedSlug}`}
-                    className="px-5 py-2.5 rounded-full bg-black text-white dark:bg-white dark:text-black text-xs font-bold hover:scale-[1.03] active:scale-[0.98] transition-all shadow-xs shrink-0 flex items-center gap-1"
+                    className="px-4 py-2 rounded-full bg-black text-white dark:bg-white dark:text-black text-xs font-bold hover:opacity-90 active:scale-95 transition-all shadow-xs shrink-0 flex items-center gap-1 cursor-pointer"
                   >
                     View Dossier
                   </Link>

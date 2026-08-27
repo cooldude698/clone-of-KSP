@@ -10,6 +10,7 @@ import {
   Mail, Bell, RefreshCw, Sparkles, CheckCircle2, Send
 } from 'lucide-react';
 import { DEMO_REPEAT_OFFENDERS, DEMO_FIRS, DEMO_TRAIL } from '@/lib/demo-data';
+import { getSuspectMedia } from '@/lib/suspect-media';
 
 // Slug → display name: "ramesh-kumar" → "Ramesh Kumar"
 function slugToName(slug) {
@@ -305,9 +306,23 @@ export default function SuspectProfilePage() {
         </nav>
 
         <div className="flex items-center gap-4 flex-wrap">
-          <div className={`w-14 h-14 rounded-2xl ${risk.bg} border ${risk.border} flex items-center justify-center flex-shrink-0`}>
-            <User className={`w-7 h-7 ${risk.color}`} />
-          </div>
+          {(() => {
+            const media = getSuspectMedia(suspect);
+            return (
+              <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-slate-800 border-2 border-slate-700 shrink-0 shadow-lg">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={media.mugshot}
+                  alt={suspect.name}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+                <span className={`absolute bottom-1 right-1 w-3 h-3 rounded-full border-2 border-slate-900 ${
+                  currentRiskScore >= 75 ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'
+                }`} />
+              </div>
+            );
+          })()}
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 flex-wrap">

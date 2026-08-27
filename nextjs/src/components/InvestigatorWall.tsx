@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { getSuspectMedia } from "@/lib/suspect-media";
 
 // ── TypeScript Type Definitions ──────────────────────────────────────────────
 
@@ -351,33 +352,55 @@ export default function InvestigatorWall({
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {accused.map((item, idx) => (
-              <motion.div
-                key={`${item.full_name}-${idx}`}
-                variants={cardVariants}
-                className="group rounded-xl bg-white border border-slate-200 p-5 hover:border-red-300 hover:shadow-md transition-all duration-200 shadow-sm"
-              >
-                {/* Header Row */}
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-14 h-14 rounded-xl bg-red-50 text-red-700 flex items-center justify-center border border-red-200 font-bold font-serif shrink-0 text-2xl">
-                    {item.full_name.charAt(0)}
-                  </div>
-                  <div className="flex-grow">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <h4 className="text-lg font-bold text-slate-900 group-hover:text-red-700 transition-colors font-serif">
-                          {item.full_name}
-                        </h4>
-                        {item.alias && (
-                          <p className="text-xs text-slate-500 italic font-serif">Also known as: &quot;{item.alias}&quot;</p>
-                        )}
+            {accused.map((item, idx) => {
+              const media = getSuspectMedia(item.full_name || item.alias || 'Suspect');
+              const isHighRisk = item.risk_score >= 75;
+
+              return (
+                <motion.div
+                  key={`${item.full_name}-${idx}`}
+                  variants={cardVariants}
+                  className="group rounded-2xl bg-white border border-slate-200 p-5 hover:border-red-300 hover:shadow-md transition-all duration-200 shadow-sm"
+                >
+                  {/* Header Row with Authentic Mugshot */}
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-slate-100 border-2 border-slate-300 shrink-0 shadow-xs">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={media.mugshot}
+                        alt={item.full_name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                      <span className={`absolute bottom-1 right-1 w-3 h-3 rounded-full border-2 border-white ${
+                        isHighRisk ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'
+                      }`} />
+                    </div>
+
+                    <div className="flex-grow">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <span className="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                              {media.cctns_id}
+                            </span>
+                            <span className="text-[10px] font-bold text-emerald-600">
+                              ANPR: {media.confidence}
+                            </span>
+                          </div>
+                          <h4 className="text-lg font-bold text-slate-900 group-hover:text-red-700 transition-colors font-serif">
+                            {item.full_name}
+                          </h4>
+                          {item.alias && (
+                            <p className="text-xs text-slate-500 italic font-serif">Also known as: &quot;{item.alias}&quot;</p>
+                          )}
+                        </div>
+                        <span className={`px-2 py-1 rounded text-[9px] font-mono font-bold shrink-0 ${getRiskColor(item.risk_score)}`}>
+                          {getRiskLabel(item.risk_score)}
+                        </span>
                       </div>
-                      <span className={`px-2 py-1 rounded text-[9px] font-mono font-bold shrink-0 ${getRiskColor(item.risk_score)}`}>
-                        {getRiskLabel(item.risk_score)}
-                      </span>
                     </div>
                   </div>
-                </div>
 
                 {/* Detailed Info Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs mb-4 font-sans border-t border-slate-100 pt-4">
@@ -470,8 +493,9 @@ export default function InvestigatorWall({
                   View Complete Suspect Profile & Full History
                 </Link>
               </motion.div>
-            ))}
-          </div>
+            );
+          })}
+        </div>
         )}
       </div>
 
