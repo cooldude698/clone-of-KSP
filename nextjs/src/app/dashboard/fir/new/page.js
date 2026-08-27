@@ -82,31 +82,31 @@ export default function NewFIRPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-12">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-5">
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard/fir"
-            className="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-black hover:border-gray-300 transition-all"
+            className="p-2 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white transition-all shadow-xs"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
+            <h1 className="text-xl font-black text-zinc-950 dark:text-white tracking-tight flex items-center gap-2">
               <span>Register Official KSP FIR</span>
-              <span className="text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                20-Table ERD Compliant
+              <span className="text-[10px] font-mono font-bold tracking-widest px-2.5 py-0.5 rounded-md bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 uppercase">
+                ERD Compliant
               </span>
             </h1>
-            <p className="text-xs text-gray-500">
-              Karnataka State Police — Statutory Crime Incident & Case Registration Portal
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono">
+              Karnataka State Police — Statutory Incident & Case Registration Portal
             </p>
           </div>
         </div>
 
         {/* 18-Digit Crime No Preview Pill */}
         <div className="hidden sm:flex flex-col items-end">
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Generated Crime No (18 Digits)</span>
-          <span className="font-mono text-xs font-bold text-blue-700 bg-blue-50/80 px-3 py-1 rounded-lg border border-blue-200">
+          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider font-mono">Crime Number (18 Digits)</span>
+          <span className="font-mono text-xs font-black text-zinc-950 dark:text-white bg-zinc-100 dark:bg-zinc-800 px-3 py-1 rounded-lg border border-zinc-300 dark:border-zinc-700">
             {previewCrimeNo}
           </span>
         </div>
@@ -117,16 +117,16 @@ export default function NewFIRPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="p-8 rounded-3xl bg-white border border-emerald-200 shadow-sm text-center space-y-4"
+            className="p-8 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs text-center space-y-4"
           >
-            <div className="w-14 h-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
+            <div className="w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-950 dark:text-white flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-8 h-8" />
             </div>
-            <h2 className="text-lg font-bold text-gray-900">FIR Successfully Registered in KSP Data Store!</h2>
-            <p className="text-xs text-gray-500 max-w-md mx-auto">
-              Relational records committed to <code className="text-emerald-700 font-semibold">CaseMaster</code>, <code className="text-emerald-700 font-semibold">ComplainantDetails</code>, <code className="text-emerald-700 font-semibold">Accused</code>, and <code className="text-emerald-700 font-semibold">ActSectionAssociation</code>.
+            <h2 className="text-lg font-black text-zinc-950 dark:text-white">FIR Successfully Registered in KSP Data Store!</h2>
+            <p className="text-xs text-zinc-500 max-w-md mx-auto font-mono">
+              Relational records committed to CaseMaster, ComplainantDetails, Accused, and ActSectionAssociation.
             </p>
-            <div className="inline-block p-4 rounded-2xl bg-gray-50 border border-gray-200 font-mono text-xs text-gray-800">
+            <div className="inline-block p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 font-mono text-xs text-zinc-900 dark:text-zinc-100 text-left space-y-1">
               <p><strong>Crime No:</strong> {generatedCrimeNo}</p>
               <p><strong>Case No:</strong> {previewCaseNo}</p>
               <p><strong>Status:</strong> Under Investigation (Assigned to IO)</p>
@@ -134,36 +134,36 @@ export default function NewFIRPage() {
             <div className="pt-2 flex justify-center gap-3">
               <Link
                 href="/dashboard/fir"
-                className="px-5 py-2.5 rounded-xl bg-black text-white text-xs font-semibold hover:bg-gray-800 transition-all"
+                className="px-5 py-2.5 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold hover:opacity-90 transition-all"
               >
                 Return to FIR Registry
               </Link>
               <button
                 onClick={() => setSubmitted(false)}
-                className="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 transition-all"
+                className="px-5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs font-bold hover:bg-zinc-200 transition-all"
               >
                 Register Another FIR
               </button>
             </div>
           </motion.div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Section 1: Case Identity & Station Jurisdiction */}
-            <div className="p-6 rounded-3xl bg-white border border-gray-200/80 shadow-sm space-y-4">
-              <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
-                <Building2 className="w-4 h-4 text-blue-600" />
-                <h2 className="text-xs font-bold uppercase tracking-wider text-gray-900">
+            <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-4">
+              <div className="flex items-center gap-2 border-b border-zinc-100 dark:border-zinc-800 pb-3">
+                <Building2 className="w-4 h-4 text-zinc-950 dark:text-white" />
+                <h2 className="text-xs font-black uppercase tracking-wider text-zinc-950 dark:text-white font-mono">
                   1. Jurisdiction & Case Master Information
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono">
                 <div>
-                  <label className="block font-semibold text-gray-700 mb-1.5">Case Category Code</label>
+                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 font-sans">Case Category Code</label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-black/5"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium focus:outline-none"
                   >
                     <option value="1">1 — Regular FIR</option>
                     <option value="3">3 — Unnatural Death Report (UDR)</option>
@@ -173,11 +173,11 @@ export default function NewFIRPage() {
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-gray-700 mb-1.5">District Jurisdiction</label>
+                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 font-sans">District Jurisdiction</label>
                   <select
                     value={districtId}
                     onChange={(e) => setDistrictId(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-black/5"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium focus:outline-none"
                   >
                     <option value="443">District 0443 — Bengaluru Urban / City</option>
                     <option value="102">District 0102 — Mysuru District</option>
@@ -187,11 +187,11 @@ export default function NewFIRPage() {
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-gray-700 mb-1.5">Police Unit (Station)</label>
+                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 font-sans">Police Unit (Station)</label>
                   <select
                     value={unitId}
                     onChange={(e) => setUnitId(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-black/5"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium focus:outline-none"
                   >
                     <option value="6">Unit 0006 — Silk Board & Madiwala PS</option>
                     <option value="12">Unit 0012 — MG Road & Cubbon Park PS</option>
@@ -202,11 +202,11 @@ export default function NewFIRPage() {
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-gray-700 mb-1.5">Gravity of Offence</label>
+                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 font-sans">Gravity of Offence</label>
                   <select
                     value={gravity}
                     onChange={(e) => setGravity(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-black/5"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium focus:outline-none"
                   >
                     <option value="1">1 — Heinous (Murder, Armed Robbery, Kidnapping)</option>
                     <option value="2">2 — Non-Heinous (Theft, Simple Assault, Cheating)</option>
@@ -214,29 +214,29 @@ export default function NewFIRPage() {
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-gray-700 mb-1.5">Incident Date & Time</label>
+                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 font-sans">Incident Date & Time</label>
                   <div className="flex gap-2">
                     <input
                       type="date"
                       value={incidentDate}
                       onChange={(e) => setIncidentDate(e.target.value)}
-                      className="w-1/2 px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 text-xs focus:outline-none"
+                      className="w-1/2 px-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none font-mono"
                     />
                     <input
                       type="time"
                       value={incidentTime}
                       onChange={(e) => setIncidentTime(e.target.value)}
-                      className="w-1/2 px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 text-xs focus:outline-none"
+                      className="w-1/2 px-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none font-mono"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-gray-700 mb-1.5">Investigating Officer (IO)</label>
+                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 font-sans">Investigating Officer (IO)</label>
                   <select
                     value={ioId}
                     onChange={(e) => setIoId(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 font-medium focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium focus:outline-none"
                   >
                     <option value="1001">Insp. Vikram Sharma (KGID: KSP-4092)</option>
                     <option value="1002">Insp. Ananya Hegde (KGID: KSP-5120)</option>
@@ -248,41 +248,41 @@ export default function NewFIRPage() {
             </div>
 
             {/* Section 2: Complainant Details */}
-            <div className="p-6 rounded-3xl bg-white border border-gray-200/80 shadow-sm space-y-4">
-              <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
-                <User className="w-4 h-4 text-emerald-600" />
-                <h2 className="text-xs font-bold uppercase tracking-wider text-gray-900">
+            <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-4">
+              <div className="flex items-center gap-2 border-b border-zinc-100 dark:border-zinc-800 pb-3">
+                <User className="w-4 h-4 text-zinc-950 dark:text-white" />
+                <h2 className="text-xs font-black uppercase tracking-wider text-zinc-950 dark:text-white font-mono">
                   2. Complainant Details (ComplainantDetails Table)
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs font-mono">
                 <div className="sm:col-span-2">
-                  <label className="block font-semibold text-gray-700 mb-1.5">Complainant Full Name *</label>
+                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 font-sans">Complainant Full Name *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. Ramesh Chandra Murthy"
                     value={complainant.name}
                     onChange={(e) => setComplainant({ ...complainant, name: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none font-sans"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-gray-700 mb-1.5">Age (Years)</label>
+                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 font-sans">Age (Years)</label>
                   <input
                     type="number"
                     value={complainant.age}
                     onChange={(e) => setComplainant({ ...complainant, age: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-gray-700 mb-1.5">Gender</label>
+                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 font-sans">Gender</label>
                   <select
                     value={complainant.gender}
                     onChange={(e) => setComplainant({ ...complainant, gender: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none font-sans"
                   >
                     <option>Male</option>
                     <option>Female</option>
@@ -293,28 +293,28 @@ export default function NewFIRPage() {
             </div>
 
             {/* Section 3: Accused Roster (A1, A2...) */}
-            <div className="p-6 rounded-3xl bg-white border border-gray-200/80 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+            <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-4">
+              <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
                 <div className="flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-red-600" />
-                  <h2 className="text-xs font-bold uppercase tracking-wider text-gray-900">
-                    3. Accused Roster (Accused Table — PersonID A1/A2)
+                  <Shield className="w-4 h-4 text-zinc-950 dark:text-white" />
+                  <h2 className="text-xs font-black uppercase tracking-wider text-zinc-950 dark:text-white font-mono">
+                    3. Accused Persons Roster (Accused Table)
                   </h2>
                 </div>
                 <button
                   type="button"
                   onClick={addAccused}
-                  className="flex items-center gap-1 text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 px-2.5 py-1 rounded-lg border border-red-200"
+                  className="flex items-center gap-1 text-xs font-bold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 px-3 py-1 rounded-lg border border-zinc-200 dark:border-zinc-700 transition-all font-mono"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Add Co-Accused</span>
+                  <span>Add Accused</span>
                 </button>
               </div>
 
               <div className="space-y-3">
                 {accusedList.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-3 p-3 rounded-2xl bg-gray-50 border border-gray-200 text-xs">
-                    <span className="font-mono font-bold text-red-700 bg-red-100/70 px-2 py-1 rounded-lg">
+                  <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-xs">
+                    <span className="font-mono font-black text-zinc-950 dark:text-white bg-zinc-200 dark:bg-zinc-800 px-2 py-1 rounded-md">
                       {item.personId}
                     </span>
                     <input
@@ -326,7 +326,7 @@ export default function NewFIRPage() {
                         copy[idx].name = e.target.value;
                         setAccusedList(copy);
                       }}
-                      className="flex-1 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-900"
+                      className="flex-1 px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-sans"
                     />
                     <input
                       type="number"
@@ -337,7 +337,7 @@ export default function NewFIRPage() {
                         copy[idx].age = e.target.value;
                         setAccusedList(copy);
                       }}
-                      className="w-16 px-2 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-900 text-center"
+                      className="w-16 px-2 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 text-center font-mono"
                     />
                     <input
                       type="text"
@@ -348,13 +348,13 @@ export default function NewFIRPage() {
                         copy[idx].role = e.target.value;
                         setAccusedList(copy);
                       }}
-                      className="w-48 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-900"
+                      className="w-48 px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-sans"
                     />
                     {accusedList.length > 1 && (
                       <button
                         type="button"
                         onClick={() => removeAccused(idx)}
-                        className="p-1 text-gray-400 hover:text-red-600"
+                        className="p-1 text-zinc-400 hover:text-rose-500"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -365,18 +365,18 @@ export default function NewFIRPage() {
             </div>
 
             {/* Section 4: Legal Acts & Sections Framed */}
-            <div className="p-6 rounded-3xl bg-white border border-gray-200/80 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+            <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-4">
+              <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
                 <div className="flex items-center gap-2">
-                  <Scale className="w-4 h-4 text-purple-600" />
-                  <h2 className="text-xs font-bold uppercase tracking-wider text-gray-900">
-                    4. Statutory Acts & Sections Framed (ActSectionAssociation Table)
+                  <Scale className="w-4 h-4 text-zinc-950 dark:text-white" />
+                  <h2 className="text-xs font-black uppercase tracking-wider text-zinc-950 dark:text-white font-mono">
+                    4. Statutory Acts & Sections Framed (ActSectionAssociation)
                   </h2>
                 </div>
                 <button
                   type="button"
                   onClick={addActSection}
-                  className="flex items-center gap-1 text-xs font-bold text-purple-600 hover:text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-200"
+                  className="flex items-center gap-1 text-xs font-bold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 px-3 py-1 rounded-lg border border-zinc-200 dark:border-zinc-700 transition-all font-mono"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Add Section</span>
@@ -385,7 +385,7 @@ export default function NewFIRPage() {
 
               <div className="space-y-3">
                 {acts.map((actItem, idx) => (
-                  <div key={idx} className="flex items-center gap-3 p-3 rounded-2xl bg-gray-50 border border-gray-200 text-xs">
+                  <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-xs">
                     <select
                       value={actItem.act}
                       onChange={(e) => {
@@ -393,7 +393,7 @@ export default function NewFIRPage() {
                         copy[idx].act = e.target.value;
                         setActs(copy);
                       }}
-                      className="w-28 px-3 py-1.5 rounded-lg bg-white border border-gray-200 font-bold text-purple-700"
+                      className="w-28 px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 font-bold font-mono text-zinc-950 dark:text-white"
                     >
                       <option value="IPC">IPC / BNS</option>
                       <option value="NDPS">NDPS Act</option>
@@ -410,7 +410,7 @@ export default function NewFIRPage() {
                         copy[idx].section = e.target.value;
                         setActs(copy);
                       }}
-                      className="w-24 px-3 py-1.5 rounded-lg bg-white border border-gray-200 font-mono text-center font-bold"
+                      className="w-24 px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 font-mono text-center font-bold text-zinc-950 dark:text-white"
                     />
                     <input
                       type="text"
@@ -421,13 +421,13 @@ export default function NewFIRPage() {
                         copy[idx].desc = e.target.value;
                         setActs(copy);
                       }}
-                      className="flex-1 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-700"
+                      className="flex-1 px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-sans"
                     />
                     {acts.length > 1 && (
                       <button
                         type="button"
                         onClick={() => removeActSection(idx)}
-                        className="p-1 text-gray-400 hover:text-purple-600"
+                        className="p-1 text-zinc-400 hover:text-rose-500"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -438,56 +438,56 @@ export default function NewFIRPage() {
             </div>
 
             {/* Section 5: Coordinates & Brief Facts */}
-            <div className="p-6 rounded-3xl bg-white border border-gray-200/80 shadow-sm space-y-4">
-              <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
-                <MapPin className="w-4 h-4 text-amber-600" />
-                <h2 className="text-xs font-bold uppercase tracking-wider text-gray-900">
-                  5. Incident Location Coordinates & Brief Facts
+            <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-4">
+              <div className="flex items-center gap-2 border-b border-zinc-100 dark:border-zinc-800 pb-3">
+                <MapPin className="w-4 h-4 text-zinc-950 dark:text-white" />
+                <h2 className="text-xs font-black uppercase tracking-wider text-zinc-950 dark:text-white font-mono">
+                  5. Incident Location & Brief Facts Summary
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
                 <div>
-                  <label className="block font-semibold text-gray-700 mb-1.5">GPS Latitude Coordinate</label>
+                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 font-sans">GPS Latitude</label>
                   <input
                     type="text"
                     value={lat}
                     onChange={(e) => setLat(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 font-mono focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-gray-700 mb-1.5">GPS Longitude Coordinate</label>
+                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 font-sans">GPS Longitude</label>
                   <input
                     type="text"
                     value={lng}
                     onChange={(e) => setLng(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 font-mono focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none"
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block font-semibold text-gray-700 mb-1.5">Brief Facts / FIR Summary (BriefFacts Column)</label>
+                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 font-sans">Brief Statement of Facts</label>
                   <textarea
                     rows={4}
                     required
                     placeholder="Enter official brief statement of facts narrated by the complainant..."
                     value={briefFacts}
                     onChange={(e) => setBriefFacts(e.target.value)}
-                    className="w-full px-4 py-3 rounded-2xl bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none text-xs leading-relaxed"
+                    className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none text-xs leading-relaxed font-sans"
                   />
                 </div>
               </div>
             </div>
 
             {/* Submission Bar */}
-            <div className="flex items-center justify-between p-4 rounded-2xl bg-white border border-gray-200/80 shadow-sm">
-              <span className="text-xs text-gray-500 font-medium">
-                Record will be indexed in Catalyst Data Store & ANPR Watchlist.
+            <div className="flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs">
+              <span className="text-xs text-zinc-500 font-mono">
+                Record indexed in Catalyst Data Store & ANPR Watchlist.
               </span>
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-black text-white text-xs font-bold hover:bg-gray-800 disabled:opacity-50 shadow-sm transition-all cursor-pointer"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-xs font-black hover:opacity-90 disabled:opacity-50 shadow-xs transition-all cursor-pointer font-sans"
               >
                 {submitting ? (
                   <span>Registering FIR...</span>
