@@ -187,7 +187,6 @@ export default function SuspectWatchlistPage() {
             const officialId = s.suspect_id || media.cctns_id || `SUS-${rawId.slice(0, 4).toUpperCase()}`;
             const encodedSlug = encodeURIComponent(s.suspect_id || rawId);
             const risk = s.risk_score || s.risk || 60;
-            const isTracked = trackedSuspects.has(rawId) || trackedSuspects.has(s.suspect_id);
             const statusFormatted = formatStatus(s.status);
             const isAbsconding = statusFormatted.toLowerCase().includes('abscond');
             const alias = s.alias || media.alias;
@@ -197,115 +196,67 @@ export default function SuspectWatchlistPage() {
             return (
               <div
                 key={rawId}
-                className="group rounded-3xl bg-white dark:bg-[#18181B] border border-gray-200/90 dark:border-gray-800 p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200 flex flex-col justify-between h-full"
+                className="group rounded-2xl bg-white dark:bg-[#18181B] border border-gray-200/80 dark:border-gray-800 p-5 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-xs transition-all duration-150 flex flex-col justify-between"
               >
                 <div>
-                  {/* TOP ROW: Authentic Biometric Mugshot + Track Pill Button */}
-                  <div className="flex items-start justify-between gap-3 mb-4">
-                    <div className="flex items-center gap-3.5">
-                      {/* Realistic Mugshot with Tactical Overlay */}
-                      <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shrink-0 shadow-xs">
+                  {/* TOP ROW: Mugshot, Suspect Identity, and Risk Badge */}
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shrink-0">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={media.mugshot}
                           alt={s.name || 'Suspect'}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-cover"
                           loading="lazy"
                         />
-                        {/* Biometric Status Indicator */}
-                        <span className={`absolute bottom-1 right-1 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-[#18181B] ${
-                          isAbsconding ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'
-                        }`} />
                       </div>
 
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-mono text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-md">
-                            {officialId}
-                          </span>
-                          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5">
-                            <Camera className="w-3 h-3" /> {media.confidence}
-                          </span>
-                        </div>
-                        <h3 className="font-extrabold text-base text-gray-900 dark:text-white tracking-tight leading-snug group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors mt-0.5">
+                      <div className="min-w-0">
+                        <h3 className="font-bold text-base text-gray-900 dark:text-white tracking-tight leading-snug truncate max-w-[150px]">
                           {s.name || s.accused_name || 'Suspect Profile'}
                         </h3>
-                        {alias && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium italic">
-                            aka &ldquo;{alias}&rdquo;
-                          </p>
-                        )}
+                        <p className="text-xs text-gray-400 font-normal truncate max-w-[150px]">
+                          {alias ? `"${alias}"` : officialId} · <span className="font-mono">{officialId}</span>
+                        </p>
                       </div>
                     </div>
 
-                    <button
-                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleTrackSuspect(rawId); }}
-                      className={`flex items-center gap-1 px-3 py-1.5 rounded-full border text-[11px] font-bold transition-all cursor-pointer shrink-0 ${
-                        isTracked
-                          ? 'bg-black text-white dark:bg-white dark:text-black border-transparent shadow-xs'
-                          : 'bg-gray-50 dark:bg-gray-800/80 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      <span>{isTracked ? 'Tracked' : 'Track'}</span>
-                      <Bookmark className={`w-3.5 h-3.5 ${isTracked ? 'fill-current' : ''}`} />
-                    </button>
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0 ${
+                      risk >= 80
+                        ? 'bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400'
+                        : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
+                    }`}>
+                      {risk}% Risk
+                    </span>
                   </div>
 
-                  {/* Modus Operandi / Primary Crime Brief */}
-                  <div className="space-y-2.5 my-3">
-                    <div className="p-3 rounded-2xl bg-gray-50/80 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800/80 space-y-1">
-                      <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-gray-400">
-                        <span>Primary Offence</span>
-                        <span>{s.fir_count || s.total_cases || s.active_firs || 3} Linked FIRs</span>
-                      </div>
-                      <p className="text-xs font-bold text-gray-800 dark:text-gray-200 leading-snug">
-                        {primaryCrime}
-                      </p>
-                    </div>
-
-                    {/* Threat Assessment Gauge Bar */}
-                    <div>
-                      <div className="flex items-center justify-between text-[11px] font-bold mb-1">
-                        <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                          <ShieldAlert className="w-3.5 h-3.5 text-rose-500" />
-                          Recidivism Threat
-                        </span>
-                        <span className={`font-mono ${risk >= 80 ? 'text-rose-600 dark:text-rose-400' : 'text-amber-600 dark:text-amber-400'}`}>
-                          {risk}%
-                        </span>
-                      </div>
-                      <div className="w-full h-2 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all duration-500 ${
-                            risk >= 80 ? 'bg-rose-500' : risk >= 60 ? 'bg-amber-500' : 'bg-emerald-500'
-                          }`}
-                          style={{ width: `${risk}%` }}
-                        />
-                      </div>
-                    </div>
+                  {/* MIDDLE: Primary Crime & Status */}
+                  <div className="space-y-1 my-3">
+                    <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate">
+                      {primaryCrime}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                      <span className={`w-1.5 h-1.5 rounded-full ${isAbsconding ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`} />
+                      <span>{statusFormatted}</span>
+                      <span>·</span>
+                      <span>{s.fir_count || s.total_cases || s.active_firs || 3} Cases</span>
+                    </p>
                   </div>
                 </div>
 
-                {/* Bottom Row: Status / Last Sighted + View Dossier Button */}
-                <div className="pt-4 mt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                  <div className="min-w-0 pr-3">
-                    <div className="flex items-center gap-1.5">
-                      <span className={`w-2 h-2 rounded-full shrink-0 ${isAbsconding ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`} />
-                      <span className="text-xs font-extrabold text-gray-900 dark:text-white truncate">
-                        {statusFormatted}
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-gray-400 font-medium flex items-center gap-1 mt-0.5">
-                      <MapPin className="w-3 h-3 text-gray-400 shrink-0" />
-                      <span className="truncate max-w-[140px]">{lastLocation.split(',')[0]}</span>
-                    </div>
+                {/* BOTTOM ROW: Location & Action Link */}
+                <div className="pt-3.5 mt-2 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
+                  <div className="text-[11px] text-gray-400 font-medium flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                    <span className="truncate max-w-[140px]">{lastLocation.split(',')[0]}</span>
                   </div>
 
                   <Link
                     href={`/dashboard/suspect/${encodedSlug}`}
-                    className="px-4 py-2 rounded-full bg-black text-white dark:bg-white dark:text-black text-xs font-bold hover:opacity-90 active:scale-95 transition-all shadow-xs shrink-0 flex items-center gap-1 cursor-pointer"
+                    className="text-xs font-bold text-gray-900 dark:text-white hover:underline flex items-center gap-1 group-hover:translate-x-0.5 transition-transform"
                   >
-                    View Dossier
+                    View Dossier <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
               </div>

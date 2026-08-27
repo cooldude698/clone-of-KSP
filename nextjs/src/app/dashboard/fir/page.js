@@ -318,98 +318,87 @@ export default function FirRegistryPage() {
             const encodedId = encodeURIComponent(caseId);
             const isClosedOrChargesheeted = fir.status === 'Chargesheeted' || fir.status === 'chargesheeted' || fir.status === 'closed';
             const meta = getCrimeCardMeta(fir.crime_type, caseId);
-            const isSaved = savedCases.has(caseId);
             const accusedName = fir.accused_name || fir.suspect_name;
             const suspectMedia = accusedName ? getSuspectMedia(accusedName) : null;
-            const rawDescription = fir.description || 'FIR complaint registered under relevant IPC/BNS legal sections.';
+            const rawDescription = fir.description || 'FIR complaint registered under relevant legal sections.';
             const briefSummary = rawDescription.split('\n')[0].replace(/FIR registered at .* for /i, '');
 
             return (
               <div
                 key={caseId}
-                className="group rounded-3xl bg-white dark:bg-[#18181B] border border-gray-200/90 dark:border-gray-800 p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200 flex flex-col justify-between h-full"
+                className="group rounded-2xl bg-white dark:bg-[#18181B] border border-gray-200/80 dark:border-gray-800 p-5 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-xs transition-all duration-150 flex flex-col justify-between"
               >
                 <div>
-                  {/* TOP ROW: Crime Category Badge + Case Status */}
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-[10px] font-extrabold uppercase tracking-wider bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-2.5 py-1 rounded-lg border border-gray-200/80 dark:border-gray-700">
-                        {meta.ipc}
-                      </span>
-                      <span className="text-[11px] font-bold text-gray-600 dark:text-gray-400">
-                        {meta.badge}
-                      </span>
+                  {/* TOP ROW: Header with Portrait/Icon, Case ID, and Minimal Status */}
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div className="flex items-center gap-3">
+                      {suspectMedia && accusedName ? (
+                        <div className="relative w-11 h-11 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shrink-0">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={suspectMedia.mugshot}
+                            alt={accusedName}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-11 h-11 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 flex items-center justify-center shrink-0 border border-gray-200/80 dark:border-gray-700 font-mono text-[11px] font-bold">
+                          {meta.ipc.split(' ')[0] || 'FIR'}
+                        </div>
+                      )}
+
+                      <div className="min-w-0">
+                        <span className="font-mono text-xs font-bold text-gray-900 dark:text-white block truncate max-w-[150px]">
+                          {caseId}
+                        </span>
+                        <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate max-w-[150px]">
+                          {fir.police_station || fir.district_name || 'KSP Station'}
+                        </p>
+                      </div>
                     </div>
 
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wide uppercase flex items-center gap-1 ${
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold shrink-0 ${
                       isClosedOrChargesheeted
-                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
-                        : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400'
+                        : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
                     }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${isClosedOrChargesheeted ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`} />
+                      <span className={`w-1.5 h-1.5 rounded-full ${isClosedOrChargesheeted ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                       {fir.status || 'Under Investigation'}
                     </span>
                   </div>
 
-                  {/* Case Number & Station Meta */}
-                  <div className="space-y-1 mt-2">
-                    <div className="flex items-center gap-1.5 text-xs text-gray-400 font-medium">
-                      <span className="font-bold font-mono text-gray-900 dark:text-white">{caseId}</span>
-                      <span>·</span>
-                      <span className="truncate max-w-[140px]">{fir.police_station || fir.district_name || 'KSP Command'}</span>
-                    </div>
-
-                    <h3 className="font-extrabold text-base text-gray-900 dark:text-white tracking-tight leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors pt-1">
+                  {/* MIDDLE: Crime Title, Accused Name, and Brief Summary */}
+                  <div className="space-y-1.5 my-3">
+                    <h3 className="font-bold text-base text-gray-900 dark:text-white tracking-tight">
                       {fir.crime_type || 'General Offence'}
                     </h3>
+                    
+                    {accusedName && (
+                      <p className="text-xs text-gray-600 dark:text-gray-300">
+                        Accused: <span className="font-semibold text-gray-900 dark:text-white">{accusedName}</span>
+                        {suspectMedia?.alias ? <span className="text-gray-400 font-normal"> ({suspectMedia.alias})</span> : ''}
+                      </p>
+                    )}
 
-                    <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
                       {briefSummary}
                     </p>
                   </div>
-
-                  {/* Suspect Photo & Identification Snippet */}
-                  {suspectMedia && accusedName && (
-                    <div className="mt-3.5 p-2.5 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800 flex items-center gap-3">
-                      <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-gray-200 shrink-0 border border-gray-300 dark:border-gray-700">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={suspectMedia.mugshot}
-                          alt={accusedName}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Accused Suspect</span>
-                          <span className="text-[9px] font-mono font-bold text-emerald-600 dark:text-emerald-400">ANPR Matched</span>
-                        </div>
-                        <p className="text-xs font-bold text-gray-900 dark:text-white truncate">
-                          {accusedName} {suspectMedia.alias ? `("${suspectMedia.alias}")` : ''}
-                        </p>
-                      </div>
-                    </div>
-                  )}
                 </div>
 
-                {/* Bottom Row: Assigned IO / Location + View Case Button */}
-                <div className="pt-4 mt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                  <div className="min-w-0 pr-2">
-                    <div className="text-[11px] font-bold text-gray-700 dark:text-gray-300 truncate">
-                      {fir.investigation_office || 'IO: Inspector In-Charge'}
-                    </div>
-                    <div className="text-[10px] text-gray-400 font-medium flex items-center gap-1 mt-0.5">
-                      <MapPin className="w-3 h-3 text-gray-400 shrink-0" />
-                      <span className="truncate max-w-[130px]">{fir.location_name || fir.district_name || 'Bengaluru'}</span>
-                    </div>
+                {/* BOTTOM ROW: Clean Location & Action Link */}
+                <div className="pt-3.5 mt-2 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
+                  <div className="text-[11px] text-gray-400 font-medium flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                    <span className="truncate max-w-[150px]">{fir.location_name || fir.district_name || 'Bengaluru'}</span>
                   </div>
 
                   <Link
                     href={`/dashboard/fir/${encodedId}`}
-                    className="px-4 py-2 rounded-full bg-black text-white dark:bg-white dark:text-black text-xs font-bold hover:opacity-90 active:scale-95 transition-all shadow-xs shrink-0 flex items-center gap-1 cursor-pointer"
+                    className="text-xs font-bold text-gray-900 dark:text-white hover:underline flex items-center gap-1 group-hover:translate-x-0.5 transition-transform"
                   >
-                    View Case
+                    View Case <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
               </div>
