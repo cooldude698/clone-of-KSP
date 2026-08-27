@@ -227,23 +227,24 @@ export default function FirRegistryPage() {
   const districts = ['ALL', ...new Set(safeFirs.map(f => f?.district_name || f?.district).filter(Boolean))];
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6 text-gray-900 dark:text-white">
+    <div className="w-full max-w-7xl mx-auto space-y-6 text-zinc-900 dark:text-zinc-50 font-sans">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 dark:border-gray-800 pb-5">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-xs">
-            <FileText className="w-6 h-6" />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-5">
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 flex items-center justify-center font-bold shadow-xs">
+            <FileText className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+            <h1 className="text-xl font-black text-zinc-950 dark:text-white tracking-tight">
               FIR Case Registry
             </h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              Official Karnataka State Police First Information Records & Live Investigation Files
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 font-mono">
+              Karnataka State Police Intelligence Records · Live CCTNS Datastore
             </p>
           </div>
         </div>
 
+<<<<<<< HEAD
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard/fir/new"
@@ -252,42 +253,45 @@ export default function FirRegistryPage() {
             <Plus className="w-4 h-4" />
             Register Official FIR
           </Link>
+=======
+        <div className="flex items-center gap-2.5">
+>>>>>>> 5414b6e (style: replace AI-slop pastel colors with bold, high-contrast, Swiss-inspired monochrome editorial palette)
           <button
             onClick={() => setIsOcrOpen(true)}
-            className="px-4 py-2.5 rounded-2xl bg-black text-white dark:bg-white dark:text-black font-bold text-xs hover:opacity-90 shadow-sm transition-all flex items-center gap-2 cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 font-bold text-xs hover:opacity-90 transition-all flex items-center gap-2 cursor-pointer shadow-xs"
           >
             <ImageIcon className="w-4 h-4" />
-            Scan FIR with Zia OCR
+            Scan FIR with OCR
           </button>
           <Link
             href="/dashboard/chat"
-            className="px-4 py-2.5 rounded-2xl bg-white dark:bg-[#18181B] border border-gray-200/80 dark:border-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold text-xs transition-all flex items-center gap-2 shadow-xs"
+            className="px-4 py-2 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 hover:border-zinc-900 dark:hover:border-zinc-100 font-bold text-xs transition-all flex items-center gap-2 shadow-xs"
           >
-            <Shield className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+            <Shield className="w-4 h-4 text-zinc-900 dark:text-white" />
             Ask DRISHTI AI
           </Link>
         </div>
       </div>
 
       {/* Filters & Live Search */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white dark:bg-[#18181B] p-4 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white dark:bg-zinc-900 p-3.5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-xs">
         <form onSubmit={handleSearchSubmit} className="relative">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
           <input
             type="text"
-            placeholder="Data Store Search: FIR #, crime, location..."
+            placeholder="Search FIR #, crime type, police station..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 text-xs rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-200/80 dark:border-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/5 dark:focus:ring-white/10 font-mono transition-all"
+            className="w-full pl-10 pr-4 py-2 text-xs rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-950 dark:focus:border-zinc-50 font-mono transition-all"
           />
         </form>
 
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-gray-400" />
+          <Filter className="w-4 h-4 text-zinc-400" />
           <select
             value={districtFilter}
             onChange={e => setDistrictFilter(e.target.value)}
-            className="w-full px-3.5 py-2.5 text-xs rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-200/80 dark:border-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-black/5 dark:focus:ring-white/10 font-medium transition-all"
+            className="w-full px-3 py-2 text-xs rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-950 dark:focus:border-zinc-50 font-medium transition-all"
           >
             {districts.map(d => (
               <option key={d} value={d}>{d === 'ALL' ? 'All Districts' : d}</option>
@@ -299,7 +303,7 @@ export default function FirRegistryPage() {
           <select
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
-            className="w-full px-3.5 py-2.5 text-xs rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-200/80 dark:border-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-black/5 dark:focus:ring-white/10 font-medium transition-all"
+            className="w-full px-3 py-2 text-xs rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-950 dark:focus:border-zinc-50 font-medium transition-all"
           >
             <option value="ALL">All Case Statuses</option>
             <option value="Under Investigation">Under Investigation</option>
@@ -311,15 +315,15 @@ export default function FirRegistryPage() {
 
       {/* List */}
       {loading ? (
-        <div className="py-16 text-center text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2 font-medium text-xs">
-          <RefreshCw className="w-4 h-4 animate-spin text-blue-500" /> Querying Catalyst Data Store...
+        <div className="py-16 text-center text-zinc-500 flex items-center justify-center gap-2 font-mono text-xs">
+          <RefreshCw className="w-4 h-4 animate-spin text-zinc-900 dark:text-white" /> Querying KSP Intelligence Datastore...
         </div>
       ) : filtered.length === 0 ? (
-        <div className="py-16 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-[#18181B] rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm text-sm">
+        <div className="py-16 text-center text-zinc-500 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-xs font-mono">
           No FIR records matched your search parameters.
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map(fir => {
             const caseId = fir.case_number || fir.id || 'FIR-2026-UNKNOWN';
             const encodedId = encodeURIComponent(caseId);
@@ -333,15 +337,14 @@ export default function FirRegistryPage() {
             return (
               <div
                 key={caseId}
-                className="group rounded-2xl bg-white dark:bg-[#18181B] border border-gray-200/80 dark:border-gray-800 p-5 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-xs transition-all duration-150 flex flex-col justify-between"
+                className="group rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all duration-150 flex flex-col justify-between"
               >
                 <div>
-<<<<<<< Updated upstream
                   {/* TOP ROW: Header with Portrait/Icon, Case ID, and Minimal Status */}
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="flex items-center gap-3">
                       {suspectMedia && accusedName ? (
-                        <div className="relative w-11 h-11 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shrink-0">
+                        <div className="relative w-11 h-11 rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 shrink-0">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={suspectMedia.mugshot}
@@ -351,79 +354,56 @@ export default function FirRegistryPage() {
                           />
                         </div>
                       ) : (
-                        <div className="w-11 h-11 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 flex items-center justify-center shrink-0 border border-gray-200/80 dark:border-gray-700 font-mono text-[11px] font-bold">
+                        <div className="w-11 h-11 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700 font-mono text-[11px] font-bold">
                           {meta.ipc.split(' ')[0] || 'FIR'}
                         </div>
                       )}
 
                       <div className="min-w-0">
-                        <span className="font-mono text-xs font-bold text-gray-900 dark:text-white block truncate max-w-[150px]">
-                          {caseId}
+                        <span className="font-mono text-xs font-black text-zinc-950 dark:text-white block truncate max-w-[150px]">
+                          {fir.crime_no || caseId}
                         </span>
-                        <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate max-w-[150px]">
+                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate max-w-[150px] font-mono">
                           {fir.police_station || fir.district_name || 'KSP Station'}
                         </p>
                       </div>
                     </div>
 
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold shrink-0 ${
-                      isClosedOrChargesheeted
-                        ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400'
-                        : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
-                    }`}>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-[10px] font-bold uppercase tracking-wider shrink-0">
                       <span className={`w-1.5 h-1.5 rounded-full ${isClosedOrChargesheeted ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                      {fir.status || 'Under Investigation'}
-=======
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <div className="space-y-0.5">
-                      <span className="font-mono text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200 block w-fit">
-                        {fir.crime_no || caseId}
-                      </span>
-                      {fir.crime_no && (
-                        <span className="text-[10px] text-gray-400 font-mono pl-1 block">
-                          Case #{caseId}
-                        </span>
-                      )}
-                    </div>
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                      fir.status === 'Chargesheeted' || fir.status === 'chargesheeted'
-                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                        : 'bg-amber-50 text-amber-700 border border-amber-200'
-                    }`}>
                       {fir.case_category || fir.status || 'Under Investigation'}
->>>>>>> Stashed changes
                     </span>
                   </div>
 
                   {/* MIDDLE: Crime Title, Accused Name, and Brief Summary */}
                   <div className="space-y-1.5 my-3">
-                    <h3 className="font-bold text-base text-gray-900 dark:text-white tracking-tight">
+                    <h3 className="font-extrabold text-base text-zinc-950 dark:text-white tracking-tight">
                       {fir.crime_type || 'General Offence'}
                     </h3>
                     
                     {accusedName && (
-                      <p className="text-xs text-gray-600 dark:text-gray-300">
-                        Accused: <span className="font-semibold text-gray-900 dark:text-white">{accusedName}</span>
-                        {suspectMedia?.alias ? <span className="text-gray-400 font-normal"> ({suspectMedia.alias})</span> : ''}
+                      <p className="text-xs text-zinc-600 dark:text-zinc-300">
+                        Accused: <span className="font-bold text-zinc-950 dark:text-white">{accusedName}</span>
+                        {suspectMedia?.alias ? <span className="text-zinc-400 font-normal"> ({suspectMedia.alias})</span> : ''}
                       </p>
                     )}
 
-                    <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
                       {briefSummary}
                     </p>
                   </div>
                 </div>
 
                 {/* BOTTOM ROW: Clean Location & Action Link */}
-                <div className="pt-3.5 mt-2 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
-                  <div className="text-[11px] text-gray-400 font-medium flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                <div className="pt-3.5 mt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                  <div className="text-[11px] text-zinc-500 font-mono flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
                     <span className="truncate max-w-[150px]">{fir.location_name || fir.district_name || 'Bengaluru'}</span>
                   </div>
 
                   <Link
                     href={`/dashboard/fir/${encodedId}`}
-                    className="text-xs font-bold text-gray-900 dark:text-white hover:underline flex items-center gap-1 group-hover:translate-x-0.5 transition-transform"
+                    className="text-xs font-black text-zinc-950 dark:text-white hover:underline flex items-center gap-1 group-hover:translate-x-0.5 transition-transform"
                   >
                     View Case <ArrowRight className="w-3 h-3" />
                   </Link>

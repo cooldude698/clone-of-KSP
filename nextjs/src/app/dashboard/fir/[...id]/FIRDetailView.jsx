@@ -759,20 +759,20 @@ function DetailsTab({ fir, detail }) {
         const accusedMedia = getSuspectMedia(detail.accused_name || detail.accused_alias);
         return (
           <section className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]/50 overflow-hidden shadow-sm">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]/50 bg-[var(--surface-0)]">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">
               <div className="flex items-center gap-2.5">
-                <Users className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-                <h3 className="font-bold text-[var(--text-primary)] text-xs uppercase tracking-wider font-heading">
+                <Users className="w-4 h-4 text-zinc-950 dark:text-white" />
+                <h3 className="font-black text-zinc-950 dark:text-white text-xs uppercase tracking-wider font-mono">
                   Primary Accused / Suspect Dossier
                 </h3>
               </div>
-              <span className="text-[10px] font-bold text-rose-600 bg-rose-50 dark:bg-rose-900/20 px-2.5 py-0.5 rounded border border-rose-300 dark:border-rose-700 uppercase">
+              <span className="text-[10px] font-mono font-bold text-white bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-950 px-2.5 py-0.5 rounded uppercase tracking-wider">
                 {detail.accused_status}
               </span>
             </div>
             <div className="p-5">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-                <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shrink-0 shadow-xs">
+                <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 border-2 border-zinc-300 dark:border-zinc-700 shrink-0 shadow-xs">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={accusedMedia.mugshot}
@@ -785,24 +785,24 @@ function DetailsTab({ fir, detail }) {
 
                 <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 flex-1">
                   <div>
-                    <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Accused Name</dt>
-                    <dd className="text-sm font-extrabold text-[var(--text-primary)]">{detail.accused_name}</dd>
-                    <span className="text-[10px] font-mono font-bold text-emerald-600">ANPR: {accusedMedia.confidence}</span>
+                    <dt className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-400 mb-1">Accused Name</dt>
+                    <dd className="text-sm font-black text-zinc-950 dark:text-white">{detail.accused_name}</dd>
+                    <span className="text-[10px] font-mono font-bold text-zinc-500">ANPR: {accusedMedia.confidence}</span>
                   </div>
                   <div>
-                    <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Known Alias</dt>
-                    <dd className="text-sm font-bold text-rose-600 dark:text-rose-400 font-mono">&quot;{detail.accused_alias || accusedMedia.alias}&quot;</dd>
+                    <dt className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-400 mb-1">Known Alias</dt>
+                    <dd className="text-sm font-bold text-zinc-700 dark:text-zinc-300 font-mono">&quot;{detail.accused_alias || accusedMedia.alias}&quot;</dd>
                   </div>
                   <div>
-                    <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Risk Score</dt>
-                    <dd className="text-sm font-extrabold text-rose-600">{detail.accused_risk} / 100</dd>
+                    <dt className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-400 mb-1">Risk Score</dt>
+                    <dd className="text-sm font-black text-rose-600 dark:text-rose-400 font-mono">{detail.accused_risk}% Threat</dd>
                   </div>
                   <div>
-                    <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Action</dt>
+                    <dt className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-400 mb-1">Action</dt>
                     <dd className="text-xs">
                       <Link
                         href={`/dashboard/suspect/${detail.accused_name.toLowerCase().replace(/\s+/g, '-')}`}
-                        className="font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                        className="font-black text-zinc-950 dark:text-white hover:underline flex items-center gap-1"
                       >
                         Open Full Dossier →
                       </Link>
