@@ -244,24 +244,20 @@ export default function FirRegistryPage() {
           </div>
         </div>
 
-<<<<<<< HEAD
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2.5">
           <Link
             href="/dashboard/fir/new"
-            className="px-4 py-2 text-sm font-bold rounded-xl bg-black hover:bg-gray-800 text-white shadow-md transition-all flex items-center gap-2"
+            className="px-4 py-2 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 font-bold text-xs hover:opacity-90 transition-all flex items-center gap-2 shadow-xs cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            Register Official FIR
+            Register FIR
           </Link>
-=======
-        <div className="flex items-center gap-2.5">
->>>>>>> 5414b6e (style: replace AI-slop pastel colors with bold, high-contrast, Swiss-inspired monochrome editorial palette)
           <button
             onClick={() => setIsOcrOpen(true)}
-            className="px-4 py-2 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 font-bold text-xs hover:opacity-90 transition-all flex items-center gap-2 cursor-pointer shadow-xs"
+            className="px-4 py-2 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 hover:border-zinc-900 dark:hover:border-zinc-100 font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-xs"
           >
             <ImageIcon className="w-4 h-4" />
-            Scan FIR with OCR
+            Scan with OCR
           </button>
           <Link
             href="/dashboard/chat"
