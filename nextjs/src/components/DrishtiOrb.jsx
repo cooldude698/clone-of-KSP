@@ -254,7 +254,7 @@ const DrishtiOrb = ({
                   </button>
                 </div>
                 <p className="text-xs text-white/90 italic font-medium leading-relaxed">
-                  "{liveTranscript}"
+                  &quot;{liveTranscript}&quot;
                 </p>
               </div>
             )}
@@ -269,12 +269,13 @@ const DrishtiOrb = ({
                   <button
                     onClick={handleDismissBubble}
                     className="text-white/40 hover:text-white hover:bg-white/10 p-1 rounded-full cursor-pointer"
+                    title="Dismiss"
                   >
                     ✕
                   </button>
                 </div>
                 <p className="text-xs text-white font-medium mb-3 leading-relaxed">
-                  "{pendingTranscript}"
+                  &quot;{pendingTranscript}&quot;
                 </p>
                 <div className="flex items-center gap-2">
                   <button

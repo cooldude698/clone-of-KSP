@@ -45,30 +45,34 @@
   ],
   "suspects": [
     {
+      "suspect_id": "SUS-8842",
       "name": "Ramesh Kumar",
       "accused_name": "Ramesh Kumar",
-      "alias": "Vicky Blade / Shadow Vicky",
-      "risk_score": 88,
+      "alias": "Bullet Ramesh",
+      "risk_score": 94,
       "status": "Active Absconding",
       "district": "Bengaluru Urban",
       "district_name": "Bengaluru Urban",
-      "active_firs": 1,
+      "active_firs": 3,
       "primary_crime": "Vehicle Theft",
       "last_known_location": "Silk Board TTMC Parking Bay 3, Hosur Main Road, Bengaluru",
       "cases": [
-        "FIR-2026-BL-8842"
+        "FIR-2026-BL-8842",
+        "FIR-2026-BL-4921",
+        "FIR-2026-BL-1104"
       ],
       "police_station": "Madiwala PS / Silk Board TTMC Command"
     },
     {
+      "suspect_id": "SUS-9104",
       "name": "Vikram Malhotra",
       "accused_name": "Vikram Malhotra",
-      "alias": "Vicky Blade / Shadow Vicky",
+      "alias": "Vicky Blade",
       "risk_score": 88,
       "status": "Active Absconding",
       "district": "Bengaluru Urban",
       "district_name": "Bengaluru Urban",
-      "active_firs": 1,
+      "active_firs": 2,
       "primary_crime": "Cyber Fraud & Extortion",
       "last_known_location": "ITPB Main Road, Whitefield Tech Park Corridor, Bengaluru",
       "cases": [

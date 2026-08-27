@@ -10,12 +10,80 @@ import {
 import { fetchWithFallback } from '@/lib/fetch-with-fallback';
 import { DEMO_FIRS } from '@/lib/demo-data';
 
+// Crime icons & color scheme mapping for stylish modern cards
+import {
+  Car, Laptop, ShieldAlert, Home, Activity, Bookmark
+} from 'lucide-react';
+
+function getCrimeCardMeta(crimeType = '', firId = '') {
+  const t = (crimeType || '').toLowerCase();
+  if (t.includes('vehicle') || t.includes('theft') || t.includes('motorcycle')) {
+    return {
+      icon: Car,
+      iconBg: 'bg-blue-50 dark:bg-blue-950/60',
+      iconBorder: 'border-blue-100 dark:border-blue-900/60',
+      iconText: 'text-blue-600 dark:text-blue-400',
+      ipc: 'IPC 379 / BNS 303',
+      badge: 'Vehicle Offence'
+    };
+  }
+  if (t.includes('cyber') || t.includes('fraud') || t.includes('phishing') || t.includes('online')) {
+    return {
+      icon: Laptop,
+      iconBg: 'bg-indigo-50 dark:bg-indigo-950/60',
+      iconBorder: 'border-indigo-100 dark:border-indigo-900/60',
+      iconText: 'text-indigo-600 dark:text-indigo-400',
+      ipc: 'IT Act 66D / IPC 420',
+      badge: 'Cyber Division'
+    };
+  }
+  if (t.includes('robbery') || t.includes('chain') || t.includes('assault') || t.includes('extortion')) {
+    return {
+      icon: ShieldAlert,
+      iconBg: 'bg-rose-50 dark:bg-rose-950/60',
+      iconBorder: 'border-rose-100 dark:border-rose-900/60',
+      iconText: 'text-rose-600 dark:text-rose-400',
+      ipc: 'IPC 392 / IPC 324',
+      badge: 'Urgent Crime'
+    };
+  }
+  if (t.includes('burglary') || t.includes('house') || t.includes('trespass')) {
+    return {
+      icon: Home,
+      iconBg: 'bg-amber-50 dark:bg-amber-950/60',
+      iconBorder: 'border-amber-100 dark:border-amber-900/60',
+      iconText: 'text-amber-600 dark:text-amber-400',
+      ipc: 'IPC 454 / IPC 380',
+      badge: 'Property Crime'
+    };
+  }
+  if (t.includes('drug') || t.includes('narcotics') || t.includes('ndps')) {
+    return {
+      icon: AlertCircle,
+      iconBg: 'bg-purple-50 dark:bg-purple-950/60',
+      iconBorder: 'border-purple-100 dark:border-purple-900/60',
+      iconText: 'text-purple-600 dark:text-purple-400',
+      ipc: 'NDPS Act Sec 21',
+      badge: 'Narcotics Wing'
+    };
+  }
+  return {
+    icon: Activity,
+    iconBg: 'bg-teal-50 dark:bg-teal-950/60',
+    iconBorder: 'border-teal-100 dark:border-teal-900/60',
+    iconText: 'text-teal-600 dark:text-teal-400',
+    ipc: 'IPC 279 / 337',
+    badge: 'Traffic / Law & Order'
+  };
+}
+
 export default function FirRegistryPage() {
   const [firs, setFirs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [districtFilter, setDistrictFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [savedCases, setSavedCases] = useState(new Set(['FIR-2026-BL-8842', 'FIR-2026-BL-9104']));
 
   // OCR Modal & Stratus Upload State
   const [isOcrOpen, setIsOcrOpen] = useState(false);
@@ -24,6 +92,15 @@ export default function FirRegistryPage() {
   const [stratusUrl, setStratusUrl] = useState('');
   const [uploadStatus, setUploadStatus] = useState('');
   const fileInputRef = useRef(null);
+
+  const toggleSaveCase = (caseId) => {
+    setSavedCases(prev => {
+      const next = new Set(prev);
+      if (next.has(caseId)) next.delete(caseId);
+      else next.add(caseId);
+      return next;
+    });
+  };
 
   useEffect(() => {
     async function loadFirs() {
@@ -149,57 +226,60 @@ export default function FirRegistryPage() {
   const districts = ['ALL', ...new Set(safeFirs.map(f => f?.district_name || f?.district).filter(Boolean))];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-6 text-gray-900 dark:text-white">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--border)] pb-5">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
-              <FileText className="w-6 h-6" />
-            </span>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-[var(--foreground)]">FIR Case Registry</h1>
-              <p className="text-sm text-[var(--muted-foreground)]">Official Karnataka State Police First Information Records & Live Investigation Files</p>
-            </div>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 dark:border-gray-800 pb-5">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-xs">
+            <FileText className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+              FIR Case Registry
+            </h1>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              Official Karnataka State Police First Information Records & Live Investigation Files
+            </p>
           </div>
         </div>
+
         <div className="flex items-center gap-3">
           <button
             onClick={() => setIsOcrOpen(true)}
-            className="px-4 py-2 text-sm font-bold rounded-xl bg-blue-600 hover:bg-blue-500 text-white shadow-md transition-all flex items-center gap-2"
+            className="px-4 py-2.5 rounded-2xl bg-black text-white dark:bg-white dark:text-black font-bold text-xs hover:opacity-90 shadow-sm transition-all flex items-center gap-2 cursor-pointer"
           >
             <ImageIcon className="w-4 h-4" />
             Scan FIR with Zia OCR
           </button>
           <Link
             href="/dashboard/chat"
-            className="px-4 py-2 text-sm font-medium rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-2)] transition-all flex items-center gap-2"
+            className="px-4 py-2.5 rounded-2xl bg-white dark:bg-[#18181B] border border-gray-200/80 dark:border-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold text-xs transition-all flex items-center gap-2 shadow-xs"
           >
-            <Shield className="w-4 h-4 text-blue-400" />
+            <Shield className="w-4 h-4 text-blue-500 dark:text-blue-400" />
             Ask DRISHTI AI
           </Link>
         </div>
       </div>
 
       {/* Filters & Live Search */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[var(--surface-1)] p-4 rounded-2xl border border-[var(--border)] shadow-sm">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white dark:bg-[#18181B] p-4 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
         <form onSubmit={handleSearchSubmit} className="relative">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
           <input
             type="text"
             placeholder="Data Store Search: FIR #, crime, location..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-blue-500/30 font-mono"
+            className="w-full pl-10 pr-4 py-2.5 text-xs rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-200/80 dark:border-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/5 dark:focus:ring-white/10 font-mono transition-all"
           />
         </form>
 
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-[var(--muted-foreground)]" />
+          <Filter className="w-4 h-4 text-gray-400" />
           <select
             value={districtFilter}
             onChange={e => setDistrictFilter(e.target.value)}
-            className="w-full px-3 py-2 text-sm rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)] focus:outline-none"
+            className="w-full px-3.5 py-2.5 text-xs rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-200/80 dark:border-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-black/5 dark:focus:ring-white/10 font-medium transition-all"
           >
             {districts.map(d => (
               <option key={d} value={d}>{d === 'ALL' ? 'All Districts' : d}</option>
@@ -211,7 +291,7 @@ export default function FirRegistryPage() {
           <select
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
-            className="w-full px-3 py-2 text-sm rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)] focus:outline-none"
+            className="w-full px-3.5 py-2.5 text-xs rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-200/80 dark:border-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-black/5 dark:focus:ring-white/10 font-medium transition-all"
           >
             <option value="ALL">All Case Statuses</option>
             <option value="Under Investigation">Under Investigation</option>
@@ -223,58 +303,99 @@ export default function FirRegistryPage() {
 
       {/* List */}
       {loading ? (
-        <div className="py-16 text-center text-[var(--muted-foreground)] flex items-center justify-center gap-2">
-          <RefreshCw className="w-5 h-5 animate-spin text-blue-500" /> Querying Catalyst Data Store...
+        <div className="py-16 text-center text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2 font-medium text-xs">
+          <RefreshCw className="w-4 h-4 animate-spin text-blue-500" /> Querying Catalyst Data Store...
         </div>
       ) : filtered.length === 0 ? (
-        <div className="py-16 text-center text-[var(--muted-foreground)] bg-[var(--surface-1)] rounded-2xl border border-[var(--border)]">
+        <div className="py-16 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-[#18181B] rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm text-sm">
           No FIR records matched your search parameters.
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map(fir => {
             const caseId = fir.case_number || fir.id || 'FIR-2026-UNKNOWN';
             const encodedId = encodeURIComponent(caseId);
+            const isClosedOrChargesheeted = fir.status === 'Chargesheeted' || fir.status === 'closed';
+            const meta = getCrimeCardMeta(fir.crime_type, caseId);
+            const Icon = meta.icon;
+            const isSaved = savedCases.has(caseId);
 
             return (
-              <Link
+              <div
                 key={caseId}
-                href={`/dashboard/fir/${encodedId}`}
-                className="group p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 hover:shadow-lg transition-all flex flex-col justify-between"
+                className="group rounded-[32px] bg-white dark:bg-[#18181B] border border-gray-100 dark:border-gray-800 p-6 sm:p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none hover:shadow-[0_16px_40px_rgb(0,0,0,0.08)] transition-all duration-300 flex flex-col justify-between h-full"
               >
                 <div>
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <span className="font-mono text-xs font-bold text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20">
-                      {caseId}
-                    </span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                      fir.status === 'Chargesheeted'
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                        : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                    }`}>
-                      {fir.status || 'Under Investigation'}
-                    </span>
+                  {/* TOP ROW: Circular Avatar + Save Button */}
+                  <div className="flex items-center justify-between mb-5">
+                    <div className={`w-12 h-12 rounded-full ${meta.iconBg} border ${meta.iconBorder} flex items-center justify-center ${meta.iconText} shadow-xs`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <button
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleSaveCase(caseId); }}
+                      className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-[11px] font-bold transition-all cursor-pointer ${
+                        isSaved
+                          ? 'bg-black text-white dark:bg-white dark:text-black border-transparent shadow-xs'
+                          : 'bg-gray-50 dark:bg-gray-800/80 border-gray-200/80 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      <span>{isSaved ? 'Saved' : 'Save'}</span>
+                      <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-current' : ''}`} />
+                    </button>
                   </div>
 
-                  <h3 className="font-semibold text-base text-[var(--foreground)] group-hover:text-blue-400 transition-colors mt-1">
-                    {fir.crime_type || 'General Offence'}
-                  </h3>
+                  {/* Title & Station Meta */}
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 font-medium">
+                      <span className="font-bold text-gray-800 dark:text-gray-200 truncate max-w-[170px]">
+                        {fir.police_station || fir.district_name || 'KSP Station'}
+                      </span>
+                      <span>·</span>
+                      <span className="text-[11px] text-gray-400 shrink-0">
+                        {fir.date_of_occurrence || 'Recent'}
+                      </span>
+                    </div>
 
-                  <p className="text-xs text-[var(--muted-foreground)] line-clamp-2 mt-2">
-                    {fir.description || `Registered at ${(fir.district_name || fir.district || 'Karnataka')}. Live investigation tracking active.`}
-                  </p>
+                    <h3 className="font-extrabold text-base text-gray-900 dark:text-white tracking-tight leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors pt-1">
+                      {fir.crime_type || 'General Offence'}
+                    </h3>
+
+                    {/* Tag Pills Row */}
+                    <div className="flex flex-wrap items-center gap-2 pt-3 pb-2">
+                      <span className="px-3 py-1 rounded-full bg-gray-100/90 dark:bg-gray-800 text-[11px] font-semibold text-gray-700 dark:text-gray-300 font-mono">
+                        {meta.ipc}
+                      </span>
+                      <span className={`px-3 py-1 rounded-full text-[11px] font-bold ${
+                        isClosedOrChargesheeted
+                          ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400'
+                          : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400'
+                      }`}>
+                        {fir.status || 'Under Investigation'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="pt-4 mt-4 border-t border-[var(--border)]/50 flex items-center justify-between text-xs text-[var(--muted-foreground)]">
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                    {fir.location_name || fir.district_name || fir.district || 'Bengaluru'}
-                  </span>
-                  <span className="flex items-center gap-1 font-medium text-blue-400 group-hover:translate-x-0.5 transition-transform">
-                    View File <ArrowRight className="w-3.5 h-3.5" />
-                  </span>
+                {/* Bottom Row: Key Metric/ID & Apply/View Action Button */}
+                <div className="pt-5 mt-4 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
+                  <div className="min-w-0 pr-2">
+                    <div className="text-sm font-extrabold text-gray-900 dark:text-white font-mono tracking-tight">
+                      {caseId}
+                    </div>
+                    <div className="text-[11px] text-gray-400 font-medium flex items-center gap-1 mt-0.5">
+                      <MapPin className="w-3 h-3 text-gray-400 shrink-0" />
+                      <span className="truncate max-w-[120px]">{fir.location_name || fir.district_name || 'Bengaluru'}</span>
+                    </div>
+                  </div>
+
+                  <Link
+                    href={`/dashboard/fir/${encodedId}`}
+                    className="px-5 py-2.5 rounded-full bg-black text-white dark:bg-white dark:text-black text-xs font-bold hover:scale-[1.03] active:scale-[0.98] transition-all shadow-xs shrink-0 flex items-center gap-1"
+                  >
+                    View Case
+                  </Link>
                 </div>
-              </Link>
+              </div>
             );
           })}
         </div>
@@ -282,21 +403,21 @@ export default function FirRegistryPage() {
 
       {/* Zia Vision OCR & Catalyst Stratus Upload Modal */}
       {isOcrOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[var(--surface-1)] border border-[var(--border)] rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-[var(--border)] pb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#18181B] border border-gray-200 dark:border-gray-800 rounded-3xl max-w-xl w-full p-6 sm:p-7 space-y-5 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/50">
                   <ImageIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg text-[var(--foreground)]">Zia Vision OCR & Stratus Ingestion</h3>
-                  <p className="text-xs text-[var(--muted-foreground)]">Extract structured case fields from FIR images and save to Catalyst Stratus</p>
+                  <h3 className="font-extrabold text-lg text-gray-900 dark:text-white">Zia Vision OCR & Stratus Ingestion</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Extract structured case fields from FIR images and save to Catalyst Stratus</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsOcrOpen(false)}
-                className="p-1 rounded-lg hover:bg-[var(--surface-2)] text-[var(--muted-foreground)]"
+                className="p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -305,7 +426,7 @@ export default function FirRegistryPage() {
             {/* Upload Area */}
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-[var(--border)] hover:border-blue-500/50 rounded-2xl p-6 text-center cursor-pointer transition-all bg-[var(--surface-2)]/40 space-y-2"
+              className="border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-blue-500 rounded-2xl p-7 text-center cursor-pointer transition-all bg-gray-50/50 dark:bg-gray-900/40 space-y-2"
             >
               <input
                 ref={fileInputRef}
@@ -314,14 +435,14 @@ export default function FirRegistryPage() {
                 onChange={handleFileChange}
                 className="hidden"
               />
-              <Upload className="w-8 h-8 text-blue-400 mx-auto" />
-              <p className="text-sm font-semibold text-[var(--foreground)]">Click to upload scanned FIR or document photo</p>
-              <p className="text-xs text-[var(--muted-foreground)]">Supports JPEG, PNG, WEBP (Auto-processed via Zia Vision)</p>
+              <Upload className="w-8 h-8 text-blue-500 dark:text-blue-400 mx-auto" />
+              <p className="text-sm font-bold text-gray-900 dark:text-white">Click to upload scanned FIR or document photo</p>
+              <p className="text-xs text-gray-400">Supports JPEG, PNG, WEBP (Auto-processed via Zia Vision)</p>
             </div>
 
             {/* Loading Indicator */}
             {ocrLoading && (
-              <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono flex items-center gap-2.5">
+              <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-300 text-xs font-mono flex items-center gap-2.5">
                 <RefreshCw className="w-4 h-4 animate-spin shrink-0" />
                 <span>{uploadStatus}</span>
               </div>
@@ -331,33 +452,33 @@ export default function FirRegistryPage() {
             {ocrResult && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-emerald-400 flex items-center gap-1.5">
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4" /> Zia OCR Extraction Complete
                   </span>
-                  <span className="font-mono text-slate-400">Confidence: {(ocrResult.confidence * 100).toFixed(1)}%</span>
+                  <span className="font-mono text-gray-400">Confidence: {(ocrResult.confidence * 100).toFixed(1)}%</span>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs space-y-1.5 text-slate-200">
-                  <p><strong className="text-slate-400">Case No:</strong> <span className="text-blue-400">{ocrResult.parsed_fields?.case_number || 'KAR/BEN/2026/1840'}</span></p>
-                  <p><strong className="text-slate-400">IPC Sections:</strong> <span className="text-amber-400">{ocrResult.parsed_fields?.ipc_sections || 'IPC 379, 411'}</span></p>
+                <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-900/80 border border-gray-200 dark:border-gray-800 font-mono text-xs space-y-2 text-gray-800 dark:text-gray-200">
+                  <p><strong className="text-gray-400">Case No:</strong> <span className="text-blue-600 dark:text-blue-400 font-bold">{ocrResult.parsed_fields?.case_number || 'KAR/BEN/2026/1840'}</span></p>
+                  <p><strong className="text-gray-400">IPC Sections:</strong> <span className="text-amber-600 dark:text-amber-400 font-bold">{ocrResult.parsed_fields?.ipc_sections || 'IPC 379, 411'}</span></p>
                   {ocrResult.parsed_fields?.vehicle_number && (
-                    <p><strong className="text-slate-400">Vehicle:</strong> <span className="text-emerald-400">{ocrResult.parsed_fields.vehicle_number}</span></p>
+                    <p><strong className="text-gray-400">Vehicle:</strong> <span className="text-emerald-600 dark:text-emerald-400 font-bold">{ocrResult.parsed_fields.vehicle_number}</span></p>
                   )}
                   {stratusUrl && (
-                    <p><strong className="text-slate-400">Stratus Blob:</strong> <span className="text-cyan-400 truncate">{stratusUrl}</span></p>
+                    <p><strong className="text-gray-400">Stratus Blob:</strong> <span className="text-cyan-600 dark:text-cyan-400 truncate">{stratusUrl}</span></p>
                   )}
                 </div>
 
                 <div className="flex justify-end gap-2 pt-2">
                   <button
                     onClick={() => setIsOcrOpen(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-medium border border-[var(--border)] text-[var(--muted-foreground)]"
+                    className="px-4 py-2 rounded-xl text-xs font-semibold border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSaveOcrFir}
-                    className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md flex items-center gap-1.5"
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm flex items-center gap-1.5 transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     Save Digitized Case

@@ -59,7 +59,7 @@ export default function VoiceDebugStatus({
         </span>
         {lastTranscript && (
           <span className="text-xs text-paper-100/50 max-w-[150px] truncate ml-2 border-l border-steel-600 pl-2">
-            "{lastTranscript}"
+            &quot;{lastTranscript}&quot;
           </span>
         )}
       </div>

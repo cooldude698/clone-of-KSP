@@ -130,132 +130,192 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* 4-CARD BALANCED INTELLIGENCE GRID */}
+          {/* 4-CARD BALANCED INTELLIGENCE GRID (Clean Minimalist Design) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
             
-            {/* CARD 1: AI SYNDICATE PATTERN ALERT */}
-            <Link
-              href="/dashboard/network"
-              className="rounded-3xl bg-white dark:bg-[#18181B] border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-700 transition-all flex flex-col justify-between group cursor-pointer"
+            {/* CARD 1: CRIME NETWORK / SYNDICATE */}
+            <div
+              className="rounded-[28px] bg-white dark:bg-[#18181B] border border-gray-100 dark:border-gray-800 p-5 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none hover:shadow-[0_16px_36px_rgb(0,0,0,0.07)] transition-all flex flex-col justify-between group"
             >
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center shadow-xs">
-                  <Sparkles className="w-5 h-5" />
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-11 h-11 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200/80 dark:border-gray-700 flex items-center justify-center shadow-xs">
+                    <Shield className="w-5 h-5" />
+                  </div>
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                    Syndicate Intel
+                  </span>
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300">
-                  AI Pattern Alert
-                </span>
+
+                <div className="space-y-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                    KSP Intelligence · Indiranagar
+                  </p>
+                  <h3 className="text-base font-extrabold text-gray-900 dark:text-white tracking-tight leading-snug">
+                    Night Chain-Snatching Syndicate
+                  </h3>
+                  <div className="flex flex-wrap items-center gap-1.5 pt-2 pb-1">
+                    <span className="px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-[10px] font-semibold text-gray-700 dark:text-gray-300">
+                      3 Incidents / 48h
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-[10px] font-semibold text-gray-700 dark:text-gray-300 font-mono">
+                      KA-01-MJ-8821
+                    </span>
+                  </div>
+                </div>
               </div>
 
-              <div className="my-2">
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-                  Night Chain-Snatching Syndicate
-                </h3>
-                <p className="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed">
-                  3 clustered incidents in 48h · Pulsar KA-01-MJ-8821 flagged on ANPR 14m ago.
-                </p>
+              <div className="pt-4 mt-3 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-extrabold text-gray-900 dark:text-white">92% Risk Score</span>
+                  <span className="block text-[10px] text-gray-400 font-medium">High Priority Cluster</span>
+                </div>
+                <Link
+                  href="/dashboard/network"
+                  className="px-4 py-2 rounded-full bg-black text-white dark:bg-white dark:text-black text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
+                >
+                  Investigate
+                </Link>
               </div>
+            </div>
 
-              <div className="pt-2.5 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                <span className="text-xs font-bold text-amber-600 dark:text-amber-400">92% High Threat</span>
-                <span className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1">
-                  Syndicate Graph <ArrowUpRight className="w-3.5 h-3.5" />
-                </span>
-              </div>
-            </Link>
-
-            {/* CARD 2: CRITICAL HOTSPOT PATROL ADVISORY */}
-            <Link
-              href="/dashboard/map"
-              className="rounded-3xl bg-white dark:bg-[#18181B] border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-700 transition-all flex flex-col justify-between group cursor-pointer"
+            {/* CARD 2: CRITICAL HOTSPOT */}
+            <div
+              className="rounded-[28px] bg-white dark:bg-[#18181B] border border-gray-100 dark:border-gray-800 p-5 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none hover:shadow-[0_16px_36px_rgb(0,0,0,0.07)] transition-all flex flex-col justify-between group"
             >
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center shadow-xs">
-                  <MapPin className="w-5 h-5" />
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-11 h-11 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200/80 dark:border-gray-700 flex items-center justify-center shadow-xs">
+                    <MapPin className="w-5 h-5" />
+                  </div>
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                    Hotspot Advisory
+                  </span>
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-300">
-                  Critical Hotspot
-                </span>
+
+                <div className="space-y-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                    Sector 4 Command · Bengaluru South
+                  </p>
+                  <h3 className="text-base font-extrabold text-gray-900 dark:text-white tracking-tight leading-snug">
+                    Koramangala 5th Block
+                  </h3>
+                  <div className="flex flex-wrap items-center gap-1.5 pt-2 pb-1">
+                    <span className="px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-[10px] font-semibold text-gray-700 dark:text-gray-300">
+                      34 FIRs Active
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-[10px] font-semibold text-gray-700 dark:text-gray-300">
+                      Hoysala 14 Deployed
+                    </span>
+                  </div>
+                </div>
               </div>
 
-              <div className="my-2">
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
-                  Koramangala 5th Block
-                </h3>
-                <p className="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed">
-                  34 Incidents · 8 Burglary · 12 Snatching recorded this cycle.
-                </p>
+              <div className="pt-4 mt-3 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-extrabold text-gray-900 dark:text-white">Active Patrol</span>
+                  <span className="block text-[10px] text-gray-400 font-medium">Static Checkpoint</span>
+                </div>
+                <Link
+                  href="/dashboard/map"
+                  className="px-4 py-2 rounded-full bg-black text-white dark:bg-white dark:text-black text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
+                >
+                  Crime Map
+                </Link>
               </div>
+            </div>
 
-              <div className="pt-2.5 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                <span className="text-xs font-bold text-rose-600 dark:text-rose-400">Patrol Advisory Active</span>
-                <span className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1">
-                  Crime Map <ArrowUpRight className="w-3.5 h-3.5" />
-                </span>
-              </div>
-            </Link>
-
-            {/* CARD 3: WATCHLIST SIGHTINGS */}
-            <Link
-              href="/dashboard/suspect"
-              className="rounded-3xl bg-white dark:bg-[#18181B] border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-700 transition-all flex flex-col justify-between group cursor-pointer"
+            {/* CARD 3: REPEAT SUSPECT SIGHTING */}
+            <div
+              className="rounded-[28px] bg-white dark:bg-[#18181B] border border-gray-100 dark:border-gray-800 p-5 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none hover:shadow-[0_16px_36px_rgb(0,0,0,0.07)] transition-all flex flex-col justify-between group"
             >
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center shadow-xs">
-                  <Users className="w-5 h-5" />
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-11 h-11 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200/80 dark:border-gray-700 flex items-center justify-center shadow-xs font-extrabold text-xs">
+                    VN
+                  </div>
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                    Watchlist Hit
+                  </span>
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300">
-                  Live Sighting
-                </span>
+
+                <div className="space-y-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                    ANPR Hit 14m ago · Indiranagar
+                  </p>
+                  <h3 className="text-base font-extrabold text-gray-900 dark:text-white tracking-tight leading-snug">
+                    Vicky &ldquo;The Snake&rdquo; (Repeat)
+                  </h3>
+                  <div className="flex flex-wrap items-center gap-1.5 pt-2 pb-1">
+                    <span className="px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-[10px] font-semibold text-gray-700 dark:text-gray-300">
+                      Non-Bailable Warrant
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-[10px] font-semibold text-gray-700 dark:text-gray-300 font-mono">
+                      SUS-7701
+                    </span>
+                  </div>
+                </div>
               </div>
 
-              <div className="my-2">
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-                  Vicky &ldquo;The Snake&rdquo; (Repeat)
-                </h3>
-                <p className="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed">
-                  ANPR Hit 14m ago · Indiranagar 100ft Rd · Active Non-Bailable Warrant.
-                </p>
+              <div className="pt-4 mt-3 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-extrabold text-gray-900 dark:text-white">Active Warrant</span>
+                  <span className="block text-[10px] text-gray-400 font-medium">Patrol Alerted</span>
+                </div>
+                <Link
+                  href="/dashboard/suspect"
+                  className="px-4 py-2 rounded-full bg-black text-white dark:bg-white dark:text-black text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
+                >
+                  Track Suspect
+                </Link>
               </div>
+            </div>
 
-              <div className="pt-2.5 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                <span className="text-xs font-bold text-amber-600 dark:text-amber-400">Active Warrant</span>
-                <span className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1">
-                  Track Suspect <ArrowUpRight className="w-3.5 h-3.5" />
-                </span>
-              </div>
-            </Link>
-
-            {/* CARD 4: ANPR SENSOR GRID & PATROL DECK */}
-            <Link
-              href="/dashboard/surveillance"
-              className="rounded-3xl bg-white dark:bg-[#18181B] border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-700 transition-all flex flex-col justify-between group cursor-pointer"
+            {/* CARD 4: ANPR SENSOR TELEMETRY */}
+            <div
+              className="rounded-[28px] bg-white dark:bg-[#18181B] border border-gray-100 dark:border-gray-800 p-5 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none hover:shadow-[0_16px_36px_rgb(0,0,0,0.07)] transition-all flex flex-col justify-between group"
             >
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shadow-xs">
-                  <Camera className="w-5 h-5" />
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-11 h-11 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200/80 dark:border-gray-700 flex items-center justify-center shadow-xs">
+                    <Camera className="w-5 h-5" />
+                  </div>
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                    99.4% Grid Uptime
+                  </span>
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">
-                  99.4% Online
-                </span>
+
+                <div className="space-y-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                    Surveillance Network · Bengaluru City
+                  </p>
+                  <h3 className="text-base font-extrabold text-gray-900 dark:text-white tracking-tight leading-snug">
+                    12,500+ ANPR Nodes Active
+                  </h3>
+                  <div className="flex flex-wrap items-center gap-1.5 pt-2 pb-1">
+                    <span className="px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-[10px] font-semibold text-gray-700 dark:text-gray-300">
+                      14 PCR Units
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-[10px] font-semibold text-gray-700 dark:text-gray-300">
+                      Optical Sync Live
+                    </span>
+                  </div>
+                </div>
               </div>
 
-              <div className="my-2">
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                  12,500+ ANPR Nodes
-                </h3>
-                <p className="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed">
-                  14 PCR Patrol Units Synchronized across Bengaluru City Grid.
-                </p>
+              <div className="pt-4 mt-3 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-extrabold text-gray-900 dark:text-white">Sensor Grid</span>
+                  <span className="block text-[10px] text-gray-400 font-medium">Real-Time Streams</span>
+                </div>
+                <Link
+                  href="/dashboard/surveillance"
+                  className="px-4 py-2 rounded-full bg-black text-white dark:bg-white dark:text-black text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
+                >
+                  View Feed
+                </Link>
               </div>
-
-              <div className="pt-2.5 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">Surveillance Grid</span>
-                <span className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1">
-                  View Feed <ArrowUpRight className="w-3.5 h-3.5" />
-                </span>
-              </div>
-            </Link>
+            </div>
 
           </div>
         </div>

@@ -774,7 +774,7 @@ function DetailsTab({ fir, detail }) {
             </div>
             <div>
               <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Known Alias</dt>
-              <dd className="text-sm font-bold text-rose-600 dark:text-rose-400 font-mono">"{detail.accused_alias}"</dd>
+              <dd className="text-sm font-bold text-rose-600 dark:text-rose-400 font-mono">&quot;{detail.accused_alias}&quot;</dd>
             </div>
             <div>
               <dt className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-1">Risk Score</dt>

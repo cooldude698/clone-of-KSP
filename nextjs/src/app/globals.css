@@ -8,32 +8,28 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── LIGHT MODE (COASTAL OASIS REVAMP PALETTE) ────────── */
+/* ─── LIGHT & DARK THEME TOKENS ────────── */
 :root {
-  /* Exact Coastal Revamp Palette Tokens */
-  --coastal-sand:      #EFEAE4;
-  --earthy-gold:       #A68A69;
-  --sky-oasis-blue:    #AECAE8;
-  --coastal-slate:     #7A90A8;
-  --deep-ocean-navy:   #1E2733;
-
   /* Dynamic Light Surface & UI Mapping */
-  --surface-0:        #EFEAE4; /* Coastal Sand base canvas */
-  --surface-1:        #FAF6F0; /* Soft warm ivory card background */
-  --surface-2:        #E2D8CC; /* Elevated subtle sand container & hover highlight */
-  --border:           #7A90A8; /* Coastal Slate Blue border definition */
-  --border-subtle:    #D5DDE6;
-  --text-primary:     #1E2733; /* Deep Ocean Navy ultra-readable text */
-  --text-secondary:   #48596D; /* Coastal Slate secondary text */
-  --text-muted:       #A68A69; /* Earthy Gold muted text & accents */
-  --accent:           #1E2733; /* Deep Ocean Navy primary accent */
-  --accent-light:     #7A90A8; /* Coastal Slate highlight */
-  --accent-glow:      rgba(122, 144, 168, 0.25);
-  --cyan-accent:      #7A90A8;
-  --cyan-glow:        rgba(122, 144, 168, 0.2);
-  --status-critical:  #DC2626; /* Alert red */
-  --status-warning:   #A68A69; /* Earthy gold warning */
-  --status-success:   #16A34A; /* Emerald success */
+  --background:        #F4F5F8;
+  --foreground:        #09090B;
+  --surface-0:         #F4F5F8;
+  --surface-1:         #FFFFFF;
+  --surface-2:         #F1F3F6;
+  --border:            #E2E8F0;
+  --border-subtle:     #F1F5F9;
+  --text-primary:      #09090B;
+  --text-secondary:    #64748B;
+  --text-muted:        #94A3B8;
+  --muted-foreground:  #64748B;
+  --accent:            #09090B;
+  --accent-light:      #2563EB;
+  --accent-glow:       rgba(37, 99, 235, 0.12);
+  --cyan-accent:       #0284C7;
+  --cyan-glow:         rgba(2, 132, 199, 0.15);
+  --status-critical:   #DC2626; /* Alert red */
+  --status-warning:    #D97706; /* Amber warning */
+  --status-success:    #16A34A; /* Emerald success */
 
   /* ── Legacy aliases ── */
   --color-void-000:       var(--surface-0);
@@ -46,12 +42,47 @@
   --color-success-500:    var(--status-success);
   --color-paper-100:      var(--text-primary);
 
-  --scroll-track: #EFEAE4;
-  --scroll-thumb: #7A90A8;
+  --scroll-track: #F4F5F8;
+  --scroll-thumb: #CBD5E1;
 
   --radius-sm:   6px;
   --radius-md:   10px;
   --radius-lg:   14px;
+}
+
+.dark {
+  --background:        #09090B;
+  --foreground:        #F8FAFC;
+  --surface-0:         #09090B;
+  --surface-1:         #18181B;
+  --surface-2:         #27272A;
+  --border:            #27272A;
+  --border-subtle:     #1F1F23;
+  --text-primary:      #F8FAFC;
+  --text-secondary:    #94A3B8;
+  --text-muted:        #64748B;
+  --muted-foreground:  #94A3B8;
+  --accent:            #F8FAFC;
+  --accent-light:      #3B82F6;
+  --accent-glow:       rgba(59, 130, 246, 0.2);
+  --cyan-accent:       #38BDF8;
+  --cyan-glow:         rgba(56, 189, 248, 0.2);
+  --status-critical:   #EF4444;
+  --status-warning:    #F59E0B;
+  --status-success:    #10B981;
+
+  --color-void-000:       #09090B;
+  --color-steel-700:      #18181B;
+  --color-steel-600:      #27272A;
+  --color-phosphor-500:   #F8FAFC;
+  --color-warn-500:       var(--status-warning);
+  --color-critical-500:   var(--status-critical);
+  --color-stamp-red-500:  var(--status-critical);
+  --color-success-500:    var(--status-success);
+  --color-paper-100:      #F8FAFC;
+
+  --scroll-track: #09090B;
+  --scroll-thumb: #27272A;
 }
 
 
@@ -172,7 +203,7 @@ body {
 
 /* High-tech glass card */
 .glass-panel {
-  background: rgba(18, 22, 32, 0.75);
+  background: rgba(24, 24, 27, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border);
@@ -181,9 +212,9 @@ body {
 }
 
 :root:not(.dark) .glass-panel {
-  background: rgba(250, 246, 240, 0.94);
-  box-shadow: 0 12px 36px -4px rgba(30, 39, 51, 0.12), 0 2px 8px 0 rgba(30, 39, 51, 0.05);
-  border: 1px solid #7A90A8;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.08), 0 2px 8px 0 rgba(0, 0, 0, 0.04);
+  border: 1px solid #E2E8F0;
 }
 
 /* Glow Border & Accents */
