@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 
 // Server-side in-memory cache per state and page: key -> { timestamp, data }
