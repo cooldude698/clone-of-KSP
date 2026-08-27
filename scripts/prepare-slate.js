@@ -7,6 +7,14 @@ const nextDir = path.join(rootDir, 'nextjs');
 const rootNext = path.join(rootDir, '.next');
 const standaloneNext = path.join(rootNext, 'standalone', '.next');
 
+console.log('--- 0. Checking dependencies in /nextjs ---');
+const tailwindPath = path.join(nextDir, 'node_modules', 'tailwindcss');
+const lucidePath = path.join(nextDir, 'node_modules', 'lucide-react');
+if (!fs.existsSync(tailwindPath) || !fs.existsSync(lucidePath)) {
+  console.log('Installing dependencies inside /nextjs...');
+  execSync('npm install --legacy-peer-deps', { cwd: nextDir, stdio: 'inherit' });
+}
+
 console.log('--- 1. Building Next.js inside /nextjs ---');
 execSync('npm run build', { cwd: nextDir, stdio: 'inherit' });
 
@@ -29,7 +37,15 @@ console.log('--- 3. Formatting .next/standalone for Catalyst OpenNext ---');
 fs.mkdirSync(standaloneNext, { recursive: true });
 
 // Copy server and static manifests to .next/standalone/.next
-const requiredForOpenNext = ['server', 'static', 'app-build-manifest.json', 'build-manifest.json', 'prerender-manifest.json', 'routes-manifest.json', 'react-loadable-manifest.json'];
+const requiredForOpenNext = [
+  'server',
+  'static',
+  'app-build-manifest.json',
+  'build-manifest.json',
+  'prerender-manifest.json',
+  'routes-manifest.json',
+  'react-loadable-manifest.json'
+];
 for (const item of requiredForOpenNext) {
   const src = path.join(rootNext, item);
   const dest = path.join(standaloneNext, item);
@@ -51,6 +67,16 @@ const nextPublic = path.join(nextDir, 'public');
 if (fs.existsSync(nextPublic)) {
   if (!fs.existsSync(rootPublic)) fs.mkdirSync(rootPublic, { recursive: true });
   fs.cpSync(nextPublic, rootPublic, { recursive: true });
+}
+
+// Sync root config files for Catalyst tools
+const configs = ['postcss.config.mjs', 'tailwind.config.js', 'tsconfig.json', 'jsconfig.json', 'next.config.mjs'];
+for (const cfg of configs) {
+  const src = path.join(nextDir, cfg);
+  const dest = path.join(rootDir, cfg);
+  if (fs.existsSync(src) && !fs.existsSync(dest)) {
+    fs.copyFileSync(src, dest);
+  }
 }
 
 console.log('--- Slate Build Prepared Successfully ---');
