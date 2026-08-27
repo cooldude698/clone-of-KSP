@@ -1,9 +1,10 @@
+import { loadCatalystFunction } from '@/lib/dynamic-fn-loader';
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 
 export async function POST(req) {
   try {
-    const fn = require('../../../../../functions/askDrishtiAI/index.js');
+    const fn = loadCatalystFunction('askDrishtiAI');
     let body = {};
     try { body = await req.json(); } catch (_) {}
     let statusCode = 200;

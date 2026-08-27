@@ -1,9 +1,10 @@
+import { loadCatalystFunction } from '@/lib/dynamic-fn-loader';
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 
 export async function GET(req) {
   try {
-    const fn = require('../../../../../functions/zia-ocr/index.js');
+    const fn = loadCatalystFunction('zia-ocr');
     const { searchParams } = new URL(req.url);
     const queryObj = Object.fromEntries(searchParams.entries());
     let statusCode = 200;
@@ -30,7 +31,7 @@ export async function GET(req) {
 
 export async function POST(req) {
   try {
-    const fn = require('../../../../../functions/zia-ocr/index.js');
+    const fn = loadCatalystFunction('zia-ocr');
     let body = {};
     try { body = await req.json(); } catch (_) {}
     let statusCode = 200;

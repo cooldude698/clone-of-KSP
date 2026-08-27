@@ -1,3 +1,4 @@
+import { loadCatalystFunction } from '@/lib/dynamic-fn-loader';
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 
@@ -9,7 +10,7 @@ const CORS = {
 
 export async function GET(req) {
   try {
-    const fn = require('../../../../../functions/export-pdf/index.js');
+    const fn = loadCatalystFunction('export-pdf');
     const { searchParams } = new URL(req.url);
     const queryObj = Object.fromEntries(searchParams.entries());
     let statusCode = 200;
@@ -94,7 +95,7 @@ export async function POST(req) {
     }
 
     // Otherwise execute Catalyst export-pdf function directly
-    const fn = require('../../../../../functions/export-pdf/index.js');
+    const fn = loadCatalystFunction('export-pdf');
     let statusCode = 200;
     let jsonResult = {};
     const mockReq = {

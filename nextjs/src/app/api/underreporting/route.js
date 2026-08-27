@@ -1,9 +1,10 @@
+import { loadCatalystFunction } from '@/lib/dynamic-fn-loader';
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 
 export async function GET(req) {
   try {
-    const fn = require('../../../../../functions/underreporting/index.js');
+    const fn = loadCatalystFunction('underreporting');
     const { searchParams } = new URL(req.url);
     const queryObj = Object.fromEntries(searchParams.entries());
     let statusCode = 200;
