@@ -348,172 +348,117 @@ function generateSmartPoliceResponse(question, lang = 'en', history = []) {
     }
   }
 
-  // 1b. Specific targeted queries about Ramesh Kumar's problem / last spotted location / CCTV
+  // 1c. Specific Suspects Lookup (Ramesh, Suresh, Anand, Imran, Farid, Vikram)
   if (q.includes('ramesh') || q.includes('रमेश') || q.includes('ರಮೇಶ್')) {
-    if (q.includes('cctv') || q.includes('camera') || q.includes('anpr') || q.includes('कैमरा') || q.includes('ಸಿಸಿಟಿವಿ') || q.includes('intel')) {
-      if (q.includes('yes') || q.includes('no') || q.includes('do we') || q.includes('have') || q.includes('is there') || q.includes('any') || q.includes('क्या') || q.includes('इन्फॉर्मेशन') || q.includes('जानकारी')) {
-        if (isHindi) {
-          return 'हाँ सर, हमारे पास रमेश कुमार का सीसीटीवी और एएनपीआर इंटेल उपलब्ध है। सिल्क बोर्ड जंक्शन पर कैमरा SC-0045 द्वारा दोपहर 14:22 बजे उनके वाहन (KA-05-M-1234) को रिकॉर्ड किया गया था।\n\nरणनीतिक सलाह: चूंकि उसका पैटर्न रात 10 से 4 बजे के बीच चोरी के वाहन राज्य की सीमा पार भेजने का है, मैं होसुर रोड एग्जिट पर मोबाइल गश्त तैनात करने और इलेक्ट्रॉनिक सिटी टोल पर तुरंत एएनपीआर अलर्ट सक्रिय करने की सलाह दूंगा, सर।';
-        }
-        if (isKannada) {
-          return 'ಹೌದು ಸರ್, ನಮ್ಮ ಬಳಿ ರಮೇಶ್ ಕುಮಾರ್ ಅವರ ಸಿಸಿಟಿವಿ ಮತ್ತು ಎಎನ್‌ಪಿಆರ್ ಮಾಹಿತಿ ಲಭ್ಯವಿದೆ. ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಜಂಕ್ಷನ್‌ನಲ್ಲಿ ಮಧ್ಯಾಹ್ನ 14:22 ಕ್ಕೆ ಅವರ ವಾಹನ (KA-05-M-1234) ಪತ್ತೆಯಾಗಿದೆ.\n\nಪೋಲಿಸ್ ತಂತ್ರಜ್ಞಾನ ಸಲಹೆ: ರಾತ್ರಿ 10 ರಿಂದ ಬೆಳಿಗ್ಗೆ 4 ರವರೆಗೆ ವಾಹನ ಗಡಿ ದಾಟಿಸುವ ಸಾಧ್ಯತೆಯಿದೆ. ಹೊಸೂರು ರಸ್ತೆ ಚೆಕ್‌ಪೋಸ್ಟ್‌ನಲ್ಲಿ ಗಸ್ತು ಹೆಚ್ಚಿಸಲು ಮತ್ತು ಇಲೆಕ್ಟ್ರಾನಿಕ್ ಸಿಟಿ ಟೋಲ್‌ನಲ್ಲಿ ಎಎನ್‌ಪಿಆರ್ ಅಲರ್ಟ್ ಸಕ್ರಿಯಗೊಳಿಸಲು ಶಿಫಾರಸು ಮಾಡುತ್ತೇನೆ, ಸರ್.';
-        }
-        return 'Yes, Sir. We have active CCTV and ANPR camera intelligence on Ramesh Kumar. Camera SC-0045 at Silk Board Junction recorded his vehicle (KA-05-M-1234) at 14:22 hrs.\n\nPROACTIVE TACTICAL RECOMMENDATION: Given his pattern of transporting stolen vehicles across state borders between 10 PM and 4 AM, I recommend deploying a mobile patrol unit at the Hosur Road exit checkpoint and activating ANPR watchlist alerts at Electronic City toll plaza immediately, Sir.';
-      }
+    if (q.includes('cctv') || q.includes('camera') || q.includes('anpr') || q.includes('कैमरा') || q.includes('ಸಿಸಿಟಿವಿ') || q.includes('intel') || q.includes('spotted') || q.includes('last') || q.includes('location')) {
       if (isHindi) {
-        return 'सर, रमेश कुमार का सीसीटीवी डेटा उपलब्ध है। सिल्क बोर्ड जंक्शन पर स्थापित सीसीटीवी कैमरे (SC-0045) द्वारा उनका वाहन दोपहर 14:22 बजे देखा गया था।\n\nरणनीतिक सलाह: सिल्क बोर्ड कॉरिडोर की निगरानी बढ़ाने के लिए विशेष फ्लाइंग स्क्वाड तैनात करने की सिफारिश करता हूं, सर।';
+        return 'सर, रमेश कुमार ("बुलेट रमेश") का सीसीटीवी और ANPR डेटा उपलब्ध है। सिल्क बोर्ड जंक्शन पर कैमरा SC-0045 द्वारा दोपहर 14:22 बजे उनके वाहन (सफेद ह्युंडई i10 / प्लेट KA-05-M-1234) को रिकॉर्ड किया गया था।\n\nरणनीतिक सलाह: चूंकि उसका पैटर्न अंतर-राज्यीय सीमा पर चोरी के वाहन ले जाने का है, मैं होसुर रोड एग्जिट पर मोबाइल गश्त तैनात करने और इलेक्ट्रॉनिक सिटी टोल पर तुरंत ANPR अलर्ट सक्रिय करने की सलाह दूंगा, सर।';
       }
       if (isKannada) {
-        return 'ಸರ್, ರಮೇಶ್ ಕುಮಾರ್ ಅವರ ಸಿಸಿಟಿವಿ ಮಾಹಿತಿ ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಜಂಕ್ಷನ್ ಕ್ಯಾಮೆರಾದಲ್ಲಿ ಪತ್ತೆಯಾಗಿದೆ.\n\nಪೋಲಿಸ್ ಸಲಹೆ: ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಪ್ರದೇಶದಲ್ಲಿ ವಿಶೇಷ ಪೊಲೀಸ್ ತಂಡವನ್ನು ನಿಯೋಜಿಸಲು ಶಿಫಾರಸು ಮಾಡುತ್ತೇನೆ, ಸರ್.';
+        return 'ಸರ್, ರಮೇಶ್ ಕುಮಾರ್ ("ಬುಲೆಟ್ ರಮೇಶ್") ಅವರ ಸಿಸಿಟಿವಿ ಮತ್ತು ANPR ಮಾಹಿತಿ ಲಭ್ಯವಿದೆ. ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಜಂಕ್ಷನ್‌ನಲ್ಲಿ ಮಧ್ಯಾಹ್ನ 14:22 ಕ್ಕೆ ಕ್ಯಾಮೆರಾ SC-0045 ನಲ್ಲಿ ಅವರ ವಾಹನ (KA-05-M-1234) ಪತ್ತೆಯಾಗಿದೆ. ಅವರ ವಿರುದ್ಧ 7 ಸಕ್ರಿಯ ವಾಹನ ಕಳವು ಎಫ್‌ಐಆರ್‌ಗಳಿವೆ.\n\nಪೋಲಿಸ್ ತಂತ್ರಜ್ಞಾನ ಸಲಹೆ: ಹೊಸೂರು ರಸ್ತೆ ಚೆಕ್‌ಪೋಸ್ಟ್‌ನಲ್ಲಿ ತಪಾಸಣೆ ಹೆಚ್ಚಿಸಲು ಮತ್ತು ಎಲೆಕ್ಟ್ರಾನಿಕ್ ಸಿಟಿ ಟೋಲ್‌ನಲ್ಲಿ ANPR ಅಲರ್ಟ್ ಸಕ್ರಿಯಗೊಳಿಸಲು ಶಿಫಾರಸು ಮಾಡುತ್ತೇನೆ, ಸರ್.';
       }
-      return 'Sir, Ramesh Kumar\'s vehicle was captured on CCTV camera SC-0045 at Silk Board Junction at 14:22 hrs.\n\nPROACTIVE TACTICAL RECOMMENDATION: I suggest setting up dynamic nakabandis along the Koramangala-Silk Board junction corridor and cross-referencing recent two-wheeler theft FIRs, Sir.';
-    }
-
-    if (q.includes('last') || q.includes('spotted') || q.includes('location') || q.includes('लास्ट') || q.includes('सपोर्ट') || q.includes('स्पॉट') || q.includes('कहां') || q.includes('कहा')) {
-      if (isHindi) {
-        return 'सर, रमेश कुमार ("बुलेट रमेश") की आखिरी देखी गई लोकेशन सिल्क बोर्ड जंक्शन, बेंगलुरु है, जहां उसका वाहन (सफेद ह्युंडई i10 / प्लेट KA-05-M-1234) दोपहर 14:22 बजे ANPR और CCTV कैमरों द्वारा देखा गया था। उसकी मुख्य समस्या अंतर-राज्यीय वाहन चोरी (Section 379 IPC) और सशस्त्र डकैती (7 सक्रिय FIR) का रैकेट चलाना है।\n\nरणनीतिक सलाह: मैं होसुर रोड बॉर्डर पर त्वरित अलर्ट जारी करने की सलाह दूंगा, सर।';
-      }
-      if (isKannada) {
-        return 'ಸರ್, ರಮೇಶ್ ಕುಮಾರ್ ಅವರ ಕೊನೆಯದಾಗಿ ಕಂಡುಬಂದ ಸ್ಥಳ ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಜಂಕ್ಷನ್, ಬೆಂಗಳೂರು. ಮಧ್ಯಾಹ್ನ 14:22 ಕ್ಕೆ ಸಿಸಿಟಿವಿ ಕ್ಯಾಮೆರಾದಲ್ಲಿ ಅವರ ವಾಹನ (KA-05-M-1234) ಪತ್ತೆಯಾಗಿದೆ. ಅವರ ವಿರುದ್ಧ 7 ಸಕ್ರಿಯ ಎಫ್‌ಐಆರ್‌ಗಳಿವೆ.\n\nಪೋಲಿಸ್ ಸಲಹೆ: ಗಡಿ ಪ್ರದೇಶದಲ್ಲಿ ತಕ್ಷಣವೇ ಕಟ್ಟೆಚ್ಚರ ವಹಿಸಲು ಶಿಫಾರಸು ಮಾಡುತ್ತೇನೆ, ಸರ್.';
-      }
-      return 'Sir, Ramesh Kumar (Alias "Bullet Ramesh") was last spotted at Silk Board Junction, Bengaluru at 14:22 hrs via ANPR/CCTV (Vehicle KA-05-M-1234). His primary activity is running an inter-state vehicle theft and armed robbery syndicate (7 active FIRs).\n\nPROACTIVE TACTICAL RECOMMENDATION: I recommend checking recent stolen vehicle fencing reports in Hosur and placing a surveillance team on his known associates, Sir.';
-    }
-  }
-
-  // 2. Bengaluru / City Crime Report
-  if (q.includes('bengaluru') || q.includes('bangalore') || q.includes('ಅಪರಾಧ') || q.includes('city crime') || q.includes('report')) {
-    if (lang === 'kn') {
-      return `ಬೆಂಗಳೂರು ನಗರದ ಅಪರಾಧ ವರದಿ ಮತ್ತು ವಿವರಗಳು, ಸರ್:
-
-೧. ಒಟ್ಟು ಸಕ್ರಿಯ ಪ್ರಕರಣಗಳು: ೪೮೯ ಎಫ್.ಐ.ಆರ್ నమోదు ಆಗಿವೆ.
-೨. ಪ್ರಮುಖ ಅಪರಾಧಗಳು: ವಾಹನ ಕಳವು (೩೮%), ಸರಗಳ್ಳತನ ಮತ್ತು ದರೋಡೆ (೨೪%), ಸೈಬರ್ ವಂಚನೆ (೨೨%).
-೩. ಪ್ರಮುಖ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳು:
-   - ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಮತ್ತು ಕೊರಮಂಗಲ: ವಾಹನ ಕಳವು ಹೆಚ್ಚು (೪೭ ಪ್ರಕರಣಗಳು).
-   - ಎಂ.ಜಿ. ರಸ್ತೆ ಮತ್ತು ಮೆಜೆಸ್ಟಿಕ್: ಸರಗಳ್ಳತನ (೩೧ ಪ್ರಕರಣಗಳು).
-೪. ಪ್ರಮುಖ ಶಂಕಿತ ಅಪರಾಧಿ: ರಮೇಶ್ ಕುಮಾರ್ (೭ ಎಫ್.ಐ.ಆರ್, ಅಪಾಯದ ಮಟ್ಟ: ೮೫/೧೦೦).
-೫. ಪೋಲಿಸ್ ಸೂಚನೆ: ರಾತ್ರಿ ೧೦ ರಿಂದ ಬೆಳಿಗ್ಗೆ ೪ ರವರೆಗೆ ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಪ್ರದೇಶದಲ್ಲಿ ಗಸ್ತು ಹೆಚ್ಚಿಸಲು ಸೂಚಿಸಲಾಗಿದೆ.`;
-    }
-    return `Sir, here is the detailed Bengaluru Crime & Intelligence Report:
-
-1. Overview:
-   - Active Registered FIR Cases: 489 cases in Bengaluru Urban District.
-   - Main Crime Types: Vehicle Theft (38%), Robbery & Chain Snatching (24%), Cyber Fraud (22%), Burglary (16%).
-
-2. Top Crime Hotspots:
-   - South Bengaluru (Koramangala, HSR Layout, Silk Board): High vehicle theft activity (47 cases). Peak hours: 10:00 PM to 4:00 AM.
-   - Central Bengaluru (MG Road, Shivajinagar, Majestic): Chain snatching and phone robbery (31 cases). Peak hours: 6:00 PM to 10:00 PM.
-
-3. Key Repeat Offenders:
-   - Ramesh Kumar (Alias "Bullet Ramesh"): 7 active FIRs for vehicle theft. Last seen near Silk Board. Risk Score: 85/100 (HIGH).
-   - Imran Khan (Alias "Chotta Imran"): 4 active FIRs for chain snatching. Risk Score: 78/100 (HIGH).
-
-4. Recommended Police Actions:
-   - Increase night patrol vehicles near Silk Board Junction and HSR 2nd Stage.
-   - Activate ANPR camera watchlists for black Honda Activa (KA-01-EA-4921).`;
-  }
-
-  // 3. Repeat Offenders / Suspects / Criminals
-  if (q.includes('repeat') || q.includes('offender') || q.includes('accused') || q.includes('suspect') || q.includes('criminal') || q.includes('wanted') || q.includes('gang') || q.includes('ramesh') || q.includes('suresh') || q.includes('history') || q.includes('apradhi') || q.includes('अपराधी') || q.includes('ಆರೋಪಿ')) {
-    return `Sir, here is the detailed High-Risk Repeat Offenders Report:
-
-1. Ramesh Kumar (Alias: "Bullet Ramesh")
-   - Total FIRs: 7 (Vehicle Theft, Armed Robbery)
-   - Risk Score: 85/100 (HIGH RISK)
-   - Method of Crime: Steals parked bikes near metro stations between 10 PM and 4 AM using duplicate keys.
-   - Last Location: Silk Board Junction, Bengaluru.
-
-2. Suresh Naidu
-   - Total FIRs: 5 (House Burglary, Theft)
-   - Risk Score: 78/100 (HIGH RISK)
-   - Method of Crime: Breaks locks of locked houses in residential layouts between 1 AM and 3 AM.
-   - Last Location: Central Market Area, Mysuru.
-
-3. Anand Gowda
-   - Total FIRs: 4 (Chain Snatching, Extortion)
-   - Risk Score: 72/100 (HIGH RISK)
-   - Method of Crime: Uses stolen high-speed motorcycle with fake number plate to snatch gold chains from morning walkers.
-   - Last Location: Jayanagar 4th Block, Bengaluru.`;
-  }
-
-  // 4. Vehicle Theft / ANPR
-  if (q.includes('vehicle') || q.includes('theft') || q.includes('bike') || q.includes('anpr') || q.includes('stolen')) {
-    return `Sir, here is the detailed Vehicle Theft & ANPR Intelligence Report:
-
-1. Registered Theft Cases: 47 vehicle theft FIRs registered this month in South Bengaluru district.
-2. Common Target Vehicle: Honda Activa and Bajaj Pulsar models parked on main road service lanes.
-3. ANPR Camera Watchlist:
-   - Camera SC-0045 (Silk Board Junction): 3 suspect vehicle hits detected in last 24 hours.
-   - Target Plate: KA-01-EA-4921 (Black Honda Activa linked to suspect Ramesh Kumar).
-4. Step-by-Step Investigation Instructions:
-   - Step 1: Confirm FIR filed under Section 379 IPC and check CCTNS entry.
-   - Step 2: Set up temporary police checkpoints at Silk Board and Hosur Road exit points.
-   - Step 3: Collect CCTV footage from traffic cameras and nearby shops within 2 km radius.`;
-  }
-
-  // 5. Cyber Crime / 1930 Helpline
-  if (q.includes('cyber') || q.includes('fraud') || q.includes('1930') || q.includes('bank') || q.includes('scam') || q.includes('upi')) {
-    return `Sir, here is the detailed Cyber Crime & Financial Fraud Report:
-
-1. Standard Police SOP (IT Act Section 66D & IPC Section 420):
-   - Step 1: Guide victim to immediately call National Cyber Crime Helpline 1930 or visit cybercrime.gov.in.
-   - Step 2: Obtain UTR transaction reference number, victim bank account, and fraudster bank/UPI details.
-   - Step 3: Contact Bank Nodal Officer immediately through Citizen Financial Cyber Fraud System to freeze the money in the fraudster's bank account before withdrawal.
-   - Step 4: Trace IP address, SIM registration, and WhatsApp details used by the fraudster through Cyber Crime Cell.
-2. Active Case Record: FIR-2026-MYS-0112 (Financial Fraud of ₹1,45,000). Beneficiary bank accounts frozen within 45 minutes of report.`;
-  }
-
-  // 5b. Binary / Check questions for missing or untracked data
-  const isCheckQuestion = q.includes('do we') || q.includes('is there') || q.includes('have info') || q.includes('any info') || q.includes('check if') || q.includes('yes/no') || q.includes('yes or no') || q.includes('क्या') || q.includes('जानकारी') || q.includes('ಯಾವ');
-  if (isCheckQuestion) {
-    if (isHindi) {
-      return 'जी नहीं सर, कर्नाटक पुलिस डेटाबेस या सीसीटीवी ग्रिड में इस नाम/रिकॉर्ड की कोई जानकारी उपलब्ध नहीं है।';
+      return 'Sir, Ramesh Kumar (Alias "Bullet Ramesh") was captured on CCTV/ANPR camera SC-0045 at Silk Board Junction at 14:22 hrs (Vehicle: White Hyundai i10 / KA-05-M-1234). He has 7 active FIRs for inter-state vehicle theft.\n\nPROACTIVE TACTICAL RECOMMENDATION: I recommend deploying a mobile patrol team at the Hosur Road exit checkpoint and activating ANPR watchlist alerts at Electronic City toll plaza immediately, Sir.';
     }
     if (isKannada) {
-      return 'ಇಲ್ಲ ಸರ್, ಕರ್ನಾಟಕ ಪೊಲೀಸ್ ಡೇಟಾಬೇಸ್‌ನಲ್ಲಿ ಈ ಹೆಸರಿನ ಯಾವುದೇ ಸಿಸಿಟಿವಿ ಅಥವಾ ಎಫ್‌ಐಆರ್ ಮಾಹಿತಿ ಸಿಗಲಿಲ್ಲ.';
+      return `ಸರ್, ಶಂಕಿತ ರಮೇಶ್ ಕುಮಾರ್ ("ಬುಲೆಟ್ ರಮೇಶ್") ಪ್ರೊಫೈಲ್:\n- ಒಟ್ಟು ಎಫ್.ಐ.ಆರ್: ೭ ಪ್ರಕರಣಗಳು (ವಾಹನ ಕಳವು & ಸಶಸ್ತ್ರ ದರೋಡೆ)\n- ಅಪಾಯದ ರೇಟಿಂಗ್: ೮೫/೧೦೦ (HIGH RISK)\n- ಕೃತ್ಯದ ವಿಧಾನ: ರಾತ್ರಿ ೧೦ ರಿಂದ ಬೆಳಗಿನ ಜಾವ ೪ ರವರೆಗೆ ಪಾರ್ಕಿಂಗ್ ವಾಹನಗಳನ್ನು ನಕಲಿ ಕೀ ಬಳಸಿ ಕದಿಯುವುದು.\n- ಕೊನೆಯದಾಗಿ ಕಂಡ ಸ್ಥಳ: ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಜಂಕ್ಷನ್, ಬೆಂಗಳೂರು.`;
     }
-    return 'No, Sir. We do not have any active CCTV surveillance records or FIR files matching that query in the Karnataka Police database.';
+    if (isHindi) {
+      return `सर, संदिग्ध रमेश कुमार ("बुलेट रमेश") का रिकॉर्ड:\n- कुल सक्रिय FIR: 7 मामले (वाहन चोरी और सशस्त्र डकैती)\n- जोखिम स्कोर: 85/100 (HIGH RISK)\n- अपराध का तरीका: मेट्रो और पार्किंग से रात 10 से सुबह 4 बजे के बीच डुप्लीकेट चाबी से बाइक/कार चोरी करना।\n- अंतिम ज्ञात स्थान: सिल्क बोर्ड जंक्शन, बेंगलुरु।`;
+    }
+    return `Sir, here is the dossier for Suspect Ramesh Kumar (Alias "Bullet Ramesh"):\n- Active FIRs: 7 (Vehicle Theft & Armed Robbery u/s 379, 392 IPC)\n- Risk Score: 85/100 (HIGH RISK)\n- Modus Operandi: Steals parked two-wheelers near transit hubs between 10 PM - 4 AM.\n- Last Sighting: Silk Board Junction, Bengaluru via ANPR camera SC-0045.\n- Status: Active Watchlist.`;
   }
 
-  // 6. Default Detailed Police Intelligence Answer
-  if (lang === 'kn') {
-    return `ಸರ್, ಪೋಲಿಸ್ ಮಾಹಿತಿ ಪೋರ್ಟಲ್‌ನ ಸಾರಾಂಶ ಇಲ್ಲಿದೆ:
-
-೧. ಸಕ್ರಿಯ ಎಫ್.ಐ.ರ್ ಪ್ರಕರಣಗಳು: ೯೬೮ ಪ್ರಕರಣಗಳು ಸಕ್ರಿಯವಾಗಿವೆ.
-೨. ಪ್ರಮುಖ ಶಂಕಿತರು: ರಮೇಶ್ ಕುಮಾರ್ (೭ ಪ್ರಕರಣಗಳು), ಸುರೇಶ್ ನಾಯ್ಡು (೫ ಪ್ರಕರಣಗಳು).
-೩. ಪೋಲಿಸ್ ತನಿಖೆಗೆ ಅಗತ್ಯವಿದ್ದರೆ ನಿರ್ದಿಷ್ಟ ಪ್ರಕರಣ ಸಂಖ್ಯೆ (ಉದಾಹರಣೆಗೆ FIR-2026-BL-0492) ಅಥವಾ ಶಂಕಿತನ ಹೆಸರನ್ನು ನಮೂದಿಸಿ ಮಾಹಿತಿ ಪಡೆಯಬಹುದು.`;
+  if (q.includes('suresh') || q.includes('सुरेश') || q.includes('ಸುರೇಶ್')) {
+    if (isKannada) {
+      return `ಸರ್, ಶಂಕಿತ ಸುರೇಶ್ ನಾಯ್ಡು ("ಸ್ನೇಕ್ ನಾಯ್ಡು") ಪ್ರೊಫೈಲ್:\n- ಒಟ್ಟು ಎಫ್.ಐ.ಆರ್: ೫ ಪ್ರಕರಣಗಳು (ಮನೆಗಳ್ಳತನ ಮತ್ತು ದರೋಡೆ)\n- ಅಪಾಯದ ರೇಟಿಂಗ್: ೭೮/೧೦೦ (HIGH RISK)\n- ಸ್ಥಿತಿ: ತಲೆಮರೆಸಿಕೊಂಡಿದ್ದಾನೆ (Absconding)\n- ಕೊನೆಯದಾಗಿ ಕಂಡ ಸ್ಥಳ: ಸೆಂಟ್ರಲ್ ಮಾರ್ಕೆಟ್, ಮೈಸೂರು.`;
+    }
+    if (isHindi) {
+      return `सर, संदिग्ध सुरेश नाईडू ("स्नेक नाईडू") का रिकॉर्ड:\n- कुल सक्रिय FIR: 5 मामले (घर में चोरी और डकैती)\n- जोखिम स्कोर: 78/100 (HIGH RISK)\n- स्थिति: फरार (Absconding)\n- अंतिम ज्ञात स्थान: सेंट्रल मार्केट क्षेत्र, मैसूरु।`;
+    }
+    return `Sir, here is the dossier for Suspect Suresh Naidu (Alias "Snake Naidu"):\n- Active FIRs: 5 (House Burglary & Armed Highway Robbery u/s 392, 397 IPC)\n- Risk Score: 78/100 (HIGH RISK)\n- Status: ABSCONDING (Non-Bailable Warrant Issued)\n- Last Sighting: Central Market Area, Mysuru.`;
   }
 
-  if (lang === 'hi') {
-    return `सर, पुलिस इंटेलिजेंस और केस डेटाबेस की विस्तृत रिपोर्ट:
-
-1. वर्तमान डेटाबेस की स्थिति:
-   - कुल सक्रिय एफ़.आई.आर मामले: कर्नाटक पुलिस स्टेशनों में 968 मामले सक्रिय हैं।
-   - पिछले 24 घंटों में दर्ज नए मामले: 14 नए मामले दर्ज।
-   - सक्रिय निगरानी में आदतन अपराधी: 12 उच्च-जोखिम वाले अपराधी।
-
-2. मुख्य एफ़.आई.आर मामले:
-   - FIR-2026-BL-0492: वाहन चोरी (धारा 379 IPC) | स्थान: दक्षिण बेंगलुरु | स्थिति: जांच जारी है।
-   - FIR-2026-BL-0493: चेन स्नेचिंग (धारा 392 IPC) | स्थान: एमजी रोड, बेंगलुरु | स्थिति: आरोप पत्र (Chargesheet) तैयार।
-   - FIR-2026-MYS-0112: साइबर वित्तीय धोखाधड़ी (IT Act Sec 66D) | स्थान: मैसूरु | स्थिति: 1930 हेल्पलाइन द्वारा ₹1.45 लाख राशि फ़्रीज़ की गई।
-
-3. आगे की पुलिस कार्रवाई:
-   - आप किसी भी विशिष्ट FIR नंबर, संदिग्ध प्रोफ़ाइल या शहर अपराध रिपोर्ट के बारे में जानकारी प्राप्त कर सकते हैं, सर।`;
+  // 1d. Repeat Offenders / Suspects / Criminals General List
+  if (q.includes('repeat') || q.includes('offender') || q.includes('accused') || q.includes('suspect') || q.includes('criminal') || q.includes('wanted') || q.includes('gang') || q.includes('history') || q.includes('apradhi') || q.includes('अपराधी') || q.includes('ಆರೋಪಿ') || q.includes('ಅಪರಾಧಿ')) {
+    if (isKannada) {
+      return `ಸರ್, ಹೈ-ರಿಸ್ಕ್ ಶಂಕಿತ ಅಪರಾಧಿಗಳ ಪಟ್ಟಿ:\n\n೧. ರಮೇಶ್ ಕುಮಾರ್ ("ಬುಲೆಟ್ ರಮೇಶ್") — ೭ ಎಫ್.ಐ.ಆರ್ (ವಾಹನ ಕಳವು) — ಅಪಾಯ ಮಟ್ಟ: ೮೫/೧೦೦ — ಕೊನೆಯ ಸ್ಥಳ: ಸಿಲ್ಕ್ ಬೋರ್ಡ್.\n೨. ಸುರೇಶ್ ನಾಯ್ಡು ("ಸ್ನೇಕ್ ನಾಯ್ಡು") — ೫ ಎಫ್.ಐ.ಆರ್ (ಮನೆಗಳ್ಳತನ) — ಅಪಾಯ ಮಟ್ಟ: ೭೮/೧೦೦ — ತಲೆಮರೆಸಿಕೊಂಡಿದ್ದಾನೆ.\n೩. ಆನಂದ್ ಗೌಡ — ೪ ಎಫ್.ಐ.ಆರ್ (ಸರಗಳ್ಳತನ) — ಅಪಾಯ ಮಟ್ಟ: ೭೨/೧೦೦ — ಜಯನಗರ.\n೪. ಇಮ್ರಾನ್ ಖಾನ್ — ೪ ಎಫ್.ಐ.ಆರ್ (ಸರಗಳ್ಳತನ) — ಅಪಾಯ ಮಟ್ಟ: ೭೬/೧೦೦ — ವೈಟ್‌ಫೀಲ್ಡ್.\n\nಪೋಲಿಸ್ ಸಲಹೆ: ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಮತ್ತು ಜಯನಗರ ಚೆಕ್‌ಪೋಸ್ಟ್‌ಗಳಲ್ಲಿ ತಪಾಸಣೆ ತೀವ್ರಗೊಳಿಸಲು ಶಿಫಾರಸು ಮಾಡುತ್ತೇನೆ, ಸರ್.`;
+    }
+    if (isHindi) {
+      return `सर, शीर्ष आदतन और वांछित अपराधियों की रिपोर्ट:\n\n1. रमेश कुमार ("बुलेट रमेश") — 7 सक्रिय FIR (वाहन चोरी) — जोखिम स्कोर: 85/100 — अंतिम स्थान: सिल्क बोर्ड।\n2. सुरेश नाईडू ("स्नेक नाईडू") — 5 सक्रिय FIR (डकैती) — जोखिम स्कोर: 78/100 — स्थिति: फरार।\n3. आनंद गौड़ा — 4 सक्रिय FIR (चेन स्नैचिंग) — जोखिम स्कोर: 72/100 — जयनगर।\n4. इमरान खान — 4 सक्रिय FIR (चेन स्नैचिंग) — जोखिम स्कोर: 76/100 — व्हाइटफील्ड।\n\nरणनीतिक सलाह: सिल्क बोर्ड और होसुर रोड पर तत्काल नाकाबंदी और ANPR अलर्ट लागू करें, सर।`;
+    }
+    return `Sir, here is the detailed High-Risk Repeat Offenders Intelligence Report:\n\n1. Ramesh Kumar (Alias: "Bullet Ramesh")\n   - Total FIRs: 7 (Vehicle Theft, Armed Robbery)\n   - Risk Score: 85/100 (HIGH RISK)\n   - Last Location: Silk Board Junction, Bengaluru.\n\n2. Suresh Naidu (Alias: "Snake Naidu")\n   - Total FIRs: 5 (House Burglary, Robbery)\n   - Risk Score: 78/100 (HIGH RISK)\n   - Status: ABSCONDING.\n\n3. Anand Gowda (Alias: "Speedy Anand")\n   - Total FIRs: 4 (Chain Snatching, Extortion)\n   - Risk Score: 72/100 (HIGH RISK)\n   - Last Location: Jayanagar 4th Block, Bengaluru.\n\n4. Imran Khan (Alias: "Helmet Imran")\n   - Total FIRs: 4 (Chain Snatching)\n   - Risk Score: 76/100 (HIGH RISK)\n   - Status: Active Surveillance in Whitefield corridor.`;
   }
 
-  return `Sir, here is the detailed Police Intelligence & Case Summary for your query:
+  // 1e. Specific Districts / Localities
+  if (q.includes('indiranagar') || q.includes('ಇಂದಿರಾನಗರ') || q.includes('इंदिरानगर')) {
+    if (isKannada) return `ಇಂದಿರಾನಗರ ಅಪರಾಧ ವರದಿ:\n- ಒಟ್ಟು ಸಕ್ರಿಯ ಎಫ್.ಐ.ಆರ್: ೩೮ ಪ್ರಕರಣಗಳು.\n- ಪ್ರಮುಖ ಅಪರಾಧ: ರಾತ್ರಿ ವೇಳೆ ಮೊಬೈಲ್ ಹಾಗೂ ಸರಗಳ್ಳತನ (೪೨%), ವಾಹನ ಕಳವು (೩೫%).\n- ಹಾಟ್‌ಸ್ಪಾಟ್: ೧೦೦ ಫೀಟ್ ರಸ್ತೆ ಮತ್ತು ೧೨ನೇ ಮೇನ್ ಜಂಕ್ಷನ್ (ರಾತ್ರಿ ೧೦ ರಿಂದ ೨ ಗಂಟೆ).\n- ಶಂಕಿತ: ಆನಂದ್ ಗೌಡ (೩ ಸರಗಳ್ಳತನ ಪ್ರಕರಣಗಳು).`;
+    if (isHindi) return `इंदिरानगर अपराध रिपोर्ट:\n- कुल सक्रिय FIR: 38 मामले।\n- मुख्य अपराध: रात के समय मोबाइल और चेन स्नैचिंग (42%), वाहन चोरी (35%)।\n- हॉटस्पॉट: 100 फीट रोड और 12वीं मेन जंक्शन (रात 10 बजे से 2 बजे तक)।\n- संदिग्ध: आनंद गौड़ा (3 मामले)।`;
+    return `Indiranagar Jurisdiction Intelligence Briefing:\n- Total Active FIRs: 38 cases.\n- Primary Offenses: Night-time Mobile/Chain Snatching (42%), Vehicle Theft (35%).\n- Hotspots: 100 Feet Road & 12th Main Junction (Peak: 10 PM - 2 AM).\n- Top Suspect: Anand Gowda (3 active robbery warrants).`;
+  }
 
-1. Current Database Status:
-   - Total Active FIR Cases: 968 cases across Karnataka Police stations.
-   - Repeat Offenders Tracked: 12 high-risk criminals under active surveillance.
-   - ANPR Camera Surveillance Network: 94% coverage across major city junctions.
+  if (q.includes('mysuru') || q.includes('mysore') || q.includes('ಮೈಸೂರು') || q.includes('मैसूर')) {
+    if (isKannada) return `ಮೈಸೂರು ಜಿಲ್ಲೆಯ ಅಪರಾಧ ಗುಪ್ತಚರ ವರದಿ:\n- ಒಟ್ಟು ಸಕ್ರಿಯ ಎಫ್.ಐ.ಆರ್: ೨೧೪ ಪ್ರಕರಣಗಳು.\n- ಪ್ರಮುಖ ಅಪರಾಧಗಳು: ಸೈಬರ್ ವಂಚನೆ (೩೪%), ಆಸ್ತಿ ಅಪರಾಧ ಮತ್ತು ಮನೆಗಳ್ಳತನ (೨೮%).\n- ಪ್ರಮುಖ ಪ್ರಕರಣ: FIR-2026-MYS-0112 (ಸೈಬರ್ ಆರ್ಥಿಕ ವಂಚನೆ - ₹೧.೪೫ ಲಕ್ಷ ೧೯೩೦ ಹೆಲ್ಪ್‌ಲೈನ್ ಮೂಲಕ ಫ್ರೀಜ್ ಮಾಡಲಾಗಿದೆ).\n- ಪ್ರಮುಖ ಶಂಕಿತ: ಸುರೇಶ್ ನಾಯ್ಡು (ಸೆಂಟ್ರಲ್ ಮಾರ್ಕೆಟ್ ವ್ಯಾಪ್ತಿ).`;
+    if (isHindi) return `मैसूरु जिला अपराध रिपोर्ट:\n- कुल सक्रिय FIR: 214 मामले।\n- मुख्य अपराध: साइबर वित्तीय धोखाधड़ी (34%), घर में चोरी (28%)।\n- मुख्य मामला: FIR-2026-MYS-0112 (साइबर फ्रॉड - 1930 हेल्पलाइन द्वारा ₹1.45 लाख फ्रीज)।\n- प्रमुख संदिग्ध: सुरेश नाईडू (सेंट्रल मार्केट क्षेत्र)।`;
+    return `Mysuru District Crime & Intelligence Summary:\n- Active Registered FIRs: 214 cases.\n- Key Crime Categories: Cyber Financial Fraud (34%), Residential Burglary (28%).\n- Lead Case: FIR-2026-MYS-0112 (Financial Fraud of ₹1.45 Lakh frozen via 1930 helpline).\n- Key Suspect: Suresh Naidu (Wanted for serial housebreakings).`;
+  }
 
-2. Primary FIR Highlights:
-   - FIR-2026-BL-0492: Vehicle Theft (Section 379 IPC) | Location: South Bengaluru | Status: Under Investigation.
-   - FIR-2026-BL-0493: Chain Snatching (Section 392 IPC) | Location: Central Bengaluru | Status: Chargesheet Prepared.
-   - FIR-2026-MYS-0112: Cyber Financial Fraud (IT Act Sec 66D) | Location: Mysuru | Status: Money Frozen via 1930 Helpline.
+  if (q.includes('bengaluru') || q.includes('bangalore') || q.includes('ಬೆಂಗಳೂರು') || q.includes('बेंगलुरु')) {
+    if (isKannada) {
+      return `ಬೆಂಗಳೂರು ನಗರ ಅಪರಾಧ ವರದಿ, ಸರ್:\n೧. ಒಟ್ಟು ಸಕ್ರಿಯ ಪ್ರಕರಣಗಳು: ೪೮೯ ಎಫ್.ಐ.ಆರ್ ದಾಖಲಾಗಿವೆ.\n೨. ಪ್ರಮುಖ ಅಪರಾಧಗಳು: ವಾಹನ ಕಳವು (೩೮%), ಸರಗಳ್ಳತನ ಮತ್ತು ದರೋಡೆ (೨೪%), ಸೈಬರ್ ವಂಚನೆ (೨೨%).\n೩. ಪ್ರಮುಖ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳು: ಸಿಲ್ಕ್ ಬೋರ್ಡ್, ಕೊರಮಂಗಲ (ವಾಹನ ಕಳವು - ೪೭ ಪ್ರಕರಣಗಳು); ಎಂ.ಜಿ. ರಸ್ತೆ (ಸರಗಳ್ಳತನ - ೩೧ ಪ್ರಕರಣಗಳು).\n೪. ಪ್ರಮುಖ ಶಂಕಿತರು: ರಮೇಶ್ ಕುಮಾರ್ (೭ ಎಫ್.ಐ.ಆರ್), ಇಮ್ರಾನ್ ಖಾನ್ (೪ ಎಫ್.ಐ.ಆರ್).`;
+    }
+    if (isHindi) {
+      return `बेंगलुरु शहर अपराध रिपोर्ट, सर:\n1. कुल सक्रिय FIR: 489 मामले दर्ज हैं।\n2. मुख्य अपराध: वाहन चोरी (38%), चेन स्नैचिंग/डकैती (24%), साइबर अपराध (22%)।\n3. प्रमुख हॉटस्पॉट: सिल्क बोर्ड, कोरमंगला (वाहन चोरी - 47 मामले); एमजी रोड (स्नैचिंग - 31 मामले)।\n4. प्रमुख संदिग्ध: रमेश कुमार (7 FIR), इमरान खान (4 FIR)।`;
+    }
+    return `Bengaluru City Crime Intelligence Summary:\n1. Active Registered FIRs: 489 cases in Bengaluru Urban.\n2. Primary Offenses: Vehicle Theft (38%), Robbery & Chain Snatching (24%), Cyber Fraud (22%).\n3. Major Hotspot Clusters: South Bengaluru (Silk Board/Koramangala - 47 vehicle thefts); Central Bengaluru (MG Road/Majestic - 31 robbery cases).\n4. Top Repeat Offenders: Ramesh Kumar (7 FIRs), Imran Khan (4 FIRs).`;
+  }
 
-3. Investigation Action Available:
-   - You can ask about specific FIR numbers, suspect profiles, crime SOPs, or city crime reports for detailed step-by-step guidance, Sir.`;
+  // 1f. Statutory Legal Sections (IPC / BNS / IT Act / POCSO / NDPS)
+  if (q.includes('379') || q.includes('theft') || q.includes('stolen') || q.includes('ಕಳವು') || q.includes('चोरी')) {
+    if (isKannada) return `IPC Section 379 (ವಾಹನ ಮತ್ತು ಆಸ್ತಿ ಕಳವು):\n- ಶಿಕ್ಷೆ: ೩ ವರ್ಷಗಳವರೆಗೆ ಜೈಲು ಶಿಕ್ಷೆ ಅಥವಾ ದಂಡ ಅಥವಾ ಎರಡೂ.\n- ಜಾಮೀನು: ಜಾಮೀನು ರಹಿತ (Non-bailable).\n- ಪೊಲೀಸ್ SOP: CCTNS ನಲ್ಲಿ ೨ ಗಂಟೆಯೊಳಗೆ ಎಂಜಿನ್/ಚಾಸಿಸ್ ನಂಬರ್ ನಮೂದಿಸಿ ಮತ್ತು ANPR ಕ್ಯಾಮೆರಾ ವಾಚ್‌ಲಿಸ್ಟ್ ಸಕ್ರಿಯಗೊಳಿಸಿ.`;
+    if (isHindi) return `IPC Section 379 (चोरी / वाहन चोरी):\n- सजा: 3 वर्ष तक का कारावास या जुर्माना या दोनों।\n- जमानत: गैर-जमानती (Non-bailable)।\n- पुलिस SOP: 2 घंटे के भीतर CCTNS में वाहन विवरण दर्ज करें और ANPR कैमरा अलर्ट सक्रिय करें।`;
+    return `IPC Section 379 (Theft / Vehicle Theft):\n- Penalty: Imprisonment up to 3 years, or fine, or both.\n- Cognizability & Bail: Cognizable & Non-Bailable.\n- Police SOP: Enter Chassis/Engine numbers into CCTNS within 2 hours and activate ANPR junction alert grids.`;
+  }
+
+  if (q.includes('392') || q.includes('394') || q.includes('397') || q.includes('robbery') || q.includes('snatch') || q.includes('ದರೋಡೆ') || q.includes('डकैती') || q.includes('स्नैचिंग')) {
+    if (isKannada) return `IPC Section 392/394/397 (ದರೋಡೆ ಮತ್ತು ಸರಗಳ್ಳತನ):\n- ಶಿಕ್ಷೆ: ೧೦ ರಿಂದ ೧೪ ವರ್ಷಗಳವರೆಗೆ ಕಠಿಣ ಜೈಲು ಶಿಕ್ಷೆ.\n- ಜಾಮೀನು: ಜಾಮೀನು ರಹಿತ (Non-bailable).\n- ಪೊಲೀಸ್ SOP: ಹೊಯ್ಸಳ ಗಸ್ತು ವಾಹನಗಳನ್ನು ತಕ್ಷಣ ರವಾನಿಸಿ, ೨ ಕಿ.ಮೀ ವ್ಯಾಪ್ತಿಯ ಸಿಸಿಟಿವಿ ದೃಶ್ಯಗಳನ್ನು ಸಂಗ್ರಹಿಸಿ.`;
+    if (isHindi) return `IPC Section 392/394/397 (डकैती और चेन स्नैचिंग):\n- सजा: 10 से 14 वर्ष तक का कठोर कारावास।\n- जमानत: गैर-जमानती (Non-bailable)।\n- पुलिस SOP: 30 मिनट के भीतर नाकाबंदी करें और 2 किमी के दायरे में सीसीटीवी फुटेज खंगालें।`;
+    return `IPC Section 392 / 394 / 397 (Robbery & Chain Snatching):\n- Penalty: Rigorous imprisonment up to 10 to 14 years.\n- Cognizability & Bail: Cognizable & Non-Bailable.\n- Police SOP: Dispatch PCR & Hoysala mobile units within 30 minutes, sweep CCTV within 2 km radius, and cross-reference known snatchers.`;
+  }
+
+  if (q.includes('cyber') || q.includes('1930') || q.includes('fraud') || q.includes('66d') || q.includes('ವಂಚನೆ') || q.includes('धोखाधड़ी')) {
+    if (isKannada) return `ಸೈಬರ್ ಆರ್ಥಿಕ ವಂಚನೆ SOP (IT Act Sec 66D & 1930):\n೧. ಸಂತ್ರಸ್ತರಿಗೆ ತಕ್ಷಣ ೧೯೩೦ ಸಹಾಯವಾಣಿಗೆ ಕರೆ ಮಾಡಲು ಅಥವಾ cybercrime.gov.in ಗೆ ದೂರು ನೀಡಲು ತಿಳಿಸಿ.\n೨. ಬ್ಯಾಂಕ್ ಖಾತೆ ಮತ್ತು UTR ವಹಿವಾಟು ಸಂಖ್ಯೆ ಪಡೆದುಕೊಳ್ಳಿ.\n೩. CFCFRMS ಪೋರ್ಟಲ್ ಮೂಲಕ ಬ್ಯಾಂಕ್ ನೋಡಲ್ ಅಧಿಕಾರಿಯನ್ನು ಸಂಪರ್ಕಿಸಿ ವಂಚಕನ ಖಾತೆಯನ್ನು ೩೦ ನಿಮಿಷಗಳಲ್ಲಿ ಫ್ರೀಜ್ ಮಾಡಿ.`;
+    if (isHindi) return `साइबर वित्तीय धोखाधड़ी SOP (IT Act Sec 66D और 1930):\n1. पीड़ित को तुरंत राष्ट्रीय साइबर हेल्पलाइन 1930 पर रिपोर्ट करने के लिए कहें।\n2. बैंक खाता, यूपीआई आईडी और यूटीआर नंबर प्राप्त करें।\n3. CFCFRMS पोर्टल के माध्यम से बैंक नोडल अधिकारी से संपर्क करके 30 मिनट के भीतर राशि फ्रीज करें।`;
+    return `Cyber Crime Investigation SOP (IT Act Section 66D & 1930 Helpline):\n1. Direct victim to immediately call National Cyber Helpline 1930 or log on to cybercrime.gov.in.\n2. Obtain UTR transaction reference number, victim bank account, and fraudster UPI/bank details.\n3. Coordinate with Bank Nodal Officers via CFCFRMS within 30 minutes to freeze the defrauded funds.`;
+  }
+
+  // 1g. Hotspots General Query
+  if (q.includes('hotspot') || q.includes('ಹಾಟ್‌ಸ್ಪಾಟ್') || q.includes('हॉटस्पॉट') || q.includes('area') || q.includes('ಪ್ರದೇಶ') || q.includes('क्षेत्र')) {
+    if (isKannada) {
+      return `ಕರ್ನಾಟಕ ರಾಜ್ಯ ಪ್ರಮುಖ ಕ್ರೈಮ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳು:\n೧. ದಕ್ಷಿಣ ಬೆಂಗಳೂರು (ಸಿಲ್ಕ್ ಬೋರ್ಡ್, ಕೊರಮಂಗಲ, ಎಚ್.ಎಸ್.ಆರ್): ವಾಹನ ಕಳವು ಹೆಚ್ಚು (೪೭ ಪ್ರಕರಣಗಳು, ರಾತ್ರಿ ೧೦ - ಬೆಳಿಗ್ಗೆ ೪).\n೨. ಸೆಂಟ್ರಲ್ ಬೆಂಗಳೂರು (ಎಂ.ಜಿ. ರಸ್ತೆ, ಶಿವಾಜಿನಗರ, ಮೆಜೆಸ್ಟಿಕ್): ಸರಗಳ್ಳತನ (೩೧ ಪ್ರಕರಣಗಳು, ಸಂಜೆ ೬ - ರಾತ್ರಿ ೧೦).\n೩. ಮೈಸೂರು ಸೆಂಟ್ರಲ್ ಮಾರ್ಕೆಟ್: ಸೈಬರ್ ಮತ್ತು ಆಸ್ತಿ ಅಪರಾಧ.\n೪. ಕಲಬುರಗಿ ರೂರಲ್: ಹೆದ್ದಾರಿ ಅಪಘಾತ ಮತ್ತು ಹಿಟ್ & ರನ್.`;
+    }
+    if (isHindi) {
+      return `कर्नाटक राज्य प्रमुख क्राइम हॉटस्पॉट रिपोर्ट:\n1. दक्षिण बेंगलुरु (सिल्क बोर्ड, कोरमंगला): वाहन चोरी (47 मामले, रात 10 से सुबह 4 बजे)।\n2. सेंट्रल बेंगलुरु (एमजी रोड, मैजेस्टिक): चेन स्नैचिंग (31 मामले, शाम 6 से रात 10 बजे)।\n3. मैसूरु सेंट्रल: साइबर धोखाधड़ी और चोरी।\n4. कलबुर्गी रूरल: हाईवे हिट एंड रन।`;
+    }
+    return `Karnataka Crime Hotspot Clusters:\n1. South Bengaluru (Silk Board, Koramangala, HSR Layout): 47 Vehicle Thefts (Peak: 10 PM - 4 AM).\n2. Central Bengaluru (MG Road, Majestic, Shivajinagar): 31 Robbery/Snatching cases (Peak: 6 PM - 10 PM).\n3. Mysuru Urban (Central Market Corridor): Financial Fraud & Burglary.\n4. Kalaburagi (Rural Highway Corridor): Hit and Run incidents.`;
+  }
+
+  // 1h. Weather / General Knowledge or Conversational Guard
+  if (q.includes('weather') || q.includes('rain') || q.includes('हवामान') || q.includes('मौसम') || q.includes('ಬಿಸಿಲು') || q.includes('ಮಳೆ')) {
+    if (isKannada) return 'ಸರ್, ಪ್ರಸ್ತುತ ಬೆಂಗಳೂರು ಮತ್ತು ಕರ್ನಾಟಕದ ಪ್ರಮುಖ ನಗರಗಳಲ್ಲಿ ಹವಾಮಾನ ಸಾಮಾನ್ಯವಾಗಿದೆ. ನೈಟ್ ಪೆಟ್ರೋಲಿಂಗ್ ಮತ್ತು ಹೆದ್ದಾರಿ ಗಸ್ತು ತಂಡಗಳು ಸುಗಮವಾಗಿ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತಿವೆ, ಸರ್.';
+    if (isHindi) return 'सर, वर्तमान में बेंगलुरु और कर्नाटक के प्रमुख क्षेत्रों में मौसम सामान्य है। रात्रि गश्त और पुलिस नियंत्रण कक्ष सुचारू रूप से कार्य कर रहे हैं, सर।';
+    return 'Sir, weather conditions across Bengaluru and major Karnataka patrol divisions are normal. Highway patrol and night squad mobility are operating smoothly.';
+  }
+
+  // 1i. Default Contextual Police Intelligence Briefing
+  if (isKannada) {
+    return `ಸರ್, ನಿಮ್ಮ ಪ್ರಶ್ನೆಗೆ ಸಂಬಂಧಿಸಿದಂತೆ ಪೊಲೀಸ್ ಗುಪ್ತಚರ ಸಾರಾಂಶ:\n- ಸಕ್ರಿಯ ಎಫ್.ಐ.ಆರ್ ದಾಖಲೆಗಳು ಮತ್ತು ಸಿ.ಸಿ.ಟಿ.ವಿ ನೆಟ್‌ವರ್ಕ್ ಆನ್‌ಲೈನ್‌ನಲ್ಲಿದೆ.\n- ನೀವು ನಿರ್ದಿಷ್ಟ ಶಂಕಿತರ ಮಾಹಿತಿ (ಉದಾ: ರಮೇಶ್ ಕುಮಾರ್, ಸುರೇಶ್ ನಾಯ್ಡು), ಅಪರಾಧ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳು, ಸಿಸಿಟಿವಿ ಎಎನ್‌ಪಿಆರ್ ಅಲರ್ಟ್‌ಗಳು ಅಥವಾ ಐಪಿಸಿ ಸೆಕ್ಷನ್ ಮಾರ್ಗದರ್ಶನವನ್ನು ಕೇಳಬಹುದು, ಸರ್.`;
+  }
+
+  if (isHindi) {
+    return `सर, आपके प्रश्न के संदर्भ में पुलिस इंटेलिजेंस सारांश:\n- सक्रिय एफआईआर डेटाबेस और सीसीटीवी सर्विलांस नेटवर्क ऑनलाइन हैं।\n- आप विशिष्ट संदिग्धों (जैसे रमेश कुमार, सुरेश नाईडू), क्राइम हॉटस्पॉट, एएनपीआर वाहन ट्रैकिंग या कानूनी धाराओं (IPC Sections) की जानकारी ले सकते हैं, सर।`;
+  }
+
+  return `Sir, here is the live tactical briefing from the DRISHTI Intelligence Network:\n- Active Datastore FIRs, ANPR surveillance feeds, and repeat offender matrices are fully synchronized.\n- You can query specific suspect records (e.g. Ramesh Kumar, Suresh Naidu), crime hotspots (e.g. Silk Board, Indiranagar), ANPR vehicle tracks, or legal SOPs for immediate tactical guidance, Sir.`;
 }
 
 // --- Groq LLM API Call --------------------------------------------------------
