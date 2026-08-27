@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import {
   Scale, BookOpen, Search, Shield, Filter,
-  FileCheck, AlertTriangle, ChevronRight, CheckCircle2, Bookmark
+  FileCheck, AlertTriangle, ChevronRight, CheckCircle2, Bookmark, Gavel
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -115,38 +115,40 @@ export default function StatutesPage() {
   });
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12 font-sans text-zinc-900 dark:text-zinc-50">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
-            <span>KSP Statutory Acts & Sections Repository</span>
-            <span className="text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
-              Act & Section Master
-            </span>
-          </h1>
-          <p className="text-xs text-gray-500">
-            Legal Statutes, Crime Head Classifications, Bail Status, Penalties & Conviction Benchmarks
-          </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-5">
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 flex items-center justify-center font-bold shadow-xs">
+            <Gavel className="w-5 h-5" />
+          </div>
+          <div>
+            <h1 className="text-xl font-black text-zinc-950 dark:text-white tracking-tight">
+              KSP Statutory Acts & Legal Repository
+            </h1>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 font-mono">
+              Bail Classifications · Statutory Penalties · Conviction Benchmarks Master
+            </p>
+          </div>
         </div>
 
         {/* Filters */}
         <div className="flex items-center gap-3">
           <div className="relative w-64">
-            <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search section (e.g. 379, 302, 66D)..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 focus:outline-none shadow-xs"
+              className="w-full pl-9 pr-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-950 dark:focus:border-zinc-50 font-mono transition-all"
             />
           </div>
 
           <select
             value={selectedAct}
             onChange={(e) => setSelectedAct(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-800 font-semibold focus:outline-none shadow-xs"
+            className="px-3.5 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 font-bold focus:outline-none font-mono"
           >
             <option value="all">All Statutes</option>
             <option value="IPC">IPC / BNS</option>
@@ -157,68 +159,66 @@ export default function StatutesPage() {
         </div>
       </div>
 
-      {/* Grid of Sections */}
+      {/* Grid of Section Cards - Clean, Authoritative Swiss Legal Design */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filteredStatutes.map((item, idx) => (
-          <motion.div
+          <div
             key={idx}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-6 rounded-3xl bg-white border border-gray-200/80 shadow-sm space-y-4 hover:border-gray-300 transition-all flex flex-col justify-between"
+            className="group p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all duration-150 flex flex-col justify-between"
           >
-            <div className="space-y-3">
+            <div>
               {/* Header Badge */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between gap-2 mb-3">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-bold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-200">
+                  <span className="font-mono text-xs font-black uppercase tracking-wider bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 px-2.5 py-1 rounded-md">
                     {item.actCode} § {item.section}
                   </span>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${item.gravity === 'Heinous' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-gray-100 text-gray-600'}`}>
+                  <span className="font-mono text-[11px] text-zinc-500 font-semibold">
                     {item.gravity}
                   </span>
                 </div>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${item.bailable ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>
+                <span className={`font-mono text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
+                  item.bailable ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300' : 'bg-rose-500 text-white dark:bg-rose-600'
+                }`}>
                   {item.bailable ? 'Bailable' : 'Non-Bailable'}
                 </span>
               </div>
 
               {/* Title & Description */}
-              <div>
-                <h2 className="text-sm font-bold text-gray-900">{item.title}</h2>
-                <p className="text-xs text-gray-500 mt-1 font-medium">{item.actName}</p>
+              <div className="space-y-1 mb-3">
+                <h2 className="text-base font-black text-zinc-950 dark:text-white tracking-tight">
+                  {item.title}
+                </h2>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono leading-relaxed">
+                  {item.actName}
+                </p>
               </div>
 
-              {/* Crime Group Classification */}
-              <div className="p-3 rounded-2xl bg-gray-50 border border-gray-100 space-y-1 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-[10px] text-gray-400 font-medium">Crime Head</span>
-                  <span className="font-semibold text-gray-800">{item.crimeHead}</span>
+              {/* Legal Classification & Penalty (Clean typographic spec, no gray lasagna boxes) */}
+              <div className="space-y-2 text-xs font-mono py-3 my-2 border-y border-zinc-100 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 block">Offence Category</span>
+                  <p className="font-semibold text-zinc-900 dark:text-zinc-100">{item.crimeHead} · {item.crimeSubHead}</p>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-[10px] text-gray-400 font-medium">Sub-Classification</span>
-                  <span className="font-semibold text-gray-700">{item.crimeSubHead}</span>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 block">Statutory Penalty</span>
+                  <p className="font-medium text-zinc-800 dark:text-zinc-200 leading-relaxed">{item.maxPunishment}</p>
                 </div>
-              </div>
-
-              {/* Punishment */}
-              <div className="text-xs space-y-1">
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Maximum Statutory Penalty</span>
-                <p className="text-gray-700 text-xs leading-relaxed font-medium">{item.maxPunishment}</p>
               </div>
             </div>
 
             {/* Footer Stats */}
-            <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
+            <div className="pt-3 flex items-center justify-between text-xs font-mono">
               <div>
-                <span className="text-[10px] text-gray-400 block">Avg Conviction Rate</span>
-                <span className="font-bold text-emerald-600">{item.avgConvictionRate}</span>
+                <span className="text-[10px] text-zinc-400 uppercase tracking-wider block">Conviction Rate</span>
+                <span className="font-black text-zinc-950 dark:text-white">{item.avgConvictionRate}</span>
               </div>
               <div className="text-right">
-                <span className="text-[10px] text-gray-400 block">Active Charges</span>
-                <span className="font-bold text-gray-900">{item.totalCasesActive} Cases</span>
+                <span className="text-[10px] text-zinc-400 uppercase tracking-wider block">Active Charges</span>
+                <span className="font-black text-zinc-950 dark:text-white">{item.totalCasesActive} Cases</span>
               </div>
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>
