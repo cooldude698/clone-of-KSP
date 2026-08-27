@@ -9,6 +9,24 @@
   },
   "projects": [
     {
+      "idx": 2,
+      "id": "49149000000013026",
+      "name": "Project-Rainfall",
+      "domain": {
+        "id": "50042971722",
+        "name": "project-rainfall-60073715607.development"
+      },
+      "timezone": "Asia/Kolkata",
+      "env": [
+        {
+          "idx": 1,
+          "id": "60073715607",
+          "name": "Development",
+          "type": 3
+        }
+      ]
+    },
+    {
       "idx": 1,
       "id": "49149000000019001",
       "name": "DRISHTI-KSP",
@@ -29,7 +47,7 @@
             "id": "49149000000019001",
             "project_type": "Live"
           },
-          "is_default": true,
+          "is_default": false,
           "action_required": false
         }
       ]
