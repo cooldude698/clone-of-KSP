@@ -1,0 +1,7 @@
+CrimeSubHeadID,CrimeHeadID,CrimeHeadName,SeqID
+1,1,Vehicle Theft / Motor Vehicle Larceny,1
+2,1,Armed Robbery / Highway Heist,2
+3,1,Chain Snatching / Street Theft,3
+4,2,Assault / Attempt to Murder,4
+5,3,Financial Fraud & Digital Phishing,5
+6,4,Commercial Drug Trafficking,6

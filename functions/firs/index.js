@@ -1,56 +1,144 @@
 const dbHelper = require('./db-helper');
 
 const ALL_50_FIRS = [
-  { case_number: "KAR/KAL/2024/0330", date_filed: "2024-06-01", time_filed: "13:09:00", crime_type_code: "hit_and_run", crime_type: "Hit And Run", description: "Speeding vehicle collided with two-wheeler near Murty Circle, Kalaburagi.", status: "open", case_status: "open", district_name: "Kalaburagi", police_station: "Kalaburagi Rural PS", location_name: "Near Murty Circle, Kalaburagi", investigation_office: "Insp. Lohit Lall", accused_name: "Vikram Singh", risk_score: 88 },
-  { case_number: "KAR/KAL/2024/0102", date_filed: "2024-06-01", time_filed: "13:09:00", crime_type_code: "hit_and_run", crime_type: "Hit And Run", description: "Speeding vehicle collided with pedestrian near Murty Circle.", status: "open", case_status: "open", district_name: "Kalaburagi", police_station: "Kalaburagi Rural PS", location_name: "Near Murty Circle, Kalaburagi", investigation_office: "Insp. Lohit Lall", accused_name: "Vikram Singh", risk_score: 88 },
-  { case_number: "KAR/RAI/2024/0123", date_filed: "2024-06-01", time_filed: "00:10:00", crime_type_code: "vehicle_theft", crime_type: "Vehicle Theft", description: "Stolen motorcycle outside Balay Circle, Raichur.", status: "chargesheeted", case_status: "chargesheeted", district_name: "Raichur", police_station: "Raichur Suburban PS", location_name: "Near Balay Circle, Raichur", investigation_office: "Insp. Jonathan Iyengar", accused_name: "Ramesh Kumar", risk_score: 94 },
-  { case_number: "KAR/BEN/2024/1726", date_filed: "2024-06-01", time_filed: "22:52:00", crime_type_code: "drug_offence", crime_type: "Drug Offence", description: "Tactical raid near Wadhwa seizing commercial MDMA payload.", status: "chargesheeted", case_status: "chargesheeted", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban East PS", location_name: "Near Wadhwa, Bengaluru Urban", investigation_office: "Insp. George Gopal", accused_name: "Imran Khan", risk_score: 96 },
-  { case_number: "KAR/UDU/2024/0049", date_filed: "2024-06-01", time_filed: "17:21:00", crime_type_code: "senior_citizen_crime", crime_type: "Senior Citizen Crime", description: "Extortion complaint under Senior Citizen Protection Act near Das Marg.", status: "open", case_status: "open", district_name: "Udupi", police_station: "Udupi Rural PS", location_name: "Near Das Marg, Udupi", investigation_office: "Insp. Saanvi Dara", accused_name: "Saanvi Dara", risk_score: 82 },
-  { case_number: "KAR/KAL/2024/0106", date_filed: "2024-06-01", time_filed: "13:09:00", crime_type_code: "hit_and_run", crime_type: "Hit And Run", description: "Hit and run collision logged near Murty Circle.", status: "open", case_status: "open", district_name: "Kalaburagi", police_station: "Kalaburagi Rural PS", location_name: "Near Murty Circle, Kalaburagi", investigation_office: "Insp. Lohit Lall", accused_name: "Vikram Singh", risk_score: 88 },
-  { case_number: "KAR/BEN/2024/0380", date_filed: "2024-06-01", time_filed: "22:58:00", crime_type_code: "cybercrime", crime_type: "Cybercrime", description: "Phishing scam mimicking banking portal near Gara Zila.", status: "chargesheeted", case_status: "chargesheeted", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban Traffic PS", location_name: "Near Gara Zila, Bengaluru Urban", investigation_office: "Insp. Bhavani Karpe", accused_name: "Bhavani Karpe", risk_score: 85 },
-  { case_number: "KAR/RAI/2024/0108", date_filed: "2024-06-01", time_filed: "00:10:00", crime_type_code: "vehicle_theft", crime_type: "Vehicle Theft", description: "Vehicle theft reported near Balay Circle.", status: "chargesheeted", case_status: "chargesheeted", district_name: "Raichur", police_station: "Raichur Suburban PS", location_name: "Near Balay Circle, Raichur", investigation_office: "Insp. Jonathan Iyengar", accused_name: "Ramesh Kumar", risk_score: 94 },
-  { case_number: "KAR/BEN/2024/0109", date_filed: "2024-06-01", time_filed: "22:52:00", crime_type_code: "drug_offence", crime_type: "Drug Offence", description: "Narcotics interception near Wadhwa.", status: "chargesheeted", case_status: "chargesheeted", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban East PS", location_name: "Near Wadhwa, Bengaluru Urban", investigation_office: "Insp. George Gopal", accused_name: "Imran Khan", risk_score: 96 },
-  { case_number: "KAR/BEN/2024/0747", date_filed: "2024-06-01", time_filed: "01:32:00", crime_type_code: "vehicle_theft", crime_type: "Vehicle Theft", description: "Vehicle theft logged near Keer Circle.", status: "chargesheeted", case_status: "chargesheeted", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban Central PS", location_name: "Near Keer Circle, Bengaluru Urban", investigation_office: "Insp. Radha Virk", accused_name: "Ramesh Kumar", risk_score: 94 },
-  { case_number: "KAR/CHI/2024/0901", date_filed: "2024-06-01", time_filed: "23:36:00", crime_type_code: "burglary", crime_type: "Burglary", description: "Housebreaking and gold looting near Ganesh Marg.", status: "open", case_status: "open", district_name: "Chikkamagaluru", police_station: "Chikkamagaluru Market PS", location_name: "Near Ganesh Marg, Chikkamagaluru", investigation_office: "Insp. Bhavna Menon", accused_name: "Vikram Reddy", risk_score: 84 },
-  { case_number: "KAR/TUM/2024/0774", date_filed: "2024-06-01", time_filed: "10:25:00", crime_type_code: "drug_offence", crime_type: "Drug Offence", description: "Narcotics contraband raid near Bajaj Chowk.", status: "closed", case_status: "closed", district_name: "Tumakuru", police_station: "Tumakuru Town PS", location_name: "Near Bajaj Chowk, Tumakuru", investigation_office: "Insp. Janaki Bhatia", accused_name: "Imran Khan", risk_score: 96 },
-  { case_number: "KAR/BEN/2024/0384", date_filed: "2024-06-01", time_filed: "07:54:00", crime_type_code: "assault", crime_type: "Assault", description: "Physical altercation near Padmanabhan Zila.", status: "under_investigation", case_status: "under_investigation", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban West PS", location_name: "Near Padmanabhan Zila, Bengaluru Urban", investigation_office: "Insp. Mahika Ramachandran", accused_name: "Mahika Ramachandran", risk_score: 78 },
-  { case_number: "KAR/BEN/2024/0114", date_filed: "2024-06-01", time_filed: "07:54:00", crime_type_code: "assault", crime_type: "Assault", description: "Physical assault reported near Padmanabhan Zila.", status: "under_investigation", case_status: "under_investigation", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban West PS", location_name: "Near Padmanabhan Zila, Bengaluru Urban", investigation_office: "Insp. Mahika Ramachandran", accused_name: "Mahika Ramachandran", risk_score: 78 },
-  { case_number: "KAR/KAL/2024/0115", date_filed: "2024-06-01", time_filed: "13:09:00", crime_type_code: "hit_and_run", crime_type: "Hit And Run", description: "Hit and run logged near Murty Circle.", status: "open", case_status: "open", district_name: "Kalaburagi", police_station: "Kalaburagi Rural PS", location_name: "Near Murty Circle, Kalaburagi", investigation_office: "Insp. Lohit Lall", accused_name: "Vikram Singh", risk_score: 88 },
-  { case_number: "KAR/KAL/2024/0116", date_filed: "2024-06-01", time_filed: "13:09:00", crime_type_code: "hit_and_run", crime_type: "Hit And Run", description: "Speeding hit and run near Murty Circle.", status: "open", case_status: "open", district_name: "Kalaburagi", police_station: "Kalaburagi Rural PS", location_name: "Near Murty Circle, Kalaburagi", investigation_office: "Insp. Lohit Lall", accused_name: "Vikram Singh", risk_score: 88 },
-  { case_number: "KAR/BEN/2024/0117", date_filed: "2024-06-01", time_filed: "07:54:00", crime_type_code: "assault", crime_type: "Assault", description: "Assault reported near Padmanabhan Zila.", status: "under_investigation", case_status: "under_investigation", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban West PS", location_name: "Near Padmanabhan Zila, Bengaluru Urban", investigation_office: "Insp. Mahika Ramachandran", accused_name: "Mahika Ramachandran", risk_score: 78 },
-  { case_number: "KAR/BEN/2024/0118", date_filed: "2024-06-01", time_filed: "07:54:00", crime_type_code: "assault", crime_type: "Assault", description: "Assault incident near Padmanabhan Zila.", status: "under_investigation", case_status: "under_investigation", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban West PS", location_name: "Near Padmanabhan Zila, Bengaluru Urban", investigation_office: "Insp. Mahika Ramachandran", accused_name: "Mahika Ramachandran", risk_score: 78 },
-  { case_number: "KAR/RAI/2024/0119", date_filed: "2024-06-01", time_filed: "00:10:00", crime_type_code: "vehicle_theft", crime_type: "Vehicle Theft", description: "Vehicle theft near Balay Circle.", status: "chargesheeted", case_status: "chargesheeted", district_name: "Raichur", police_station: "Raichur Suburban PS", location_name: "Near Balay Circle, Raichur", investigation_office: "Insp. Jonathan Iyengar", accused_name: "Ramesh Kumar", risk_score: 94 },
-  { case_number: "KAR/RAI/2024/0120", date_filed: "2024-06-01", time_filed: "00:10:00", crime_type_code: "vehicle_theft", crime_type: "Vehicle Theft", description: "Vehicle theft reported near Balay Circle.", status: "chargesheeted", case_status: "chargesheeted", district_name: "Raichur", police_station: "Raichur Suburban PS", location_name: "Near Balay Circle, Raichur", investigation_office: "Insp. Jonathan Iyengar", accused_name: "Ramesh Kumar", risk_score: 94 },
-  { case_number: "KAR/RAI/2024/0121", date_filed: "2024-06-01", time_filed: "00:10:00", crime_type_code: "vehicle_theft", crime_type: "Vehicle Theft", description: "Stolen two-wheeler near Balay Circle.", status: "chargesheeted", case_status: "chargesheeted", district_name: "Raichur", police_station: "Raichur Suburban PS", location_name: "Near Balay Circle, Raichur", investigation_office: "Insp. Jonathan Iyengar", accused_name: "Ramesh Kumar", risk_score: 94 },
-  { case_number: "KAR/BEN/2024/0122", date_filed: "2024-06-01", time_filed: "22:52:00", crime_type_code: "drug_offence", crime_type: "Drug Offence", description: "Contraband MDMA seizure near Wadhwa.", status: "chargesheeted", case_status: "chargesheeted", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban East PS", location_name: "Near Wadhwa, Bengaluru Urban", investigation_office: "Insp. George Gopal", accused_name: "Imran Khan", risk_score: 96 },
-  { case_number: "KAR/BEN/2024/0123", date_filed: "2024-06-01", time_filed: "07:54:00", crime_type_code: "assault", crime_type: "Assault", description: "Assault altercation near Padmanabhan Zila.", status: "under_investigation", case_status: "under_investigation", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban West PS", location_name: "Near Padmanabhan Zila, Bengaluru Urban", investigation_office: "Insp. Mahika Ramachandran", accused_name: "Mahika Ramachandran", risk_score: 78 },
-  { case_number: "KAR/KAL/2024/0124", date_filed: "2024-06-01", time_filed: "13:09:00", crime_type_code: "hit_and_run", crime_type: "Hit And Run", description: "Hit and run logged near Murty Circle.", status: "open", case_status: "open", district_name: "Kalaburagi", police_station: "Kalaburagi Rural PS", location_name: "Near Murty Circle, Kalaburagi", investigation_office: "Insp. Lohit Lall", accused_name: "Vikram Singh", risk_score: 88 },
-  { case_number: "KAR/BEN/2024/0125", date_filed: "2024-06-01", time_filed: "07:54:00", crime_type_code: "assault", crime_type: "Assault", description: "Grievous assault near Padmanabhan Zila.", status: "under_investigation", case_status: "under_investigation", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban West PS", location_name: "Near Padmanabhan Zila, Bengaluru Urban", investigation_office: "Insp. Mahika Ramachandran", accused_name: "Mahika Ramachandran", risk_score: 78 },
-  { case_number: "KAR/CHI/2024/0126", date_filed: "2024-06-01", time_filed: "23:36:00", crime_type_code: "burglary", crime_type: "Burglary", description: "Residential burglary near Ganesh Marg.", status: "open", case_status: "open", district_name: "Chikkamagaluru", police_station: "Chikkamagaluru Market PS", location_name: "Near Ganesh Marg, Chikkamagaluru", investigation_office: "Insp. Bhavna Menon", accused_name: "Vikram Reddy", risk_score: 84 },
-  { case_number: "KAR/CHI/2024/0127", date_filed: "2024-06-01", time_filed: "23:36:00", crime_type_code: "burglary", crime_type: "Burglary", description: "Night break-in near Ganesh Marg.", status: "open", case_status: "open", district_name: "Chikkamagaluru", police_station: "Chikkamagaluru Market PS", location_name: "Near Ganesh Marg, Chikkamagaluru", investigation_office: "Insp. Bhavna Menon", accused_name: "Vikram Reddy", risk_score: 84 },
-  { case_number: "KAR/HAS/2024/1961", date_filed: "2024-06-01", time_filed: "11:35:00", crime_type_code: "domestic_violence", crime_type: "Domestic Violence", description: "Domestic abuse complaint near Kumer Nagar.", status: "open", case_status: "open", district_name: "Hassan", police_station: "Hassan Industrial PS", location_name: "Near Kumer Nagar, Hassan", investigation_office: "Insp. Avi Goda", accused_name: "Anand Shinde", risk_score: 90 },
-  { case_number: "KAR/RAI/2024/0129", date_filed: "2024-06-01", time_filed: "00:10:00", crime_type_code: "vehicle_theft", crime_type: "Vehicle Theft", description: "Motorcycle stolen near Balay Circle.", status: "chargesheeted", case_status: "chargesheeted", district_name: "Raichur", police_station: "Raichur Suburban PS", location_name: "Near Balay Circle, Raichur", investigation_office: "Insp. Jonathan Iyengar", accused_name: "Ramesh Kumar", risk_score: 94 },
-  { case_number: "KAR/VIJ/2024/2269", date_filed: "2024-05-31", time_filed: "15:19:00", crime_type_code: "robbery", crime_type: "Robbery", description: "Armed robbery near Karan Marg.", status: "open", case_status: "open", district_name: "Vijayapura", police_station: "Vijayapura Industrial PS", location_name: "Near Karan Marg, Vijayapura", investigation_office: "Insp. Sanya Bora", accused_name: "Suresh Naidu", risk_score: 91 },
-  { case_number: "KAR/BEN/2024/0675", date_filed: "2024-05-31", time_filed: "07:40:00", crime_type_code: "robbery", crime_type: "Robbery", description: "Robbery incident near Balan Street.", status: "chargesheeted", case_status: "chargesheeted", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban East PS", location_name: "Near Balan Street, Bengaluru Urban", investigation_office: "Insp. Yatan Mani", accused_name: "Suresh Naidu", risk_score: 91 },
-  { case_number: "KAR/BEN/2024/1840", date_filed: "2024-05-31", time_filed: "12:51:00", crime_type_code: "vehicle_theft", crime_type: "Vehicle Theft", description: "Vehicle theft near Nagarajan Street.", status: "chargesheeted", case_status: "chargesheeted", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban East PS", location_name: "Near Nagarajan Street, Bengaluru Urban", investigation_office: "Insp. Ekavir Pingle", accused_name: "Ramesh Kumar", risk_score: 94 },
-  { case_number: "KAR/KAL/2024/0718", date_filed: "2024-05-31", time_filed: "23:43:00", crime_type_code: "assault", crime_type: "Assault", description: "Assault incident near Behl Path.", status: "under_investigation", case_status: "under_investigation", district_name: "Kalaburagi", police_station: "Kalaburagi Industrial PS", location_name: "Near Behl Path, Kalaburagi", investigation_office: "Insp. Yug Varty", accused_name: "Mahika Ramachandran", risk_score: 78 },
-  { case_number: "KAR/VIJ/2024/1383", date_filed: "2024-05-31", time_filed: "19:57:00", crime_type_code: "domestic_violence", crime_type: "Domestic Violence", description: "Domestic harassment near Shenoy Zila.", status: "open", case_status: "open", district_name: "Vijayapura", police_station: "Vijayapura Suburban PS", location_name: "Near Shenoy Zila, Vijayapura", investigation_office: "Insp. Meghana Sen", accused_name: "Anand Shinde", risk_score: 90 },
-  { case_number: "KAR/TUM/2024/1316", date_filed: "2024-05-31", time_filed: "16:20:00", crime_type_code: "fraud", crime_type: "Fraud", description: "Financial scam near Ramakrishnan Circle.", status: "under_investigation", case_status: "under_investigation", district_name: "Tumakuru", police_station: "Tumakuru Industrial PS", location_name: "Near Ramakrishnan Circle, Tumakuru", investigation_office: "Insp. Imaran Biswas", accused_name: "Bhavani Karpe", risk_score: 85 },
-  { case_number: "KAR/CHI/2024/2061", date_filed: "2024-05-31", time_filed: "10:37:00", crime_type_code: "cybercrime", crime_type: "Cybercrime", description: "Phishing attack near Prasad Path.", status: "under_investigation", case_status: "under_investigation", district_name: "Chikkamagaluru", police_station: "Chikkamagaluru Town PS", location_name: "Near Prasad Path, Chikkamagaluru", investigation_office: "Insp. Anika Din", accused_name: "Bhavani Karpe", risk_score: 85 },
-  { case_number: "KAR/CHI/2024/0137", date_filed: "2024-05-31", time_filed: "10:37:00", crime_type_code: "cybercrime", crime_type: "Cybercrime", description: "Cyber fraud near Prasad Path.", status: "under_investigation", case_status: "under_investigation", district_name: "Chikkamagaluru", police_station: "Chikkamagaluru Town PS", location_name: "Near Prasad Path, Chikkamagaluru", investigation_office: "Insp. Anika Din", accused_name: "Bhavani Karpe", risk_score: 85 },
-  { case_number: "KAR/CHI/2024/0138", date_filed: "2024-05-31", time_filed: "10:37:00", crime_type_code: "cybercrime", crime_type: "Cybercrime", description: "Cyber phishing complaint near Prasad Path.", status: "under_investigation", case_status: "under_investigation", district_name: "Chikkamagaluru", police_station: "Chikkamagaluru Town PS", location_name: "Near Prasad Path, Chikkamagaluru", investigation_office: "Insp. Anika Din", accused_name: "Bhavani Karpe", risk_score: 85 },
-  { case_number: "KAR/KOP/2024/0131", date_filed: "2024-05-31", time_filed: "05:28:00", crime_type_code: "drug_offence", crime_type: "Drug Offence", description: "Substance contraband seizure near Mammen Marg.", status: "open", case_status: "open", district_name: "Koppal", police_station: "Koppal Town PS", location_name: "Near Mammen Marg, Koppal", investigation_office: "Insp. Oliver Ramesh", accused_name: "Imran Khan", risk_score: 96 },
-  { case_number: "KAR/BID/2024/1595", date_filed: "2024-05-31", time_filed: "05:25:00", crime_type_code: "robbery", crime_type: "Robbery", description: "Robbery logged near Narayan Street.", status: "open", case_status: "open", district_name: "Bidar", police_station: "Bidar Rural PS", location_name: "Near Narayan Street, Bidar", investigation_office: "Insp. Nidhi Dhaliwal", accused_name: "Suresh Naidu", risk_score: 91 },
-  { case_number: "KAR/RAI/2024/2205", date_filed: "2024-05-30", time_filed: "05:47:00", crime_type_code: "assault", crime_type: "Assault", description: "Assault incident near Minhas Nagar.", status: "open", case_status: "open", district_name: "Raichur", police_station: "Raichur Industrial PS", location_name: "Near Minhas Nagar, Raichur", investigation_office: "Insp. Sarthak Om", accused_name: "Mahika Ramachandran", risk_score: 78 },
-  { case_number: "KAR/BEN/2024/0303", date_filed: "2024-05-30", time_filed: "06:19:00", crime_type_code: "fraud", crime_type: "Fraud", description: "Financial fraud near Prasad Circle.", status: "under_investigation", case_status: "under_investigation", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban Traffic PS", location_name: "Near Prasad Circle, Bengaluru Urban", investigation_office: "Insp. Vaishnavi Aggarwal", accused_name: "Bhavani Karpe", risk_score: 85 },
-  { case_number: "KAR/BEN/2024/0822", date_filed: "2024-05-30", time_filed: "05:11:00", crime_type_code: "fraud", crime_type: "Fraud", description: "Cheating fraud near Bhandari Street.", status: "open", case_status: "open", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban North PS", location_name: "Near Bhandari Street, Bengaluru Urban", investigation_office: "Insp. Anamika Sule", accused_name: "Bhavani Karpe", risk_score: 85 },
-  { case_number: "KAR/RAI/2024/0144", date_filed: "2024-05-30", time_filed: "05:47:00", crime_type_code: "assault", crime_type: "Assault", description: "Assault complaint near Minhas Nagar.", status: "open", case_status: "open", district_name: "Raichur", police_station: "Raichur Industrial PS", location_name: "Near Minhas Nagar, Raichur", investigation_office: "Insp. Sarthak Om", accused_name: "Mahika Ramachandran", risk_score: 78 },
-  { case_number: "KAR/BEN/2024/2250", date_filed: "2024-05-30", time_filed: "20:49:00", crime_type_code: "robbery", crime_type: "Robbery", description: "Armed robbery near Saini.", status: "under_investigation", case_status: "under_investigation", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban North PS", location_name: "Near Saini, Bengaluru Urban", investigation_office: "Insp. Vasana Sastry", accused_name: "Suresh Naidu", risk_score: 91 },
-  { case_number: "KAR/KAL/2024/2223", date_filed: "2024-05-30", time_filed: "03:16:00", crime_type_code: "property_crime", crime_type: "Property Crime", description: "Property offense near Thaman.", status: "chargesheeted", case_status: "chargesheeted", district_name: "Kalaburagi", police_station: "Kalaburagi Market PS", location_name: "Near Thaman, Kalaburagi", investigation_office: "Insp. Nidhi Pandey", accused_name: "Chetan Shetty", risk_score: 89 },
-  { case_number: "KAR/BID/2024/0897", date_filed: "2024-05-30", time_filed: "02:27:00", crime_type_code: "vehicle_theft", crime_type: "Vehicle Theft", description: "Vehicle theft near Verma Circle.", status: "open", case_status: "open", district_name: "Bidar", police_station: "Bidar Suburban PS", location_name: "Near Verma Circle, Bidar", investigation_office: "Insp. Yashodhara Konda", accused_name: "Ramesh Kumar", risk_score: 94 },
-  { case_number: "KAR/BID/2024/2425", date_filed: "2024-05-30", time_filed: "09:24:00", crime_type_code: "vehicle_theft", crime_type: "Vehicle Theft", description: "Stolen motorcycle near Kalita Path.", status: "chargesheeted", case_status: "chargesheeted", district_name: "Bidar", police_station: "Bidar Market PS", location_name: "Near Kalita Path, Bidar", investigation_office: "Insp. Timothy Kota", accused_name: "Ramesh Kumar", risk_score: 94 },
-  { case_number: "KAR/DAV/2024/2111", date_filed: "2024-05-30", time_filed: "06:35:00", crime_type_code: "hit_and_run", crime_type: "Hit And Run", description: "Hit and run near Sahota Ganj.", status: "chargesheeted", case_status: "chargesheeted", district_name: "Davangere", police_station: "Davangere Market PS", location_name: "Near Sahota Ganj, Davangere", investigation_office: "Insp. Jyoti Kumer", accused_name: "Vikram Singh", risk_score: 88 },
-  { case_number: "KAR/BEN/2024/0150", date_filed: "2024-05-30", time_filed: "20:49:00", crime_type_code: "robbery", crime_type: "Robbery", description: "Robbery near Saini, Bengaluru Urban.", status: "under_investigation", case_status: "under_investigation", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban North PS", location_name: "Near Saini, Bengaluru Urban", investigation_office: "Insp. Vasana Sastry", accused_name: "Suresh Naidu", risk_score: 91 }
+  {
+    case_number: "KAR/BLR/2026/04921",
+    crime_no: "104430006202600001",
+    case_no: "202600001",
+    case_category: "FIR",
+    gravity: "Heinous",
+    date_filed: "2026-07-22",
+    time_filed: "13:09:00",
+    crime_type_code: "vehicle_theft",
+    crime_type: "Vehicle Theft",
+    description: "Armed gang stole commercial multi-axle carrier near Silk Board Inbound Signal.",
+    status: "open",
+    case_status: "under_investigation",
+    district_name: "Bengaluru Urban",
+    police_station: "Silk Board & Madiwala PS (Unit #0006)",
+    location_name: "Silk Board Junction, Hosur Main Road",
+    location_lat: 12.9352,
+    location_lng: 77.6245,
+    investigation_office: "Insp. Vikram Sharma (KGID: KSP-4092)",
+    io_details: { kgid: "KSP-4092", name: "Insp. Vikram Sharma", rank: "Police Inspector (SHO)" },
+    court_name: "City Civil & Sessions Court, Bengaluru",
+    complainant: { name: "Anand R. Murthy", age: 44, gender: "Male", occupation: "Logistics Fleet Manager", religion: "Hindu" },
+    victims: [{ name: "Karnataka State Roadlines Driver", age: 38, gender: "Male", is_police: false }],
+    accused: [
+      { person_id: "A1", name: "Vikram Malhotra", age: 31, gender: "Male", role: "Prime Accused / Mastermind", risk_score: 94 },
+      { person_id: "A2", name: "Suresh Naidu", age: 28, gender: "Male", role: "Driver / Intercept Accomplice", risk_score: 86 }
+    ],
+    act_sections: [
+      { act: "IPC", section: "379", desc: "Punishment for Theft" },
+      { act: "IPC", section: "392", desc: "Punishment for Robbery" }
+    ],
+    chargesheet: { cs_type: "A", cs_label: "Chargesheet in Progress", date: "2026-07-24" },
+    accused_name: "Vikram Malhotra",
+    risk_score: 94
+  },
+  {
+    case_number: "KAR/BLR/2026/01184",
+    crime_no: "104430012202600002",
+    case_no: "202600002",
+    case_category: "FIR",
+    gravity: "Heinous",
+    date_filed: "2026-07-20",
+    time_filed: "22:15:00",
+    crime_type_code: "robbery",
+    crime_type: "Robbery",
+    description: "Highway armed snatching of jewelry consignment near MG Road Metro Approach.",
+    status: "chargesheeted",
+    case_status: "chargesheeted",
+    district_name: "Bengaluru Urban",
+    police_station: "MG Road & Cubbon Park PS (Unit #0012)",
+    location_name: "MG Road Metro Signal Approach",
+    location_lat: 12.9716,
+    location_lng: 77.5946,
+    investigation_office: "Insp. Siddharth Rao (KGID: KSP-3011)",
+    io_details: { kgid: "KSP-3011", name: "Insp. Siddharth Rao", rank: "Deputy Superintendent of Police" },
+    court_name: "Chief Metropolitan Magistrate Court, Bengaluru",
+    complainant: { name: "Girish K. Jewellers", age: 52, gender: "Male", occupation: "Merchant / Business Owner", religion: "Hindu" },
+    victims: [{ name: "Girish Kumar", age: 52, gender: "Male", is_police: false }],
+    accused: [
+      { person_id: "A1", name: "Ramesh Kumar", age: 34, gender: "Male", role: "Prime Accused", risk_score: 96 },
+      { person_id: "A2", name: "Imran Khan", age: 29, gender: "Male", role: "Armed Accomplice", risk_score: 92 }
+    ],
+    act_sections: [
+      { act: "IPC", section: "392", desc: "Punishment for Robbery" },
+      { act: "ARMS", section: "25", desc: "Possession of Illegal Firearm" }
+    ],
+    chargesheet: { cs_type: "A", cs_label: "Formal Chargesheeted (Type A)", date: "2026-07-21" },
+    accused_name: "Ramesh Kumar",
+    risk_score: 96
+  },
+  {
+    case_number: "KAR/BLR/2026/09104",
+    crime_no: "104430018202600003",
+    case_no: "202600003",
+    case_category: "FIR",
+    gravity: "Non-Heinous",
+    date_filed: "2026-07-18",
+    time_filed: "14:40:00",
+    crime_type_code: "cyber_fraud",
+    crime_type: "Cyber Fraud",
+    description: "Spear-phishing tokens deployed to compromise corporate credentials and drain escrow.",
+    status: "under_investigation",
+    case_status: "under_investigation",
+    district_name: "Bengaluru Urban",
+    police_station: "Whitefield Cyber Crime PS / CEN Command (Unit #0018)",
+    location_name: "ITPB Main Road, Whitefield",
+    location_lat: 12.9860,
+    location_lng: 77.7380,
+    investigation_office: "Insp. Ananya Hegde (KGID: KSP-5120)",
+    io_details: { kgid: "KSP-5120", name: "Insp. Ananya Hegde", rank: "Crime Intelligence Lead (IO)" },
+    court_name: "City Civil & Sessions Court, Bengaluru",
+    complainant: { name: "FinTech Security Cell", age: 35, gender: "Female", occupation: "IT Security Lead", religion: "Christian" },
+    victims: [{ name: "Corporate Escrow Holding", age: 0, gender: "Organization", is_police: false }],
+    accused: [
+      { person_id: "A1", name: "Bhavani Karpe", age: 27, gender: "Female", role: "Digital Mule Operator", risk_score: 85 }
+    ],
+    act_sections: [
+      { act: "ITACT", section: "66D", desc: "Cheating by Personation via Computer Resource" },
+      { act: "IPC", section: "420", desc: "Cheating & Dishonest Inducement" }
+    ],
+    chargesheet: { cs_type: "C", cs_label: "Under Active Tracing (Type C)", date: "2026-07-25" },
+    accused_name: "Bhavani Karpe",
+    risk_score: 85
+  },
+  {
+    case_number: "KAR/MYS/2026/00199",
+    crime_no: "801020042202600004",
+    case_no: "202600004",
+    case_category: "Zero FIR",
+    gravity: "Heinous",
+    date_filed: "2026-07-15",
+    time_filed: "09:30:00",
+    crime_type_code: "assault",
+    crime_type: "Assault",
+    description: "Zero FIR transferred from Mysuru highway patrol involving physical altercation.",
+    status: "open",
+    case_status: "open",
+    district_name: "Mysuru District",
+    police_station: "Mysuru Central PS (Unit #0042)",
+    location_name: "Mysuru Expressway Toll Junction",
+    location_lat: 12.3052,
+    location_lng: 76.6552,
+    investigation_office: "Insp. Rajesh Gowda (KGID: KSP-6304)",
+    io_details: { kgid: "KSP-6304", name: "Insp. Rajesh Gowda", rank: "Sub-Inspector of Police" },
+    court_name: "Principal District & Sessions Court, Mysuru",
+    complainant: { name: "Mahesh Swamy", age: 41, gender: "Male", occupation: "Highway Patrol Duty Officer", religion: "Hindu" },
+    victims: [{ name: "Head Constable Ravi P.", age: 46, gender: "Male", is_police: true }],
+    accused: [
+      { person_id: "A1", name: "Mahika Ramachandran", age: 32, gender: "Male", role: "Prime Assailant", risk_score: 78 }
+    ],
+    act_sections: [
+      { act: "IPC", section: "307", desc: "Attempt to Murder" },
+      { act: "IPC", section: "353", desc: "Assault on Public Servant" }
+    ],
+    chargesheet: { cs_type: "A", cs_label: "Chargesheet Pending Court Date", date: "2026-07-23" },
+    accused_name: "Mahika Ramachandran",
+    risk_score: 78
+  }
 ];
 
 module.exports = async (req, res) => {
@@ -97,8 +185,35 @@ module.exports = async (req, res) => {
         const countResult = await dbHelper.executeQuery(req, countSql);
         const total_count = countResult.length > 0 ? (countResult[0].FIRs?.ROWID || countResult[0].FIRs?.case_number || Object.values(countResult[0].FIRs || {})[0] || 0) : 0;
 
-        let resultFirs = firs.map(f => f.FIRs || f);
-        if (resultFirs.length < 50) {
+        let resultFirs = firs.map(f => {
+            const row = f.FIRs || f;
+            const distId = (row.district_name || '').includes('Bengaluru') ? 443 : 102;
+            const unitId = 6;
+            const yr = 2026;
+            const serialNum = (row.case_number || '').replace(/\D/g, '').slice(-5) || '00001';
+            const crime_no = row.crime_no || `1${String(distId).padStart(4, '0')}${String(unitId).padStart(4, '0')}${yr}${String(serialNum).padStart(5, '0')}`;
+            const case_no = row.case_no || `${yr}${String(serialNum).padStart(5, '0')}`;
+
+            return {
+                ...row,
+                crime_no,
+                case_no,
+                case_category: row.case_category || (crime_no.startsWith('8') ? 'Zero FIR' : 'FIR'),
+                gravity: row.gravity || (parseInt(row.risk_score || 50, 10) > 80 ? 'Heinous' : 'Non-Heinous'),
+                accused_name: row.accused_name || 'Vikram Malhotra',
+                accused: row.accused || [
+                    { person_id: 'A1', name: row.accused_name || 'Vikram Malhotra', role: 'Prime Accused', risk_score: row.risk_score || 88 }
+                ],
+                victims: row.victims || [
+                    { name: 'Complainant Informant', age: 34, gender: 'Male', is_police: false }
+                ],
+                act_sections: row.act_sections || [
+                    { act: 'IPC', section: '379', desc: 'Punishment for Theft' }
+                ],
+                chargesheet: row.chargesheet || { cs_type: row.status === 'chargesheeted' ? 'A' : 'C', cs_label: row.status === 'chargesheeted' ? 'Chargesheet Filed' : 'Under Investigation' }
+            };
+        });
+        if (resultFirs.length < 4) {
             resultFirs = ALL_50_FIRS;
         }
 

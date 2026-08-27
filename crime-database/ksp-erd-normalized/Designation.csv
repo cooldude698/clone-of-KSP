@@ -1,0 +1,5 @@
+DesignationID,DesignationName,Active,SortOrder
+1,Station House Officer (SHO),1,1
+2,Investigating Officer (IO),1,2
+3,Crime Intelligence Analyst,1,3
+4,Surveillance Field Intercept Lead,1,4

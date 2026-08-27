@@ -245,6 +245,13 @@ export default function FirRegistryPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <Link
+            href="/dashboard/fir/new"
+            className="px-4 py-2 text-sm font-bold rounded-xl bg-black hover:bg-gray-800 text-white shadow-md transition-all flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Register Official FIR
+          </Link>
           <button
             onClick={() => setIsOcrOpen(true)}
             className="px-4 py-2.5 rounded-2xl bg-black text-white dark:bg-white dark:text-black font-bold text-xs hover:opacity-90 shadow-sm transition-all flex items-center gap-2 cursor-pointer"
@@ -329,6 +336,7 @@ export default function FirRegistryPage() {
                 className="group rounded-2xl bg-white dark:bg-[#18181B] border border-gray-200/80 dark:border-gray-800 p-5 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-xs transition-all duration-150 flex flex-col justify-between"
               >
                 <div>
+<<<<<<< Updated upstream
                   {/* TOP ROW: Header with Portrait/Icon, Case ID, and Minimal Status */}
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="flex items-center gap-3">
@@ -365,6 +373,25 @@ export default function FirRegistryPage() {
                     }`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${isClosedOrChargesheeted ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                       {fir.status || 'Under Investigation'}
+=======
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="space-y-0.5">
+                      <span className="font-mono text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200 block w-fit">
+                        {fir.crime_no || caseId}
+                      </span>
+                      {fir.crime_no && (
+                        <span className="text-[10px] text-gray-400 font-mono pl-1 block">
+                          Case #{caseId}
+                        </span>
+                      )}
+                    </div>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                      fir.status === 'Chargesheeted' || fir.status === 'chargesheeted'
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        : 'bg-amber-50 text-amber-700 border border-amber-200'
+                    }`}>
+                      {fir.case_category || fir.status || 'Under Investigation'}
+>>>>>>> Stashed changes
                     </span>
                   </div>
 

@@ -8,7 +8,7 @@ import {
   LayoutDashboard, MessageSquare, Map, GitBranch,
   Camera, BarChart2, LogOut, Shield, ChevronLeft, ChevronRight,
   Newspaper, FileText, Server, Search, ChevronDown, Sparkles,
-  User, History, Navigation, Eye
+  User, History, Navigation, Eye, Building2, Scale
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -27,6 +27,8 @@ const NAV_ITEMS = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Overview', id: 'nav-overview' },
   { href: '/dashboard/chat', icon: MessageSquare, label: 'Co-Pilot Chat', id: 'nav-chat' },
   { href: '/dashboard/fir', icon: FileText, label: 'FIR Registry', id: 'nav-fir' },
+  { href: '/dashboard/hierarchy', icon: Building2, label: 'KSP Units & HR', id: 'nav-hierarchy' },
+  { href: '/dashboard/statutes', icon: Scale, label: 'Acts & Sections', id: 'nav-statutes' },
   { href: '/dashboard/suspect', icon: User, label: 'Suspect Roster', id: 'nav-suspect' },
   { href: '/dashboard/map', icon: Map, label: 'Crime Map', id: 'nav-map' },
   { href: '/dashboard/network', icon: GitBranch, label: 'Network Graph', id: 'nav-network' },

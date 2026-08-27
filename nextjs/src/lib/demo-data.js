@@ -55,7 +55,34 @@ const STATIC_FIRS = [
 
 export const DEMO_FIRS = {
   get firs() {
-    return [...UPLOADED_FIRS, ...STATIC_FIRS];
+    const raw = [...UPLOADED_FIRS, ...STATIC_FIRS];
+    return raw.map((f, idx) => {
+      const distId = (f.district_name || '').includes('Bengaluru') ? 443 : 102;
+      const unitId = 6;
+      const yr = 2026;
+      const serialNum = (f.case_number || '').replace(/\D/g, '').slice(-5) || String(idx + 1).padStart(5, '0');
+      const crime_no = f.crime_no || `1${String(distId).padStart(4, '0')}${String(unitId).padStart(4, '0')}${yr}${String(serialNum).padStart(5, '0')}`;
+      const case_no = f.case_no || `${yr}${String(serialNum).padStart(5, '0')}`;
+
+      return {
+        ...f,
+        crime_no,
+        case_no,
+        case_category: f.case_category || (crime_no.startsWith('8') ? 'Zero FIR' : 'FIR'),
+        gravity: f.gravity || (parseInt(f.risk_score || 50, 10) > 80 ? 'Heinous' : 'Non-Heinous'),
+        accused_name: f.accused_name || 'Vikram Malhotra',
+        accused: f.accused || [
+          { person_id: 'A1', name: f.accused_name || 'Vikram Malhotra', role: 'Prime Accused', risk_score: f.risk_score || 88 }
+        ],
+        victims: f.victims || [
+          { name: 'Citizen Complainant', age: 35, gender: 'Male', is_police: false }
+        ],
+        act_sections: f.act_sections || [
+          { act: 'IPC', section: '379', desc: 'Punishment for Theft' }
+        ],
+        chargesheet: f.chargesheet || { cs_type: f.status === 'chargesheeted' ? 'A' : 'C', cs_label: f.status === 'chargesheeted' ? 'Chargesheet Filed' : 'Under Investigation' }
+      };
+    });
   },
   get total_count() {
     return UPLOADED_FIRS.length + STATIC_FIRS.length;
