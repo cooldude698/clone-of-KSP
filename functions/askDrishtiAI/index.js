@@ -709,7 +709,7 @@ function generateSmartPoliceResponse(question, lang = 'en') {
     }
   }
 
-  if (q.includes('repeat') || q.includes('offender') || q.includes('accused') || q.includes('suspect') || q.includes('ramesh')) {
+  if (q.includes('repeat') || q.includes('offender') || q.includes('accused') || q.includes('suspect') || q.includes('criminal') || q.includes('wanted') || q.includes('gang') || q.includes('ramesh') || q.includes('suresh') || q.includes('history') || q.includes('apradhi') || q.includes('अपराधी') || q.includes('ಆರೋಪಿ')) {
     return `Sir, here is the detailed High-Risk Repeat Offenders Report:
 
 1. Ramesh Kumar (Alias: "Bullet Ramesh")

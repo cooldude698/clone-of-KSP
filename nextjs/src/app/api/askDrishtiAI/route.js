@@ -373,8 +373,8 @@ function generateSmartPoliceResponse(question, lang = 'en', history = []) {
    - Activate ANPR camera watchlists for black Honda Activa (KA-01-EA-4921).`;
   }
 
-  // 3. Repeat Offenders / Suspects
-  if (q.includes('repeat') || q.includes('offender') || q.includes('accused') || q.includes('suspect') || q.includes('ramesh') || q.includes('suresh')) {
+  // 3. Repeat Offenders / Suspects / Criminals
+  if (q.includes('repeat') || q.includes('offender') || q.includes('accused') || q.includes('suspect') || q.includes('criminal') || q.includes('wanted') || q.includes('gang') || q.includes('ramesh') || q.includes('suresh') || q.includes('history') || q.includes('apradhi') || q.includes('अपराधी') || q.includes('ಆರೋಪಿ')) {
     return `Sir, here is the detailed High-Risk Repeat Offenders Report:
 
 1. Ramesh Kumar (Alias: "Bullet Ramesh")

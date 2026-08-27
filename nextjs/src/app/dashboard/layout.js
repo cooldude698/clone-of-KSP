@@ -191,8 +191,8 @@ function detectLocalIntent(query) {
   if (/^(yes|yeah|sure|okay|ok|do it|go ahead|proceed|affirmative|हां|हाँ|ठीक है|ओके)$/.test(q))
     return { type: 'confirm', reply: isHindi ? 'ठीक है सर, कार्रवाई जारी है।' : 'On it, Sir.' };
 
-  // Greetings
-  if (/^(hi|hello|hey|whats\s*up|what's\s*up|greetings|hello\s*drishti|hi\s*drishti|good\s*morning|good\s*afternoon|good\s*evening|नमस्ते|हेलो|हाय)(\s+(.*))?$/.test(q))
+  // Pure Standalone Greetings (only if no query follows)
+  if (/^(hi|hello|hey|whats\s*up|what's\s*up|greetings|hello\s*drishti|hi\s*drishti|drishti|good\s*morning|good\s*afternoon|good\s*evening|नमस्ते|हेलो|हाय|ನಮಸ್ಕಾರ)$/.test(q))
     return { type: 'greeting', reply: isHindi ? 'नमस्ते सर। दृष्टि एआई सक्रिय है। आज मैं आपकी कैसे मदद कर सकता हूं?' : 'Hello, Sir. Drishti is active. How can I assist you with the intelligence network today?' };
 
   return null;
