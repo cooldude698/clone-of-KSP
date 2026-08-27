@@ -1,13 +1,46 @@
 import { NextResponse } from 'next/server';
-import { proxyCatalystFunction, optionsResponse } from '@/lib/catalyst-proxy';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
-export async function OPTIONS() { return optionsResponse(); }
+export async function GET(req) {
+  try {
+    const fn = require('../../../../../functions/export-pdf/index.js');
+    const { searchParams } = new URL(req.url);
+    const queryObj = Object.fromEntries(searchParams.entries());
+    let statusCode = 200;
+    let jsonResult = {};
+    const mockReq = {
+      method: 'GET',
+      url: req.url,
+      getQueryParams: () => queryObj,
+      getMethod: () => 'GET'
+    };
+    const mockRes = {
+      setHeader: () => {},
+      writeHead: (code) => { statusCode = code; },
+      end: (data) => {
+        if (!data) return;
+        try { jsonResult = JSON.parse(data); } catch { jsonResult = { data }; }
+      },
+      write: (data) => {
+        if (!data) return;
+        try { jsonResult = JSON.parse(data); } catch { jsonResult = { data }; }
+      }
+    };
+    await fn(mockReq, mockRes);
+    return NextResponse.json(jsonResult, { status: statusCode });
+  } catch (err) {
+    return NextResponse.json({ error: true, message: err.message }, { status: 500 });
+  }
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*' } });
+}
 
 export async function POST(req) {
   try {
@@ -59,8 +92,35 @@ export async function POST(req) {
       }, { status: 200, headers: CORS });
     }
 
-    // Otherwise proxy to Catalyst function for NoSQL conversation lookup
-    return proxyCatalystFunction('export-pdf', req);
+    // Otherwise execute Catalyst export-pdf function directly
+    const fn = require('../../../../../functions/export-pdf/index.js');
+    let statusCode = 200;
+    let jsonResult = {};
+    const mockReq = {
+      method: 'POST',
+      url: req.url,
+      body,
+      on: (evt, cb) => {
+        if (evt === 'data') cb(JSON.stringify(body));
+        if (evt === 'end') cb();
+      },
+      getQueryParams: () => ({}),
+      getMethod: () => 'POST'
+    };
+    const mockRes = {
+      setHeader: () => {},
+      writeHead: (code) => { statusCode = code; },
+      end: (data) => {
+        if (!data) return;
+        try { jsonResult = JSON.parse(data); } catch { jsonResult = { data }; }
+      },
+      write: (data) => {
+        if (!data) return;
+        try { jsonResult = JSON.parse(data); } catch { jsonResult = { data }; }
+      }
+    };
+    await fn(mockReq, mockRes);
+    return NextResponse.json(jsonResult, { status: statusCode, headers: CORS });
   } catch (err) {
     return NextResponse.json({ error: true, message: err.message }, { status: 500, headers: CORS });
   }

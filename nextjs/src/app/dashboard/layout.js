@@ -882,7 +882,7 @@ export default function DashboardLayout({ children }) {
   const showOrb = orbPinned || !isPanelOpen;
 
   return (
-    <div className="flex h-screen bg-void-000 overflow-hidden">
+    <div className="flex h-screen bg-[#F4F5F8] overflow-hidden">
 
       {/* ── MINIMALIST MODERN SIDEBAR ── */}
       <aside className={`flex flex-col transition-all duration-300 ease-in-out bg-white dark:bg-[#18181B] border-r border-gray-100 dark:border-gray-800 relative z-20 shadow-sm ${collapsed ? 'w-20' : 'w-60'}`}>
