@@ -5,3 +5,9 @@ node_modules
 nextjs/node_modules
 nextjs/.next/cache
 nextjs/.cache
+crime-database
+sample_firs
+dist-appsail-staging
+*.zip
+functions
+tests

@@ -50,11 +50,14 @@
       "source": "nextjs",
       "ignore": [
         "**/node_modules/**",
-        "**/.next/**",
+        "**/.next/cache/**",
         "**/.git/**",
         "**/.cache/**",
         "**/*.log",
-        "public/videos/**"
+        "public/videos/**",
+        "**/crime-database/**",
+        "**/sample_firs/**",
+        "**/*.zip"
       ]
     }
   ]
