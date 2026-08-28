@@ -208,21 +208,52 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
 
   if (isGreeting || isIdentityOrHelp) {
     if (isKannada) {
+      let out = `### 🛡️ ಕರ್ನಾಟಕ ರಾಜ್ಯ ಪೊಲೀಸ್ ಗುಪ್ತಚರ ಕಮಾಂಡ್ ಗ್ರಿಡ್\n`;
+      out += `ದೃಷ್ಟಿ ಎಐ (DRISHTI AI) ಸಂಪೂರ್ಣವಾಗಿ ಸಕ್ರಿಯವಾಗಿದ್ದು, ರಾಜ್ಯದ ಸಿಸಿಟಿಎನ್‌ಎಸ್ ಮತ್ತು 450+ ANPR ಕಣ್ಗಾವಲು ಜಾಲದೊಂದಿಗೆ ಸಿಂಕ್ರೊನೈಸ್ ಆಗಿದೆ.\n\n`;
+      out += `| ಕಾರ್ಯಾಚರಣೆಯ ವಿಭಾಗ | ಲಭ್ಯವಿರುವ ಮಾಹಿತಿ |\n`;
+      out += `| :--- | :--- |\n`;
+      out += `| **ಪ್ರಮುಖ ಗುರಿ ಶಂಕಿತರು** | ಅಪರಾಧಿಗಳ ಡಾಕ್ಯೂಮೆಂಟ್, ರಿಸ್ಕ್ ಸ್ಕೋರ್ ಮತ್ತು ಎಂ.ಒ. |\n`;
+      out += `| **ANPR ವಾಹನ ಕಣ್ಗಾವಲು** | ಕದ್ದ ವಾಹನ ಶೋಧನೆ, ಟೋಲ್ ಪ್ಲಾಜಾ ಲೈವ್ ಅಲರ್ಟ್ |\n`;
+      out += `| **ಪ್ರಕರಣಗಳ ತನಿಖೆ** | ಎಫ್‌ಐಆರ್ ದಾಖಲೆಗಳು ಮತ್ತು ಕಾಯ್ದೆಗಳು (BNS/IPC) |\n`;
+      out += `| **ಸ್ಥಳ ಮಹಜರು** | ಸ್ವಯಂಚಾಲಿತ ಪಂಚನಾಮ ಡ್ರಾಫ್ಟಿಂಗ್ |\n\n`;
+      out += `ಇಂದು ನಿಮ್ಮ ಕರ್ತವ್ಯದಲ್ಲಿ ನಾನು ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ, ಸರ್?`;
+
       return {
-        answer: `ಜೈ ಹಿಂದ್, ಸರ್! ನಾನು ದೃಷ್ಟಿ (DRISHTI AI) — ಕರ್ನಾಟಕ ರಾಜ್ಯ ಪೊಲೀಸ್ ಗುಪ್ತಚರ ಸಹಾಯಕ. ನಾನು ಸಂಪೂರ್ಣವಾಗಿ ಸಕ್ರಿಯವಾಗಿದ್ದೇನೆ.\n\nಇಂದು ನಿಮ್ಮ ತನಿಖೆಯಲ್ಲಿ ನಾನು ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ, ಸರ್? ನೀವು ಶಂಕಿತರ ಪಟ್ಟಿ, ಪ್ರಕರಣದ ವಿವರಗಳು, ವಾಹನ ಶೋಧನೆ ಅಥವಾ ಸ್ಥಳ ಮಹಜರು SOP ಬಗ್ಗೆ ಕೇಳಬಹುದು.`,
+        answer: out,
         suggestions: ['ಇತ್ತೀಚಿನ ವಾಹನ ಕಳವು ಪ್ರಕರಣಗಳು', 'ಪ್ರಮುಖ ಗುರಿ ಶಂಕಿತರು (Target Suspects)', 'ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಅಪರಾಧ ಹಾಟ್‌ಸ್ಪಾಟ್', 'ಸ್ಥಳ ಮಹಜರು SOP'],
         kpis: { active_firs: allFirs.length, repeat_offenders: SUSPECTS_INTEL.length, grid_status: 'ONLINE' }
       };
     }
     if (isHindi) {
+      let out = `### 🛡️ कर्नाटक राज्य पुलिस इंटेलिजेंस कमांड ग्रिड\n`;
+      out += `दृष्टि एआई (DRISHTI AI) पूरी तरह सक्रिय है और राज्यव्यापी CCTNS और 450+ ANPR सर्विलांस कैमरों से कनेक्टेड है।\n\n`;
+      out += `| इंटेलिजेंस कार्यक्षेत्र | उपलब्ध संचालन |\n`;
+      out += `| :--- | :--- |\n`;
+      out += `| **वांछित संदिग्ध** | आपराधिक प्रोफाइल, रिस्क स्कोर और सक्रिय केस |\n`;
+      out += `| **ANPR वाहन ट्रैकिंग** | संदिग्ध वाहन ट्रैकिंग और हॉटलिस्ट अलर्ट |\n`;
+      out += `| **CCTNS केस फाइलें** | FIR विवरण और कानूनी धाराएं (BNS/IPC) |\n`;
+      out += `| **स्पॉट पंचनामा** | स्वचालित पंचनामा ड्राफ्टिंग SOP |\n\n`;
+      out += `आज आपकी शिफ्ट में मैं कैसे सहायता कर सकता हूँ, सर?`;
+
       return {
-        answer: `जय हिंद, सर! मैं दृष्टि (DRISHTI AI) हूँ — कर्नाटक राज्य पुलिस इंटेलिजेंस असिस्टेंट। मैं पूरी तरह सक्रिय और ऑन-ड्यूटी हूँ।\n\nआज आपकी जांच में मैं कैसे सहायता कर सकता हूँ, सर? आप वांछित संदिग्धों, केस फाइलों, ANPR वाहन ट्रैकिंग या पुलिस SOP के बारे में पूछ सकते हैं।`,
-        suggestions: ['नवीनतम वाहन चोरी मामले (Vehicle Theft)', 'शीर्ष वांछित संदिग्ध (Target Suspects)', 'सिल्क board क्राइम एनालिसिस', 'पंचनामा SOP'],
+        answer: out,
+        suggestions: ['नवीनतम वाहन चोरी मामले (Vehicle Theft)', 'शीर्ष वांछित संदिग्ध (Target Suspects)', 'सिल्क बोर्ड क्राइम एनालिसिस', 'पंचनामा SOP'],
         kpis: { active_firs: allFirs.length, repeat_offenders: SUSPECTS_INTEL.length, grid_status: 'ONLINE' }
       };
     }
+
+    let out = `### 🛡️ KSP Intelligence Command Grid Online\n`;
+    out += `DRISHTI AI is active and synchronized across Karnataka State Police CCTNS datastores and 450+ ANPR surveillance nodes.\n\n`;
+    out += `| Core Intelligence Vector | Available Operations |\n`;
+    out += `| :--- | :--- |\n`;
+    out += `| **Clearance Targets** | Suspect dossiers, threat ratings, MO patterns & linked FIRs |\n`;
+    out += `| **ANPR Camera Grid** | Stolen vehicle tracking, toll corridors & hotlist hits |\n`;
+    out += `| **Case Investigation** | FIR docket search, statutory mappings (IPC §379 / BNS §303) |\n`;
+    out += `| **Tactical Directives** | Spot panchanama drafting & dynamic nakabandi deployments |\n\n`;
+    out += `How may I assist your command shift today, Sir?`;
+
     return {
-      answer: `Jai Hind, Officer! I am doing well and on active duty. DRISHTI AI is fully operational, synchronized with Karnataka State Police CCTNS datastores and the statewide ANPR grid.\n\nHow may I assist your command shift today, Sir? You can query active target suspects, inspect specific FIR dockets, track vehicles via CCTV, or generate spot panchanamas.`,
+      answer: out,
       suggestions: ['Latest Vehicle Theft Cases', 'Show Clearance & Target Suspects', 'Inspect Ramesh Kumar Dossier', 'Analyze Silk Board Crime Hotspot'],
       kpis: { active_firs: allFirs.length, repeat_offenders: SUSPECTS_INTEL.length, grid_status: 'ONLINE' }
     };
