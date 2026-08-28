@@ -10,11 +10,12 @@ import {
   FileText, Car, DollarSign, Database, ChevronDown, CheckCircle2,
   SlidersHorizontal, Lock, Radio, Network as NetworkIcon, Search,
   Terminal, Flame, Crosshair, Briefcase, FlaskConical, Navigation,
-  Radar, ShieldCheck, UserCheck, ArrowUpRight, Compass
+  Radar, ShieldCheck, UserCheck, ArrowUpRight, Compass, Sparkles
 } from 'lucide-react';
 import InvestigatorWall from '@/components/InvestigatorWall';
 import { DEMO_FIRS } from '@/lib/demo-data';
 import { getFIRFromStore } from '@/lib/fir-store';
+import { getSuspectMedia } from '@/lib/suspect-media';
 
 // Dynamic import of Leaflet network map for the Map View tab
 const NetworkMapView = dynamic(
@@ -29,8 +30,8 @@ const SYNDICATES = [
     name: 'Bullet Ramesh Inter-District Vehicle Theft Syndicate',
     category: 'vehicle_theft',
     category_label: 'Vehicle Theft & Fencing',
-    color: '#2563eb',
-    badge_color: 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/25',
+    color: '#3b82f6',
+    badge_color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/25',
     threat_level: 'CRITICAL',
     risk_score: 94,
     estimated_volume: '₹1.8 Cr (42 Vehicles/yr)',
@@ -69,7 +70,7 @@ const SYNDICATES = [
     category: 'narcotics',
     category_label: 'Commercial Narcotics (NDPS)',
     color: '#10b981',
-    badge_color: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/25',
+    badge_color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25',
     threat_level: 'CRITICAL',
     risk_score: 96,
     estimated_volume: '₹3.4 Cr (Commercial MDMA)',
@@ -106,8 +107,8 @@ const SYNDICATES = [
     name: 'Snake Naidu Armed Highway Robbery & Extortion Cell',
     category: 'robbery',
     category_label: 'Armed Robbery & Extortion',
-    color: '#ef4444',
-    badge_color: 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/25',
+    color: '#f43f5e',
+    badge_color: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/25',
     threat_level: 'HIGH',
     risk_score: 91,
     estimated_volume: '₹95 Lakhs (Highway Loot)',
@@ -145,7 +146,7 @@ const SYNDICATES = [
     category: 'cybercrime',
     category_label: 'Cyber Fraud & Money Laundering',
     color: '#06b6d4',
-    badge_color: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border-cyan-500/25',
+    badge_color: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/25',
     threat_level: 'HIGH',
     risk_score: 88,
     estimated_volume: '₹4.2 Cr (Digital Extortion)',
@@ -156,7 +157,7 @@ const SYNDICATES = [
     kingpin: {
       id: 'SUS-9104',
       name: 'Vikram Malhotra',
-      alias: 'Vicky Blade / Shadow Vicky',
+      alias: 'Vicky Blade',
       role: 'Cyber Extortion & Money Laundering Head',
       risk_score: 88,
       status: 'Digital Intelligence Tracking',
@@ -183,7 +184,7 @@ const SYNDICATES = [
     category: 'assault',
     category_label: 'Extortion & Organized Assault',
     color: '#8b5cf6',
-    badge_color: 'bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/25',
+    badge_color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/25',
     threat_level: 'HIGH',
     risk_score: 90,
     estimated_volume: '₹45 Lakhs (Protection Money)',
@@ -258,7 +259,8 @@ export default function NetworkPage() {
           age: 34,
           gender: 'Male',
           prior_convictions: 7,
-          risk_score: firData.risk_score || selectedSyndicate.risk_score
+          risk_score: selectedSyndicate.kingpin.risk_score,
+          modus_operandi: selectedSyndicate.modus_operandi
         }
       ],
       victims: [{ full_name: 'KSP State Complainant', age: 40 }],
@@ -267,118 +269,114 @@ export default function NetworkPage() {
     });
   };
 
+  const selectedKingpinMedia = getSuspectMedia(selectedSyndicate.kingpin.name || selectedSyndicate.kingpin.alias);
+
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6 pb-12 font-sans text-slate-900 dark:text-white animate-fade-in">
+    <div className="w-full max-w-7xl mx-auto space-y-6 pb-12 font-sans text-slate-900 dark:text-slate-100 animate-fade-in">
       
       {/* ── 1. TOP HEADER & EXECUTIVE TELEMETRY HUB ── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-[#121215] p-5 sm:p-6 rounded-2xl border border-slate-200/90 dark:border-zinc-800 shadow-xs">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 text-white flex items-center justify-center shadow-md shadow-blue-600/20">
-              <Share2 className="w-5 h-5" />
+      <div className="relative overflow-hidden bg-white dark:bg-[#0f172a]/90 backdrop-blur-md p-5 sm:p-6 rounded-2xl border border-slate-200/90 dark:border-slate-800/90 shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
+              <NetworkIcon className="w-6 h-6" />
             </div>
             <div>
-              <div className="flex items-center gap-2.5">
-                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white font-mono uppercase">
-                  CRIMINAL SYNDICATE & GANG NEXUS
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                  Criminal Syndicate & Gang Nexus
                 </h1>
-                <span className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/25 text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold uppercase">
-                  5 RINGS ACTIVE
+                <span className="inline-flex items-center gap-1.5 bg-rose-500/10 dark:bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/25 text-[11px] font-mono px-2.5 py-0.5 rounded-full font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                  5 ACTIVE GANG RINGS
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium mt-0.5">
-                Karnataka State Police CCTNS • Multi-Hop Gang Disruption & Predictive Tracking Grid
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                Karnataka State Police CCTNS · Multi-Hop Intelligence & Organized Crime Network
               </p>
             </div>
           </div>
-        </div>
 
-        {/* View Mode Switcher */}
-        <div className="flex items-center gap-1 bg-slate-100 dark:bg-zinc-800/90 p-1 rounded-xl border border-slate-200/80 dark:border-zinc-700/60 text-xs font-mono font-bold self-start md:self-auto overflow-x-auto max-w-full">
-          {[
-            { id: 'cards', label: 'Syndicate Cards', icon: Layers },
-            { id: 'hierarchy', label: 'Workflow Hierarchy', icon: Share2 },
-            { id: 'matrix', label: 'Nexus Matrix', icon: Database },
-            { id: 'map', label: 'Predictive Routes', icon: Navigation },
-          ].map(tab => {
-            const IconComp = tab.icon;
-            const isActive = viewMode === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setViewMode(tab.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                  isActive 
-                    ? 'bg-blue-600 text-white shadow-xs' 
-                    : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <IconComp className="w-3.5 h-3.5" />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
+          {/* View Mode Switcher */}
+          <div className="flex items-center gap-1 bg-slate-100/90 dark:bg-slate-800/90 p-1.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold self-start md:self-auto overflow-x-auto max-w-full shadow-inner">
+            {[
+              { id: 'cards', label: 'Syndicate Cards', icon: Layers },
+              { id: 'hierarchy', label: 'Workflow Hierarchy', icon: Share2 },
+              { id: 'matrix', label: 'Nexus Matrix', icon: Database },
+              { id: 'map', label: 'Predictive Routes', icon: Navigation },
+            ].map(tab => {
+              const IconComp = tab.icon;
+              const isActive = viewMode === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setViewMode(tab.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                    isActive 
+                      ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/25 font-bold' 
+                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/60'
+                  }`}
+                >
+                  <IconComp className="w-3.5 h-3.5" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* ── 2. DE-CONGESTED STATS KPI TILES ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121215] border border-slate-200/90 dark:border-zinc-800 shadow-xs hover:border-blue-500/40 transition-all">
-          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-zinc-400 mb-2">
-            <span className="font-mono uppercase tracking-wider font-semibold">Kingpins Tracked</span>
+      {/* ── 2. UNIFIED STATS KPI TILES ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div className="p-4 rounded-xl bg-white dark:bg-[#0f172a]/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-800/90 shadow-sm hover:border-blue-500/40 transition-all">
+          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1.5">
+            <span className="font-semibold uppercase tracking-wider text-[10px] text-slate-400">Kingpins Tracked</span>
             <div className="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
               <UserCheck className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <p className="text-2xl font-bold font-mono text-slate-900 dark:text-white">5 High-Value</p>
-          </div>
-          <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-zinc-800/80 text-[11px] text-rose-600 dark:text-rose-400 font-mono font-semibold">
-            100% Active ANPR Sweeps
+          <p className="text-xl font-bold font-mono text-slate-900 dark:text-white">5 High-Value</p>
+          <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/80 text-[11px] text-blue-600 dark:text-blue-400 font-semibold flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+            <span>100% Active ANPR Sweeps</span>
           </div>
         </div>
 
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121215] border border-slate-200/90 dark:border-zinc-800 shadow-xs hover:border-amber-500/40 transition-all">
-          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-zinc-400 mb-2">
-            <span className="font-mono uppercase tracking-wider font-semibold">Key Lieutenants</span>
-            <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
-              <ShieldAlert className="w-3.5 h-3.5" />
+        <div className="p-4 rounded-xl bg-white dark:bg-[#0f172a]/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-800/90 shadow-sm hover:border-indigo-500/40 transition-all">
+          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1.5">
+            <span className="font-semibold uppercase tracking-wider text-[10px] text-slate-400">Key Lieutenants</span>
+            <div className="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+              <Users className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <p className="text-2xl font-bold font-mono text-amber-600 dark:text-amber-400">11 Operatives</p>
-          </div>
-          <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-zinc-800/80 text-[11px] text-slate-500 dark:text-zinc-400 font-mono">
+          <p className="text-xl font-bold font-mono text-indigo-600 dark:text-indigo-400">11 Operatives</p>
+          <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/80 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
             Chopshops, Mules & Couriers
           </div>
         </div>
 
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121215] border border-slate-200/90 dark:border-zinc-800 shadow-xs hover:border-emerald-500/40 transition-all">
-          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-zinc-400 mb-2">
-            <span className="font-mono uppercase tracking-wider font-semibold">Correlated FIRs</span>
+        <div className="p-4 rounded-xl bg-white dark:bg-[#0f172a]/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-800/90 shadow-sm hover:border-emerald-500/40 transition-all">
+          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1.5">
+            <span className="font-semibold uppercase tracking-wider text-[10px] text-slate-400">Correlated FIRs</span>
             <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
               <FileText className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <p className="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">51 Indexed</p>
-          </div>
-          <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-zinc-800/80 text-[11px] text-emerald-600 dark:text-emerald-400 font-mono font-semibold">
+          <p className="text-xl font-bold font-mono text-emerald-600 dark:text-emerald-400">51 Indexed</p>
+          <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/80 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
             Cross-District Multi-Hop Verified
           </div>
         </div>
 
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121215] border border-slate-200/90 dark:border-zinc-800 shadow-xs hover:border-cyan-500/40 transition-all">
-          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-zinc-400 mb-2">
-            <span className="font-mono uppercase tracking-wider font-semibold">Surveillance Nodes</span>
+        <div className="p-4 rounded-xl bg-white dark:bg-[#0f172a]/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-800/90 shadow-sm hover:border-cyan-500/40 transition-all">
+          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1.5">
+            <span className="font-semibold uppercase tracking-wider text-[10px] text-slate-400">Surveillance Nodes</span>
             <div className="w-7 h-7 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
               <Radar className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <p className="text-2xl font-bold font-mono text-cyan-600 dark:text-cyan-400">18 Chokepoints</p>
-          </div>
-          <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-zinc-800/80 text-[11px] text-cyan-600 dark:text-cyan-400 font-mono font-semibold">
+          <p className="text-xl font-bold font-mono text-cyan-600 dark:text-cyan-400">18 Chokepoints</p>
+          <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/80 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
             Statewide Interceptor Grid
           </div>
         </div>
@@ -398,10 +396,10 @@ export default function NetworkPage() {
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold font-mono whitespace-nowrap transition-all cursor-pointer shadow-xs ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shadow-2xs ${
                 activeCategory === cat.id
-                  ? 'bg-blue-600 text-white shadow-blue-500/20'
-                  : 'bg-white dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20 font-bold'
+                  : 'bg-white dark:bg-[#0f172a] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               {cat.label}
@@ -410,91 +408,111 @@ export default function NetworkPage() {
         </div>
 
         <div className="relative flex-shrink-0 w-full sm:w-72">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search syndicate, kingpin, or corridor…"
-            className="w-full pl-10 pr-3 py-2 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-xs font-mono text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 shadow-xs"
+            className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 text-xs font-medium text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 shadow-2xs"
           />
         </div>
       </div>
 
       {/* ── 4. VIEW 1: SYNDICATE DOSSIER CARDS (SPACIOUS & CLEAN) ── */}
       {viewMode === 'cards' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left / Middle: List of Syndicate Dossier Cards (7 Cols) */}
-          <div className="lg:col-span-7 space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          {/* Left: List of Syndicate Dossier Cards (7 Cols) */}
+          <div className="lg:col-span-7 space-y-3.5">
             {filteredSyndicates.map(syn => {
               const isSelected = selectedSyndicate.id === syn.id;
+              const kingpinMedia = getSuspectMedia(syn.kingpin.name || syn.kingpin.alias);
               return (
                 <div
                   key={syn.id}
                   onClick={() => setSelectedSyndicate(syn)}
-                  className={`p-5 rounded-2xl bg-white dark:bg-[#121215] border transition-all cursor-pointer shadow-xs relative overflow-hidden ${
+                  className={`p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0f172a]/90 backdrop-blur-md border transition-all cursor-pointer shadow-sm relative overflow-hidden ${
                     isSelected
-                      ? 'border-blue-500 dark:border-blue-500 ring-2 ring-blue-500/20'
-                      : 'border-slate-200/90 dark:border-zinc-800 hover:border-blue-500/40'
+                      ? 'border-blue-500/80 dark:border-blue-500/80 ring-2 ring-blue-500/20'
+                      : 'border-slate-200/90 dark:border-slate-800/90 hover:border-slate-400 dark:hover:border-slate-600'
                   }`}
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3.5 border-b border-slate-100 dark:border-zinc-800/80">
-                    <div className="flex items-center gap-2.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800/80">
+                    <div className="flex items-center gap-2">
                       <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${syn.badge_color}`}>
                         {syn.category_label}
                       </span>
-                      <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white font-mono tracking-tight">
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
                         {syn.name}
                       </h3>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-rose-500 text-white uppercase shadow-xs">
                         RISK {syn.risk_score}/100
                       </span>
-                      <span className="text-[10px] text-slate-400 font-mono">
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono font-medium">
                         {syn.connected_firs.length} Cases
                       </span>
                     </div>
                   </div>
 
                   {/* Kingpin & Lieutenants Clean Summary */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-3.5">
-                    {/* Kingpin */}
-                    <div className="p-3 rounded-xl bg-slate-50/80 dark:bg-zinc-900/60 border border-slate-200/60 dark:border-zinc-800/80">
-                      <span className="text-[9.5px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 font-mono block">
-                        Prime Kingpin
-                      </span>
-                      <p className="text-xs font-bold text-slate-900 dark:text-white mt-1">
-                        {syn.kingpin.name}
-                      </p>
-                      <p className="text-[11px] text-slate-500 dark:text-zinc-400 italic">
-                        "{syn.kingpin.alias}"
-                      </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 my-3">
+                    {/* Kingpin with Biometric Photo */}
+                    <div className="sm:col-span-5 p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/60 flex items-center gap-3">
+                      <div className="relative w-11 h-11 rounded-lg overflow-hidden shrink-0 border border-slate-300 dark:border-slate-600">
+                        {kingpinMedia?.mugshot ? (
+                          <img
+                            src={kingpinMedia.mugshot}
+                            alt={syn.kingpin.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs font-mono">
+                            {syn.kingpin.name.split(' ').map(n => n[0]).join('')}
+                          </div>
+                        )}
+                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900" />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 font-mono block">
+                          Prime Kingpin
+                        </span>
+                        <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                          {syn.kingpin.name}
+                        </p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 italic truncate">
+                          &quot;{syn.kingpin.alias}&quot;
+                        </p>
+                      </div>
                     </div>
 
-                    {/* Key Operatives */}
-                    <div className="sm:col-span-2 p-3 rounded-xl bg-slate-50/80 dark:bg-zinc-900/60 border border-slate-200/60 dark:border-zinc-800/80 flex flex-col justify-between">
-                      <span className="text-[9.5px] font-bold uppercase tracking-wider text-slate-400 font-mono block">
+                    {/* Specialized Cells */}
+                    <div className="sm:col-span-7 p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/60 flex flex-col justify-between">
+                      <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 font-mono block">
                         Specialized Cells ({syn.lieutenants.length})
                       </span>
                       <div className="flex flex-wrap gap-1.5 mt-1.5">
                         {syn.lieutenants.map(lt => (
-                          <span key={lt.id} className="text-[10px] font-mono px-2 py-0.5 rounded bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 font-medium">
-                            {lt.name} ({lt.role.split(' ')[0]})
+                          <span
+                            key={lt.id}
+                            className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium"
+                          >
+                            {lt.name} <span className="text-slate-400">({lt.role.split(' ')[0]})</span>
                           </span>
                         ))}
                       </div>
                     </div>
                   </div>
 
-                  {/* Modus Operandi Snippet */}
-                  <p className="text-xs text-slate-600 dark:text-zinc-400 line-clamp-2 leading-relaxed font-sans">
-                    <strong>Modus Operandi:</strong> {syn.modus_operandi}
+                  {/* Modus Operandi */}
+                  <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed font-sans pb-1">
+                    <strong className="text-slate-900 dark:text-white">Modus Operandi:</strong> {syn.modus_operandi}
                   </p>
 
-                  <div className="mt-3.5 pt-3 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between text-xs font-mono">
-                    <span className="text-slate-400 text-[11px] truncate max-w-xs">
-                      Corridor: {syn.primary_corridor}
+                  <div className="pt-3 mt-1 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-mono">
+                    <span className="text-slate-500 dark:text-slate-400 text-[11px] truncate max-w-xs">
+                      Corridor: <span className="text-slate-800 dark:text-slate-200 font-medium">{syn.primary_corridor}</span>
                     </span>
                     <button
                       onClick={(e) => {
@@ -502,7 +520,7 @@ export default function NetworkPage() {
                         setSelectedSyndicate(syn);
                         setViewMode('hierarchy');
                       }}
-                      className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 font-bold hover:underline text-xs shrink-0"
+                      className="inline-flex items-center gap-1 font-bold text-blue-600 dark:text-blue-400 hover:underline text-xs shrink-0"
                     >
                       <span>Workflow Flowchart</span>
                       <ArrowRight className="w-3 h-3" />
@@ -515,65 +533,74 @@ export default function NetworkPage() {
 
           {/* Right: Selected Syndicate Deep-Dive Focus Panel (5 Cols) */}
           <div className="lg:col-span-5 space-y-4">
-            <div className="sticky top-20 p-5 rounded-2xl bg-white dark:bg-[#121215] border border-slate-200/90 dark:border-zinc-800 shadow-xs space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800/80">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-mono">
-                    Target Syndicate Focus
-                  </span>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white font-mono mt-0.5">
-                    {selectedSyndicate.name}
-                  </h3>
-                </div>
+            <div className="sticky top-20 p-5 rounded-2xl bg-white dark:bg-[#0f172a]/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-800/90 shadow-sm space-y-4">
+              <div className="pb-3 border-b border-slate-100 dark:border-slate-800/80">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 font-mono block">
+                  Target Syndicate Focus
+                </span>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white font-mono mt-0.5">
+                  {selectedSyndicate.name}
+                </h3>
               </div>
 
               {/* Kingpin Spotlight */}
-              <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-zinc-900/60 border border-slate-200/60 dark:border-zinc-800/80 space-y-2">
+              <div className="p-3.5 rounded-xl bg-slate-50/90 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-2.5">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 text-white flex items-center justify-center font-bold text-sm shadow-xs font-mono">
-                    {selectedSyndicate.kingpin.name.split(' ').map(n => n[0]).join('')}
+                  <div className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-slate-300 dark:border-slate-600">
+                    {selectedKingpinMedia?.mugshot ? (
+                      <img
+                        src={selectedKingpinMedia.mugshot}
+                        alt={selectedSyndicate.kingpin.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm font-mono">
+                        {selectedSyndicate.kingpin.name.split(' ').map(n => n[0]).join('')}
+                      </div>
+                    )}
+                    <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900" />
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 dark:text-white">
                       {selectedSyndicate.kingpin.name}
                     </h4>
-                    <p className="text-[11px] text-slate-500 dark:text-zinc-400 font-medium">
-                      Alias: <span className="font-semibold text-slate-800 dark:text-zinc-200">"{selectedSyndicate.kingpin.alias}"</span>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                      Alias: <span className="font-semibold text-slate-800 dark:text-slate-200">&quot;{selectedSyndicate.kingpin.alias}&quot;</span>
                     </p>
-                    <span className="inline-block text-[9.5px] font-mono px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 font-bold border border-rose-500/20 mt-0.5">
+                    <span className="inline-block text-[9.5px] font-mono px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 font-bold border border-rose-500/25 mt-0.5">
                       Risk Rating {selectedSyndicate.kingpin.risk_score}/100
                     </span>
                   </div>
                 </div>
-                <div className="text-[11px] text-slate-600 dark:text-zinc-400 space-y-1 pt-1.5 border-t border-slate-200/60 dark:border-zinc-800/80 font-mono">
-                  <p><strong>Status:</strong> {selectedSyndicate.kingpin.status}</p>
-                  <p><strong>Vehicle:</strong> {selectedSyndicate.kingpin.vehicle}</p>
-                  <p><strong>Last Sighted:</strong> {selectedSyndicate.kingpin.last_location}</p>
+                <div className="text-[11px] text-slate-600 dark:text-slate-300 space-y-1 pt-2 border-t border-slate-200/80 dark:border-slate-700/60 font-mono">
+                  <p><strong className="text-slate-900 dark:text-white">Status:</strong> {selectedSyndicate.kingpin.status}</p>
+                  <p><strong className="text-slate-900 dark:text-white">Vehicle:</strong> {selectedSyndicate.kingpin.vehicle}</p>
+                  <p><strong className="text-slate-900 dark:text-white">Last Sighted:</strong> {selectedSyndicate.kingpin.last_location}</p>
                 </div>
               </div>
 
               {/* Connected CCTNS Cases */}
               <div className="space-y-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono block">
-                  Connected CCTNS Case Dockets ({selectedSyndicate.connected_firs.length})
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono block">
+                  Connected Case Dockets ({selectedSyndicate.connected_firs.length})
                 </span>
-                <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1 drishti-scrollbar">
+                <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
                   {selectedSyndicate.connected_firs.map(fir => (
                     <div
                       key={fir.case_number}
                       onClick={() => handleCaseClick(fir.case_number)}
-                      className="p-2.5 rounded-xl bg-slate-50/80 dark:bg-zinc-900/60 hover:bg-blue-50 dark:hover:bg-blue-950/30 border border-slate-200/60 dark:border-zinc-800/80 transition-all cursor-pointer flex items-center justify-between"
+                      className="p-2.5 rounded-xl bg-slate-50/90 dark:bg-slate-800/60 hover:bg-blue-50 dark:hover:bg-blue-950/30 border border-slate-200/80 dark:border-slate-700/60 transition-all cursor-pointer flex items-center justify-between"
                     >
                       <div>
-                        <div className="flex items-center gap-1 text-xs font-bold font-mono text-blue-600 dark:text-blue-400">
+                        <div className="flex items-center gap-1.5 text-xs font-bold font-mono text-blue-600 dark:text-blue-400">
                           <FileText className="w-3 h-3" />
                           <span>{fir.case_number}</span>
                         </div>
-                        <p className="text-[10.5px] text-slate-500 dark:text-zinc-400 font-medium">
+                        <p className="text-[10.5px] text-slate-500 dark:text-slate-400 font-medium">
                           {fir.crime} · {fir.station}
                         </p>
                       </div>
-                      <span className="text-[9.5px] font-mono px-1.5 py-0.5 rounded bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 font-bold">
+                      <span className="text-[9.5px] font-mono px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold uppercase">
                         {fir.status}
                       </span>
                     </div>
@@ -587,7 +614,7 @@ export default function NetworkPage() {
                   <ShieldAlert className="w-3.5 h-3.5" />
                   <span>COMMAND TACTICAL DIRECTIVE</span>
                 </div>
-                <p className="text-xs text-slate-700 dark:text-zinc-300 leading-snug font-sans">
+                <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-sans">
                   {selectedSyndicate.tactical_action}
                 </p>
               </div>
@@ -595,7 +622,7 @@ export default function NetworkPage() {
               {/* Deep Link to Co-Pilot Chat */}
               <Link
                 href="/dashboard/chat"
-                className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold font-mono flex items-center justify-center gap-1.5 transition-all shadow-xs"
+                className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold font-mono flex items-center justify-center gap-1.5 transition-all shadow-sm shadow-blue-500/20"
               >
                 <span>Query DRISHTI Copilot On This Gang</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -607,10 +634,10 @@ export default function NetworkPage() {
 
       {/* ── 5. VIEW 2: VISUALLY STUNNING WORKFLOW ORG HIERARCHY ── */}
       {viewMode === 'hierarchy' && (
-        <div className="p-6 rounded-2xl bg-white dark:bg-[#121215] border border-slate-200/90 dark:border-zinc-800 shadow-xs space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-zinc-800/80">
+        <div className="p-6 rounded-2xl bg-white dark:bg-[#0f172a]/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-800/90 shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800/80">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-mono">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 font-mono block">
                 Multi-Hop Organizational Intelligence Flow
               </span>
               <h3 className="text-base font-bold text-slate-900 dark:text-white font-mono">
@@ -624,7 +651,7 @@ export default function NetworkPage() {
                   const s = SYNDICATES.find(syn => syn.id === e.target.value);
                   if (s) setSelectedSyndicate(s);
                 }}
-                className="px-3.5 py-1.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs font-bold font-mono text-slate-800 dark:text-zinc-200 focus:outline-none shadow-xs"
+                className="px-3.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold font-mono text-slate-800 dark:text-slate-200 focus:outline-none shadow-xs"
               >
                 {SYNDICATES.map(s => (
                   <option key={s.id} value={s.id}>{s.name}</option>
@@ -634,29 +661,49 @@ export default function NetworkPage() {
           </div>
 
           {/* Clean 3-Tier Multi-Hop Workflow Pipeline */}
-          <div className="flex flex-col items-center space-y-6 py-4">
+          <div className="flex flex-col items-center space-y-4 py-2">
             
             {/* TIER 1: KINGPIN / STRATEGIC HEAD */}
-            <div className="flex flex-col items-center w-full max-w-md">
-              <div className="w-full p-4 rounded-2xl bg-rose-500/10 border-2 border-rose-500 shadow-sm text-center relative">
-                <span className="text-[10px] font-bold font-mono uppercase tracking-wider text-rose-600 dark:text-rose-400 bg-rose-500/15 px-2.5 py-0.5 rounded-full inline-block mb-1.5 border border-rose-500/25">
+            <div className="flex flex-col items-center w-full max-w-lg">
+              <div className="w-full p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-rose-500/10 via-slate-50/50 to-white dark:from-rose-500/10 dark:via-slate-900/60 dark:to-slate-900 border-2 border-rose-500/40 shadow-md text-center relative">
+                <span className="text-[10px] font-bold font-mono uppercase tracking-wider text-rose-600 dark:text-rose-400 bg-rose-500/15 px-3 py-0.5 rounded-full inline-block mb-2 border border-rose-500/30">
                   👑 TIER 1: SYNDICATE MASTERMIND
                 </span>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white font-mono">
-                  {selectedSyndicate.kingpin.name}
-                </h4>
-                <p className="text-xs text-slate-500 dark:text-zinc-400 italic">
-                  "{selectedSyndicate.kingpin.alias}"
-                </p>
-                <div className="flex items-center justify-center gap-2 mt-2 font-mono text-[10.5px]">
-                  <span className="px-2 py-0.5 rounded bg-rose-600 text-white font-bold shadow-xs">
-                    THREAT RISK {selectedSyndicate.kingpin.risk_score}/100
-                  </span>
-                  <span className="text-slate-500 dark:text-zinc-400">{selectedSyndicate.districts[0]}</span>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-2">
+                  <div className="relative w-14 h-14 rounded-2xl overflow-hidden border-2 border-rose-500/40 shadow-sm shrink-0">
+                    {selectedKingpinMedia?.mugshot ? (
+                      <img
+                        src={selectedKingpinMedia.mugshot}
+                        alt={selectedSyndicate.kingpin.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-rose-600 flex items-center justify-center text-white font-bold text-base font-mono">
+                        {selectedSyndicate.kingpin.name.split(' ').map(n => n[0]).join('')}
+                      </div>
+                    )}
+                    <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
+                  </div>
+
+                  <div className="text-center sm:text-left">
+                    <h4 className="text-base font-bold text-slate-900 dark:text-white font-mono">
+                      {selectedSyndicate.kingpin.name}
+                    </h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-mono italic">
+                      &quot;{selectedSyndicate.kingpin.alias}&quot;
+                    </p>
+                    <div className="flex items-center justify-center sm:justify-start gap-2 mt-1.5 font-mono text-[10.5px]">
+                      <span className="px-2 py-0.5 rounded-md bg-rose-600 text-white font-bold shadow-xs">
+                        THREAT RISK {selectedSyndicate.kingpin.risk_score}/100
+                      </span>
+                      <span className="text-slate-500 dark:text-slate-400">{selectedSyndicate.districts[0]}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              {/* Animated Connector */}
-              <div className="w-0.5 h-7 bg-blue-500/50" />
+              {/* Connector */}
+              <div className="w-0.5 h-8 bg-gradient-to-b from-rose-500 to-blue-500" />
             </div>
 
             {/* TIER 2: SPECIALIZED OPERATIONAL CELLS */}
@@ -665,20 +712,37 @@ export default function NetworkPage() {
                 TIER 2: KEY LIEUTENANTS & SPECIALIZED CELLS
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 w-full max-w-4xl">
-                {selectedSyndicate.lieutenants.map(lt => (
-                  <div key={lt.id} className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-blue-500/30 text-center shadow-xs hover:border-blue-500 transition-all">
-                    <h5 className="text-xs font-bold text-slate-900 dark:text-white font-mono">{lt.name}</h5>
-                    <p className="text-[11px] text-blue-600 dark:text-blue-400 font-semibold mt-0.5">{lt.role}</p>
-                    <div className="flex items-center justify-center gap-1.5 mt-2.5 text-[10px] font-mono text-slate-500 dark:text-zinc-400">
-                      <span>{lt.district}</span>
-                      <span>·</span>
-                      <span className="font-bold text-rose-500">Risk {lt.risk_score}</span>
+                {selectedSyndicate.lieutenants.map(lt => {
+                  const ltMedia = getSuspectMedia(lt.name);
+                  return (
+                    <div
+                      key={lt.id}
+                      className="p-4 rounded-xl bg-slate-50/90 dark:bg-slate-800/60 border border-blue-500/30 text-center shadow-xs hover:border-blue-500 transition-all space-y-2"
+                    >
+                      <div className="relative w-10 h-10 rounded-full overflow-hidden mx-auto border border-blue-400/40">
+                        {ltMedia?.mugshot ? (
+                          <img src={ltMedia.mugshot} alt={lt.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold font-mono">
+                            {lt.name.split(' ').map(n => n[0]).join('')}
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <h5 className="text-xs font-bold text-slate-900 dark:text-white font-mono">{lt.name}</h5>
+                        <p className="text-[11px] text-blue-600 dark:text-blue-400 font-semibold mt-0.5">{lt.role}</p>
+                      </div>
+                      <div className="flex items-center justify-center gap-1.5 pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60 text-[10px] font-mono text-slate-500 dark:text-slate-400">
+                        <span>{lt.district}</span>
+                        <span>·</span>
+                        <span className="font-bold text-rose-500">Risk {lt.risk_score}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               {/* Connector */}
-              <div className="w-0.5 h-7 bg-emerald-500/50 mt-1" />
+              <div className="w-0.5 h-8 bg-gradient-to-b from-blue-500 to-emerald-500 mt-2" />
             </div>
 
             {/* TIER 3: LINKED CCTNS INCIDENT DOCKETS */}
@@ -691,17 +755,17 @@ export default function NetworkPage() {
                   <div
                     key={fir.case_number}
                     onClick={() => handleCaseClick(fir.case_number)}
-                    className="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-emerald-500/30 hover:border-emerald-500 shadow-xs cursor-pointer transition-all text-left"
+                    className="p-3.5 rounded-xl bg-white dark:bg-slate-800/60 border border-emerald-500/30 hover:border-emerald-500 shadow-xs cursor-pointer transition-all text-left"
                   >
-                    <div className="flex items-center gap-1 text-[11px] font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold font-mono text-emerald-600 dark:text-emerald-400">
                       <FileText className="w-3 h-3" />
                       <span className="truncate">{fir.case_number}</span>
                     </div>
                     <p className="text-xs text-slate-900 dark:text-white font-bold mt-1 truncate">{fir.crime}</p>
                     <p className="text-[10px] text-slate-400 truncate">{fir.station}</p>
-                    <div className="mt-2 pt-1.5 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between text-[9.5px] font-mono">
+                    <div className="mt-2 pt-1.5 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[9.5px] font-mono">
                       <span className="text-slate-400">{fir.date}</span>
-                      <span className="font-bold text-emerald-600 dark:text-emerald-400">{fir.status}</span>
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400 uppercase">{fir.status}</span>
                     </div>
                   </div>
                 ))}
@@ -714,13 +778,13 @@ export default function NetworkPage() {
 
       {/* ── 6. VIEW 3: STRATEGIC NEXUS MATRIX & ASSET RECOVERY LEDGER ── */}
       {viewMode === 'matrix' && (
-        <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#121215] border border-slate-200/90 dark:border-zinc-800 shadow-xs space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-zinc-800/80">
+        <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#0f172a]/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-800/90 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800/80">
             <div>
               <h3 className="text-sm font-bold text-slate-900 dark:text-white font-mono uppercase tracking-wider">
                 Cross-District Criminal Syndicate Nexus Matrix
               </h3>
-              <p className="text-xs text-slate-500 dark:text-zinc-400">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Inter-state crime nexus, financial volume, corridor tracking & linked CCTNS evidence
               </p>
             </div>
@@ -730,9 +794,9 @@ export default function NetworkPage() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left border-collapse">
+            <table className="w-full text-xs text-left border-collapse font-mono">
               <thead>
-                <tr className="bg-slate-50 dark:bg-zinc-900/80 border-b border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 font-mono text-[10.5px]">
+                <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-[10.5px]">
                   <th className="px-4 py-3 font-semibold">SYNDICATE NETWORK</th>
                   <th className="px-4 py-3 font-semibold">PRIME KINGPIN</th>
                   <th className="px-4 py-3 font-semibold">FINANCIAL SCALE</th>
@@ -742,26 +806,26 @@ export default function NetworkPage() {
                   <th className="px-4 py-3 font-semibold text-right">DOSSIER</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/80">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
                 {SYNDICATES.map((syn) => (
-                  <tr key={syn.id} className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/40 transition-colors">
-                    <td className="px-4 py-3.5 font-mono font-bold text-slate-900 dark:text-white">
+                  <tr key={syn.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+                    <td className="px-4 py-3.5 font-bold text-slate-900 dark:text-white">
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full" style={{ background: syn.color }} />
                         <span className="truncate max-w-xs">{syn.name}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3.5 text-slate-700 dark:text-zinc-300">
+                    <td className="px-4 py-3.5 text-slate-700 dark:text-slate-300">
                       <div className="font-semibold">{syn.kingpin.name}</div>
-                      <div className="text-[10px] text-slate-400 italic">"{syn.kingpin.alias}"</div>
+                      <div className="text-[10px] text-slate-400 italic">&quot;{syn.kingpin.alias}&quot;</div>
                     </td>
-                    <td className="px-4 py-3.5 font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                    <td className="px-4 py-3.5 font-bold text-emerald-600 dark:text-emerald-400">
                       {syn.estimated_volume}
                     </td>
-                    <td className="px-4 py-3.5 text-slate-600 dark:text-zinc-400 text-[11px] max-w-xs truncate font-mono">
+                    <td className="px-4 py-3.5 text-slate-600 dark:text-slate-300 text-[11px] max-w-xs truncate">
                       {syn.primary_corridor}
                     </td>
-                    <td className="px-4 py-3.5 font-mono">
+                    <td className="px-4 py-3.5">
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                         syn.threat_level === 'CRITICAL'
                           ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
@@ -770,7 +834,7 @@ export default function NetworkPage() {
                         {syn.threat_level} ({syn.risk_score})
                       </span>
                     </td>
-                    <td className="px-4 py-3.5 font-mono font-bold text-blue-600 dark:text-blue-400">
+                    <td className="px-4 py-3.5 font-bold text-blue-600 dark:text-blue-400">
                       {syn.connected_firs.length} Cases
                     </td>
                     <td className="px-4 py-3.5 text-right">
@@ -779,7 +843,7 @@ export default function NetworkPage() {
                           setSelectedSyndicate(syn);
                           handleCaseClick(syn.connected_firs[0].case_number);
                         }}
-                        className="px-3 py-1 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white font-bold text-[11px] transition-all cursor-pointer font-mono shadow-2xs"
+                        className="px-3 py-1 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white font-bold text-[11px] transition-all cursor-pointer shadow-2xs"
                       >
                         Inspect
                       </button>
@@ -792,10 +856,10 @@ export default function NetworkPage() {
         </div>
       )}
 
-      {/* ── 7. VIEW 4: CIA/SPECIAL AGENT-GRADE PREDICTIVE INTERCEPTION MAP ── */}
+      {/* ── 7. VIEW 4: PREDICTIVE INTERCEPTION MAP ── */}
       {viewMode === 'map' && (
-        <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#121215] border border-slate-200/90 dark:border-zinc-800 shadow-xs space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-zinc-800/80">
+        <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#0f172a]/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-800/90 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800/80">
             <div>
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -803,7 +867,7 @@ export default function NetworkPage() {
                   Predictive Escape Route & ANPR Interception Grid
                 </h3>
               </div>
-              <p className="text-xs text-slate-500 dark:text-zinc-400">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Calibrated multi-source intel feeds (FASTag sweeps, SIM cell tower hops, ANPR time-decay trajectory)
               </p>
             </div>
@@ -815,7 +879,7 @@ export default function NetworkPage() {
           </div>
 
           {/* Predictive Route Highlights Bar */}
-          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200/60 dark:border-zinc-800/80 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs font-mono">
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs font-mono">
             <div>
               <span className="text-[10px] text-slate-400 uppercase font-semibold">Active Tracking Target</span>
               <p className="font-bold text-slate-900 dark:text-white">{selectedSyndicate.kingpin.name} ({selectedSyndicate.kingpin.alias})</p>
@@ -827,12 +891,12 @@ export default function NetworkPage() {
             </div>
             <div>
               <span className="text-[10px] text-slate-400 uppercase font-semibold">Surveillance Checkpoints</span>
-              <p className="text-slate-700 dark:text-zinc-300">{selectedSyndicate.anpr_chokepoints.join(' · ')}</p>
+              <p className="text-slate-700 dark:text-slate-300">{selectedSyndicate.anpr_chokepoints.join(' · ')}</p>
             </div>
           </div>
 
           {/* Leaflet Network Map */}
-          <div className="h-[580px] rounded-2xl overflow-hidden border border-slate-200 dark:border-zinc-800">
+          <div className="h-[580px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
             <NetworkMapView
               nodes={SYNDICATES.map(s => ({
                 id: s.kingpin.id,
