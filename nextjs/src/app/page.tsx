@@ -138,12 +138,23 @@ export default function LandingPage() {
 
       if (res.ok) {
         const data = await res.json();
+        const isSupervisor = finalRole.toLowerCase().includes('supervisor') || finalId.toLowerCase().includes('supervisor');
+        const isAnalyst = finalRole.toLowerCase().includes('analyst') || finalId.toLowerCase().includes('analyst');
+        const officerName = data.user?.name || (isSupervisor ? 'Dr. Rajesh Kumar, IPS' : isAnalyst ? 'Dr. Priya Rao' : 'V. Sharma');
+
         localStorage.setItem('role', finalRole);
-        localStorage.setItem('userName', data.user?.name || 'V. Sharma');
+        localStorage.setItem('userName', officerName);
         localStorage.setItem('userEmail', email);
         localStorage.setItem('drishti_role', finalRole);
         localStorage.setItem('drishti_employee_id', finalId);
-        router.push('/dashboard');
+
+        if (isSupervisor) {
+          router.push('/supervisor');
+        } else if (isAnalyst) {
+          router.push('/analyst');
+        } else {
+          router.push('/dashboard');
+        }
       } else {
         const errData = await res.json().catch(() => ({}));
         setError(errData.message || 'Credentials match failed. Verify input.');
@@ -156,12 +167,23 @@ export default function LandingPage() {
   };
 
   const handleQuickLogin = (roleName: string, empId: string, officerName?: string) => {
+    const isSupervisor = roleName.toLowerCase().includes('supervisor') || empId.toLowerCase().includes('supervisor');
+    const isAnalyst = roleName.toLowerCase().includes('analyst') || empId.toLowerCase().includes('analyst');
+    const assignedName = officerName || (isSupervisor ? 'Dr. Rajesh Kumar, IPS' : isAnalyst ? 'Dr. Priya Rao' : 'V. Sharma');
+
     localStorage.setItem('role', roleName);
-    localStorage.setItem('userName', officerName || 'V. Sharma');
+    localStorage.setItem('userName', assignedName);
     localStorage.setItem('userEmail', `${empId}@drishti.ksp`);
     localStorage.setItem('drishti_role', roleName);
     localStorage.setItem('drishti_employee_id', empId);
-    router.push('/dashboard');
+
+    if (isSupervisor) {
+      router.push('/supervisor');
+    } else if (isAnalyst) {
+      router.push('/analyst');
+    } else {
+      router.push('/dashboard');
+    }
   };
 
   const scrollAnimation = prefersReducedMotion
