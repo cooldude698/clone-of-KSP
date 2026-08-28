@@ -343,7 +343,7 @@ const DrishtiOrb = ({
       </div>
 
       {/* ── FLOATING CONTROLS PILL ── */}
-      <div className="flex items-center gap-2 bg-white/95 dark:bg-[#18181B]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-800 px-3 py-1.5 rounded-full shadow-xl animate-fade-in mt-1">
+      <div className="flex items-center gap-2 bg-[#EDE4D5]/98 dark:bg-[#231F1A]/95 backdrop-blur-xl border border-[#D8C9B4] dark:border-[#42392E] px-3 py-1.5 rounded-full shadow-[0_10px_35px_rgba(140,115,85,0.22)] animate-fade-in mt-1">
         {/* PTT HOLD TO TALK BUTTON */}
         <button
           onMouseDown={(e) => { e.preventDefault(); onPttStart?.(); }}
@@ -354,7 +354,7 @@ const DrishtiOrb = ({
           className={`px-3.5 py-1.5 rounded-full text-[10px] uppercase font-bold tracking-wider select-none transition-all duration-200 flex items-center gap-1.5 h-7 cursor-pointer
             ${isListening
               ? 'bg-blue-600 text-white shadow-md scale-105'
-              : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200'}`}
+              : 'bg-[#DFD2BF] dark:bg-[#342D24] hover:bg-[#D4C3AC] dark:hover:bg-[#433B30] text-[#3B2F23] dark:text-[#EFE6D8] border border-[#CBB9A0] dark:border-[#4D4235]'}`}
         >
           {isListening && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
           {isListening ? 'Listening…' : 'Hold to Talk'}
@@ -366,7 +366,7 @@ const DrishtiOrb = ({
           className={`p-1.5 rounded-full transition-all cursor-pointer ${
             showTypingInput
               ? 'bg-blue-600 text-white'
-              : 'text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
+              : 'text-[#665440] hover:text-[#251D14] dark:text-[#D1C2AF] dark:hover:text-white hover:bg-[#DFD2BF] dark:hover:bg-[#342D24]'
           }`}
           title="Type query"
         >
@@ -379,7 +379,7 @@ const DrishtiOrb = ({
           className={`p-1.5 rounded-full transition-all cursor-pointer ${
             isMuted
               ? 'bg-rose-500/20 text-rose-500'
-              : 'text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
+              : 'text-[#665440] hover:text-[#251D14] dark:text-[#D1C2AF] dark:hover:text-white hover:bg-[#DFD2BF] dark:hover:bg-[#342D24]'
           }`}
           title={isMuted ? 'Unmute voice' : 'Mute voice'}
         >
@@ -395,7 +395,7 @@ const DrishtiOrb = ({
             e.stopPropagation();
             onTypingSubmit?.(typingText);
           }}
-          className="mt-2 w-72 flex items-center gap-1.5 bg-white dark:bg-[#18181B] border border-gray-200 dark:border-gray-800 rounded-full px-3 py-1.5 shadow-xl animate-fade-in"
+          className="mt-2 w-72 flex items-center gap-1.5 bg-[#EDE4D5] dark:bg-[#231F1A] border border-[#D8C9B4] dark:border-[#42392E] rounded-full px-3 py-1.5 shadow-[0_10px_35px_rgba(140,115,85,0.22)] animate-fade-in"
           onClick={(e) => e.stopPropagation()}
         >
           <input
@@ -404,11 +404,11 @@ const DrishtiOrb = ({
             onChange={(e) => onTypingChange?.(e.target.value)}
             placeholder="Ask Drishti AI..."
             autoFocus
-            className="flex-1 text-xs bg-transparent text-gray-900 dark:text-white focus:outline-none placeholder:text-gray-400"
+            className="flex-1 text-xs bg-transparent text-[#251D14] dark:text-white focus:outline-none placeholder:text-[#8C7A68]"
           />
           <button
             type="submit"
-            className="w-6 h-6 rounded-full bg-black dark:bg-white text-white dark:text-black flex items-center justify-center text-xs font-bold hover:opacity-80"
+            className="w-6 h-6 rounded-full bg-[#3B2F23] dark:bg-[#DFD2BF] text-[#EDE4D5] dark:text-[#231F1A] flex items-center justify-center text-xs font-bold hover:opacity-80"
           >
             ↑
           </button>
