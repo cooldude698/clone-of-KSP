@@ -229,66 +229,75 @@ const DrishtiOrb = ({
 
       {/* ── LIVE LISTENING & INTELLIGENCE RESPONSE HUD CARD ── */}
       {!isDismissed && (liveTranscript || pendingTranscript || orbResponse) && (
-        <div className="w-80 sm:w-96 max-w-[92vw] rounded-2xl overflow-hidden mb-2 animate-fade-in shadow-2xl relative">
+        <div className="w-[340px] sm:w-[420px] max-w-[94vw] rounded-2xl overflow-hidden mb-3 animate-fade-in relative z-20 shadow-[0_25px_60px_rgba(0,0,0,0.85),0_0_35px_rgba(59,130,246,0.18)] border border-slate-700/80 dark:border-blue-500/30">
+          {/* Top ambient accent glow line */}
+          <div className="h-[2px] w-full bg-gradient-to-r from-blue-600 via-cyan-400 to-indigo-500" />
+
           <div
             style={{
-              background: 'rgba(15, 23, 42, 0.95)',
-              backdropFilter: 'blur(24px)',
+              background: 'rgba(11, 15, 25, 0.94)',
+              backdropFilter: 'blur(28px)',
             }}
-            className="px-4 py-3 border border-slate-700/80 rounded-2xl relative z-10 text-white shadow-[0_15px_45px_rgba(0,0,0,0.6)]"
+            className="p-4 relative z-10 text-white"
           >
             {/* Live transcript while listening */}
             {liveTranscript && !pendingTranscript && (
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                    <span className="text-[9px] text-blue-400 uppercase tracking-widest font-bold font-mono">
-                      Listening…
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                    <span className="text-[10px] text-cyan-300 uppercase tracking-widest font-bold font-mono">
+                      LISTENING TO VOICE…
                     </span>
                   </div>
                   <button
                     onClick={handleDismissBubble}
-                    className="text-white/40 hover:text-white hover:bg-white/10 p-0.5 rounded-full cursor-pointer text-xs"
+                    className="text-slate-400 hover:text-white hover:bg-slate-800 p-1 rounded-lg transition-all text-xs"
                     title="Dismiss"
                   >
                     ✕
                   </button>
                 </div>
-                <p className="text-xs text-white/90 italic font-medium leading-relaxed truncate">
+                <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-800 text-xs text-cyan-100/90 font-mono leading-relaxed">
                   &quot;{liveTranscript}&quot;
-                </p>
+                </div>
               </div>
             )}
 
-            {/* Pending transcript confirmation */}
+            {/* Pending transcript confirmation ("Did you say: ...") */}
             {pendingTranscript && (
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[9px] text-blue-400 uppercase tracking-widest font-bold font-mono">
-                    Did you say:
-                  </span>
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs">🎙️</span>
+                    <span className="text-[10px] text-blue-300 uppercase tracking-wider font-bold font-mono">
+                      VOICE TRANSCRIPT VERIFICATION
+                    </span>
+                  </div>
                   <button
                     onClick={handleDismissBubble}
-                    className="text-white/40 hover:text-white hover:bg-white/10 p-0.5 rounded-full cursor-pointer text-xs"
+                    className="text-slate-400 hover:text-white hover:bg-slate-800 p-1 rounded-lg transition-all text-xs"
                     title="Dismiss"
                   >
                     ✕
                   </button>
                 </div>
-                <p className="text-xs text-white font-medium mb-2.5 leading-relaxed">
+
+                <div className="p-3 bg-slate-900/90 rounded-xl border border-blue-500/20 text-xs text-slate-100 font-medium leading-relaxed shadow-inner">
                   &quot;{pendingTranscript}&quot;
-                </p>
-                <div className="flex items-center gap-2">
+                </div>
+
+                <div className="flex items-center gap-2 pt-1">
                   <button
                     onClick={(e) => { e.stopPropagation(); onConfirmSend?.(); }}
-                    className="flex-1 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all shadow-sm"
+                    className="flex-1 py-2 px-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-blue-600/25 flex items-center justify-center gap-1.5 transition-all active:scale-98 cursor-pointer"
                   >
-                    Send Query
+                    <span>Send Query</span>
+                    <span className="text-[10px] opacity-75 font-mono px-1 py-0.2 bg-black/25 rounded">↵</span>
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); onCancelTranscript?.(); }}
-                    className="px-2.5 py-1.5 bg-white/10 hover:bg-white/20 text-white/70 text-[10px] font-bold rounded-lg transition-all"
+                    className="py-2 px-3.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium rounded-xl transition-all cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -298,27 +307,46 @@ const DrishtiOrb = ({
 
             {/* Voice response bubble */}
             {!liveTranscript && !pendingTranscript && orbResponse && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between pb-1.5 border-b border-slate-700/60">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                    <span className="text-[10px] text-blue-300 uppercase tracking-wider font-bold font-mono">
-                      DRISHTI INTELLIGENCE
+              <div className="space-y-3">
+                {/* Header bar */}
+                <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-lg bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-[10px] shrink-0">
+                      🛡️
+                    </div>
+                    <div>
+                      <span className="font-mono text-[11px] font-bold tracking-wider text-slate-100 uppercase">
+                        DRISHTI INTEL HUD
+                      </span>
+                    </div>
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-mono text-emerald-400 font-semibold">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      LIVE
                     </span>
                   </div>
+
                   <div className="flex items-center gap-1">
                     {onReadAloud && (
                       <button
                         onClick={(e) => { e.stopPropagation(); onReadAloud(); }}
-                        className="text-slate-400 hover:text-white hover:bg-white/10 px-1.5 py-0.5 rounded cursor-pointer transition-all text-xs"
+                        className="text-slate-400 hover:text-cyan-300 hover:bg-slate-800 px-2 py-1 rounded-lg cursor-pointer transition-all text-xs flex items-center gap-1 font-mono"
                         title="Read Aloud"
                       >
-                        🔊
+                        🔊 Listen
+                      </button>
+                    )}
+                    {onOpenPanel && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onOpenPanel(); }}
+                        className="text-slate-400 hover:text-cyan-300 hover:bg-slate-800 px-2 py-1 rounded-lg cursor-pointer transition-all text-xs font-mono"
+                        title="Open Full Copilot Workspace"
+                      >
+                        ↗ Panel
                       </button>
                     )}
                     <button
                       onClick={handleDismissBubble}
-                      className="text-slate-400 hover:text-white hover:bg-white/10 px-1 py-0.5 rounded cursor-pointer transition-all text-xs"
+                      className="text-slate-400 hover:text-white hover:bg-slate-800 p-1 rounded-lg cursor-pointer transition-all text-xs ml-0.5"
                       title="Dismiss"
                     >
                       ✕
@@ -327,8 +355,23 @@ const DrishtiOrb = ({
                 </div>
 
                 {/* Render Rich Intelligence Response */}
-                <div className="max-h-72 overflow-y-auto drishti-scrollbar pr-1">
+                <div className="max-h-80 overflow-y-auto drishti-scrollbar pr-1">
                   <PoliceIntelligenceRenderer text={orbResponse} isDark={true} mode="bubble" />
+                </div>
+
+                {/* Tactical Footer */}
+                <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                  <span>KSP CCTNS v4.2 • Grid Synced</span>
+                  <button
+                    onClick={() => {
+                      if (typeof navigator !== 'undefined') {
+                        navigator.clipboard.writeText(orbResponse);
+                      }
+                    }}
+                    className="hover:text-cyan-300 cursor-pointer flex items-center gap-1 transition-colors"
+                  >
+                    📋 Copy Brief
+                  </button>
                 </div>
               </div>
             )}

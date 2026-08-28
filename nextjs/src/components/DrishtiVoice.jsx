@@ -587,17 +587,17 @@ const useDrishtiVoice = ({
       const data = await res.json();
 
       if (currentTtsId !== activeTtsIdRef.current) return;
-      if (data.audioBase64 && data.source === 'zia') {
-        console.log('[DRISHTI VOICE] ✅ Zia audio received, playing...');
+      if (data.audioBase64) {
+        console.log('[DRISHTI VOICE] ✅ Neural audio received (' + (data.source || 'edge_tts') + '), playing...');
         try {
-          await playBase64Audio(data.audioBase64, data.mimeType || 'audio/wav', data.source);
+          await playBase64Audio(data.audioBase64, data.mimeType || 'audio/mpeg', data.source);
           return; // success
         } catch (playErr) {
           console.warn('[DRISHTI VOICE] Audio playback failed:', playErr.message);
           setIsSpeaking(false);
         }
       } else {
-        console.warn('[DRISHTI VOICE] Zia TTS returned browser_fallback — using Web Speech API');
+        console.warn('[DRISHTI VOICE] TTS returned fallback — using Web Speech API');
       }
     } catch (err) {
       console.warn('[DRISHTI VOICE] Zia TTS call failed:', err.message);

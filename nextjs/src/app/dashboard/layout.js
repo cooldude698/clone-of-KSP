@@ -396,8 +396,8 @@ export default function DashboardLayout({ children }) {
     if (!pttActiveRef.current) return;
     pttActiveRef.current = false;
 
-    // Give the recognition engine 200ms to finalize its last speech event
-    await new Promise(r => setTimeout(r, 200));
+    // Give the recognition engine 250ms to finalize its last speech event
+    await new Promise(r => setTimeout(r, 250));
 
     // stopListeningAndGetTranscript reads directly from refs (never stale)
     const finalQuery = (await stopListeningAndGetTranscript()).trim();
@@ -405,10 +405,9 @@ export default function DashboardLayout({ children }) {
 
     if (!finalQuery) return;
 
-    // Automatically send voice query upon release for smooth, instant response
-    setPendingTranscript('');
-    handleQuery(finalQuery);
-  }, [stopListeningAndGetTranscript, handleQuery]);
+    // Show prompt confirmation card ("Did you say: ...") so user can review before dispatching
+    setPendingTranscript(finalQuery);
+  }, [stopListeningAndGetTranscript]);
 
   const handleConfirmSend = useCallback(() => {
     if (!pendingTranscript.trim()) return;
@@ -474,30 +473,17 @@ export default function DashboardLayout({ children }) {
 
   const safeSpeak = useCallback((text, lang) => {
     if (isMutedRef.current) return;
-    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    const cleanText = cleanTextForSpeech(text);
+    if (!cleanText) return;
 
     try {
-      window.speechSynthesis.cancel();
-      const targetLang = lang || 'en-IN';
-      const cleanText = cleanTextForSpeech(text);
-      if (!cleanText) return;
-
-      const utt = new SpeechSynthesisUtterance(cleanText);
-      utt.lang = targetLang;
-      utt.rate = 0.95;
-      utt.pitch = 1.0;
-
-      // Select best matching voice for clear pronunciation
-      const voices = window.speechSynthesis.getVoices() || [];
-      const bestVoice = voices.find(v => v.lang === targetLang) ||
-        voices.find(v => v.lang.startsWith(targetLang.split('-')[0]));
-      if (bestVoice) utt.voice = bestVoice;
-
-      window.speechSynthesis.speak(utt);
+      const targetLang = lang || getLocale(language);
+      // Use neural speak() from useDrishtiVoice (EdgeTTS / Zia neural audio)
+      speak(cleanText, targetLang);
     } catch (e) {
       console.warn('TTS speech trigger warning:', e);
     }
-  }, []);
+  }, [speak, language]);
 
   // ─── Greeting on first open ──────────────────────────────────────
   const triggerGreeting = useCallback(() => {
