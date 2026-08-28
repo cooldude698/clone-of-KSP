@@ -1,10 +1,9 @@
 {
-  "command": "npm start",
+  "command": "node start-appsail.js",
   "stack": "node20",
   "build_path": ".",
   "env_variables": {
-    "NODE_ENV": "production",
-    "PORT": "3000"
+    "NODE_ENV": "production"
   },
   "memory": 1024
 }
