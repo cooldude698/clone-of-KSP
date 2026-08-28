@@ -56,7 +56,7 @@ export default function LiveNewsPage() {
     setPage(1);
     try {
       const param = encodeURIComponent(selectedState);
-      const res = await fetch(`/api/news?state=${param}&page=1`);
+      const res = await fetch(`/api/news?state=${param}&page=1&refresh=true&t=${Date.now()}`);
       const rawText = await res.text();
       let data: any = {};
       try {
