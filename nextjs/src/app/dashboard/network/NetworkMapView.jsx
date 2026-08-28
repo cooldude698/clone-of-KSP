@@ -88,7 +88,10 @@ export default function NetworkMapView({
     const map = L.map(containerRef.current, {
       center: defaultCenter,
       zoom: 12,
+      zoomControl: true,
       scrollWheelZoom: true,
+      doubleClickZoom: true,
+      touchZoom: true,
     });
 
     L.tileLayer(tileUrl, {

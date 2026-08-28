@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState, useMemo } from "react";
 import * as d3 from "d3";
+import { ZoomIn, ZoomOut, Maximize2, RotateCcw } from "lucide-react";
 
 // ── TypeScript Type Definitions ──────────────────────────────────────────────
 
@@ -77,11 +78,13 @@ export default function ChronoCriminalGraph({
   edges,
   date_range = { min: "2025-01-01", max: "2026-07-18" },
   onNodeClick,
-  height = 550,
+  height = 580,
 }: ChronoCriminalGraphProps) {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const zoomBehaviorRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
+  const gRef = useRef<d3.Selection<SVGGElement, unknown, null, undefined> | null>(null);
 
   // Time window bounds
   const minTime = useMemo(() => new Date(date_range.min).getTime() || new Date("2025-01-01").getTime(), [date_range.min]);
@@ -134,6 +137,22 @@ export default function ChronoCriminalGraph({
     setIsPlaying(!isPlaying);
   };
 
+  // Zoom Button Handlers
+  const handleZoomIn = () => {
+    if (!svgRef.current || !zoomBehaviorRef.current) return;
+    d3.select(svgRef.current).transition().duration(300).call(zoomBehaviorRef.current.scaleBy, 1.3);
+  };
+
+  const handleZoomOut = () => {
+    if (!svgRef.current || !zoomBehaviorRef.current) return;
+    d3.select(svgRef.current).transition().duration(300).call(zoomBehaviorRef.current.scaleBy, 0.7);
+  };
+
+  const handleResetZoom = () => {
+    if (!svgRef.current || !zoomBehaviorRef.current) return;
+    d3.select(svgRef.current).transition().duration(400).call(zoomBehaviorRef.current.transform, d3.zoomIdentity);
+  };
+
   // ── D3 Force Simulation & Render Effect ─────────────────────────────────────
 
   useEffect(() => {
@@ -169,12 +188,15 @@ export default function ChronoCriminalGraph({
 
     // Create main zoom/pan container
     const g = svg.append("g");
+    gRef.current = g;
 
     const zoom = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.3, 4])
+      .scaleExtent([0.2, 5])
       .on("zoom", (event) => {
         g.attr("transform", event.transform);
       });
+
+    zoomBehaviorRef.current = zoom;
     svg.call(zoom);
 
     // Filter nodes based on timestamp
@@ -199,21 +221,23 @@ export default function ChronoCriminalGraph({
         );
       });
 
-    // Force simulation
+    // High-Repulsion Spacious D3 Physics Simulation to eliminate overlapping
     const simulation = d3.forceSimulation<GraphNode>(visibleNodes)
-      .force("charge", d3.forceManyBody().strength(-280))
+      .force("charge", d3.forceManyBody().strength(-950))
       .force("center", d3.forceCenter(width / 2, height / 2))
-      .force("collision", d3.forceCollide<GraphNode>().radius(d => (d.size || 16) + 20))
+      .force("collision", d3.forceCollide<GraphNode>().radius(d => (d.size || 16) + 38))
       .force("link", d3.forceLink<GraphNode, GraphEdge>(visibleEdges)
         .id(d => d.id)
-        .distance(120)
+        .distance(170)
       )
       .force("gang_x", d3.forceX<GraphNode>(d => {
-        if ((d as any).gang_id === "GANG-NORTH") return width * 0.35;
-        if ((d as any).gang_id === "GANG-SOUTH") return width * 0.65;
+        if ((d as any).gang_id === "GANG-NORTH") return width * 0.28;
+        if ((d as any).gang_id === "GANG-SOUTH") return width * 0.72;
         return width / 2;
-      }).strength(0.12))
-      .force("gang_y", d3.forceY<GraphNode>(_ => height / 2).strength(0.05));
+      }).strength(0.15))
+      .force("gang_y", d3.forceY<GraphNode>(_ => height / 2).strength(0.08))
+      .alphaDecay(0.02)
+      .velocityDecay(0.3);
 
     // Render group elements
     const linkGroup = g.append("g").attr("class", "links");
@@ -252,7 +276,7 @@ export default function ChronoCriminalGraph({
         if (sGang && tGang && sGang !== tGang) return "#ef4444"; // cross-gang link
         return getEdgeColor(d.crime_type);
       })
-      .attr("stroke-opacity", 0.7)
+      .attr("stroke-opacity", 0.6)
       .attr("stroke-width", d => Math.max(2, d.weight || 2))
       .attr("stroke-dasharray", d => d.crime_type === 'surveillance' ? '4 3' : 'none');
 
@@ -260,8 +284,8 @@ export default function ChronoCriminalGraph({
 
     // ── Gang label badges above each cluster ──
     const gangLabels = [
-      { id: "GANG-NORTH", label: "▲ GANG-NORTH", x: width * 0.30, y: 40, color: "#f97316" },
-      { id: "GANG-SOUTH", label: "▲ GANG-SOUTH", x: width * 0.65, y: 40, color: "#8b5cf6" },
+      { id: "GANG-NORTH", label: "▲ GANG-NORTH (Vehicle Theft)", x: width * 0.28, y: 35, color: "#f97316" },
+      { id: "GANG-SOUTH", label: "▲ GANG-SOUTH (Chain Snatching)", x: width * 0.72, y: 35, color: "#8b5cf6" },
     ];
     g.selectAll(".gang-label")
       .data(gangLabels)
@@ -272,10 +296,10 @@ export default function ChronoCriminalGraph({
       .attr("y", d => d.y)
       .attr("text-anchor", "middle")
       .attr("fill", d => d.color)
-      .style("font-size", "11px")
+      .style("font-size", "12px")
       .style("font-weight", "bold")
       .style("font-family", "monospace")
-      .style("opacity", "0.7")
+      .style("opacity", "0.85")
       .text(d => d.label);
 
     // ── Update Nodes ──
@@ -303,18 +327,18 @@ export default function ChronoCriminalGraph({
         });
 
         nodeGroup.selectAll<SVGGElement, GraphNode>("g")
-          .style("opacity", n => connectedNodeIds.has(n.id) ? "1" : "0.2");
+          .style("opacity", n => connectedNodeIds.has(n.id) ? "1" : "0.15");
 
         linkGroup.selectAll<SVGLineElement, GraphEdge>("line")
           .style("stroke-opacity", l => {
             const sId = typeof l.source === 'object' ? l.source.id : l.source;
             const tId = typeof l.target === 'object' ? l.target.id : l.target;
-            return (sId === d.id || tId === d.id) ? "1" : "0.1";
+            return (sId === d.id || tId === d.id) ? "1" : "0.08";
           })
           .style("stroke-width", l => {
             const sId = typeof l.source === 'object' ? l.source.id : l.source;
             const tId = typeof l.target === 'object' ? l.target.id : l.target;
-            return (sId === d.id || tId === d.id) ? "4" : "1.5";
+            return (sId === d.id || tId === d.id) ? "4.5" : "1.5";
           });
 
         if (tooltipRef.current) {
@@ -345,7 +369,7 @@ export default function ChronoCriminalGraph({
       })
       .on("mouseout", () => {
         nodeGroup.selectAll<SVGGElement, GraphNode>("g").style("opacity", "1");
-        linkGroup.selectAll<SVGLineElement, GraphEdge>("line").style("stroke-opacity", "0.7").style("stroke-width", d => Math.max(2, d.weight || 2));
+        linkGroup.selectAll<SVGLineElement, GraphEdge>("line").style("stroke-opacity", "0.6").style("stroke-width", d => Math.max(2, d.weight || 2));
         if (tooltipRef.current) {
           tooltipRef.current.style.opacity = "0";
         }
@@ -366,15 +390,12 @@ export default function ChronoCriminalGraph({
       .attr("class", "animate-pulse-ring");
 
     // Main Node Shapes
-    // Case nodes -> Square / Diamond
-    // Camera nodes -> Cyan Hexagon
-    // Accused nodes -> Circle
     nodeEnter.each(function(d) {
       const gNode = d3.select(this);
       const nodeSize = d.size || 16;
 
       if (d.type === 'case') {
-        const nodeColor = '#2d83d9';
+        const nodeColor = '#2563eb';
         gNode.append("rect")
           .attr("x", -nodeSize)
           .attr("y", -nodeSize)
@@ -437,30 +458,22 @@ export default function ChronoCriminalGraph({
       }
     });
 
-    // Node Label with background pill
+    // Sleek, Crisp Node Labels (No heavy overlapping black boxes)
     nodeEnter.each(function(d) {
       const gNode = d3.select(this);
       const nodeSize = d.size || 16;
       const labelText = truncateLabel(d.label);
 
       const labelG = gNode.append("g")
-        .attr("transform", `translate(0, ${nodeSize + 16})`);
+        .attr("transform", `translate(0, ${nodeSize + 14})`);
 
-      labelG.append("rect")
-        .attr("x", -((labelText.length * 6) / 2 + 6))
-        .attr("y", -11)
-        .attr("width", labelText.length * 6 + 12)
-        .attr("height", 16)
-        .attr("rx", 4)
-        .attr("fill", "#0d1527")
-        .attr("fill-opacity", 0.9)
-        .attr("stroke", "#26354a")
-        .attr("stroke-width", 1);
-
+      // Crisp text with subtle dark halo stroke to guarantee legibility
       labelG.append("text")
-        .attr("dy", 1)
         .attr("text-anchor", "middle")
-        .attr("fill", "#f8fafc")
+        .attr("fill", "#e2e8f0")
+        .attr("stroke", "#020617")
+        .attr("stroke-width", "3px")
+        .attr("paint-order", "stroke fill")
         .style("font-size", "10px")
         .style("font-weight", "600")
         .style("font-family", "monospace")
@@ -468,40 +481,34 @@ export default function ChronoCriminalGraph({
         .text(labelText);
     });
 
-    nodeEnter.merge(nodeSel);
-
-    // ── Drag Handlers ──
-    function dragstarted(event: d3.D3DragEvent<SVGGElement, GraphNode, GraphNode>, d: GraphNode) {
+    // Drag functions
+    function dragstarted(event: any, d: GraphNode) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
       d.fx = d.x;
       d.fy = d.y;
     }
 
-    function dragged(event: d3.D3DragEvent<SVGGElement, GraphNode, GraphNode>, d: GraphNode) {
+    function dragged(event: any, d: GraphNode) {
       d.fx = event.x;
       d.fy = event.y;
     }
 
-    function dragended(event: d3.D3DragEvent<SVGGElement, GraphNode, GraphNode>, d: GraphNode) {
+    function dragended(event: any, d: GraphNode) {
       if (!event.active) simulation.alphaTarget(0);
       d.fx = null;
       d.fy = null;
     }
 
-    return () => {
-      simulation.stop();
-    };
+  }, [nodes, edges, currentTimestamp, height, onNodeClick]);
 
-  }, [nodes, edges, currentTimestamp, height]);
-
-  // Search term filter effect
+  // Handle Search highlight effect
   useEffect(() => {
     if (!svgRef.current) return;
     const svg = d3.select(svgRef.current);
     
     if (!searchTerm.trim()) {
       svg.selectAll("g.nodes g").style("opacity", "1");
-      svg.selectAll("g.links line").style("stroke-opacity", "0.7");
+      svg.selectAll("g.links line").style("stroke-opacity", "0.6");
       return;
     }
 
@@ -576,9 +583,35 @@ export default function ChronoCriminalGraph({
 
       {/* Visualization Canvas */}
       <div className="relative w-full rounded-xl bg-[var(--surface-0)]/60 border border-[var(--border)]/50 overflow-hidden flex-grow" style={{ height }}>
+        
+        {/* Interactive Floating Zoom Controls */}
+        <div className="absolute top-3 right-3 z-30 flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-md p-1.5 rounded-xl border border-slate-700/60 shadow-lg">
+          <button
+            onClick={handleZoomIn}
+            title="Zoom In (+)"
+            className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+          >
+            <ZoomIn className="w-4 h-4" />
+          </button>
+          <button
+            onClick={handleZoomOut}
+            title="Zoom Out (-)"
+            className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+          >
+            <ZoomOut className="w-4 h-4" />
+          </button>
+          <button
+            onClick={handleResetZoom}
+            title="Reset Zoom View"
+            className="p-1.5 text-slate-300 hover:text-cyan-400 hover:bg-slate-800 rounded-lg transition-colors"
+          >
+            <RotateCcw className="w-4 h-4" />
+          </button>
+        </div>
+
         <svg
           ref={svgRef}
-          className="w-full h-full"
+          className="w-full h-full cursor-grab active:cursor-grabbing"
           style={{ height }}
         />
         {nodes.length === 0 && (
@@ -636,7 +669,7 @@ export default function ChronoCriminalGraph({
               onClick={() => setSpeed(s)}
               className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
                 speed === s
-                  ? "bg-[var(--surface-2)] text-blue-500 border border-[var(--border)]/50 shadow-inner"
+                  ? "bg-blue-600 text-white font-bold border border-blue-400 shadow-md shadow-blue-500/20"
                   : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
               }`}
             >
