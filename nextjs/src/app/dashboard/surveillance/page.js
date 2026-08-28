@@ -84,8 +84,8 @@ function speakDrishtiAlert(text) {
   speakText(text, 'en').catch(() => {});
 }
 
-// CCTV Video Mapping — direct GitHub CDN URLs pinned to commit 6b33c15b04de078cc4b0723c051a559d69cd6e64 containing your real KSP project videos!
-const CDN_BASE = 'https://raw.githubusercontent.com/vedeshskhatri/kspdatathon2026/6b33c15b04de078cc4b0723c051a559d69cd6e64/nextjs/public/videos';
+// CCTV Video Mapping — High-speed jsDelivr CDN with HTTP 206 Byte-Range Video Streaming support!
+const CDN_BASE = 'https://cdn.jsdelivr.net/gh/vedeshskhatri/kspdatathon2026@6b33c15b04de078cc4b0723c051a559d69cd6e64/nextjs/public/videos';
 
 const CAMERA_SPECIFIC_VIDEOS = {
   'CAM-BLR-0010': `${CDN_BASE}/traffic1.mp4`,
@@ -408,6 +408,8 @@ function CameraStream({ cam, videoRef, isPaused }) {
           loop
           muted
           playsInline
+          preload="auto"
+          crossOrigin="anonymous"
           onError={handleError}
           className="absolute inset-0 w-full h-full object-cover filter brightness-[0.85] contrast-[1.15] opacity-80"
         />
