@@ -44,8 +44,10 @@ function getThreatBadge(scoreText) {
 }
 
 // Tokenizes inline elements (bold, links, code, case numbers, statutes)
-function renderInlineContent(content, isDark) {
+function renderInlineContent(content, isDark, theme = 'default') {
   if (!content) return null;
+
+  const isBeige = theme === 'beige';
 
   // Clean raw markdown artifact quotes like *" or "*
   let normalized = content
@@ -68,14 +70,16 @@ function renderInlineContent(content, isDark) {
       const isInternal = linkUrl.startsWith('/');
       
       const linkClasses = "inline-flex items-center gap-1 px-1.5 py-0.5 mx-0.5 rounded font-mono text-[11px] font-semibold transition-all " +
-        (isDark 
-          ? "bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 hover:border-blue-400/40" 
-          : "bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200");
+        (isBeige
+          ? "bg-amber-500/15 hover:bg-amber-500/25 text-amber-900 dark:text-amber-200 border border-amber-500/30"
+          : isDark 
+            ? "bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 hover:border-blue-400/40" 
+            : "bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200");
 
       if (isInternal) {
         return (
           <Link key={idx} href={linkUrl} className={linkClasses}>
-            <FileText className="w-3 h-3 text-blue-500 shrink-0" />
+            <FileText className={`w-3 h-3 ${isBeige ? 'text-amber-700 dark:text-amber-400' : 'text-blue-500'} shrink-0`} />
             <span>{linkText}</span>
           </Link>
         );
@@ -88,15 +92,18 @@ function renderInlineContent(content, isDark) {
       );
     }
 
-    // 2. Bold text: **text**
+    // 2. Bold text: **text** (High Contrast)
     if (token.startsWith('**') && token.endsWith('**') && token.length >= 4) {
       const inner = token.slice(2, -2).trim();
+      const boldClass = isBeige
+        ? 'text-[#1C1611] dark:text-[#FAF6F0] font-bold'
+        : isDark ? 'text-white font-semibold' : 'text-slate-900 font-semibold';
       return (
         <strong 
           key={idx} 
-          className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}
+          className={boldClass}
         >
-          {renderInlineContent(inner, isDark)}
+          {renderInlineContent(inner, isDark, theme)}
         </strong>
       );
     }
@@ -110,9 +117,9 @@ function renderInlineContent(content, isDark) {
         return (
           <span 
             key={idx}
-            className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold px-1.5 py-0.5 mx-0.5 rounded border border-amber-500/25 bg-amber-500/10 text-amber-700 dark:text-amber-300"
+            className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold px-1.5 py-0.5 mx-0.5 rounded border border-amber-500/25 bg-amber-500/10 text-amber-800 dark:text-amber-200"
           >
-            <Car className="w-3 h-3 text-amber-500 shrink-0" />
+            <Car className="w-3 h-3 text-amber-600 dark:text-amber-400 shrink-0" />
             <span>{codeText}</span>
           </span>
         );
@@ -137,9 +144,11 @@ function renderInlineContent(content, isDark) {
         <code 
           key={idx} 
           className={`font-mono text-[11px] font-medium px-1.5 py-0.5 mx-0.5 rounded border ${
-            isDark 
-              ? 'bg-zinc-800 text-zinc-200 border-zinc-700' 
-              : 'bg-zinc-100 text-zinc-800 border-zinc-200'
+            isBeige
+              ? 'bg-[#EAE1D3] text-[#28211A] dark:bg-[#28221B] dark:text-[#E8DFC0] border-[#D8CEBE] dark:border-[#383126]'
+              : isDark 
+                ? 'bg-zinc-800 text-zinc-200 border-zinc-700' 
+                : 'bg-zinc-100 text-zinc-800 border-zinc-200'
           }`}
         >
           {codeText}
@@ -150,17 +159,18 @@ function renderInlineContent(content, isDark) {
     // 4. Standalone Case Number (e.g. KAR/BEN/2024/0747)
     const singleCaseRegex = /^(KAR\/[A-Z0-9]+\/\d+\/\d+|FIR-\d{4}-[A-Z0-9]+-\d+)$/i;
     if (singleCaseRegex.test(token)) {
+      const caseLinkClasses = isBeige
+        ? 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-900 dark:text-amber-200 border-amber-500/30'
+        : isDark 
+          ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20' 
+          : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100';
       return (
         <Link
           key={idx}
           href={`/dashboard/fir/${encodeURIComponent(token)}`}
-          className={`inline-flex items-center gap-1 font-mono text-[11px] font-semibold px-1.5 py-0.5 mx-0.5 rounded border transition-all ${
-            isDark 
-              ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20' 
-              : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
-          }`}
+          className={`inline-flex items-center gap-1 font-mono text-[11px] font-semibold px-1.5 py-0.5 mx-0.5 rounded border transition-all ${caseLinkClasses}`}
         >
-          <FileText className="w-3 h-3 text-blue-500 shrink-0" />
+          <FileText className={`w-3 h-3 ${isBeige ? 'text-amber-700 dark:text-amber-400' : 'text-blue-500'} shrink-0`} />
           <span>{token}</span>
         </Link>
       );
@@ -169,16 +179,17 @@ function renderInlineContent(content, isDark) {
     // 5. Legal Statute Badges (e.g. IPC §379, BNS §303, NDPS §21)
     const isStatute = /^(IPC|BNS|NDPS|IT Act)\s*(?:§|Section)?\s*[\w\d()]+/i.test(token);
     if (isStatute && token.length < 25) {
+      const statuteClass = isBeige
+        ? 'bg-amber-500/15 text-amber-900 dark:text-amber-200 border-amber-500/30'
+        : isDark
+          ? 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20'
+          : 'bg-indigo-50 text-indigo-700 border-indigo-200';
       return (
         <span 
           key={idx}
-          className={`inline-flex items-center gap-1 text-[10.5px] font-medium px-1.5 py-0.5 mx-0.5 rounded border ${
-            isDark
-              ? 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20'
-              : 'bg-indigo-50 text-indigo-700 border-indigo-200'
-          }`}
+          className={`inline-flex items-center gap-1 text-[10.5px] font-semibold px-1.5 py-0.5 mx-0.5 rounded border ${statuteClass}`}
         >
-          <Scale className="w-2.5 h-2.5 text-indigo-500 shrink-0" />
+          <Scale className={`w-2.5 h-2.5 ${isBeige ? 'text-amber-700 dark:text-amber-400' : 'text-indigo-500'} shrink-0`} />
           <span>{token}</span>
         </span>
       );
@@ -196,11 +207,14 @@ function renderInlineContent(content, isDark) {
 export default function PoliceIntelligenceRenderer({
   text = '',
   isDark = true,
+  theme = 'default', // 'default' | 'beige'
   mode = 'panel',
   isTyping = false,
   className = '',
 }) {
   if (!text) return null;
+
+  const isBeige = theme === 'beige';
 
   // Split content into lines and construct structured AST blocks
   const rawLines = text.split('\n');
@@ -220,9 +234,9 @@ export default function PoliceIntelligenceRenderer({
       }
       if (!isDivider) {
         const cells = trimmed
-          .split('|')
           .slice(1, -1)
-          .map((c) => c.trim());
+          .split('|')
+          .map(c => c.trim());
         currentTable.rows.push(cells);
       }
       continue;
@@ -242,10 +256,10 @@ export default function PoliceIntelligenceRenderer({
       continue;
     }
 
-    // Numbered Item: 1., 2., 3.
-    const numMatch = trimmed.match(/^(\d+)\.\s+(.+)$/);
-    if (numMatch) {
-      blocks.push({ type: 'numbered', num: numMatch[1], text: numMatch[2] });
+    // Numbered List Item: 1., 2., etc.
+    const numberedMatch = trimmed.match(/^(\d+)[.)]\s+(.+)$/);
+    if (numberedMatch) {
+      blocks.push({ type: 'numbered', num: numberedMatch[1], text: numberedMatch[2] });
       continue;
     }
 
@@ -260,8 +274,12 @@ export default function PoliceIntelligenceRenderer({
     blocks.push({ type: 'p', text: trimmed });
   }
 
+  const textColorClass = isBeige
+    ? 'text-[#28211A] dark:text-[#EAE3D5]'
+    : isDark ? 'text-slate-200' : 'text-slate-700';
+
   return (
-    <div className={`space-y-2.5 text-xs sm:text-[13px] leading-relaxed font-sans ${isDark ? 'text-slate-200' : 'text-slate-700'} ${className}`}>
+    <div className={`space-y-2.5 text-xs sm:text-[13px] leading-relaxed font-sans ${textColorClass} ${className}`}>
       {blocks.map((block, idx) => {
         if (block.type === 'spacer') {
           return <div key={idx} className="h-0.5" />;
@@ -278,23 +296,27 @@ export default function PoliceIntelligenceRenderer({
               <div 
                 key={idx}
                 className={`my-2.5 rounded-xl border overflow-hidden transition-all ${
-                  isDark 
-                    ? 'bg-slate-900/60 border-slate-800' 
-                    : 'bg-white border-slate-200 shadow-xs'
+                  isBeige
+                    ? 'bg-[#F2ECE1] dark:bg-[#201C18] border-[#DFD6C7] dark:border-[#38322B] shadow-xs'
+                    : isDark 
+                      ? 'bg-slate-900/60 border-slate-800' 
+                      : 'bg-white border-slate-200 shadow-xs'
                 }`}
               >
                 {/* Table Header Bar */}
                 <div className={`flex items-center justify-between px-3.5 py-1.5 border-b text-[10.5px] font-semibold uppercase tracking-wider font-mono ${
-                  isDark 
-                    ? 'bg-slate-800/60 border-slate-700/60 text-slate-300' 
-                    : 'bg-slate-100 border-slate-200 text-slate-700'
+                  isBeige
+                    ? 'bg-[#EAE2D4] dark:bg-[#2A2520] border-[#DFD6C7] dark:border-[#38322B] text-amber-900 dark:text-amber-200'
+                    : isDark 
+                      ? 'bg-slate-800/60 border-slate-700/60 text-slate-300' 
+                      : 'bg-slate-100 border-slate-200 text-slate-700'
                 }`}>
-                  <span>{header[0] ? renderInlineContent(header[0], isDark) : 'Parameter'}</span>
-                  <span>{header[1] ? renderInlineContent(header[1], isDark) : 'Intelligence Record'}</span>
+                  <span>{header[0] ? renderInlineContent(header[0], isDark, theme) : 'Parameter'}</span>
+                  <span>{header[1] ? renderInlineContent(header[1], isDark, theme) : 'Intelligence Record'}</span>
                 </div>
 
                 {/* Key-Value Spec Rows */}
-                <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
+                <div className={`divide-y ${isBeige ? 'divide-[#E8DFD0] dark:divide-[#2D2721]' : 'divide-slate-100 dark:divide-slate-800/80'}`}>
                   {bodyRows.map((row, rIdx) => {
                     const label = row[0] || '';
                     const val = row[1] || '';
@@ -304,18 +326,24 @@ export default function PoliceIntelligenceRenderer({
                         className={`flex flex-col sm:flex-row sm:items-center justify-between px-3.5 py-2 text-xs gap-1 transition-colors ${
                           rIdx % 2 === 0 
                             ? 'bg-transparent' 
-                            : isDark ? 'bg-slate-900/30' : 'bg-slate-50/50'
+                            : isBeige
+                              ? 'bg-[#EBE3D6]/40 dark:bg-[#241F1A]/40'
+                              : isDark ? 'bg-slate-900/30' : 'bg-slate-50/50'
                         }`}
                       >
                         <div className={`font-medium shrink-0 sm:w-2/5 pr-2 ${
-                          isDark ? 'text-slate-400' : 'text-slate-500'
+                          isBeige 
+                            ? 'text-amber-950 dark:text-amber-200 font-mono text-[11.5px] font-bold' 
+                            : isDark ? 'text-slate-400' : 'text-slate-500'
                         }`}>
-                          {renderInlineContent(label, isDark)}
+                          {renderInlineContent(label, isDark, theme)}
                         </div>
-                        <div className={`sm:w-3/5 break-words ${
-                          isDark ? 'text-slate-100' : 'text-slate-900'
+                        <div className={`sm:w-3/5 break-words font-medium ${
+                          isBeige
+                            ? 'text-[#1F1914] dark:text-[#F7F3EB]'
+                            : isDark ? 'text-slate-100' : 'text-slate-900'
                         }`}>
-                          {renderInlineContent(val, isDark)}
+                          {renderInlineContent(val, isDark, theme)}
                         </div>
                       </div>
                     );
@@ -330,21 +358,29 @@ export default function PoliceIntelligenceRenderer({
             <div 
               key={idx} 
               className={`my-2.5 overflow-x-auto rounded-xl border ${
-                isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+                isBeige
+                  ? 'bg-[#F2ECE1] dark:bg-[#201C18] border-[#DFD6C7] dark:border-[#38322B] shadow-xs'
+                  : isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
               }`}
             >
               <table className="w-full text-xs text-left border-collapse">
                 {header && (
                   <thead>
-                    <tr className={`border-b ${isDark ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-100 border-slate-200'}`}>
+                    <tr className={`border-b ${
+                      isBeige
+                        ? 'bg-[#EAE2D4] dark:bg-[#2A2520] border-[#DFD6C7] dark:border-[#38322B]'
+                        : isDark ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-100 border-slate-200'
+                    }`}>
                       {header.map((col, cIdx) => (
                         <th 
                           key={cIdx} 
                           className={`px-3 py-2 font-semibold uppercase tracking-wider text-[10px] font-mono ${
-                            isDark ? 'text-slate-300' : 'text-slate-700'
+                            isBeige 
+                              ? 'text-amber-900 dark:text-amber-200' 
+                              : isDark ? 'text-slate-300' : 'text-slate-700'
                           }`}
                         >
-                          {renderInlineContent(col, isDark)}
+                          {renderInlineContent(col, isDark, theme)}
                         </th>
                       ))}
                     </tr>
@@ -357,15 +393,17 @@ export default function PoliceIntelligenceRenderer({
                       className={`border-b last:border-0 ${
                         rIdx % 2 === 0 
                           ? 'bg-transparent' 
-                          : isDark ? 'bg-slate-900/30' : 'bg-slate-50/50'
-                      } ${isDark ? 'border-slate-800' : 'border-slate-100'}`}
+                          : isBeige
+                            ? 'bg-[#EBE3D6]/40 dark:bg-[#241F1A]/40'
+                            : isDark ? 'bg-slate-900/30' : 'bg-slate-50/50'
+                      } ${isBeige ? 'border-[#E8DFD0] dark:border-[#2D2721]' : isDark ? 'border-slate-800' : 'border-slate-100'}`}
                     >
                       {row.map((cell, cIdx) => (
                         <td 
                           key={cIdx} 
-                          className="px-3 py-2 leading-relaxed"
+                          className="px-3 py-2 leading-relaxed font-medium"
                         >
-                          {renderInlineContent(cell, isDark)}
+                          {renderInlineContent(cell, isDark, theme)}
                         </td>
                       ))}
                     </tr>
@@ -379,14 +417,18 @@ export default function PoliceIntelligenceRenderer({
         // ── HEADING BLOCK ──
         if (block.type === 'heading') {
           return (
-            <div key={idx} className="mt-3.5 mb-1.5 first:mt-0">
-              <h4 className={`text-xs sm:text-[13px] font-semibold tracking-tight uppercase font-mono ${
-                isDark ? 'text-blue-400' : 'text-blue-700'
+            <div key={idx} className="mt-3 mb-1 first:mt-0">
+              <h4 className={`text-xs sm:text-[13px] font-bold tracking-tight uppercase font-mono ${
+                isBeige
+                  ? 'text-amber-800 dark:text-amber-300'
+                  : isDark ? 'text-blue-400' : 'text-blue-700'
               }`}>
-                {renderInlineContent(block.text, isDark)}
+                {renderInlineContent(block.text, isDark, theme)}
               </h4>
-              <div className={`h-[1px] w-full mt-1 ${
-                isDark ? 'bg-slate-800' : 'bg-slate-200'
+              <div className={`h-[1.5px] w-full mt-1 ${
+                isBeige
+                  ? 'bg-gradient-to-r from-amber-500/40 via-amber-400/20 to-transparent'
+                  : isDark ? 'bg-slate-800' : 'bg-slate-200'
               }`} />
             </div>
           );
@@ -396,15 +438,17 @@ export default function PoliceIntelligenceRenderer({
         if (block.type === 'numbered') {
           return (
             <div key={idx} className="flex items-start gap-2.5 my-1 pl-0.5">
-              <span className={`flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-mono font-semibold shrink-0 mt-0.5 ${
-                isDark 
-                  ? 'bg-slate-800 text-blue-400 border border-slate-700' 
-                  : 'bg-slate-100 text-blue-700 border border-slate-200'
+              <span className={`flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-mono font-bold shrink-0 mt-0.5 ${
+                isBeige
+                  ? 'bg-amber-500/20 text-amber-900 dark:text-amber-200 border border-amber-500/30'
+                  : isDark 
+                    ? 'bg-slate-800 text-blue-400 border border-slate-700' 
+                    : 'bg-slate-100 text-blue-700 border border-slate-200'
               }`}>
                 {block.num}
               </span>
-              <div className="flex-1 leading-relaxed">
-                {renderInlineContent(block.text, isDark)}
+              <div className="flex-1 leading-relaxed font-medium">
+                {renderInlineContent(block.text, isDark, theme)}
               </div>
             </div>
           );
@@ -415,10 +459,10 @@ export default function PoliceIntelligenceRenderer({
           return (
             <div key={idx} className="flex items-start gap-2 my-1 pl-0.5">
               <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1.5 ${
-                isDark ? 'bg-blue-400' : 'bg-blue-600'
+                isBeige ? 'bg-amber-600 dark:bg-amber-400' : isDark ? 'bg-blue-400' : 'bg-blue-600'
               }`} />
-              <div className="flex-1 leading-relaxed">
-                {renderInlineContent(block.text, isDark)}
+              <div className="flex-1 leading-relaxed font-medium">
+                {renderInlineContent(block.text, isDark, theme)}
               </div>
             </div>
           );
@@ -426,15 +470,17 @@ export default function PoliceIntelligenceRenderer({
 
         // ── REGULAR PARAGRAPH ──
         return (
-          <p key={idx} className="leading-relaxed">
-            {renderInlineContent(block.text, isDark)}
+          <p key={idx} className="leading-relaxed font-medium">
+            {renderInlineContent(block.text, isDark, theme)}
           </p>
         );
       })}
 
       {/* Typing cursor if actively streaming */}
       {isTyping && (
-        <span className="inline-block w-1.5 h-4 bg-blue-500 ml-1 animate-pulse align-middle rounded-full" />
+        <span className={`inline-block w-1.5 h-4 ml-1 animate-pulse align-middle rounded-full ${
+          isBeige ? 'bg-amber-600' : 'bg-blue-500'
+        }`} />
       )}
     </div>
   );
