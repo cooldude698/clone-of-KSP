@@ -22,12 +22,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: nextjs/package-lock.json
 
       - name: 📦 Install Frontend Dependencies
         working-directory: ./nextjs
-        run: npm install --legacy-peer-deps
+        run: npm install --legacy-peer-deps --no-audit
 
       - name: 🔨 Build Next.js Web App (Catalyst Slate / AppSail Artifacts)
         working-directory: ./nextjs
