@@ -1,0 +1,695 @@
+{
+  "timestamp": "2026-08-28T13:32:17.080Z",
+  "catalystConfig": {
+    "catalystJson": {
+      "present": true,
+      "hasAppSail": true,
+      "hasFunctions": true,
+      "functionCount": 29,
+      "hasSlate": true
+    },
+    "catalystRc": {
+      "present": true,
+      "projectName": "DRISHTI-KSP",
+      "domain": "drishti-ksp-60073715607.development",
+      "projectId": "49149000000019001"
+    },
+    "dockerfile": {
+      "present": true
+    },
+    "ciCdWorkflow": {
+      "present": true
+    }
+  },
+  "functionsAudit": [
+    {
+      "functionName": "anpr-check",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 11186,
+      "error": null
+    },
+    {
+      "functionName": "askDrishtiAI",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 49385,
+      "error": null
+    },
+    {
+      "functionName": "auth-verify",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 3128,
+      "error": null
+    },
+    {
+      "functionName": "cache-hotspots",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 5954,
+      "error": null
+    },
+    {
+      "functionName": "cameras-nearby",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 9556,
+      "error": null
+    },
+    {
+      "functionName": "chat",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 5528,
+      "error": null
+    },
+    {
+      "functionName": "conversations",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 7927,
+      "error": null
+    },
+    {
+      "functionName": "cron-night-recalc",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 2773,
+      "error": null
+    },
+    {
+      "functionName": "drishtiVoice",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 8148,
+      "error": null
+    },
+    {
+      "functionName": "drishti_ksp_function",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 506,
+      "error": null
+    },
+    {
+      "functionName": "export-pdf",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 8266,
+      "error": null
+    },
+    {
+      "functionName": "firs",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 11428,
+      "error": null
+    },
+    {
+      "functionName": "hotspots",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 6981,
+      "error": null
+    },
+    {
+      "functionName": "investigation-circuit",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 3463,
+      "error": null
+    },
+    {
+      "functionName": "ml-risk-score",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 3879,
+      "error": null
+    },
+    {
+      "functionName": "network-graph-data",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 14062,
+      "error": null
+    },
+    {
+      "functionName": "on-alert-broadcast",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 1779,
+      "error": null
+    },
+    {
+      "functionName": "on-fir-insert",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 2397,
+      "error": null
+    },
+    {
+      "functionName": "push-notify",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 2598,
+      "error": null
+    },
+    {
+      "functionName": "repeat-offenders",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 6643,
+      "error": null
+    },
+    {
+      "functionName": "search-firs",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 3419,
+      "error": null
+    },
+    {
+      "functionName": "send-alert-mail",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 5149,
+      "error": null
+    },
+    {
+      "functionName": "stratus-upload",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 3018,
+      "error": null
+    },
+    {
+      "functionName": "trail",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 17217,
+      "error": null
+    },
+    {
+      "functionName": "trends",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 6374,
+      "error": null
+    },
+    {
+      "functionName": "underreporting",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 5008,
+      "error": null
+    },
+    {
+      "functionName": "victim-vulnerability",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 5728,
+      "error": null
+    },
+    {
+      "functionName": "zia-automl-predict",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 3527,
+      "error": null
+    },
+    {
+      "functionName": "zia-ocr",
+      "hasIndex": true,
+      "hasPackageJson": true,
+      "syntaxValid": true,
+      "codeSize": 4291,
+      "error": null
+    }
+  ],
+  "apiRoutesAudit": [
+    {
+      "endpoint": "/api/firs",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "elapsed": "351ms",
+      "preview": "firs, total_count"
+    },
+    {
+      "endpoint": "/api/firs?limit=5",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "elapsed": "129ms",
+      "preview": "firs, total_count"
+    },
+    {
+      "endpoint": "/api/firs?search=theft",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "elapsed": "213ms",
+      "preview": "firs, total_count"
+    },
+    {
+      "endpoint": "/api/hotspots",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "elapsed": "243ms",
+      "preview": "hotspots, total_count"
+    },
+    {
+      "endpoint": "/api/trends",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1757ms",
+      "preview": "trend_data, seasonal_insight, overall_trend, average_per_period, spike_periods"
+    },
+    {
+      "endpoint": "/api/repeat-offenders",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "elapsed": "858ms",
+      "preview": "high_risk_count, suspects"
+    },
+    {
+      "endpoint": "/api/victim-vulnerability",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1022ms",
+      "preview": "top_risk_profiles, high_risk_windows, recommendation"
+    },
+    {
+      "endpoint": "/api/underreporting",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "elapsed": "964ms",
+      "preview": "dark_zones, state_average_rate_per_lakh, total_districts_analyzed"
+    },
+    {
+      "endpoint": "/api/cameras-nearby?lat=12.9716&lng=77.5946&radius=5",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "elapsed": "722ms",
+      "preview": "status, total, cameras"
+    },
+    {
+      "endpoint": "/api/trail?suspect_id=Ramesh_Kumar",
+      "method": "GET",
+      "status": 400,
+      "ok": false,
+      "elapsed": "916ms",
+      "preview": "error"
+    },
+    {
+      "endpoint": "/api/anpr-check",
+      "method": "POST",
+      "status": 408,
+      "ok": false,
+      "elapsed": ">10000ms",
+      "error": "Request Timeout"
+    },
+    {
+      "endpoint": "/api/network-graph-data",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "elapsed": "2447ms",
+      "preview": "nodes, edges, date_range, source"
+    },
+    {
+      "endpoint": "/api/news",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1009ms",
+      "preview": "articles, totalArticles, totalCount, page, hasMore, isLiveRSS"
+    },
+    {
+      "endpoint": "/api/news?category=crime",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "elapsed": "40ms",
+      "preview": "articles, totalArticles, totalCount, page, hasMore, isLiveRSS"
+    },
+    {
+      "endpoint": "/api/askDrishtiAI",
+      "method": "POST",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1616ms",
+      "preview": "answer, language, source"
+    },
+    {
+      "endpoint": "/api/ai",
+      "method": "POST",
+      "status": 400,
+      "ok": false,
+      "elapsed": "462ms",
+      "preview": "error, message"
+    },
+    {
+      "endpoint": "/api/ai/panchanama",
+      "method": "POST",
+      "status": 400,
+      "ok": false,
+      "elapsed": "519ms",
+      "preview": "error"
+    },
+    {
+      "endpoint": "/api/analytics/firs",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "elapsed": "555ms",
+      "preview": "firs, total_count, filters_applied"
+    },
+    {
+      "endpoint": "/api/conversations",
+      "method": "POST",
+      "status": 200,
+      "ok": true,
+      "elapsed": "697ms",
+      "preview": "success, conversation_id"
+    },
+    {
+      "endpoint": "/api/auth-verify",
+      "method": "POST",
+      "status": 401,
+      "ok": false,
+      "elapsed": "626ms",
+      "preview": "valid, message"
+    },
+    {
+      "endpoint": "/api/cache-hotspots",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "elapsed": "735ms",
+      "preview": "hotspots, total, source"
+    },
+    {
+      "endpoint": "/api/cron-night-recalc",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "elapsed": "650ms",
+      "preview": ""
+    },
+    {
+      "endpoint": "/api/export-pdf",
+      "method": "GET",
+      "status": 405,
+      "ok": false,
+      "elapsed": "704ms",
+      "preview": "error, message"
+    },
+    {
+      "endpoint": "/api/investigation-circuit",
+      "method": "POST",
+      "status": 500,
+      "ok": false,
+      "elapsed": "697ms",
+      "preview": "error, message, steps_executed"
+    },
+    {
+      "endpoint": "/api/ml-risk-score",
+      "method": "POST",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1201ms",
+      "preview": "risk_score, risk_tier, confidence, model, source"
+    },
+    {
+      "endpoint": "/api/on-alert-broadcast",
+      "method": "POST",
+      "status": 200,
+      "ok": true,
+      "elapsed": "702ms",
+      "preview": ""
+    },
+    {
+      "endpoint": "/api/on-fir-insert",
+      "method": "POST",
+      "status": 200,
+      "ok": true,
+      "elapsed": "681ms",
+      "preview": ""
+    },
+    {
+      "endpoint": "/api/push-notify",
+      "method": "POST",
+      "status": 200,
+      "ok": true,
+      "elapsed": "735ms",
+      "preview": "delivered, simulated, notification_id, target_user, source"
+    },
+    {
+      "endpoint": "/api/search-firs?q=burglary",
+      "method": "GET",
+      "status": 200,
+      "ok": true,
+      "elapsed": "760ms",
+      "preview": "firs, total_count, query, source"
+    },
+    {
+      "endpoint": "/api/send-alert-mail",
+      "method": "POST",
+      "status": 200,
+      "ok": true,
+      "elapsed": "749ms",
+      "preview": "sent, simulated, recipient, case_number, message_id, source"
+    },
+    {
+      "endpoint": "/api/stratus-upload",
+      "method": "POST",
+      "status": 400,
+      "ok": false,
+      "elapsed": "749ms",
+      "preview": "error, message"
+    },
+    {
+      "endpoint": "/api/zia-automl-predict",
+      "method": "POST",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1143ms",
+      "preview": "prediction, probability, features_received, model_id, source"
+    },
+    {
+      "endpoint": "/api/zia-ocr",
+      "method": "POST",
+      "status": 200,
+      "ok": true,
+      "elapsed": "987ms",
+      "preview": "extracted_text, parsed_fields, confidence, source"
+    }
+  ],
+  "uiPagesAudit": [
+    {
+      "page": "/",
+      "status": 200,
+      "ok": true,
+      "elapsed": "301ms",
+      "sizeBytes": 82334
+    },
+    {
+      "page": "/dashboard",
+      "status": 200,
+      "ok": true,
+      "elapsed": "136ms",
+      "sizeBytes": 96639
+    },
+    {
+      "page": "/dashboard/fir",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1586ms",
+      "sizeBytes": 88451
+    },
+    {
+      "page": "/dashboard/fir/new",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1025ms",
+      "sizeBytes": 100679
+    },
+    {
+      "page": "/dashboard/fir/panchanama",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1366ms",
+      "sizeBytes": 94621
+    },
+    {
+      "page": "/dashboard/map",
+      "status": 200,
+      "ok": true,
+      "elapsed": "2251ms",
+      "sizeBytes": 92875
+    },
+    {
+      "page": "/dashboard/network",
+      "status": 200,
+      "ok": true,
+      "elapsed": "7637ms",
+      "sizeBytes": 123696
+    },
+    {
+      "page": "/dashboard/chat",
+      "status": 200,
+      "ok": true,
+      "elapsed": "157ms",
+      "sizeBytes": 98226
+    },
+    {
+      "page": "/dashboard/surveillance",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1248ms",
+      "sizeBytes": 146466
+    },
+    {
+      "page": "/dashboard/news",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1285ms",
+      "sizeBytes": 90947
+    },
+    {
+      "page": "/analyst",
+      "status": 200,
+      "ok": true,
+      "elapsed": "3792ms",
+      "sizeBytes": 63538
+    },
+    {
+      "page": "/analyst/chat",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1373ms",
+      "sizeBytes": 40728
+    },
+    {
+      "page": "/analyst/heatmap",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1336ms",
+      "sizeBytes": 59621
+    },
+    {
+      "page": "/analyst/network",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1326ms",
+      "sizeBytes": 50299
+    },
+    {
+      "page": "/analyst/patterns",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1808ms",
+      "sizeBytes": 51357
+    },
+    {
+      "page": "/analyst/reports",
+      "status": 200,
+      "ok": true,
+      "elapsed": "5496ms",
+      "sizeBytes": 46724
+    },
+    {
+      "page": "/analyst/watchlist",
+      "status": 200,
+      "ok": true,
+      "elapsed": "3507ms",
+      "sizeBytes": 49639
+    },
+    {
+      "page": "/supervisor",
+      "status": 200,
+      "ok": true,
+      "elapsed": "2044ms",
+      "sizeBytes": 57109
+    },
+    {
+      "page": "/supervisor/approvals",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1446ms",
+      "sizeBytes": 44197
+    },
+    {
+      "page": "/supervisor/audit",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1438ms",
+      "sizeBytes": 49847
+    },
+    {
+      "page": "/supervisor/chat",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1514ms",
+      "sizeBytes": 40900
+    },
+    {
+      "page": "/supervisor/dispatch",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1518ms",
+      "sizeBytes": 58459
+    },
+    {
+      "page": "/supervisor/escalations",
+      "status": 200,
+      "ok": true,
+      "elapsed": "1515ms",
+      "sizeBytes": 43787
+    }
+  ],
+  "summary": {
+    "totalCatalystFunctions": 29,
+    "validCatalystFunctions": 29,
+    "totalApiRoutesTested": 33,
+    "successfulApiRoutes": 25,
+    "totalUiPagesTested": 23,
+    "successfulUiPages": 23
+  }
+}

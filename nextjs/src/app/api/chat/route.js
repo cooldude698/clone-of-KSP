@@ -1,44 +1,55 @@
-import { loadCatalystFunction } from '@/lib/dynamic-fn-loader';
-export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
+import { executeDrishtiIntelligenceQuery } from '@/lib/drishtiIntelligenceEngine';
+
+export const dynamic = 'force-dynamic';
+
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: CORS });
+}
 
 export async function POST(req) {
   try {
-    const fn = loadCatalystFunction('askDrishtiAI');
-    let body = {};
-    try { body = await req.json(); } catch (_) {}
-    let statusCode = 200;
-    let jsonResult = {};
-    const mockReq = {
-      method: 'POST',
-      url: req.url,
-      body,
-      on: (evt, cb) => {
-        if (evt === 'data') cb(JSON.stringify(body));
-        if (evt === 'end') cb();
-      },
-      getQueryParams: () => ({}),
-      getMethod: () => 'POST'
-    };
-    const mockRes = {
-      setHeader: () => {},
-      writeHead: (code) => { statusCode = code; },
-      end: (data) => {
-        if (!data) return;
-        try { jsonResult = JSON.parse(data); } catch { jsonResult = { data }; }
-      },
-      write: (data) => {
-        if (!data) return;
-        try { jsonResult = JSON.parse(data); } catch { jsonResult = { data }; }
-      }
-    };
-    await fn(mockReq, mockRes);
-    return NextResponse.json(jsonResult, { status: statusCode });
-  } catch (err) {
-    return NextResponse.json({ error: true, message: err.message }, { status: 500 });
-  }
-}
+    const body = await req.json().catch(() => ({}));
+    const question = body.message || body.question || body.query || '';
+    const lang = body.lang || 'en';
+    const role = body.role || 'Officer';
+    const history = body.history || body.sessionHistory || [];
 
-export async function OPTIONS() {
-  return new NextResponse(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*' } });
+    if (!question.trim()) {
+      return NextResponse.json({
+        reply: `Jai Hind, ${role}. How can DRISHTI AI assist your command operations today?`,
+        response: `Jai Hind, ${role}. How can DRISHTI AI assist your command operations today?`,
+        suggestions: ['Show Clearance & Target Suspects', 'Inspect Ramesh Kumar Dossier', 'Analyze Crime Hotspots'],
+      }, { status: 200, headers: CORS });
+    }
+
+    const intelResult = await executeDrishtiIntelligenceQuery(question, lang, history);
+
+    return NextResponse.json({
+      reply: intelResult.answer,
+      response: intelResult.answer,
+      answer: intelResult.answer,
+      suspects: intelResult.suspects || [],
+      case_cards: intelResult.case_cards || [],
+      suggestedActions: intelResult.suggestions || [],
+      follow_up_suggestions: intelResult.suggestions || [],
+      stats: intelResult.kpis || {},
+      source: 'drishti_intelligence_engine',
+    }, { status: 200, headers: CORS });
+  } catch (err) {
+    console.error('[/api/chat] Intelligence processing error:', err.message);
+    const fallback = await executeDrishtiIntelligenceQuery('bengaluru crime status', 'en');
+    return NextResponse.json({
+      reply: fallback.answer,
+      response: fallback.answer,
+      answer: fallback.answer,
+      source: 'drishti_intelligence_engine',
+    }, { status: 200, headers: CORS });
+  }
 }

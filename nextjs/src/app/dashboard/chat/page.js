@@ -8,7 +8,7 @@ import {
   Send, Mic, MicOff, Volume2, VolumeX, Bot, User, Sparkles, 
   Copy, Check, X, ShieldAlert, FileText, Search, Car, Users, 
   Database, RefreshCw, Cpu, Layers, ArrowRight, CornerDownLeft, Globe,
-  ChevronDown, ChevronUp
+  ChevronDown, ChevronUp, FileDown, Printer
 } from 'lucide-react';
 import Spinner from '@/components/ui/Spinner';
 import InvestigatorWall from '@/components/InvestigatorWall';
@@ -54,108 +54,229 @@ const VOICE_PROFILES = [
   { id: 'hi-SwaraNeural',   label: 'हिंदी · Swara', lang: 'hi', ttsLang: 'hi-IN', neural: 'hi-IN-SwaraNeural'  },
 ];
 
-function FormattedText({ text, onCaseClick, maxLines = 15 }) {
+function FormattedText({ text, onCaseClick, maxLines = 25 }) {
   const [expanded, setExpanded] = useState(false);
 
   if (!text) return null;
 
-  // Split lines
-  const lines = text.split('\n');
-  const isLong = lines.length > maxLines;
-  const displayLines = isLong && !expanded ? lines.slice(0, maxLines) : lines;
+  // Inline markdown tokenizer
+  const renderInline = (content) => {
+    if (!content) return null;
 
-  const renderInline = (lineStr) => {
-    // Clean raw markdown artifact stars/underscores: e.g. **** _text_ -> text
-    const cleanedLine = lineStr
-      .replace(/\*{3,}/g, '')
-      .replace(/_{2,}/g, '')
-      .replace(/^[\s*_]+/, '')
-      .replace(/[\s*_]+$/, '');
+    // Tokenize links [text](url), bold **text**, code `text`, and standalone case numbers
+    // Regex matches: [text](url) OR **bold** OR `code` OR (KAR/...|FIR-...)
+    const tokenRegex = /(\[[^\]]+\]\([^)]+\)|\*\*[^*]+\*\*|`[^`]+`|KAR\/[A-Z0-9]+\/\d+\/\d+|FIR-\d{4}-[A-Z0-9]+-\d+)/g;
+    const tokens = content.split(tokenRegex);
 
-    const boldParts = cleanedLine.split(/\*\*(.*?)\*\*/g);
+    return tokens.map((token, idx) => {
+      if (!token) return null;
 
-    return boldParts.map((part, j) => {
-      const isBold = j % 2 === 1;
+      // 1. Markdown Link: [text](url)
+      const linkMatch = token.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+      if (linkMatch) {
+        const linkText = linkMatch[1];
+        const linkUrl = linkMatch[2];
+        return (
+          <Link
+            key={idx}
+            href={linkUrl}
+            className="text-sky-600 dark:text-sky-400 hover:text-sky-500 font-mono font-bold border border-sky-500/30 rounded px-1.5 py-0.5 bg-sky-500/10 hover:bg-sky-500/20 transition-all mx-0.5 inline-flex items-center gap-1 focus:outline-none cursor-pointer text-xs"
+          >
+            <FileText className="w-3 h-3 text-sky-500" />
+            <span>{linkText}</span>
+          </Link>
+        );
+      }
+
+      // 2. Bold text: **text**
+      if (token.startsWith('**') && token.endsWith('**') && token.length >= 4) {
+        const inner = token.slice(2, -2);
+        return (
+          <strong key={idx} className="text-gray-950 dark:text-white font-bold">
+            {renderInline(inner)}
+          </strong>
+        );
+      }
+
+      // 3. Inline Code: `code`
+      if (token.startsWith('`') && token.endsWith('`') && token.length >= 2) {
+        const codeText = token.slice(1, -1);
+        return (
+          <code key={idx} className="font-mono bg-sky-500/10 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-500/25 rounded px-1.5 py-0.5 text-[11px] font-semibold tracking-tight mx-0.5">
+            {codeText}
+          </code>
+        );
+      }
+
+      // 4. Standalone Case Number
       const singleCaseRegex = /^(KAR\/[A-Z0-9]+\/\d+\/\d+|FIR-\d{4}-[A-Z0-9]+-\d+)$/i;
-      const caseSplitRegex = /(KAR\/[A-Z0-9]+\/\d+\/\d+|FIR-\d{4}-[A-Z0-9]+-\d+)/g;
-      const subParts = part.split(caseSplitRegex);
+      if (singleCaseRegex.test(token)) {
+        return (
+          <Link
+            key={idx}
+            href={`/dashboard/fir/${encodeURIComponent(token)}`}
+            className="text-sky-600 dark:text-sky-400 hover:text-sky-500 font-mono font-bold border border-sky-500/30 rounded px-1.5 py-0.5 bg-sky-500/10 hover:bg-sky-500/20 transition-all mx-0.5 inline-flex items-center gap-1 focus:outline-none cursor-pointer text-xs"
+          >
+            <FileText className="w-3 h-3 text-sky-500" />
+            <span>{token}</span>
+          </Link>
+        );
+      }
 
-      const renderedSubParts = subParts.map((subPart, k) => {
-        if (singleCaseRegex.test(subPart)) {
-          return (
-            <Link
-              key={k}
-              href={`/dashboard/fir/${encodeURIComponent(subPart)}`}
-              className="text-sky-600 dark:text-sky-400 hover:bg-sky-500/10 font-mono font-bold border border-sky-500/25 rounded px-1.5 py-0.5 bg-sky-500/5 transition-all mx-0.5 inline-flex items-center gap-1 focus:outline-none cursor-pointer text-xs"
-            >
-              <FileText className="w-3 h-3 text-sky-500" />
-              {subPart}
-            </Link>
-          );
-        }
-        return subPart;
-      });
-
-      return isBold ? (
-        <strong key={j} className="text-gray-950 dark:text-white font-semibold">{renderedSubParts}</strong>
-      ) : (
-        <span key={j}>{renderedSubParts}</span>
-      );
+      // Plain text (clean single trailing artifact asterisks)
+      return <span key={idx}>{token.replace(/^\*+|\*+$/g, '')}</span>;
     });
   };
 
+  // Block Level Markdown Parsing
+  const rawLines = text.split('\n');
+  const blocks = [];
+  let currentTable = null;
+
+  for (let i = 0; i < rawLines.length; i++) {
+    const line = rawLines[i];
+    const trimmed = line.trim();
+
+    // Check if line is part of a markdown table
+    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+      const isDivider = /^\|\s*:?-+:?\s*\|/.test(trimmed);
+      if (!currentTable) {
+        currentTable = { type: 'table', rows: [] };
+        blocks.push(currentTable);
+      }
+      if (!isDivider) {
+        const cells = trimmed
+          .split('|')
+          .slice(1, -1)
+          .map((c) => c.trim());
+        currentTable.rows.push(cells);
+      }
+      continue;
+    } else {
+      currentTable = null;
+    }
+
+    if (!trimmed) {
+      blocks.push({ type: 'spacer' });
+      continue;
+    }
+
+    // Heading: ###, ##, #
+    const headingMatch = trimmed.match(/^(#{1,4})\s+(.+)$/);
+    if (headingMatch) {
+      blocks.push({ type: 'heading', level: headingMatch[1].length, text: headingMatch[2] });
+      continue;
+    }
+
+    // Bullet item: -, *, •
+    const bulletMatch = trimmed.match(/^[-*•]\s+(.+)$/);
+    if (bulletMatch) {
+      blocks.push({ type: 'bullet', text: bulletMatch[1] });
+      continue;
+    }
+
+    // Numbered item: 1., 2.
+    const numMatch = trimmed.match(/^(\d+)\.\s+(.+)$/);
+    if (numMatch) {
+      blocks.push({ type: 'numbered', num: numMatch[1], text: numMatch[2] });
+      continue;
+    }
+
+    // Regular paragraph
+    blocks.push({ type: 'p', text: trimmed });
+  }
+
+  const isLong = blocks.length > maxLines;
+  const displayBlocks = isLong && !expanded ? blocks.slice(0, maxLines) : blocks;
+
   return (
-    <div className="space-y-1 text-[13px] leading-relaxed font-sans text-gray-800 dark:text-gray-200">
-      {displayLines.map((line, i) => {
-        const trimmed = line.trim();
-        if (!trimmed) {
-          return <div key={i} className="h-1" />;
+    <div className="space-y-1.5 text-[13px] leading-relaxed font-sans text-gray-800 dark:text-gray-200">
+      {displayBlocks.map((block, idx) => {
+        if (block.type === 'spacer') {
+          return <div key={idx} className="h-1" />;
         }
 
-        // Table row
-        if (trimmed.startsWith('|')) {
-          const cells = trimmed.split('|').filter(Boolean);
+        // Table Block
+        if (block.type === 'table') {
+          if (!block.rows.length) return null;
+          const [header, ...body] = block.rows;
           return (
-            <div key={i} className="font-mono text-[11.5px] text-gray-800 dark:text-gray-200 border-b border-gray-100 dark:border-zinc-800 py-1 grid grid-cols-4 gap-1.5">
-              {cells.map((cell, j) => {
-                const cellText = cell.trim();
-                const caseRegex = /(KAR\/[A-Z0-9]+\/\d+\/\d+|FIR-\d{4}-[A-Z0-9]+-\d+)/;
-                if (caseRegex.test(cellText)) {
-                  return (
-                    <button
-                      key={j}
-                      onClick={() => onCaseClick && onCaseClick(cellText)}
-                      className="text-left text-sky-600 dark:text-sky-400 hover:underline font-bold transition-colors focus:outline-none cursor-pointer truncate"
+            <div key={idx} className="my-2.5 overflow-x-auto rounded-xl border border-gray-200 dark:border-zinc-800 bg-white/60 dark:bg-zinc-900/60 shadow-xs">
+              <table className="w-full text-xs text-left border-collapse">
+                {header && (
+                  <thead>
+                    <tr className="bg-gray-100/90 dark:bg-zinc-800/90 border-b border-gray-200 dark:border-zinc-700">
+                      {header.map((col, cIdx) => (
+                        <th key={cIdx} className="px-3.5 py-2 font-bold text-gray-900 dark:text-white uppercase tracking-wider text-[10.5px] font-sans">
+                          {renderInline(col)}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                )}
+                <tbody>
+                  {body.map((row, rIdx) => (
+                    <tr
+                      key={rIdx}
+                      className={`border-b border-gray-100 dark:border-zinc-800/80 last:border-0 transition-colors ${
+                        rIdx % 2 === 0 ? 'bg-transparent' : 'bg-gray-50/50 dark:bg-zinc-800/30'
+                      }`}
                     >
-                      {cellText}
-                    </button>
-                  );
-                }
-                return (
-                  <span key={j} className={j === 0 ? 'text-gray-950 dark:text-white font-medium truncate' : 'text-gray-500 dark:text-gray-400 truncate'}>
-                    {cellText}
-                  </span>
-                );
-              })}
+                      {row.map((cell, cIdx) => (
+                        <td
+                          key={cIdx}
+                          className={`px-3.5 py-2 leading-relaxed ${
+                            cIdx === 0
+                              ? 'font-semibold text-gray-900 dark:text-gray-100 w-1/3 min-w-[140px]'
+                              : 'text-gray-700 dark:text-gray-300'
+                          }`}
+                        >
+                          {renderInline(cell)}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           );
         }
 
-        // Bullet point item
-        if (trimmed.startsWith('- ') || trimmed.startsWith('* ') || trimmed.startsWith('• ')) {
+        // Heading Block
+        if (block.type === 'heading') {
           return (
-            <div key={i} className="flex items-start gap-1.5 pl-0.5 py-0.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-500 mt-1.5 flex-shrink-0" />
-              <div className="flex-1 leading-snug">
-                {renderInline(trimmed.replace(/^[-*•]\s*/, ''))}
-              </div>
+            <h4 key={idx} className="text-[13.5px] font-bold text-gray-900 dark:text-white mt-3 mb-1 flex items-center gap-1.5 tracking-tight">
+              {renderInline(block.text)}
+            </h4>
+          );
+        }
+
+        // Bullet Point Block
+        if (block.type === 'bullet') {
+          return (
+            <div key={idx} className="flex items-start gap-2 pl-1 py-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-500 mt-2 flex-shrink-0" />
+              <div className="flex-1 leading-snug">{renderInline(block.text)}</div>
             </div>
           );
         }
 
+        // Numbered List Block
+        if (block.type === 'numbered') {
+          return (
+            <div key={idx} className="flex items-start gap-2 pl-1 py-0.5">
+              <span className="text-[11px] font-bold font-mono text-sky-600 dark:text-sky-400 bg-sky-500/10 rounded-full w-4 h-4 flex items-center justify-center flex-shrink-0 mt-0.5">
+                {block.num}
+              </span>
+              <div className="flex-1 leading-snug">{renderInline(block.text)}</div>
+            </div>
+          );
+        }
+
+        // Paragraph Block
         return (
-          <p key={i} className="leading-snug py-0.5">
-            {renderInline(line)}
+          <p key={idx} className="leading-snug py-0.5">
+            {renderInline(block.text)}
           </p>
         );
       })}
@@ -173,7 +294,7 @@ function FormattedText({ text, onCaseClick, maxLines = 15 }) {
               </>
             ) : (
               <>
-                <span>Read more ({lines.length - maxLines} more lines)</span>
+                <span>Read more ({blocks.length - maxLines} more sections)</span>
                 <ChevronDown className="w-3 h-3" />
               </>
             )}
@@ -323,7 +444,90 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis, onSuggestion
         }`}>
           {isUser
             ? <p className="font-sans leading-relaxed whitespace-pre-wrap break-words">{msg.content}</p>
-            : <div className="space-y-1.5">{renderContentWithCaseLinks(msg.content)}</div>
+            : (
+              <div className="space-y-2">
+                <div>{renderContentWithCaseLinks(msg.content)}</div>
+                
+                {/* Interactive Suspect Intelligence Cards */}
+                {!isUser && msg.suspects && msg.suspects.length > 0 && (
+                  <div className="pt-2 space-y-2 border-t border-gray-100 dark:border-zinc-800/80">
+                    <span className="text-[9.5px] font-mono font-bold uppercase text-sky-600 dark:text-sky-400 tracking-wider block">
+                      Target Suspect Intelligence Cards ({msg.suspects.length}):
+                    </span>
+                    <div className="grid grid-cols-1 gap-2">
+                      {msg.suspects.map((s, idx) => (
+                        <div
+                          key={idx}
+                          className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shadow-xs"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 flex items-center justify-center font-bold font-mono text-xs shrink-0">
+                              {s.name.charAt(0)}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <h5 className="font-bold text-xs text-slate-900 dark:text-white">{s.name}</h5>
+                                {s.alias && <span className="text-[10px] text-slate-400">(&ldquo;{s.alias}&rdquo;)</span>}
+                                <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                                  Risk {s.risk_score}/100
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+                                {s.primary_crime} · {s.last_known_vehicle || 'Under Watch'}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
+                            <button
+                              onClick={() => onCaseClick && onCaseClick(s.active_firs?.[0] || 'FIR-2026-BL-9104')}
+                              className="px-2 py-1 rounded-md bg-sky-600 hover:bg-sky-700 text-white font-mono text-[10px] font-bold transition-colors cursor-pointer"
+                            >
+                              Dossier →
+                            </button>
+                            <a
+                              href="/dashboard/map"
+                              className="px-2 py-1 rounded-md bg-slate-200 dark:bg-zinc-800 hover:bg-slate-300 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 font-mono text-[10px] font-bold transition-colors"
+                            >
+                              Live Map
+                            </a>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Interactive Case Docket Cards */}
+                {!isUser && msg.case_cards && msg.case_cards.length > 0 && (
+                  <div className="pt-2 space-y-2 border-t border-gray-100 dark:border-zinc-800/80">
+                    <span className="text-[9.5px] font-mono font-bold uppercase text-sky-600 dark:text-sky-400 tracking-wider block">
+                      Connected CCTNS Case Dockets ({msg.case_cards.length}):
+                    </span>
+                    <div className="grid grid-cols-1 gap-2">
+                      {msg.case_cards.map((c, idx) => (
+                        <div
+                          key={idx}
+                          className="p-2.5 rounded-xl bg-slate-50 dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800 flex items-center justify-between gap-2 shadow-xs"
+                        >
+                          <div>
+                            <span className="font-mono font-bold text-xs text-sky-600 dark:text-sky-400">{c.case_number}</span>
+                            <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
+                              {c.crime_type} · <span className="text-slate-400">{c.police_station}</span>
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => onCaseClick && onCaseClick(c.case_number)}
+                            className="px-2 py-1 rounded-md bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-mono font-bold hover:opacity-90 transition-opacity cursor-pointer shrink-0"
+                          >
+                            Open Docket
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
           }
         </div>
 
@@ -375,6 +579,21 @@ function MessageBubble({ msg, onCaseClick, onSpeak, isSpeakingThis, onSuggestion
 }
 
 function TypingIndicator() {
+  const [stage, setStage] = useState(0);
+  const stages = [
+    'Correlating CCTNS Crime Records...',
+    'Synthesizing Multilingual RAG...',
+    'Querying ANPR Camera Watchlists...',
+    'Formulating Tactical Directives...'
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStage((prev) => (prev + 1) % stages.length);
+    }, 900);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 6 }}
@@ -382,18 +601,23 @@ function TypingIndicator() {
       className="flex gap-3 items-center"
     >
       <div className="w-8 h-8 rounded-xl bg-black dark:bg-white text-white dark:text-black border border-black/10 dark:border-white/20 flex items-center justify-center flex-shrink-0 p-1.5 shadow-xs">
-        <DrishtiEmblem className="w-full h-full" color="currentColor" />
+        <DrishtiEmblem className="w-full h-full animate-pulse" color="currentColor" />
       </div>
-      <div className="bg-white dark:bg-[#18181B] border border-gray-200/80 dark:border-gray-800 rounded-2xl rounded-tl-xs px-4 py-2.5 shadow-xs">
-        <div className="flex gap-1.5 items-center h-4">
-          <span className="text-xs font-mono text-gray-400 font-bold mr-1">ANALYZING EVIDENCE</span>
-          {[0, 1, 2].map((i) => (
-            <span
-              key={i}
-              className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-bounce"
-              style={{ animationDelay: `${i * 0.15}s`, animationDuration: '0.8s' }}
-            />
-          ))}
+      <div className="bg-white dark:bg-[#18181B] border border-sky-500/30 dark:border-sky-500/20 rounded-2xl rounded-tl-xs px-4 py-2.5 shadow-sm">
+        <div className="flex gap-2 items-center h-5">
+          <span className="inline-block w-2 h-2 rounded-full bg-sky-500 animate-ping" />
+          <span className="text-xs font-mono text-sky-600 dark:text-sky-400 font-bold tracking-tight">
+            {stages[stage]}
+          </span>
+          <div className="flex gap-1 items-center ml-1">
+            {[0, 1, 2].map((i) => (
+              <span
+                key={i}
+                className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-bounce"
+                style={{ animationDelay: `${i * 0.15}s`, animationDuration: '0.8s' }}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </motion.div>
@@ -964,108 +1188,12 @@ export default function ChatPage() {
     } catch (_) {}
 
     // Auto-detect open suspect / FIR / CCTV / Crime map intent and navigate
-    const qLower = text.toLowerCase().trim();
-
-    // Guard: If message is a question or requests Yes/No, DO NOT navigate! Let the AI answer.
-    const isQuestion =
-      qLower.includes('?') || qLower.includes('do we') || qLower.includes('is there') || qLower.includes('have info') ||
-      qLower.includes('any info') || qLower.includes('check if') || qLower.includes('answer in') || qLower.includes('yes/no') ||
-      qLower.includes('yes or no') || qLower.includes('what') || qLower.includes('where') || qLower.includes('who') ||
-      qLower.includes('how') || qLower.includes('does') || qLower.includes('क्या') || qLower.includes('जानकारी') ||
-      qLower.includes('इन्फॉर्मेशन') || qLower.includes('ಯಾವ') || qLower.includes('ಇದೆಯಾ');
-
-    const isOpenAction =
-      qLower.includes('open') || qLower.includes('show') || qLower.includes('view') || qLower.includes('bring up') ||
-      qLower.includes('pull up') || qLower.includes('switch') || qLower.includes('navigate') || qLower.includes('go to') ||
-      qLower.includes('check case') || qLower.includes('case file') || qLower.includes('profile') ||
-      qLower.includes('खोलो') || qLower.includes('खोल') || qLower.includes('खोलना') || qLower.includes('दिखाओ') ||
-      qLower.includes('दिखाएं') || qLower.includes('देखना') || qLower.includes('सीरी') || qLower.includes('प्रोफाइल') ||
-      qLower.includes('ले चलो') || qLower.includes('ओपन') || qLower.includes('ತೆರೆ') || qLower.includes('ತೋರಿಸು') ||
-      qLower.includes('ಪ್ರೊಫೈಲ್');
-
-    if (!isQuestion && isOpenAction) {
-      // Direct CCTV / Surveillance check
-      if (qLower.includes('cctv') || qLower.includes('surveillance') || qLower.includes('camera') || qLower.includes('सीसीटीवी') || qLower.includes('सर्विलांस') || qLower.includes('कैमरा')) {
-        const cctvMsg = /[\u0900-\u097F]/.test(text)
-          ? 'सिल्क बोर्ड और शहर ग्रिड के सीसीटीवी कैमरे और सर्विलांस सिस्टम खोले जा रहे हैं, सर।'
-          : 'Opening Surveillance & CCTV live camera feeds, Sir.';
-        setMessages((prev) => [...prev, { role: 'assistant', content: cctvMsg, timestamp: timestamp() }]);
-        speakText(cctvMsg, messages.length + 1);
-        setTimeout(() => { if (typeof window !== 'undefined') window.location.href = '/dashboard/surveillance'; }, 800);
-        setLoading(false);
-        return;
-      }
-
-      // Direct Crime Map check
-      if (qLower.includes('crime map') || qLower.includes('map') || qLower.includes('क्राइम मैप') || qLower.includes('मैप') || qLower.includes('नक्शा')) {
-        const mapMsg = /[\u0900-\u097F]/.test(text)
-          ? 'क्राइम मैप और लोकेशन ट्रैकिंग दिखाई जा रही है, सर।'
-          : 'Opening Crime Map, Sir.';
-        setMessages((prev) => [...prev, { role: 'assistant', content: mapMsg, timestamp: timestamp() }]);
-        speakText(mapMsg, messages.length + 1);
-        setTimeout(() => { if (typeof window !== 'undefined') window.location.href = '/dashboard/map'; }, 800);
-        setLoading(false);
-        return;
-      }
-    }
-
-    if (isOpenAction) {
-      let targetRoute = null;
-      if (qLower.includes('anant') || qLower.includes('anand') || qLower.includes('gowda') || qLower.includes('godwa') || qLower.includes('buda') || qLower.includes('guda') || qLower.includes('goda') || qLower.includes('आनंद')) {
-        targetRoute = '/dashboard/suspect/anand-gowda';
-      } else if (qLower.includes('ramesh') || qLower.includes('bullet ramesh') || qLower.includes('रमेश')) {
-        targetRoute = '/dashboard/suspect/ramesh-kumar';
-      } else if (qLower.includes('suresh') || qLower.includes('naidu') || qLower.includes('सुरेश')) {
-        targetRoute = '/dashboard/suspect/suresh-naidu';
-      } else if (qLower.includes('imran') || qLower.includes('chotta imran') || qLower.includes('इमरान')) {
-        targetRoute = '/dashboard/suspect/imran-khan';
-      } else if (qLower.includes('farid') || qLower.includes('mirza') || qLower.includes('फरीद')) {
-        targetRoute = '/dashboard/suspect/farid-mirza';
-      } else if (qLower.includes('vikram') || qLower.includes('malhotra') || qLower.includes('vicky') || qLower.includes('9104')) {
-        const topCase = (UPLOADED_FIRS && UPLOADED_FIRS.length > 0) ? UPLOADED_FIRS.find(f => (f.suspect_name || '').toLowerCase().includes('vikram') || f.case_number === 'FIR-2026-BL-9104') : null;
-        const caseNum = topCase ? topCase.case_number : 'FIR-2026-BL-9104';
-        fetchCaseDetails(caseNum);
-        const openMsg = `Opening case file ${caseNum} for Suspect Vikram Malhotra, Sir.`;
-        setMessages((prev) => [...prev, { role: 'assistant', content: openMsg, timestamp: timestamp() }]);
-        speakText(openMsg, messages.length + 1);
-        setLoading(false);
-        return;
-      } else if (qLower.includes('4921') || qLower.includes('492')) {
-        targetRoute = '/dashboard/fir/FIR-2026-BL-4921';
-      } else if (qLower.includes('4000')) {
-        targetRoute = '/dashboard/fir/FIR-2026-BL-4000';
-      } else if (qLower.includes('112') || qLower.includes('mys')) {
-        targetRoute = '/dashboard/fir/FIR-2026-MYS-0112';
-      } else if (
-        qLower.includes('uploaded') || qLower.includes('his case') || qLower.includes('this case') ||
-        qLower.includes('the case') || qLower.includes('the fir') || qLower.includes('his file')
-      ) {
-        const topRec = (UPLOADED_FIRS && UPLOADED_FIRS.length > 0) ? UPLOADED_FIRS[0] : null;
-        const caseNum = topRec ? topRec.case_number : 'FIR-2026-BL-9104';
-        const sName = topRec ? (topRec.suspect_name || topRec.accused_name || 'Vikram Malhotra') : 'Vikram Malhotra';
-        fetchCaseDetails(caseNum);
-        const openMsg = `Opening active case file ${caseNum} for Suspect ${sName}, Sir.`;
-        setMessages((prev) => [...prev, { role: 'assistant', content: openMsg, timestamp: timestamp() }]);
-        speakText(openMsg, messages.length + 1);
-        setLoading(false);
-        return;
-      }
-
-      if (targetRoute) {
-        setTimeout(() => {
-          if (typeof window !== 'undefined') {
-            window.location.href = targetRoute;
-          }
-        }, 800);
-        return;
-      }
-      // NOTE: Fall through to API call if no static route or direct case details modal matched
-    }
-
     try {
       let responseText = '';
       let isDemoResp = false;
       let followUps = [];
+      let suspectsList = [];
+      let casesList = [];
       const isHindiInput = /[\u0900-\u097F]/.test(text);
       const isKannadaInput = /[\u0C80-\u0CFF]/.test(text);
       const activeLang = isKannadaInput ? 'kn' : isHindiInput ? 'hi' : (VOICE_PROFILES.find(p => p.id === voiceProfile) || VOICE_PROFILES[0]).lang;
@@ -1085,6 +1213,8 @@ export default function ChatPage() {
           responseText = data.answer || data.response_text || 'Database query processed.';
           isDemoResp = data.source === 'demo_ai';
           followUps = data.follow_up_suggestions || [];
+          suspectsList = data.suspects || [];
+          casesList = data.case_cards || [];
         } else {
           throw new Error('API error');
         }
@@ -1097,7 +1227,15 @@ export default function ChatPage() {
 
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: responseText, isDemo: isDemoResp, timestamp: timestamp(), suggestions: followUps },
+        {
+          role: 'assistant',
+          content: responseText,
+          isDemo: isDemoResp,
+          timestamp: timestamp(),
+          suggestions: followUps,
+          suspects: suspectsList,
+          case_cards: casesList,
+        },
       ]);
 
       const newMsgIdx = messages.length + 1;
@@ -1147,6 +1285,8 @@ export default function ChatPage() {
     setExportingPdf(false);
   };
 
+  const voiceTranscriptRef = useRef('');
+
   const startVoice = async () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) return;
@@ -1158,6 +1298,7 @@ export default function ChatPage() {
       recognitionRef.current = null;
     }
 
+    voiceTranscriptRef.current = '';
     const rec = new SpeechRecognition();
     recognitionRef.current = rec;
     rec.lang = (VOICE_PROFILES.find(p => p.id === voiceProfile) || VOICE_PROFILES[0]).ttsLang;
@@ -1177,7 +1318,9 @@ export default function ChatPage() {
           interimTranscript += t;
         }
       }
-      setInput((finalTranscript + interimTranscript).trim());
+      const combined = (finalTranscript + interimTranscript).trim();
+      voiceTranscriptRef.current = combined;
+      setInput(combined);
     };
 
     rec.onerror = (e) => {
@@ -1211,6 +1354,13 @@ export default function ChatPage() {
       try { recognitionRef.current.stop(); } catch (_) {}
     }
     setIsRecording(false);
+    
+    // Auto-submit voice query if speech was recognized
+    const speechText = voiceTranscriptRef.current.trim() || input.trim();
+    if (speechText) {
+      voiceTranscriptRef.current = '';
+      setTimeout(() => sendMessage(speechText), 150);
+    }
   };
 
   const handlePttStart = () => {
@@ -1315,13 +1465,24 @@ export default function ChatPage() {
             </div>
 
             {messages.length > 0 && (
-              <button
-                onClick={clearChatHistory}
-                className="px-2.5 py-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-semibold transition-all cursor-pointer shrink-0"
-                title="Clear conversation history"
-              >
-                Clear
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleExportConversation}
+                  disabled={exportingPdf}
+                  className="px-2.5 py-1.5 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800 text-xs font-semibold hover:bg-sky-100 dark:hover:bg-sky-900/50 transition-all cursor-pointer shrink-0 flex items-center gap-1.5 shadow-xs"
+                  title="Export Intelligence Dossier (PDF/HTML)"
+                >
+                  <FileDown className="w-3.5 h-3.5" />
+                  <span>{exportingPdf ? 'Exporting...' : 'Export PDF'}</span>
+                </button>
+                <button
+                  onClick={clearChatHistory}
+                  className="px-2.5 py-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-semibold transition-all cursor-pointer shrink-0"
+                  title="Clear conversation history"
+                >
+                  Clear
+                </button>
+              </div>
             )}
           </div>
         </div>

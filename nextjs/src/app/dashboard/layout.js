@@ -48,13 +48,10 @@ function extractRequestedName(queryText) {
     .trim();
 
   if (!cleaned) return 'the requested query';
-  return cleaned
-    .split(/\s+/)
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ');
+  return cleaned;
 }
 
-// ─── Local intent detector (expanded) ───────────────────────────────────────
+// ─── Local intent detector ─────────────────────────────────────────────────
 function detectLocalIntent(query) {
   const q = query.toLowerCase().trim();
   const isHindi = /[\u0900-\u097F]/.test(query);
@@ -62,140 +59,49 @@ function detectLocalIntent(query) {
 
   const nav = (path, reply, followUpQuery) => ({ type: 'navigate', path, reply, followUpQuery });
 
-  // Guard: If query is a question or requests Yes/No, DO NOT navigate! Let the AI answer the query.
-  const isQuestion =
-    q.includes('?') || q.includes('do we') || q.includes('is there') || q.includes('have info') ||
-    q.includes('any info') || q.includes('check if') || q.includes('answer in') || q.includes('yes/no') ||
-    q.includes('yes or no') || q.includes('what') || q.includes('where') || q.includes('who') ||
-    q.includes('how') || q.includes('does') || q.includes('क्या') || q.includes('जानकारी') ||
-    q.includes('इन्फॉर्मेशन') || q.includes('ಯಾವ') || q.includes('ಇದೆಯಾ');
-
-  if (isQuestion) {
-    return null;
-  }
-
-  // Explicit Open/View/Navigate action verbs
-  const isOpenAction =
-    q.includes('open') || q.includes('show') || q.includes('view') || q.includes('bring up') ||
-    q.includes('pull up') || q.includes('switch') || q.includes('navigate') || q.includes('go to') ||
-    q.includes('check case') || q.includes('case file') || q.includes('profile') ||
-    q.includes('खोलो') || q.includes('खोल') || q.includes('खोलना') || q.includes('दिखाओ') ||
-    q.includes('दिखाएं') || q.includes('देखना') || q.includes('सीरी') || q.includes('प्रोफाइल') ||
-    q.includes('ले चलो') || q.includes('ओपन') || q.includes('ತೆರೆ') || q.includes('ತೋರಿಸು') ||
-    q.includes('ಪ್ರೊಫೈಲ್');
-
-  // 1. CCTV & Surveillance Direct Intent (requires explicit open/view action verb or page request)
-  if (
-    isOpenAction && (
-      /\b(cctv|surveillance|camera|feed|anpr|watch|सीसीटीवी|सर्विलांस|कैमरा|कैमरे|फीड|ಸಿಸಿಟಿವಿ|ಕ್ಯಾಮೆರಾ|ನಿಗಾ)\b/.test(q) ||
-      q.includes('सीसीटीवी') || q.includes('सर्विलांस') || q.includes('कैमरा') || q.includes('ಸಿಸಿಟಿವಿ') || q.includes('ಕ್ಯಾಮೆರಾ')
-    )
-  ) {
-    const reply = isHindi
-      ? 'सिल्क बोर्ड और बेंगलुरु ग्रिड के सीसीटीवी कैमरे और सर्विलांस सिस्टम खोले जा रहे हैं, सर।'
-      : isKannada
-        ? 'ಸಿಸಿಟಿವಿ ಮತ್ತು ಕಣ್ಗಾವಲು ವ್ಯವಸ್ಥೆಯನ್ನು ತೆರೆಯಲಾಗುತ್ತಿದೆ, ಸರ್.'
-        : 'Switching to Surveillance & CCTV live feeds, Sir.';
-    return nav('/dashboard/surveillance', reply, null);
-  }
-
-  // 2. Crime Map Direct Intent (requires explicit open/view action verb)
-  if (
-    isOpenAction && (
-      /\b(map|crime map|hotspot|heatmap|location|where.*crime|मैप|क्राइम मैप|नक्शा|लोकेशन|ಮ್ಯಾಪ್|ನಕ್ಷೆ)\b/.test(q) ||
-      q.includes('मैप') || q.includes('नक्शा') || q.includes('ಮ್ಯಾಪ್') || q.includes('ನಕ್ಷೆ')
-    )
-  ) {
-    const reply = isHindi
-      ? 'क्राइम मैप और हॉटस्पॉट लोकेशन दिखाई जा रही है, सर।'
-      : isKannada
-        ? 'ಕ್ರೈಮ್ ಮ್ಯಾಪ್ ತೆರೆಯಲಾಗುತ್ತಿದೆ, ಸರ್.'
-        : 'Opening the Crime Map, Sir.';
-    return nav('/dashboard/map', reply, 'Give me a quick briefing on the current hotspots.');
-  }
-
-  // 3. Suspect Profile & Case File Direct Intent
-  if (isOpenAction) {
-    if (q.includes('anant') || q.includes('anand') || q.includes('gowda') || q.includes('godwa') || q.includes('buda') || q.includes('guda') || q.includes('goda') || q.includes('आनंद') || q.includes('ಆನಂದ್')) {
-      const reply = isHindi ? 'आनंद गौड़ा की संदिग्ध प्रोफाइल खोली जा रही है, सर।' : isKannada ? 'ಆನಂದ್ ಗೌಡ ಅವರ ಶಂಕಿತ ಪ್ರೊಫೈಲ್ ತೆರೆಯಲಾಗುತ್ತಿದೆ, ಸರ್.' : 'Opening suspect profile for Anand Gowda, Sir.';
-      return nav('/dashboard/suspect/anand-gowda', reply, null);
-    }
-    if (q.includes('ramesh') || q.includes('bullet ramesh') || q.includes('रमेश') || q.includes('ರಮೇಶ್')) {
-      const reply = isHindi ? 'रमेश कुमार ("बुलेट रमेश") की संदिग्ध प्रोफाइल और रिकॉर्ड खोला जा रहा है, सर।' : isKannada ? 'ರಮೇಶ್ ಕುಮಾರ್ ಅವರ ಶಂಕಿತ ಪ್ರೊಫೈಲ್ ಮತ್ತು ದಾಖಲೆಗಳನ್ನು ತೆರೆಯಲಾಗುತ್ತಿದೆ, ಸರ್.' : 'Opening suspect profile for Ramesh Kumar, Sir.';
-      return nav('/dashboard/suspect/ramesh-kumar', reply, null);
-    }
-    if (q.includes('suresh') || q.includes('naidu') || q.includes('सुरेश') || q.includes('ಸುರೇಶ್')) {
-      const reply = isHindi ? 'सुरेश नाईडू की संदिग्ध प्रोफाइल खोली जा रही है, सर।' : isKannada ? 'ಸುರೇಶ್ ನಾಯ್ಡು ಅವರ ಶಂಕಿತ ಪ್ರೊಫೈಲ್ ತೆರೆಯಲಾಗುತ್ತಿದೆ, ಸರ್.' : 'Opening suspect profile for Suresh Naidu, Sir.';
-      return nav('/dashboard/suspect/suresh-naidu', reply, null);
-    }
-    if (q.includes('imran') || q.includes('chotta imran') || q.includes('इमरान') || q.includes('ಇಮ್ರಾನ್')) {
-      const reply = isHindi ? 'इमरान खान की संदिग्ध प्रोफाइल खोली जा रही है, सर।' : isKannada ? 'ಇಮ್ರಾನ್ ಖಾನ್ ಅವರ ಶಂಕಿತ ಪ್ರೊಫೈಲ್ ತೆರೆಯಲಾಗುತ್ತಿದೆ, ಸರ್.' : 'Opening suspect profile for Imran Khan, Sir.';
-      return nav('/dashboard/suspect/imran-khan', reply, null);
-    }
-    if (q.includes('farid') || q.includes('mirza') || q.includes('फरीद') || q.includes('ಫರೀದ್')) {
-      const reply = isHindi ? 'फरीद मिर्जा की संदिग्ध प्रोफाइल खोली जा रही है, सर।' : isKannada ? 'ಫರೀದ್ ಮಿರ್ಜಾ ಅವರ ಶಂಕಿತ ಪ್ರೊಫೈಲ್ ತೆರೆಯಲಾಗುತ್ತಿದೆ, ಸರ್.' : 'Opening suspect profile for Farid Mirza, Sir.';
-      return nav('/dashboard/suspect/farid-mirza', reply, null);
-    }
-    if (q.includes('4921') || q.includes('492')) {
-      return nav('/dashboard/fir/FIR-2026-BL-4921', isKannada ? 'ಪ್ರಕರಣ ದಾಖಲೆ FIR-2026-BL-4921 ತೆರೆಯಲಾಗುತ್ತಿದೆ, ಸರ್.' : 'Opening case file FIR-2026-BL-4921, Sir.', null);
-    }
-    if (q.includes('4000')) {
-      return nav('/dashboard/fir/FIR-2026-BL-4000', isKannada ? 'ಪ್ರಕರಣ ದಾಖಲೆ FIR-2026-BL-4000 ತೆರೆಯಲಾಗುತ್ತಿದೆ, ಸರ್.' : 'Opening case file FIR-2026-BL-4000, Sir.', null);
-    }
-    if (q.includes('112') || q.includes('mys')) {
-      return nav('/dashboard/fir/FIR-2026-MYS-0112', isKannada ? 'ಪ್ರಕರಣ ದಾಖಲೆ FIR-2026-MYS-0112 ತೆರೆಯಲಾಗುತ್ತಿದೆ, ಸರ್.' : 'Opening case file FIR-2026-MYS-0112, Sir.', null);
-    }
-
-    // No matching registered suspect or FIR found in datastore
-    const targetName = extractRequestedName(query);
-    return {
-      type: 'not_found',
-      reply: isHindi
-        ? `सर, "${targetName}" के लिए कोई संदिग्ध प्रोफ़ाइल या केस फ़ाइल नहीं मिली।`
-        : isKannada
-          ? `ಸರ್, "${targetName}" ಗಾಗಿ ಯಾವುದೇ ಶಂಕಿತ ಪ್ರೊಫೈಲ್ ಅಥವಾ ಎಫ್‌ಐಆರ್ ಸಿಗಲಿಲ್ಲ.`
-          : `Sir, no suspect profile or case file found for "${targetName}" in the Karnataka Police database. Please verify the name or FIR number.`
-    };
-  }
-
-  // Network Graph
-  if (/\b(network|gang|connection|syndicate|नेटवर्क|गैंग|ಸಂಪರ್ಕ)\b/.test(q) || q.includes('नेटवर्क') || q.includes('गैंग')) {
-    const reply = isHindi ? 'क्रिमिनल नेटवर्क ग्राफ खोला जा रहा है, सर।' : 'Opening the Network Graph, Sir.';
-    return nav('/dashboard/network', reply, 'Who are the key suspects in the current network?');
-  }
-
-  // Analytics
-  if (/\b(analytic|trend|statistic|report|monthly|एनालिटिक्स|ट्रेंड|रिपोर्ट)\b/.test(q) || q.includes('एनालिटिक्स')) {
-    const reply = isHindi ? 'एनालिटिक्स और ट्रेंड्स खोले जा रहे हैं, सर।' : 'Pulling up Analytics, Sir.';
-    return nav('/dashboard/analytics', reply, 'Summarize the crime trend for this month.');
-  }
-
-  // Geo Trail
-  if (/\b(trail|track|route|vehicle route|ट्रेल|ट्रैक|रूट)\b/.test(q) || q.includes('ट्रेल') || q.includes('ट्रैक')) {
-    const reply = isHindi ? 'जियो ट्रेल ट्रैकर खोला जा रहा है, सर।' : 'Opening Geo Trail Tracker, Sir.';
-    return nav('/dashboard/trail', reply, 'Any active vehicle trails being tracked?');
-  }
-
-  // Co-Pilot Chat
-  if (/\b(chat|copilot|co-pilot|assistant|चैट|सहायक)\b/.test(q) || q.includes('चैट')) {
-    const reply = isHindi ? 'को-पायलट चैट खोली जा रही है, सर।' : 'Opening Co-Pilot Chat, Sir.';
-    return nav('/dashboard/chat', reply, null);
-  }
-
-  // Overview
-  if (/\b(overview|home|dashboard|summary|ओवरव्यू|होम|डैशबोर्ड|सारांश)\b/.test(q) || q.includes('ओवरव्यू') || q.includes('डैशबोर्ड')) {
-    const reply = isHindi ? 'ओवरव्यू डैशबोर्ड खोला जा रहा है, सर।' : 'Going to Overview, Sir.';
-    return nav('/dashboard', reply, 'Give me a status summary of active cases.');
+  // Pure Standalone Greetings (only if no query follows)
+  if (/^(hi|hello|hey|whats\s*up|what's\s*up|greetings|hello\s*drishti|hi\s*drishti|drishti|good\s*morning|good\s*afternoon|good\s*evening|नमस्ते|हेलो|हाय|ನಮಸ್ಕಾರ)$/.test(q)) {
+    return { type: 'greeting', reply: isHindi ? 'नमस्ते सर। दृष्टि एआई सक्रिय है। आज मैं आपकी कैसे मदद कर सकता हूं?' : isKannada ? 'ನಮಸ್ಕಾರ ಸರ್, ದೃಷ್ಟಿ ಎಐ ಕರ್ತವ್ಯದಲ್ಲಿದೆ. ತನಿಖೆಯಲ್ಲಿ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?' : 'Jai Hind, Sir. DRISHTI AI is active. How may I assist your command shift today?' };
   }
 
   // Confirmations
-  if (/^(yes|yeah|sure|okay|ok|do it|go ahead|proceed|affirmative|हां|हाँ|ठीक है|ओके)$/.test(q))
-    return { type: 'confirm', reply: isHindi ? 'ठीक है सर, कार्रवाई जारी है।' : 'On it, Sir.' };
+  if (/^(yes|yeah|sure|okay|ok|do it|go ahead|proceed|affirmative|हां|हाँ|ठीक है|ओके)$/.test(q)) {
+    return { type: 'confirm', reply: isHindi ? 'ठीक है सर, कार्रवाई जारी है।' : isKannada ? 'ಸರಿ ಸರ್, ಪ್ರಕ್ರಿಯೆ ಚಾಲನೆಯಲ್ಲಿದೆ.' : 'On it, Sir.' };
+  }
 
-  // Pure Standalone Greetings (only if no query follows)
-  if (/^(hi|hello|hey|whats\s*up|what's\s*up|greetings|hello\s*drishti|hi\s*drishti|drishti|good\s*morning|good\s*afternoon|good\s*evening|नमस्ते|हेलो|हाय|ನಮಸ್ಕಾರ)$/.test(q))
-    return { type: 'greeting', reply: isHindi ? 'नमस्ते सर। दृष्टि एआई सक्रिय है। आज मैं आपकी कैसे मदद कर सकता हूं?' : 'Hello, Sir. Drishti is active. How can I assist you with the intelligence network today?' };
+  // ONLY intercept explicit page navigation directives
+  const isDirectNav =
+    q.startsWith('go to') || q.startsWith('navigate to') || q.startsWith('switch to') ||
+    q.startsWith('open page') || q.startsWith('open tab') || q.startsWith('ಲೆ ಚಲೊ') || q.startsWith('ತೆರೆ');
 
+  if (isDirectNav) {
+    if (q.includes('surveillance') || q.includes('cctv') || q.includes('camera')) {
+      return nav('/dashboard/surveillance', 'Opening Surveillance & CCTV grid, Sir.', null);
+    }
+    if (q.includes('map') || q.includes('hotspot')) {
+      return nav('/dashboard/map', 'Opening Crime Map, Sir.', null);
+    }
+    if (q.includes('fir') || q.includes('registry')) {
+      return nav('/dashboard/fir', 'Opening FIR Registry, Sir.', null);
+    }
+    if (q.includes('suspect') || q.includes('roster')) {
+      return nav('/dashboard/suspect', 'Opening Suspect Roster, Sir.', null);
+    }
+    if (q.includes('network') || q.includes('nexus')) {
+      return nav('/dashboard/network', 'Opening Network Graph, Sir.', null);
+    }
+    if (q.includes('analytics')) {
+      return nav('/dashboard/analytics', 'Opening Analytics, Sir.', null);
+    }
+    if (q.includes('chat') || q.includes('copilot')) {
+      return nav('/dashboard/chat', 'Opening Co-Pilot Chat, Sir.', null);
+    }
+    if (q.includes('overview') || q.includes('home') || q.includes('dashboard')) {
+      return nav('/dashboard', 'Going to Overview, Sir.', null);
+    }
+  }
+
+  // All other queries — questions, clearance targets, suspect lookups, legal SOPs — flow to the live AI engine!
   return null;
 }
 
@@ -1074,8 +980,8 @@ export default function DashboardLayout({ children }) {
       />
 
       {/* ── DRISHTI ORB ── */}
-      {/* When panel is open, render compact orb anchored to panel header */}
-      {isPanelOpen && (
+      {/* Hide global floating orb when already inside dedicated full-screen /dashboard/chat portal */}
+      {pathname !== '/dashboard/chat' && isPanelOpen && (
         <div className="fixed top-[12px] right-[382px] z-[9996]">
           <DrishtiOrb
             state={orbState}
@@ -1087,8 +993,8 @@ export default function DashboardLayout({ children }) {
           />
         </div>
       )}
-      {/* Full floating orb when panel is closed */}
-      {!isPanelOpen && (
+      {/* Full floating orb when panel is closed and not on chat page */}
+      {pathname !== '/dashboard/chat' && !isPanelOpen && (
         <DrishtiOrb
           state={orbState}
           onClick={openPanel}
