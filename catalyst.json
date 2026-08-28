@@ -2,9 +2,8 @@
   "appsail": [
     {
       "name": "drishti-ssr",
-      "source": ".",
-      "dockerfile": "Dockerfile",
-      "build_path": "nextjs"
+      "source": "nextjs",
+      "build_path": "."
     }
   ],
   "functions": {

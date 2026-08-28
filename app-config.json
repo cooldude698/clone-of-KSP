@@ -1,0 +1,9 @@
+{
+  "command": "cd nextjs && npm start",
+  "stack": "node",
+  "env_variables": {
+    "NODE_ENV": "production",
+    "PORT": "3000"
+  },
+  "memory": 1024
+}

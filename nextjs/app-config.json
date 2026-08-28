@@ -1,0 +1,10 @@
+{
+  "command": "npm start",
+  "stack": "node20",
+  "build_path": ".",
+  "env_variables": {
+    "NODE_ENV": "production",
+    "PORT": "3000"
+  },
+  "memory": 1024
+}
