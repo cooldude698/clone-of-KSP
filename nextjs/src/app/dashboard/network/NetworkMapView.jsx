@@ -58,252 +58,189 @@ export default function NetworkMapView({
 
     // GANG-SOUTH suspects
     'SUS-5921': { lat: 12.9698, lng: 77.7499, area: 'Whitefield ITPL (Imran Khan - Gang Leader)' },
-    'SUS-7104': { lat: 12.9762, lng: 77.6033, area: 'MG Road Signal (Suresh Naidu - Co-Accused)' },
-    'SUS-3302': { lat: 13.3392, lng: 77.1015, area: 'Tumkur Highway Bypass (Arun Gowda - Lookout)' },
-    'SUS-0012': { lat: 12.9279, lng: 77.6271, area: 'Koramangala 5th Block (Prakash Nair - Intel Mole)' },
+    'SUS-7104': { lat: 12.9279, lng: 77.6271, area: 'HSR Layout BDA Complex (Suresh Naidu - Armed Heist)' },
+    'SUS-3302': { lat: 13.0456, lng: 77.6256, area: 'Hebbal Flyover Junction (Arun Gowda - Logistics)' },
+    'SUS-5512': { lat: 12.9344, lng: 77.6101, area: 'Koramangala 5th Block (Karthik Raja - Money Laundering)' },
 
-    // FIR case nodes
-    'FIR-2026-BL-4921': { lat: 12.9175, lng: 77.6215, area: 'Silk Board Metro Approach (Vehicle Theft)' },
-    'FIR-2026-MY-1103': { lat: 12.9762, lng: 77.6033, area: 'MG Road Corridor (Armed Robbery)' },
-    'FIR-2026-BL-4920': { lat: 12.9698, lng: 77.7499, area: 'ITPL Main Road (Chain Snatching)' },
-    'FIR-2026-BL-5001': { lat: 12.9716, lng: 77.5946, area: 'Cubbon Park Fringe (Assault)' },
-    'FIR-2026-YL-0234': { lat: 13.1007, lng: 77.5963, area: 'Yelahanka Auto Yard (Stolen Goods)' },
-
-    // Legacy fallback keys
-    n1: { lat: 12.9175, lng: 77.6215, area: 'Silk Board Junction' },
-    n2: { lat: 12.9762, lng: 77.6033, area: 'MG Road Signal' },
-    n3: { lat: 12.9698, lng: 77.7499, area: 'ITPL Main Road' },
+    // Core FIR Cases
+    'FIR-2026-BL-0492': { lat: 12.9165, lng: 77.6200, area: 'Silk Board Vehicle Theft (FIR-2026-BL-0492)' },
+    'FIR-2026-BL-0811': { lat: 12.9740, lng: 77.6080, area: 'MG Road Armed Robbery (FIR-2026-BL-0811)' },
+    'FIR-2026-BL-1104': { lat: 12.9680, lng: 77.7450, area: 'Whitefield Chain Snatching (FIR-2026-BL-1104)' },
+    'FIR-2026-BL-1726': { lat: 12.9250, lng: 77.6240, area: 'HSR Layout Burglary (FIR-2026-BL-1726)' },
   };
 
-  // Build a quick node lookup by id for edge gang resolution
-  const nodeMapRef = useRef({});
-
+  // ── 1. Map Initialization ──────────────────────────────────────────────────
   useEffect(() => {
     if (!containerRef.current) return;
-
-    if (containerRef.current._leaflet_id) {
-      delete containerRef.current._leaflet_id;
-    }
+    if (mapRef.current) return; // Prevent double init
 
     const map = L.map(containerRef.current, {
       center: defaultCenter,
-      zoom: 12,
-      zoomControl: true,
+      zoom: 11,
       scrollWheelZoom: true,
-      doubleClickZoom: true,
-      touchZoom: true,
+      zoomControl: true,
     });
 
     L.tileLayer(tileUrl, {
       attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 18,
     }).addTo(map);
 
     const layerGroup = L.layerGroup().addTo(map);
     layerGroupRef.current = layerGroup;
     mapRef.current = map;
 
+    setTimeout(() => {
+      if (mapRef.current) mapRef.current.invalidateSize();
+    }, 200);
+
     return () => {
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
-      }
-      if (containerRef.current && containerRef.current._leaflet_id) {
-        delete containerRef.current._leaflet_id;
+        layerGroupRef.current = null;
       }
     };
   }, [tileUrl]);
 
-  // Update map markers & gang trajectory links when nodes, edges, or selection change
+  // ── 2. Render Markers, Heat Radii & Dynamic Links ─────────────────────────
   useEffect(() => {
     if (!mapRef.current || !layerGroupRef.current) return;
-
     const layerGroup = layerGroupRef.current;
     layerGroup.clearLayers();
 
-    // Build node lookup for gang resolution in edges
-    const nodeMap = {};
-    nodes.forEach(n => { nodeMap[n.id] = n; });
+    // Node lookup dictionary by ID for drawing links
+    const nodePosMap = {};
 
-    // ── 1. Draw edge lines with gang-aware styling ──────────────────────────
-    edges.forEach((edge) => {
-      const sourceId = typeof edge.source === 'object' ? edge.source.id : edge.source;
-      const targetId = typeof edge.target === 'object' ? edge.target.id : edge.target;
+    // ── Draw Gang Area Heat Radii ───────────────────────────────────────────
+    const gangNorthCenter = [12.9175, 77.6215]; // Silk Board
+    const gangSouthCenter = [12.9698, 77.7499]; // Whitefield
 
-      const sCoords = NODE_COORDS[sourceId] || hashCoords(sourceId, '');
-      const tCoords = NODE_COORDS[targetId] || hashCoords(targetId, '');
+    L.circle(gangNorthCenter, {
+      radius: 3500,
+      color: '#f97316',
+      weight: 1.5,
+      dashArray: '6, 6',
+      fillColor: '#f97316',
+      fillOpacity: 0.08,
+    }).addTo(layerGroup).bindTooltip('GANG-NORTH Primary Vehicle Theft Zone', { permanent: false, direction: 'top' });
 
-      if (!sCoords || !tCoords) return;
+    L.circle(gangSouthCenter, {
+      radius: 4200,
+      color: '#8b5cf6',
+      weight: 1.5,
+      dashArray: '6, 6',
+      fillColor: '#8b5cf6',
+      fillOpacity: 0.08,
+    }).addTo(layerGroup).bindTooltip('GANG-SOUTH Chain Snatching Operational Zone', { permanent: false, direction: 'top' });
 
-      const sNode = nodeMap[sourceId];
-      const tNode = nodeMap[targetId];
-      const sIsCase = !sNode || sNode.type === 'fir' || sNode.type === 'case' || sourceId.startsWith('FIR');
-      const tIsCase = !tNode || tNode.type === 'fir' || tNode.type === 'case' || targetId.startsWith('FIR');
-
-      let lineOptions;
-
-      if (sIsCase || tIsCase) {
-        // Edge to/from FIR node → thin dashed blue
-        lineOptions = {
-          color: '#2563eb',
-          weight: 1.5,
-          opacity: 0.4,
-          dashArray: '4 6',
-        };
-      } else {
-        const sGang = sNode?.gang_id;
-        const tGang = tNode?.gang_id;
-
-        if (sGang && tGang && sGang === tGang) {
-          // Same-gang edge → solid, gang color
-          lineOptions = {
-            color: GANG_COLORS[sGang] || '#64748b',
-            weight: 3,
-            opacity: 0.8,
-            dashArray: null,
-          };
-        } else if (sGang && tGang && sGang !== tGang) {
-          // Cross-gang edge → dashed red
-          lineOptions = {
-            color: '#dc2626',
-            weight: 2,
-            opacity: 0.6,
-            dashArray: '6 5',
-          };
-        } else {
-          // Unknown/fallback
-          lineOptions = {
-            color: '#64748b',
-            weight: 1.5,
-            opacity: 0.5,
-            dashArray: '4 4',
-          };
-        }
-      }
-
-      const line = L.polyline(
-        [[sCoords.lat, sCoords.lng], [tCoords.lat, tCoords.lng]],
-        lineOptions
-      );
-      layerGroup.addLayer(line);
-    });
-
-    // ── 2. Render Node Markers ────────────────────────────────────────────────
-    nodes.forEach((node) => {
+    // ── Map Nodes ─────────────────────────────────────────────────────────────
+    (nodes || []).forEach((node) => {
       const coords = NODE_COORDS[node.id] || hashCoords(node.id, node.label);
+      nodePosMap[node.id] = [coords.lat, coords.lng];
+
       const isSelected = selectedNodeId === node.id;
-      const isCase = node.type === 'case' || node.type === 'fir' || node.id?.startsWith('FIR');
-
+      const isSuspect = node.type === 'suspect' || (node.id || '').startsWith('SUS');
+      const isCase = node.type === 'case' || node.type === 'fir' || (node.id || '').startsWith('FIR');
       const fillColor = getNodeFillColor(node);
-      const radius = isSelected ? 14 : isCase ? 7 : 11;
 
-      const circle = L.circleMarker([coords.lat, coords.lng], {
+      const radius = isSelected ? 14 : (node.size ? Math.max(7, Math.min(16, node.size / 1.5)) : (isSuspect ? 10 : 7));
+
+      const marker = L.circleMarker([coords.lat, coords.lng], {
         radius,
         fillColor,
-        fillOpacity: isSelected ? 0.95 : 0.85,
-        color: isSelected ? '#ffffff' : '#0f172a',
+        color: isSelected ? '#ffffff' : (isSuspect ? '#0f172a' : '#ffffff'),
         weight: isSelected ? 3 : 1.5,
+        opacity: 0.95,
+        fillOpacity: isSelected ? 0.95 : 0.8,
       });
 
-      // Tooltip: name, role, gang, district, crime type
-      const gangLabel = node.gang_id
-        ? `<p style="font-size:10px;font-weight:bold;color:${GANG_COLORS[node.gang_id] || '#64748b'};margin-top:2px;">${node.gang_id}</p>`
-        : '';
-      const roleLabel = node.role
-        ? `<p style="font-size:10px;color:#475569;margin:1px 0;">${node.role}</p>`
-        : '';
-      const districtLabel = node.district
-        ? `<p style="font-size:10px;color:#64748b;margin:1px 0;">📍 ${node.district}</p>`
-        : '';
-      const crimeLabel = node.crime
-        ? `<p style="font-size:9px;text-transform:uppercase;color:#94a3b8;margin-top:2px;">${node.crime.replace(/_/g,' ')}</p>`
-        : '';
-
+      // Tooltip content
       const tooltipContent = `
-        <div style="font-family:system-ui;padding:3px;min-width:160px;">
-          <strong style="color:${fillColor};font-size:12px;">${node.label ? node.label.replace(/\n/g,' · ') : node.id}</strong>
-          ${gangLabel}
-          ${roleLabel}
-          ${districtLabel}
-          ${crimeLabel}
+        <div style="font-family:sans-serif;padding:4px 6px;min-width:140px;">
+          <div style="font-weight:bold;font-size:12px;color:#0f172a;">${node.label || node.id}</div>
+          <div style="font-size:11px;color:#475569;margin-top:2px;">${node.role || node.district || coords.area}</div>
+          ${node.risk_score ? `<div style="font-size:10px;font-weight:bold;color:${node.risk_score > 85 ? '#dc2626' : '#d97706'};margin-top:4px;">Risk Score: ${node.risk_score}/100</div>` : ''}
+          ${node.gang_id ? `<div style="font-size:10px;font-weight:bold;color:${GANG_COLORS[node.gang_id] || '#64748b'};margin-top:2px;">Gang: ${node.gang_id}</div>` : ''}
         </div>
       `;
+      marker.bindTooltip(tooltipContent, { direction: 'top', offset: [0, -6] });
 
-      circle.bindTooltip(tooltipContent, { sticky: true });
-      circle.on('click', () => {
+      marker.on('click', () => {
         if (onNodeClick) onNodeClick(node.id);
       });
 
-      layerGroup.addLayer(circle);
+      marker.addTo(layerGroup);
     });
 
-    // ── 3. Prediction Heatmap Zones ───────────────────────────────────────────
-    const zone1 = L.circle([12.9175, 77.6215], {
-      radius: 1800,
-      fillColor: '#ef4444',
-      fillOpacity: 0.08,
-      color: '#ef4444',
-      weight: 1.5,
-      dashArray: '5 5',
-    });
-    zone1.bindPopup('<strong style="color:#ef4444;">HIGH RISK: Silk Board Corridor — Vehicle Theft Zone</strong>');
-    layerGroup.addLayer(zone1);
+    // ── Map Edges (Co-Accused & Case Links) ──────────────────────────────────
+    (edges || []).forEach((edge) => {
+      const srcId = typeof edge.source === 'object' ? edge.source.id : edge.source;
+      const tgtId = typeof edge.target === 'object' ? edge.target.id : edge.target;
 
-    const zone2 = L.circle([12.9698, 77.7499], {
-      radius: 1400,
-      fillColor: '#f97316',
-      fillOpacity: 0.07,
-      color: '#f97316',
-      weight: 1.5,
-      dashArray: '5 5',
-    });
-    zone2.bindPopup('<strong style="color:#f97316;">ELEVATED RISK: Whitefield-ITPL Corridor — Snatch Theft Zone</strong>');
-    layerGroup.addLayer(zone2);
+      const srcPos = nodePosMap[srcId];
+      const tgtPos = nodePosMap[tgtId];
 
-    // ── 4. Map Legend (bottom-left) ───────────────────────────────────────────
-    if (mapRef.current) {
-      // Remove old legend if any
-      if (mapRef.current._drishtiLegend) {
-        mapRef.current._drishtiLegend.remove();
+      if (srcPos && tgtPos) {
+        const isCrossGang = edge.crime_type === 'cross_gang' || edge.weight > 3;
+        const polyline = L.polyline([srcPos, tgtPos], {
+          color: isCrossGang ? '#dc2626' : '#94a3b8',
+          weight: isCrossGang ? 2.5 : 1.2,
+          opacity: isCrossGang ? 0.85 : 0.4,
+          dashArray: isCrossGang ? '4, 4' : null,
+        });
+
+        if (edge.fir_case_number || edge.crime_type) {
+          polyline.bindTooltip(
+            `<div style="font-size:10px;font-family:sans-serif;color:#0f172a;"><b>Link:</b> ${edge.fir_case_number || edge.crime_type}</div>`,
+            { sticky: true }
+          );
+        }
+
+        polyline.addTo(layerGroup);
       }
+    });
 
+    // ── 4. Add Crisp Light Theme Map Legend ───────────────────────────────────
+    if (!mapRef.current._drishtiLegend) {
       const legend = L.control({ position: 'bottomleft' });
       legend.onAdd = function () {
-        const div = L.DomUtil.create('div', 'leaflet-drishti-legend');
+        const div = L.DomUtil.create('div', 'info legend');
         div.style.cssText = `
-          background: rgba(10,15,30,0.88);
-          border: 1px solid rgba(255,255,255,0.1);
-          border-radius: 10px;
-          padding: 10px 14px;
-          font-family: monospace;
+          background: rgba(255, 255, 255, 0.95);
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 12px 14px;
+          font-family: inherit;
           font-size: 11px;
-          color: #f1f5f9;
-          backdrop-filter: blur(6px);
+          color: #0f172a;
+          backdrop-filter: blur(8px);
           line-height: 1.9;
-          min-width: 210px;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+          min-width: 220px;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.08);
         `;
         div.innerHTML = `
-          <div style="font-weight:bold;font-size:10px;letter-spacing:0.08em;color:#94a3b8;margin-bottom:6px;text-transform:uppercase;">Gang Intelligence Legend</div>
+          <div style="font-weight:700;font-size:10px;letter-spacing:0.08em;color:#64748b;margin-bottom:6px;text-transform:uppercase;">Gang Intelligence Legend</div>
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#f97316;flex-shrink:0;"></span>
-            <span><b style="color:#f97316;">GANG-NORTH</b> — Vehicle Theft Syndicate</span>
+            <span><b style="color:#ea580c;">GANG-NORTH</b> — Vehicle Theft Syndicate</span>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#8b5cf6;flex-shrink:0;"></span>
-            <span><b style="color:#8b5cf6;">GANG-SOUTH</b> — Chain Snatching Cell</span>
+            <span><b style="color:#7c3aed;">GANG-SOUTH</b> — Chain Snatching Cell</span>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#2563eb;flex-shrink:0;"></span>
-            <span style="color:#93c5fd;">FIR Case Node</span>
+            <span style="color:#2563eb;font-weight:600;">FIR Case Node</span>
           </div>
-          <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.08);">
+          <div style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0;">
             <div style="display:flex;align-items:center;gap:8px;">
               <span style="display:inline-block;width:22px;height:2px;background:#ef4444;border-radius:2px;flex-shrink:0;"></span>
-              <span style="color:#fca5a5;">Predicted High-Risk Zone</span>
+              <span style="color:#dc2626;font-weight:500;">Predicted High-Risk Zone</span>
             </div>
             <div style="display:flex;align-items:center;gap:8px;">
               <span style="display:inline-block;width:22px;height:2px;background:#dc2626;border-top:2px dashed #dc2626;flex-shrink:0;"></span>
-              <span style="color:#fca5a5;">Cross-Gang Link</span>
+              <span style="color:#dc2626;font-weight:500;">Cross-Gang Link</span>
             </div>
           </div>
         `;
@@ -322,5 +259,5 @@ export default function NetworkMapView({
 
   }, [nodes, edges, selectedNodeId, onNodeClick]);
 
-  return <div ref={containerRef} className="w-full rounded-xl overflow-hidden shadow-xl border border-[var(--border)]/50" style={{ height }} />;
+  return <div ref={containerRef} className="w-full rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-800" style={{ height }} />;
 }
