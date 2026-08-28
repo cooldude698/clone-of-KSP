@@ -2,6 +2,5 @@
   "framework": "nextjs",
   "buildCommand": "cd nextjs && npm install --legacy-peer-deps && npm run build",
   "outputDirectory": "nextjs/.next",
-  "installCommand": "cd nextjs && npm install --legacy-peer-deps",
-  "nodeVersion": "22.x"
+  "installCommand": "cd nextjs && npm install --legacy-peer-deps"
 }
