@@ -7,11 +7,12 @@ import Link from 'next/link';
  * DrishtiEmblem — Magnifying Vision Eye & Radar Dot Vector Emblem
  * Exact vector replication of the search loupe + eye aperture + radar dot emblem.
  */
-export function DrishtiEmblem({ className = 'w-6 h-6', color = 'currentColor' }) {
+export function DrishtiEmblem({ className = 'w-6 h-6', color = 'currentColor', style = {} }) {
   return (
     <svg
       viewBox="0 0 512 512"
       className={className}
+      style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', ...style }}
       xmlns="http://www.w3.org/2000/svg"
     >
       {/* ── Main Loupe Lens Arc (Centered ~230,230) ── */}
