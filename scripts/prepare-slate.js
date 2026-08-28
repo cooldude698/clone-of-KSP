@@ -52,9 +52,12 @@ for (const p of buildIdPaths) {
 }
 
 // 2. server/pages-manifest.json & app-paths-manifest.json
+const nextStandalone = path.join(nextDir, '.next', 'standalone', '.next');
 const serverDirs = [
   path.join(rootNext, 'server'),
-  path.join(standaloneNext, 'server')
+  path.join(standaloneNext, 'server'),
+  path.join(nextDir, '.next', 'server'),
+  path.join(nextStandalone, 'server')
 ];
 for (const sDir of serverDirs) {
   if (!fs.existsSync(sDir)) fs.mkdirSync(sDir, { recursive: true });
