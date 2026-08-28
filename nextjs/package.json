@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "postbuild": "node -e \"const fs = require('fs'); fs.rmSync('.next/cache', { recursive: true, force: true }); console.log('Cleaned .next/cache completely');\"",
+    "postbuild": "node scripts/sync-opennext-manifests.js",
     "start": "node start-appsail.js",
     "lint": "next lint"
   },
