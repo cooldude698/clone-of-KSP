@@ -10,39 +10,39 @@
 
 /* ─── LIGHT & DARK THEME TOKENS ────────── */
 :root {
-  /* Default Dark Cyber Surface & UI Tokens */
-  --background:        #09090B;
-  --foreground:        #F8FAFC;
-  --surface-0:         #09090B;
-  --surface-1:         #18181B;
-  --surface-2:         #27272A;
-  --border:            #27272A;
-  --border-subtle:     #1F1F23;
-  --text-primary:      #F8FAFC;
-  --text-secondary:    #94A3B8;
+  /* Default Crisp Light Surface & UI Tokens */
+  --background:        #F8FAFC;
+  --foreground:        #0F172A;
+  --surface-0:         #FFFFFF;
+  --surface-1:         #F1F5F9;
+  --surface-2:         #E2E8F0;
+  --border:            #E2E8F0;
+  --border-subtle:     #CBD5E1;
+  --text-primary:      #0F172A;
+  --text-secondary:    #475569;
   --text-muted:        #64748B;
-  --muted-foreground:  #94A3B8;
-  --accent:            #F8FAFC;
-  --accent-light:      #3B82F6;
-  --accent-glow:       rgba(59, 130, 246, 0.2);
-  --cyan-accent:       #38BDF8;
-  --cyan-glow:         rgba(56, 189, 248, 0.2);
-  --status-critical:   #EF4444; /* Alert red */
-  --status-warning:    #F59E0B; /* Amber warning */
-  --status-success:    #10B981; /* Emerald success */
+  --muted-foreground:  #64748B;
+  --accent:            #1D6FBF;
+  --accent-light:      #2563EB;
+  --accent-glow:       rgba(37, 99, 235, 0.15);
+  --cyan-accent:       #0284C7;
+  --cyan-glow:         rgba(2, 132, 199, 0.15);
+  --status-critical:   #DC2626;
+  --status-warning:    #D97706;
+  --status-success:    #059669;
 
   /* ── Legacy aliases ── */
-  --color-void-000:       var(--surface-0);
-  --color-steel-700:      var(--surface-1);
-  --color-steel-600:      var(--border);
-  --color-phosphor-500:   var(--accent);
-  --color-warn-500:       var(--status-warning);
-  --color-critical-500:   var(--status-critical);
-  --color-stamp-red-500:  var(--status-critical);
-  --color-success-500:    var(--status-success);
-  --color-paper-100:      var(--text-primary);
+  --color-void-000:       #FFFFFF;
+  --color-steel-700:      #FFFFFF;
+  --color-steel-600:      #E2E8F0;
+  --color-phosphor-500:   #1D6FBF;
+  --color-warn-500:       #D97706;
+  --color-critical-500:   #DC2626;
+  --color-stamp-red-500:  #DC2626;
+  --color-success-500:    #059669;
+  --color-paper-100:      #0F172A;
 
-  --scroll-track: #F4F5F8;
+  --scroll-track: #F1F5F9;
   --scroll-thumb: #CBD5E1;
 
   --radius-sm:   6px;
