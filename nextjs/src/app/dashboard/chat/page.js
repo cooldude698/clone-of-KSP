@@ -15,6 +15,7 @@ import InvestigatorWall from '@/components/InvestigatorWall';
 import VoiceDebugStatus from '@/components/VoiceDebugStatus';
 import { DrishtiEmblem } from '@/components/DrishtiLogo';
 import { UPLOADED_FIRS } from '@/lib/uploadedFirsStore';
+import { useLanguage } from '@/context/LanguageContext';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
 
@@ -403,16 +404,29 @@ const CHAT_STORAGE_KEY = 'drishti_chat_history_v2';
 
 export default function ChatPage() {
   const router = useRouter();
+  const { language, t } = useLanguage();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [voiceProfile, setVoiceProfile] = useState('en-NeerjaNeural');
+  const [voiceProfile, setVoiceProfile] = useState(
+    language === 'kn' ? 'kn-SapnaNeural' : language === 'hi' ? 'hi-SwaraNeural' : 'en-NeerjaNeural'
+  );
   const [speechSupported, setSpeechSupported] = useState(false);
   const [micPermission, setMicPermission] = useState('prompt');
   const [error, setError] = useState(null);
   const consecutiveErrorsRef = useRef(0);
   const [conversationId, setConversationId] = useState('');
+
+  useEffect(() => {
+    if (language === 'kn') {
+      setVoiceProfile('kn-SapnaNeural');
+    } else if (language === 'hi') {
+      setVoiceProfile('hi-SwaraNeural');
+    } else {
+      setVoiceProfile('en-NeerjaNeural');
+    }
+  }, [language]);
   
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speakingMsgIdx, setSpeakingMsgIdx] = useState(null);

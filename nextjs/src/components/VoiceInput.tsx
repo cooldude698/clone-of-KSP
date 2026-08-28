@@ -3,14 +3,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 interface VoiceInputProps {
-  onTranscription: (text: string, language: 'en' | 'kn') => void;
+  onTranscription: (text: string, language: 'en' | 'kn' | 'hi') => void;
   onError: (error: string) => void;
   disabled?: boolean;
 }
 
+const LANGUAGES: Array<{ id: 'en' | 'kn' | 'hi'; label: string; locale: string }> = [
+  { id: 'en', label: 'EN', locale: 'en-IN' },
+  { id: 'kn', label: 'ಕನ್ನಡ', locale: 'kn-IN' },
+  { id: 'hi', label: 'हिंदी', locale: 'hi-IN' },
+];
+
 export default function VoiceInput({ onTranscription, onError, disabled = false }: VoiceInputProps) {
   const [isRecording, setIsRecording] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'kn'>('en');
+  const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'kn' | 'hi'>('en');
   const [isSupported, setIsSupported] = useState(true);
   const [statusText, setStatusText] = useState('Tap to speak');
   const recognitionRef = useRef<any>(null);
@@ -63,8 +69,14 @@ export default function VoiceInput({ onTranscription, onError, disabled = false 
   }, [selectedLanguage, onTranscription, onError]);
 
   const toggleLanguage = () => {
-    setSelectedLanguage(prev => (prev === 'en' ? 'kn' : 'en'));
+    setSelectedLanguage(prev => {
+      if (prev === 'en') return 'kn';
+      if (prev === 'kn') return 'hi';
+      return 'en';
+    });
   };
+
+  const currentLangObj = LANGUAGES.find(l => l.id === selectedLanguage) || LANGUAGES[0];
 
   const startStopRecording = () => {
     if (disabled || !isSupported) return;
@@ -73,7 +85,7 @@ export default function VoiceInput({ onTranscription, onError, disabled = false 
       recognitionRef.current?.stop();
     } else {
       if (recognitionRef.current) {
-        recognitionRef.current.lang = selectedLanguage === 'en' ? 'en-IN' : 'kn-IN';
+        recognitionRef.current.lang = currentLangObj.locale;
         try {
           recognitionRef.current.start();
         } catch (e: any) {
@@ -91,16 +103,17 @@ export default function VoiceInput({ onTranscription, onError, disabled = false 
         <button
           onClick={toggleLanguage}
           disabled={isRecording}
-          className="px-3 py-1 text-xs font-bold rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-all disabled:opacity-50"
+          className="px-3 py-1 text-xs font-bold rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-all disabled:opacity-50 cursor-pointer shadow-xs"
+          title="Click to switch language (English / ಕನ್ನಡ / हिंदी)"
         >
-          {selectedLanguage === 'en' ? 'EN' : 'ಕನ್ನಡ'}
+          {currentLangObj.label}
         </button>
       </div>
 
       <button
         onClick={startStopRecording}
         disabled={disabled || !isSupported}
-        className={`relative flex items-center justify-center w-14 h-14 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+        className={`relative flex items-center justify-center w-14 h-14 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer ${
           isRecording
             ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse'
             : 'bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed'

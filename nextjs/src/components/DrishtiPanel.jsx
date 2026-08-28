@@ -405,7 +405,7 @@ export default function DrishtiPanel({
               {response?.follow_up_suggestions?.length > 0 && (
                 <div className="pt-2 space-y-1.5">
                   <div className={`text-[9px] uppercase tracking-widest font-mono font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    Suggested Actions
+                    {language === 'kn' ? 'ಶಿಫಾರಸು ಮಾಡಿದ ಕ್ರಮಗಳು' : language === 'hi' ? 'सुझावित कार्रवाइयां' : 'Suggested Actions'}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {response.follow_up_suggestions.map((chip, idx) => (
@@ -438,7 +438,7 @@ export default function DrishtiPanel({
                   className="w-full mb-2.5 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-[11px] font-bold uppercase tracking-wider hover:bg-red-500/20 transition-all flex items-center justify-center gap-2"
                 >
                   <VolumeX className="w-3.5 h-3.5" />
-                  Stop Voice Output
+                  {language === 'kn' ? 'ಧ್ವನಿ ನಿಲ್ಲಿಸಿ' : language === 'hi' ? 'आवाज़ बंद करें' : 'Stop Voice Output'}
                 </button>
               )}
 
@@ -522,11 +522,17 @@ export default function DrishtiPanel({
                       : isDark ? 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200' : 'bg-slate-100 border-slate-200 text-slate-600'
                   }`}
                 >
-                  🗣️ Hands-Free Talk: {talkToTalk ? 'ON' : 'OFF'}
+                  🗣️ {language === 'kn' ? 'ಹ್ಯಾಂಡ್ಸ್-ಫ್ರೀ:' : language === 'hi' ? 'हैंड्स-फ्री:' : 'Hands-Free:'} {talkToTalk ? 'ON' : 'OFF'}
                 </button>
 
                 <span className={isDark ? 'text-slate-400' : 'text-slate-500'}>
-                  Press <kbd className="px-1 py-0.5 rounded bg-slate-800 text-[9px] text-slate-300 border border-slate-700">Alt+O</kbd> to toggle panel
+                  {language === 'kn' ? (
+                    <>ಪ್ಯಾನಲ್ ತೆರೆಯಲು <kbd className="px-1 py-0.5 rounded bg-slate-800 text-[9px] text-slate-300 border border-slate-700">Alt+O</kbd> ಒತ್ತಿ</>
+                  ) : language === 'hi' ? (
+                    <>पैनल के लिए <kbd className="px-1 py-0.5 rounded bg-slate-800 text-[9px] text-slate-300 border border-slate-700">Alt+O</kbd> दबाएं</>
+                  ) : (
+                    <>Press <kbd className="px-1 py-0.5 rounded bg-slate-800 text-[9px] text-slate-300 border border-slate-700">Alt+O</kbd> to toggle panel</>
+                  )}
                 </span>
               </div>
             </div>

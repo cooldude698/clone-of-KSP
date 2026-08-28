@@ -14,6 +14,7 @@ import { fetchWithFallback } from '@/lib/fetch-with-fallback';
 import { DEMO_FIRS, DEMO_HOTSPOTS } from '@/lib/demo-data';
 import { saveFIRsToStore } from '@/lib/fir-store';
 import InvestigatorWall from '@/components/InvestigatorWall';
+import { useLanguage } from '@/context/LanguageContext';
 
 const CRIME_ICONS = {
   vehicle_theft:   Car,
@@ -47,6 +48,7 @@ function fmtDate(dateStr) {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   // Data State
   const [firs, setFirs] = useState([]);
@@ -115,7 +117,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                Dashboard
+                {t('nav.dashboard', 'Dashboard')}
               </h1>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Karnataka State Police · Sector 4 Tactical Command & Analytics

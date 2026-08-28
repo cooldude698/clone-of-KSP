@@ -8,12 +8,13 @@ import {
   LayoutDashboard, MessageSquare, Map, GitBranch,
   Camera, BarChart2, LogOut, Shield, ChevronLeft, ChevronRight,
   Newspaper, FileText, Server, Search, ChevronDown, Sparkles,
-  User, History, Navigation, Eye, Building2, Scale
+  User, History, Navigation, Eye, Building2, Scale, Globe, Check
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '@/components/ThemeToggle';
 import DrishtiLogo from '@/components/DrishtiLogo';
 import useDrishtiVoice from '@/components/DrishtiVoice'; // hook — must be static import
+import { useLanguage } from '@/context/LanguageContext';
 
 // ── Lazy-loaded heavy components ─────────────────────────────────────────────
 // Deferred so they don't block the initial sidebar + page render.
@@ -24,19 +25,19 @@ const DrishtiPanel = dynamic(() => import('@/components/DrishtiPanel'), { ssr: f
 
 
 const NAV_ITEMS = [
-  { href: '/dashboard', icon: LayoutDashboard, label: 'Overview', id: 'nav-overview' },
-  { href: '/dashboard/chat', icon: MessageSquare, label: 'Co-Pilot Chat', id: 'nav-chat' },
-  { href: '/dashboard/fir', icon: FileText, label: 'FIR Registry', id: 'nav-fir' },
-  { href: '/dashboard/hierarchy', icon: Building2, label: 'KSP Units & HR', id: 'nav-hierarchy' },
-  { href: '/dashboard/statutes', icon: Scale, label: 'Acts & Sections', id: 'nav-statutes' },
-  { href: '/dashboard/suspect', icon: User, label: 'Suspect Roster', id: 'nav-suspect' },
-  { href: '/dashboard/map', icon: Map, label: 'Crime Map', id: 'nav-map' },
-  { href: '/dashboard/network', icon: GitBranch, label: 'Network Graph', id: 'nav-network' },
-  { href: '/dashboard/surveillance', icon: Camera, label: 'Surveillance', id: 'nav-surveillance' },
-  { href: '/dashboard/analytics', icon: BarChart2, label: 'Analytics', id: 'nav-analytics' },
-  { href: '/dashboard/logs', icon: History, label: 'AI Logs', id: 'nav-logs' },
-  { href: '/dashboard/trail', icon: Navigation, label: 'Geo Trail', id: 'nav-trail' },
-  { href: '/dashboard/news', icon: Newspaper, label: 'Live News', id: 'nav-news' },
+  { href: '/dashboard', icon: LayoutDashboard, label: 'Overview', translationKey: 'nav.dashboard', id: 'nav-overview' },
+  { href: '/dashboard/chat', icon: MessageSquare, label: 'Co-Pilot Chat', translationKey: 'nav.chat', id: 'nav-chat' },
+  { href: '/dashboard/fir', icon: FileText, label: 'FIR Registry', translationKey: 'nav.fir', id: 'nav-fir' },
+  { href: '/dashboard/hierarchy', icon: Building2, label: 'KSP Units & HR', translationKey: 'nav.hierarchy', id: 'nav-hierarchy' },
+  { href: '/dashboard/statutes', icon: Scale, label: 'Acts & Sections', translationKey: 'nav.statutes', id: 'nav-statutes' },
+  { href: '/dashboard/suspect', icon: User, label: 'Suspect Roster', translationKey: 'nav.suspect', id: 'nav-suspect' },
+  { href: '/dashboard/map', icon: Map, label: 'Crime Map', translationKey: 'nav.hotspots', id: 'nav-map' },
+  { href: '/dashboard/network', icon: GitBranch, label: 'Network Graph', translationKey: 'nav.network', id: 'nav-network' },
+  { href: '/dashboard/surveillance', icon: Camera, label: 'Surveillance', translationKey: 'nav.surveillance', id: 'nav-surveillance' },
+  { href: '/dashboard/analytics', icon: BarChart2, label: 'Analytics', translationKey: 'nav.analytics', id: 'nav-analytics' },
+  { href: '/dashboard/logs', icon: History, label: 'AI Logs', translationKey: 'nav.logs', id: 'nav-logs' },
+  { href: '/dashboard/trail', icon: Navigation, label: 'Geo Trail', translationKey: 'nav.trail', id: 'nav-trail' },
+  { href: '/dashboard/news', icon: Newspaper, label: 'Live News', translationKey: 'nav.news', id: 'nav-news' },
 ];
 
 function extractRequestedName(queryText) {
@@ -222,7 +223,9 @@ export default function DashboardLayout({ children }) {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [response, setResponse] = useState(null);
   const [conversationId, setConversationId] = useState(null);
-  const [language, setLanguage] = useState('en');
+  const { language, setLanguage, t, supportedLanguages, currentLanguageObj } = useLanguage();
+  const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
+  const langDropdownRef = useRef(null);
   const [greetingText, setGreetingText] = useState('');
   const [hasGreeted, setHasGreeted] = useState(false);
   const [sessionLogs, setSessionLogs] = useState([]);
@@ -871,6 +874,16 @@ export default function DashboardLayout({ children }) {
     return () => clearInterval(t);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (langDropdownRef.current && !langDropdownRef.current.contains(e.target)) {
+        setIsLangDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem('drishti_role');
     localStorage.removeItem('drishti_employee_id');
@@ -887,7 +900,7 @@ export default function DashboardLayout({ children }) {
     <div className="flex h-screen bg-[#F4F5F8] overflow-hidden">
 
       {/* ── MINIMALIST MODERN SIDEBAR ── */}
-      <aside className={`flex flex-col transition-all duration-300 ease-in-out bg-white dark:bg-[#18181B] border-r border-gray-100 dark:border-gray-800 relative z-20 shadow-sm ${collapsed ? 'w-20' : 'w-60'}`}>
+      <aside className={`flex flex-col transition-all duration-300 ease-in-out bg-white dark:bg-[#18181B] border-r border-gray-100 dark:border-gray-800 relative z-20 shadow-sm ${collapsed ? 'w-20' : 'w-64'}`}>
         {/* Brand Header */}
         <div className={`flex items-center px-4 py-5 ${collapsed ? 'justify-center px-2' : 'pr-6'}`}>
           <DrishtiLogo variant={collapsed ? 'icon' : 'compact'} size="md" href="/dashboard" />
@@ -895,8 +908,9 @@ export default function DashboardLayout({ children }) {
 
         {/* Navigation Items */}
         <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
-          {NAV_ITEMS.map(({ href, icon: Icon, label, id }) => {
+          {NAV_ITEMS.map(({ href, icon: Icon, label, translationKey, id }) => {
             const active = isActive(href);
+            const translatedLabel = t(translationKey, label);
             return (
               <Link key={href} href={href} prefetch={true} id={id}
                 className={`flex items-center transition-all duration-150 group relative text-sm font-semibold rounded-2xl
@@ -907,13 +921,13 @@ export default function DashboardLayout({ children }) {
                   ${active
                     ? 'bg-black text-white dark:bg-white dark:text-black shadow-sm'
                     : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/60'}`}
-                title={collapsed ? label : undefined}
+                title={collapsed ? translatedLabel : undefined}
               >
                 <Icon className={`w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-105 ${active ? 'text-white dark:text-black' : 'text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'}`} />
-                {!collapsed && <span className="tracking-normal">{label}</span>}
+                {!collapsed && <span className="tracking-normal truncate">{translatedLabel}</span>}
                 {collapsed && (
                   <div className="absolute left-full ml-3 px-3 py-1.5 rounded-xl bg-gray-900 text-white shadow-xl text-xs font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50">
-                    {label}
+                    {translatedLabel}
                   </div>
                 )}
               </Link>
@@ -929,16 +943,16 @@ export default function DashboardLayout({ children }) {
                 VS
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold text-gray-900 dark:text-white truncate">Insp. {officerName || 'V. Sharma'}</p>
+                <p className="text-xs font-bold text-gray-900 dark:text-white truncate">{t('header.officer', 'Insp.')} {officerName || 'V. Sharma'}</p>
                 <p className="text-[10px] text-gray-400 font-medium truncate">{employeeId || 'KSP-4092'}</p>
               </div>
             </div>
           )}
           <button id="logout-btn" onClick={handleLogout}
             className={`flex items-center gap-2 w-full px-3 py-2 rounded-xl text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all text-xs font-semibold ${collapsed ? 'justify-center' : ''}`}
-            title={collapsed ? 'Logout' : undefined}>
+            title={collapsed ? t('header.sign_out', 'Sign Out') : undefined}>
             <LogOut className="w-4 h-4 flex-shrink-0" />
-            {!collapsed && <span>Sign Out</span>}
+            {!collapsed && <span>{t('header.sign_out', 'Sign Out')}</span>}
           </button>
         </div>
 
@@ -958,17 +972,54 @@ export default function DashboardLayout({ children }) {
             <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
-              placeholder="Search cases, suspects, FIRs..."
+              placeholder={t('header.search_placeholder', 'Search cases, suspects, FIRs...')}
               className="w-full pl-10 pr-4 py-2.5 rounded-full bg-white dark:bg-[#18181B] border border-gray-200/80 dark:border-gray-800 text-xs text-gray-800 dark:text-gray-200 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/5 shadow-xs transition-all"
             />
           </div>
 
           {/* Right Section: Language, Alert Bell, Profile */}
           <div className="flex items-center gap-4">
-            {/* Language Selector */}
-            <div className="hidden sm:flex items-center gap-1 text-xs font-semibold text-gray-600 dark:text-gray-300 cursor-pointer hover:text-black">
-              <span>EN</span>
-              <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+            {/* Interactive Language Selector Dropdown */}
+            <div className="relative" ref={langDropdownRef}>
+              <button
+                type="button"
+                id="language-selector-btn"
+                onClick={() => setIsLangDropdownOpen(prev => !prev)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-[#18181B] border border-gray-200/80 dark:border-gray-800 text-xs font-bold text-gray-700 dark:text-gray-200 hover:border-gray-400 dark:hover:border-gray-600 transition-all shadow-xs cursor-pointer"
+                title="Change System Language (English / ಕನ್ನಡ / हिंदी)"
+              >
+                <Globe className="w-3.5 h-3.5 text-blue-500" />
+                <span>{currentLanguageObj?.short || 'EN'}</span>
+                <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isLangDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 rounded-2xl bg-white dark:bg-[#18181B] border border-gray-100 dark:border-gray-800 shadow-xl py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-3 py-1.5 border-b border-gray-100 dark:border-gray-800 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                    Select Language
+                  </div>
+                  {supportedLanguages.map((l) => (
+                    <button
+                      key={l.id}
+                      onClick={() => {
+                        handleLanguageChange(l.id);
+                        setIsLangDropdownOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-3.5 py-2 text-xs font-semibold transition-colors cursor-pointer text-left ${
+                        language === l.id
+                          ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-bold'
+                          : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/60'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span>{l.flag}</span>
+                        <span>{l.label}</span>
+                      </div>
+                      {language === l.id && <Check className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* AI Assistant Quick Trigger */}
@@ -977,7 +1028,7 @@ export default function DashboardLayout({ children }) {
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-black text-white dark:bg-white dark:text-black text-xs font-bold hover:opacity-90 shadow-sm transition-all cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Drishti AI</span>
+              <span>{t('header.drishti_ai', 'Drishti AI')}</span>
             </button>
 
             {/* Notification Bell */}

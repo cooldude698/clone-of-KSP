@@ -124,16 +124,20 @@ const DrishtiChat = ({
             <div className="flex items-center gap-2">
               {/* Language Selector */}
               <div className="flex items-center gap-1 p-0.5 rounded bg-white/5 border border-white/10">
-                {['en', 'kn'].map((lang) => (
+                {[
+                  { id: 'en', label: 'EN' },
+                  { id: 'kn', label: 'ಕನ್ನಡ' },
+                  { id: 'hi', label: 'हिंदी' },
+                ].map((l) => (
                   <button
-                    key={lang}
-                    onClick={() => onLanguageChange && onLanguageChange(lang)}
+                    key={l.id}
+                    onClick={() => onLanguageChange && onLanguageChange(l.id)}
                     className={`px-1.5 py-0.5 rounded text-[10px] font-semibold transition-all
-                      ${language === lang
+                      ${language === l.id
                         ? 'bg-blue-600 text-white shadow'
                         : 'text-white/50 hover:text-white'}`}
                   >
-                    {lang === 'en' ? 'EN' : 'ಕನ್ನಡ'}
+                    {l.label}
                   </button>
                 ))}
               </div>
