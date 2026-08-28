@@ -46,8 +46,8 @@
     "zcatalyst-sdk-node": "^3.4.0"
   },
   "devDependencies": {
-    "@types/node": "^20.19.43",
-    "@types/react": "^18.3.31",
-    "@types/react-dom": "^18.3.7"
+    "@types/node": "20.17.6",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1"
   }
 }

@@ -116,17 +116,34 @@ for (const cfg of configs) {
   }
 }
 
-// 7. Clean caches to ensure lean zip packaging
+// 7. Clean caches, traces, and source maps to ensure lean zip packaging
 const caches = [
   path.join(rootNext, 'cache'),
   path.join(standaloneNext, 'cache'),
-  path.join(nextDir, '.next', 'cache')
+  path.join(nextDir, '.next', 'cache'),
+  path.join(rootNext, 'trace'),
+  path.join(standaloneNext, 'trace')
 ];
 for (const c of caches) {
   if (fs.existsSync(c)) {
     fs.rmSync(c, { recursive: true, force: true });
   }
 }
+
+function removeSourceMaps(dir) {
+  if (!fs.existsSync(dir)) return;
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      removeSourceMaps(fullPath);
+    } else if (entry.name.endsWith('.map')) {
+      fs.unlinkSync(fullPath);
+    }
+  }
+}
+removeSourceMaps(rootNext);
+removeSourceMaps(standaloneNext);
 
 console.log('--- Slate Build Prepared Successfully with all OpenNext Manifests ---');
 
