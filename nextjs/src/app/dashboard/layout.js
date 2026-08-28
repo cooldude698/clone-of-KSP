@@ -399,7 +399,7 @@ export default function DashboardLayout({ children }) {
     await new Promise(r => setTimeout(r, 300));
 
     // stopListeningAndGetTranscript reads directly from refs (never stale)
-    const finalQuery = stopListeningAndGetTranscript().trim();
+    const finalQuery = (await stopListeningAndGetTranscript()).trim();
     setOrbState('idle');
 
     if (!finalQuery) return;
