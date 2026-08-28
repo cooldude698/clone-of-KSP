@@ -16,6 +16,7 @@ export const TRANSLATIONS = {
     'nav.logs': 'AI Logs',
     'nav.trail': 'Geo Trail',
     'nav.news': 'Live News',
+    'fir.voice_panchanama': 'Voice Panchanama & FIR',
 
     // Header & Actions
     'header.search_placeholder': 'Search cases, suspects, FIRs...',
@@ -81,6 +82,7 @@ export const TRANSLATIONS = {
     'nav.logs': 'ಎಐ ಆಡಿಟ್ ಲಾಗ್‌ಗಳು',
     'nav.trail': 'ಸಂಚಾರ ಪಥ (ಟ್ರಯಲ್)',
     'nav.news': 'ಲೈವ್ ಅಪರಾಧ ಸುದ್ದಿ',
+    'fir.voice_panchanama': 'ಧ್ವನಿ ಸ್ಥಳ ಮಹಜರು & ಎಫ್‌ಐಆರ್',
 
     // Header & Actions
     'header.search_placeholder': 'ಪ್ರಕರಣಗಳು, ಶಂಕಿತರು, ಎಫ್‌ಐಆರ್‌ಗಳನ್ನು ಹುಡುಕಿ...',
@@ -146,6 +148,7 @@ export const TRANSLATIONS = {
     'nav.logs': 'एआई ऑडिट लॉग',
     'nav.trail': 'जियो लोकेशन ट्रेल',
     'nav.news': 'लाइव क्राइम न्यूज़',
+    'fir.voice_panchanama': 'वॉइस पंचनामा और एफआईआर',
 
     // Header & Actions
     'header.search_placeholder': 'मामले, संदिग्ध, एफआईआर खोजें...',

@@ -5,7 +5,8 @@ import Link from 'next/link';
 import {
   FileText, Search, Filter, Plus, Shield, MapPin, Calendar,
   ArrowRight, RefreshCw, Upload, Image as ImageIcon, CheckCircle2,
-  HardDrive, Zap, X, AlertCircle, Car, Laptop, ShieldAlert, Home, Activity
+  HardDrive, Zap, X, AlertCircle, Car, Laptop, ShieldAlert, Home, Activity,
+  Mic, Sparkles
 } from 'lucide-react';
 import { fetchWithFallback } from '@/lib/fetch-with-fallback';
 import { DEMO_FIRS } from '@/lib/demo-data';
@@ -243,6 +244,13 @@ export default function FirRegistryPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
+          <Link
+            href="/dashboard/fir/panchanama"
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs transition-all flex items-center gap-2 shadow-sm cursor-pointer"
+          >
+            <Mic className="w-4 h-4 animate-pulse" />
+            <span>Voice Panchanama & FIR</span>
+          </Link>
           <Link
             href="/dashboard/fir/new"
             className="px-4 py-2 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 font-bold text-xs hover:opacity-90 transition-all flex items-center gap-2 shadow-xs cursor-pointer"

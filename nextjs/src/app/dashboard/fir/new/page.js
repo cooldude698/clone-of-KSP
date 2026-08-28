@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   FileText, Shield, ArrowLeft, Plus, Trash2, CheckCircle2,
-  AlertTriangle, MapPin, User, Scale, Building2, Send, Sparkles
+  AlertTriangle, MapPin, User, Scale, Building2, Send, Sparkles, Mic
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -110,6 +110,29 @@ export default function NewFIRPage() {
             {previewCrimeNo}
           </span>
         </div>
+      </div>
+
+      {/* Voice Auto-Drafter Fast-Track Banner */}
+      <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-900/20 via-indigo-900/20 to-purple-900/20 border border-blue-500/30 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-md">
+            <Mic className="w-5 h-5 animate-pulse" />
+          </div>
+          <div>
+            <h3 className="text-xs font-bold text-slate-900 dark:text-white">
+              Try Voice-to-Panchanama & Court-Ready FIR Drafter
+            </h3>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-sans">
+              Dictate crime scene observations in Kannada or English to automatically draft BNS-compliant Form 1 & Seizure Mahajaru.
+            </p>
+          </div>
+        </div>
+        <Link
+          href="/dashboard/fir/panchanama"
+          className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shrink-0 transition-all shadow-sm"
+        >
+          Open Voice Drafter →
+        </Link>
       </div>
 
       <AnimatePresence>
