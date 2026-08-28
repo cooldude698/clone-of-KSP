@@ -227,35 +227,35 @@ const DrishtiOrb = ({
       }}
     >
 
-      {/* ── TRANSCRIPT / RESPONSE BUBBLE ── */}
-      {!isDismissed && (liveTranscript || pendingTranscript || orbResponse) && (
-        <div className="w-[320px] sm:w-[440px] max-w-[94vw] rounded-2xl overflow-hidden mb-2 animate-fade-in shadow-2xl relative">
+      {/* ── LIVE LISTENING & TRANSCRIPT PILL (Minimalist HUD) ── */}
+      {!isDismissed && (liveTranscript || pendingTranscript) && (
+        <div className="w-80 max-w-[90vw] rounded-2xl overflow-hidden mb-2 animate-fade-in shadow-2xl relative">
           <div
             style={{
-              background: 'rgba(11, 15, 25, 0.88)',
-              backdropFilter: 'blur(28px)',
+              background: 'rgba(15, 23, 42, 0.92)',
+              backdropFilter: 'blur(20px)',
             }}
-            className="px-4 py-3.5 border border-blue-500/20 rounded-2xl relative z-10 text-white shadow-[0_15px_40px_rgba(0,0,0,0.6)]"
+            className="px-3.5 py-2.5 border border-slate-700/80 rounded-2xl relative z-10 text-white shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
           >
             {/* Live transcript while listening */}
             {liveTranscript && !pendingTranscript && (
               <div>
-                <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-1.5">
                     <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
                     <span className="text-[9px] text-blue-400 uppercase tracking-widest font-bold font-mono">
-                      Listening
+                      Listening…
                     </span>
                   </div>
                   <button
                     onClick={handleDismissBubble}
-                    className="text-white/40 hover:text-white hover:bg-white/10 p-1 rounded-full cursor-pointer"
+                    className="text-white/40 hover:text-white hover:bg-white/10 p-0.5 rounded-full cursor-pointer text-xs"
                     title="Dismiss"
                   >
                     ✕
                   </button>
                 </div>
-                <p className="text-xs text-white/90 italic font-medium leading-relaxed">
+                <p className="text-xs text-white/90 italic font-medium leading-relaxed truncate">
                   &quot;{liveTranscript}&quot;
                 </p>
               </div>
@@ -264,80 +264,34 @@ const DrishtiOrb = ({
             {/* Pending transcript confirmation */}
             {pendingTranscript && (
               <div>
-                <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center justify-between mb-1">
                   <span className="text-[9px] text-blue-400 uppercase tracking-widest font-bold font-mono">
                     Did you say:
                   </span>
                   <button
                     onClick={handleDismissBubble}
-                    className="text-white/40 hover:text-white hover:bg-white/10 p-1 rounded-full cursor-pointer"
+                    className="text-white/40 hover:text-white hover:bg-white/10 p-0.5 rounded-full cursor-pointer text-xs"
                     title="Dismiss"
                   >
                     ✕
                   </button>
                 </div>
-                <p className="text-xs text-white font-medium mb-3 leading-relaxed">
+                <p className="text-xs text-white font-medium mb-2.5 leading-relaxed">
                   &quot;{pendingTranscript}&quot;
                 </p>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={(e) => { e.stopPropagation(); onConfirmSend?.(); }}
-                    className="flex-1 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all shadow-md"
+                    className="flex-1 py-1 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all shadow-sm"
                   >
                     Send Query
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); onCancelTranscript?.(); }}
-                    className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white/70 text-[10px] font-bold rounded-lg transition-all"
+                    className="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white/70 text-[10px] font-bold rounded-lg transition-all"
                   >
                     Cancel
                   </button>
-                </div>
-              </div>
-            )}
-
-            {/* Voice response bubble */}
-            {!liveTranscript && !pendingTranscript && orbResponse && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between pb-1.5 border-b border-white/10">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
-                    <span className="text-[9px] text-cyan-300 uppercase tracking-widest font-bold font-mono">
-                      DRISHTI INTELLIGENCE BRIEFING
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {onReadAloud && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onReadAloud(); }}
-                        className="text-white/60 hover:text-cyan-300 hover:bg-white/10 px-1.5 py-0.5 rounded text-[10px] flex items-center gap-1 cursor-pointer transition-all"
-                        title="Read Aloud"
-                      >
-                        🔊
-                      </button>
-                    )}
-                    {onOpenPanel && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onOpenPanel(); }}
-                        className="text-white/60 hover:text-cyan-300 hover:bg-white/10 px-1.5 py-0.5 rounded text-[10px] flex items-center gap-0.5 cursor-pointer transition-all font-mono"
-                        title="Open Full Dossier Panel"
-                      >
-                        ↗ Panel
-                      </button>
-                    )}
-                    <button
-                      onClick={handleDismissBubble}
-                      className="text-white/40 hover:text-white hover:bg-white/10 p-1 rounded-full cursor-pointer ml-1"
-                      title="Dismiss"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                </div>
-
-                {/* Render Rich Intelligence Response */}
-                <div className="max-h-[50vh] overflow-y-auto drishti-scrollbar pr-1">
-                  <PoliceIntelligenceRenderer text={orbResponse} isDark={true} mode="bubble" />
                 </div>
               </div>
             )}

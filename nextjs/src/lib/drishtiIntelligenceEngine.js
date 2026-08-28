@@ -6,8 +6,8 @@
  * criminal network link analysis, BNS/IPC legal mappings, and tactical recommendations.
  */
 
-import { DEMO_FIRS } from './demo-data';
-import { UPLOADED_FIRS } from './uploadedFirsStore';
+import { DEMO_FIRS } from './demo-data.js';
+import { UPLOADED_FIRS } from './uploadedFirsStore.js';
 
 // All active Karnataka State Police districts
 const DISTRICTS = [
@@ -311,8 +311,7 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
       };
     }
 
-    let out = `Sir, here is the certified CCTNS incident report on the **Latest Registered Vehicle Theft Case**:\n\n`;
-    out += `### 📋 Case Docket: [${latestCase.case_number}](/dashboard/fir/${encodeURIComponent(latestCase.case_number)})\n\n`;
+    let out = `### 📋 Case Docket: [${latestCase.case_number}](/dashboard/fir/${encodeURIComponent(latestCase.case_number)})\n\n`;
     out += `| Parameter | Incident & Intelligence Details |\n`;
     out += `| :--- | :--- |\n`;
     out += `| **Crime Category** | **${latestCase.crime_type}** (IPC §379 / BNS §303) |\n`;
@@ -352,8 +351,7 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
     const latestCase = drugFirs[0] || allFirs[3];
     const suspect = SUSPECTS_INTEL.find(s => s.name.includes('Imran')) || SUSPECTS_INTEL[1];
 
-    let out = `Sir, here is the verified narcotics intelligence briefing on our **Latest Drug Offence Case**:\n\n`;
-    out += `### 📋 Active Case: [${latestCase.case_number}](/dashboard/fir/${encodeURIComponent(latestCase.case_number)})\n`;
+    let out = `### 📋 Active Narcotics Incident: [${latestCase.case_number}](/dashboard/fir/${encodeURIComponent(latestCase.case_number)})\n`;
     out += `- **Offense:** Commercial MDMA & Synthetic Narcotics Contraband (NDPS §21(c) / §29)\n`;
     out += `- **Jurisdiction:** ${latestCase.police_station} (${latestCase.district_name})\n`;
     out += `- **Occurrence:** ${latestCase.location_name} at ${latestCase.time_filed} hrs\n`;
@@ -429,7 +427,7 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
       };
     }
 
-    let out = `Sir, here is the verified tactical intelligence report on our **Top Priority Clearance Targets & Repeat Offender Syndicates**:\n\n`;
+    let out = `### Top Priority Clearance Targets & Repeat Offenders\n\n`;
     criticalSuspects.forEach((s, idx) => {
       out += `### ${idx + 1}. ${s.name} (Alias: "${s.alias}") — \`${s.cctns_id}\`\n`;
       out += `- **Threat Assessment:** Risk Score **\`${s.risk_score}/100\`** (${s.risk_level} Gravity)\n`;
@@ -470,7 +468,7 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
       (f.description || '').toLowerCase().includes(matchedSuspect.name.toLowerCase())
     );
 
-    let out = `Sir, here is the complete active dossier for **${matchedSuspect.name}** (Alias: *"${matchedSuspect.alias}"* | \`${matchedSuspect.cctns_id}\`):\n\n`;
+    let out = `### Active Target Dossier: **${matchedSuspect.name}** ("${matchedSuspect.alias}" | \`${matchedSuspect.cctns_id}\`)\n\n`;
     out += `| Parameter | Intelligence Record |\n`;
     out += `| :--- | :--- |\n`;
     out += `| **Threat Rating** | \`${matchedSuspect.risk_score}/100\` (${matchedSuspect.risk_level} Gravity) |\n`;
@@ -521,7 +519,7 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
     }
 
     if (targetCase) {
-      let out = `Sir, here is the certified CCTNS case summary for **${targetCase.case_number}**:\n\n`;
+      let out = `### CCTNS Case Record: **${targetCase.case_number}**\n\n`;
       out += `- **Case Registration:** \`${targetCase.case_number}\` (Crime No: \`${targetCase.crime_no || 'N/A'}\`)\n`;
       out += `- **Crime Classification:** **${targetCase.crime_type || targetCase.crime_type_code}** (${targetCase.gravity || 'Heinous'})\n`;
       out += `- **Police Station:** ${targetCase.police_station} (${targetCase.district_name})\n`;
@@ -557,7 +555,7 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
     const targetDistrict = DISTRICTS.find(d => q.includes(d.toLowerCase().split(' ')[0])) || 'Bengaluru Urban';
     const districtFirs = allFirs.filter(f => (f.district_name || '').toLowerCase().includes(targetDistrict.toLowerCase().split(' ')[0]));
 
-    let out = `Sir, here is the geospatial crime cluster analysis for **${targetDistrict}** & High-Density Hotspots:\n\n`;
+    let out = `### Geospatial Hotspot Analysis: **${targetDistrict}**\n\n`;
     out += `1. **Silk Board Junction Corridor (Bengaluru South)**\n`;
     out += `   - Primary Vector: Inter-District Vehicle Theft (38% volume) & Transit Fencing.\n`;
     out += `   - Vulnerability Window: 22:00 hrs – 04:00 hrs (Peak Night Hours).\n`;
@@ -604,7 +602,7 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
 
     const sop = LEGAL_SOPS[sopKey];
 
-    let out = `Sir, here is the official **Karnataka State Police Standard Operating Procedure (SOP)** for **${sop.title}**:\n\n`;
+    let out = `### Standard Operating Procedure (SOP): **${sop.title}**\n\n`;
     out += `### Governing Legal Framework:\n`;
     sop.acts.forEach(a => { out += `- **${a}**\n`; });
     out += `\n### Mandatory Investigation Steps:\n`;
@@ -628,15 +626,14 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
   // ── 8. DEFAULT DEEP POLICE INTELLIGENCE SYNTHESIS (FALLBACK) ────────────────
   const topSuspects = SUSPECTS_INTEL.slice(0, 3);
   
-  let out = `Sir, here is the active tactical intelligence assessment from the DRISHTI KSP Command Grid regarding your query:\n\n`;
-  out += `### 1. Operational Surveillance & CCTNS Status:\n`;
+  let out = `### 1. Operational Surveillance & CCTNS Status:\n`;
   out += `- **Synchronized Cases:** 51 active FIR dockets indexed across 6 key Karnataka districts.\n`;
   out += `- **High-Gravity Offence Distribution:** Vehicle Theft (38%), Commercial Narcotics (22%), Armed Robbery (20%), Cyber Extortion (20%).\n`;
   out += `- **Statewide Surveillance Grid:** 450+ ANPR cameras active with 98.4% uptime.\n\n`;
 
   out += `### 2. Immediate High-Priority Clearance Targets:\n`;
   topSuspects.forEach((s, idx) => {
-    out += `${idx + 1}. **${s.name}** (Alias: *"${s.alias}"*) — Risk Score: \`${s.risk_score}/100\` | Last Sighting: ${s.last_known_location} (${s.last_known_vehicle})\n`;
+    out += `${idx + 1}. **${s.name}** ("${s.alias}") — Risk Score: \`${s.risk_score}/100\` | Last Sighting: ${s.last_known_location} (${s.last_known_vehicle})\n`;
   });
 
   out += `\n### 3. Recommended Tactical Action:\n`;

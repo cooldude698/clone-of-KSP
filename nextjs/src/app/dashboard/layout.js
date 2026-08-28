@@ -205,6 +205,9 @@ export default function DashboardLayout({ children }) {
     // Dismiss proactive suggestion if open
     setProactiveSuggestion(null);
 
+    // Open Copilot side drawer so answers are cleanly displayed without floating obstructions
+    setIsPanelOpen(true);
+
     setOrbState('thinking');
     setStateOverrideLabel('Thinking…');
     setSessionLogs(prev => [...prev, { role: 'user', content: queryText, timestamp: ts() }]);
