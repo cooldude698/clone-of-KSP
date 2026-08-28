@@ -22,6 +22,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
+    optimizeCss: false,
     optimizePackageImports: ['lucide-react', 'framer-motion', 'recharts', 'date-fns'],
   },
   async rewrites() {
