@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTheme } from 'next-themes';
 import { AgentAudioVisualizerAura } from '@/components/agents-ui/agent-audio-visualizer-aura';
+import PoliceIntelligenceRenderer from '@/components/PoliceIntelligenceRenderer';
 
 const cn = (...classes) => classes.filter(Boolean).join(' ');
 
@@ -65,6 +66,7 @@ const DrishtiOrb = ({
   liveTranscript = '',
   onReadAloud,
   onDismissResponse,
+  onOpenPanel,
   isMuted = false,
   onToggleMute,
 }) => {
@@ -227,13 +229,13 @@ const DrishtiOrb = ({
 
       {/* ── TRANSCRIPT / RESPONSE BUBBLE ── */}
       {!isDismissed && (liveTranscript || pendingTranscript || orbResponse) && (
-        <div className="w-72 rounded-2xl overflow-hidden mb-1 animate-fade-in shadow-2xl relative">
+        <div className="w-[320px] sm:w-[440px] max-w-[94vw] rounded-2xl overflow-hidden mb-2 animate-fade-in shadow-2xl relative">
           <div
             style={{
-              background: 'rgba(10, 10, 15, 0.75)',
-              backdropFilter: 'blur(24px)',
+              background: 'rgba(11, 15, 25, 0.88)',
+              backdropFilter: 'blur(28px)',
             }}
-            className="px-4 py-3.5 border border-white/10 rounded-2xl relative z-10 text-white"
+            className="px-4 py-3.5 border border-blue-500/20 rounded-2xl relative z-10 text-white shadow-[0_15px_40px_rgba(0,0,0,0.6)]"
           >
             {/* Live transcript while listening */}
             {liveTranscript && !pendingTranscript && (
@@ -296,24 +298,47 @@ const DrishtiOrb = ({
 
             {/* Voice response bubble */}
             {!liveTranscript && !pendingTranscript && orbResponse && (
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between pb-1.5 border-b border-white/10">
                   <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                    <span className="text-[9px] text-cyan-400 uppercase tracking-widest font-bold font-mono">
-                      DRISHTI INTELLIGENCE
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
+                    <span className="text-[9px] text-cyan-300 uppercase tracking-widest font-bold font-mono">
+                      DRISHTI INTELLIGENCE BRIEFING
                     </span>
                   </div>
-                  <button
-                    onClick={handleDismissBubble}
-                    className="text-white/40 hover:text-white hover:bg-white/10 p-1 rounded-full cursor-pointer"
-                  >
-                    ✕
-                  </button>
+                  <div className="flex items-center gap-1">
+                    {onReadAloud && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onReadAloud(); }}
+                        className="text-white/60 hover:text-cyan-300 hover:bg-white/10 px-1.5 py-0.5 rounded text-[10px] flex items-center gap-1 cursor-pointer transition-all"
+                        title="Read Aloud"
+                      >
+                        🔊
+                      </button>
+                    )}
+                    {onOpenPanel && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onOpenPanel(); }}
+                        className="text-white/60 hover:text-cyan-300 hover:bg-white/10 px-1.5 py-0.5 rounded text-[10px] flex items-center gap-0.5 cursor-pointer transition-all font-mono"
+                        title="Open Full Dossier Panel"
+                      >
+                        ↗ Panel
+                      </button>
+                    )}
+                    <button
+                      onClick={handleDismissBubble}
+                      className="text-white/40 hover:text-white hover:bg-white/10 p-1 rounded-full cursor-pointer ml-1"
+                      title="Dismiss"
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </div>
-                <p className="text-xs text-white/95 leading-relaxed font-normal">
-                  {orbResponse}
-                </p>
+
+                {/* Render Rich Intelligence Response */}
+                <div className="max-h-[50vh] overflow-y-auto drishti-scrollbar pr-1">
+                  <PoliceIntelligenceRenderer text={orbResponse} isDark={true} mode="bubble" />
+                </div>
               </div>
             )}
           </div>

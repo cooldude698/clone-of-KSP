@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useTheme } from 'next-themes';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Send, X, Volume2, VolumeX, History, Pin, Sun, Moon, Bot, MessageSquare, ShieldAlert, Cpu } from 'lucide-react';
+import PoliceIntelligenceRenderer from '@/components/PoliceIntelligenceRenderer';
 
 /** Typewriter — reveals text character by character */
 function useTypewriter(text, speed = 14) {
@@ -314,7 +315,11 @@ export default function DrishtiPanel({
                       <span className="text-[9px] font-mono">{log.timestamp}</span>
                     </div>
 
-                    <p className="whitespace-pre-wrap leading-relaxed">{log.content}</p>
+                    {log.role === 'user' ? (
+                      <p className="whitespace-pre-wrap leading-relaxed">{log.content}</p>
+                    ) : (
+                      <PoliceIntelligenceRenderer text={log.content} isDark={isDark} mode="panel" />
+                    )}
 
                     {/* Audio buttons for Assistant messages */}
                     {log.role === 'assistant' && (
@@ -367,7 +372,7 @@ export default function DrishtiPanel({
                       )}
                     </div>
 
-                    <ResponseText text={displayed} isTyping={!done} isDark={isDark} />
+                    <PoliceIntelligenceRenderer text={displayed} isDark={isDark} mode="panel" isTyping={!done} />
 
                     {/* Audio Playback Toolbar */}
                     {done && (

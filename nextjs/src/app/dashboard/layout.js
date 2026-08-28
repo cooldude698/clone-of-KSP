@@ -15,6 +15,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import DrishtiLogo from '@/components/DrishtiLogo';
 import useDrishtiVoice from '@/components/DrishtiVoice'; // hook — must be static import
 import { useLanguage } from '@/context/LanguageContext';
+import { cleanTextForSpeech } from '@/lib/speechUtils';
 
 // ── Lazy-loaded heavy components ─────────────────────────────────────────────
 // Deferred so they don't block the initial sidebar + page render.
@@ -232,7 +233,7 @@ export default function DashboardLayout({ children }) {
       setOrbResponse(reply);
 
       const ttsLang = targetLang === 'kn' ? 'kn-IN' : targetLang === 'hi' ? 'hi-IN' : 'en-IN';
-      const clean = reply.replace(/[|*#`]/g, ' ').replace(/\s+/g, ' ').trim();
+      const clean = cleanTextForSpeech(reply);
       safeSpeak(clean, ttsLang);
 
       // After 1.8s, automatically fire a follow-up intel query for this page
@@ -312,7 +313,7 @@ export default function DashboardLayout({ children }) {
         // Pass data.language so TTS uses the correct locale
         const ttsLang = (data.language || targetLang) === 'kn' ? 'kn-IN' : (data.language || targetLang) === 'hi' ? 'hi-IN' : 'en-IN';
         const spokenText = data.spokenAnswer || text;
-        const clean = spokenText.replace(/[|*#`]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 800);
+        const clean = cleanTextForSpeech(spokenText);
         safeSpeak(clean, ttsLang);
       } else {
         setOrbState('idle');
@@ -479,7 +480,7 @@ export default function DashboardLayout({ children }) {
     try {
       window.speechSynthesis.cancel();
       const targetLang = lang || 'en-IN';
-      const cleanText = (text || '').replace(/[*#_`]/g, ' ').replace(/\s+/g, ' ').trim();
+      const cleanText = cleanTextForSpeech(text);
       if (!cleanText) return;
 
       const utt = new SpeechSynthesisUtterance(cleanText);
@@ -1023,6 +1024,7 @@ export default function DashboardLayout({ children }) {
             setOrbState('speaking');
             safeSpeak(orbResponse, getLocale(language));
           }}
+          onOpenPanel={openPanel}
           onDismissResponse={() => {
             setOrbResponse('');
             stopSpeaking();
