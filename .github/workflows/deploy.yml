@@ -27,7 +27,7 @@ jobs:
 
       - name: 📦 Install Frontend Dependencies
         working-directory: ./nextjs
-        run: npm ci
+        run: npm install --legacy-peer-deps
 
       - name: 🔨 Build Next.js Web App (Catalyst Slate / AppSail Artifacts)
         working-directory: ./nextjs
