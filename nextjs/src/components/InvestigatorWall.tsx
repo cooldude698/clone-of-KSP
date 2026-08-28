@@ -356,6 +356,42 @@ export default function InvestigatorWall({
               const media = getSuspectMedia(item.full_name || item.alias || 'Suspect');
               const isHighRisk = item.risk_score >= 75;
 
+              const femaleKeywords = [
+                'mahika', 'bhavani', 'saanvi', 'anamika', 'meghana', 'sanya', 'janaki', 
+                'vaishnavi', 'bhavna', 'radha', 'anika', 'nidhi', 'sanyukta', 'dara', 
+                'karpe', 'sen', 'bora', 'menon', 'bhatia', 'virk', 'sastry', 'pandey', 
+                'konda', 'kumer', 'aggarwal', 'sule', 'din', 'dhaliwal'
+              ];
+              const isFemale = femaleKeywords.some(kw => (item.full_name || '').toLowerCase().includes(kw));
+              const correctGender = (item.gender && item.gender.toLowerCase() === 'female') || isFemale ? 'Female' : 'Male';
+
+              const femalePhotos = [
+                'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=400&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&auto=format&fit=crop&q=80'
+              ];
+
+              const malePhotos = [
+                'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&auto=format&fit=crop&q=80'
+              ];
+
+              const isMugshotFemale = femalePhotos.some(p => (media.mugshot || '').includes('1580489944761') || (media.mugshot || '').includes('1573496359142') || (media.mugshot || '').includes('1544005313') || (media.mugshot || '').includes('1567532939604') || (media.mugshot || '').includes('1517841905240'));
+
+              let mugshotUrl = media.mugshot;
+              if (correctGender === 'Female' && !isMugshotFemale) {
+                mugshotUrl = femalePhotos[idx % femalePhotos.length];
+              } else if (correctGender === 'Male' && isMugshotFemale) {
+                mugshotUrl = malePhotos[idx % malePhotos.length];
+              }
+
               return (
                 <motion.div
                   key={`${item.full_name}-${idx}`}
@@ -367,7 +403,7 @@ export default function InvestigatorWall({
                     <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-slate-100 border-2 border-slate-300 shrink-0 shadow-xs">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={media.mugshot}
+                        src={mugshotUrl}
                         alt={item.full_name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         loading="lazy"
@@ -410,7 +446,7 @@ export default function InvestigatorWall({
                   </div>
                   <div>
                     <span className="text-[9px] text-slate-400 uppercase tracking-widest block mb-0.5 font-bold">Gender</span>
-                    <span className="font-semibold text-slate-700">{item.gender || "Not Specified"}</span>
+                    <span className="font-semibold text-slate-700">{correctGender}</span>
                   </div>
                   <div>
                     <span className="text-[9px] text-slate-400 uppercase tracking-widest block mb-0.5 font-bold">Occupation</span>

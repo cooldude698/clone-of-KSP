@@ -108,7 +108,6 @@ function buildNetworkFromFirs(firsList) {
       crime_type: crimeCode
     });
 
-    // Interlink with previous FIR of same crime type
     if (prevByCrime[crimeCode]) {
       firEdges.push({
         id: `e-link-${idx}`,
@@ -140,7 +139,6 @@ function buildNetworkFromFirs(firsList) {
   };
 }
 
-// Gang Attack Prediction Model Dataset
 const GANG_PREDICTIONS = [
   {
     id: 'PRED-01',
@@ -179,13 +177,10 @@ export default function NetworkPage() {
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [viewMode, setViewMode] = useState('split'); // 'split' | 'graph' | 'map' | 'prediction'
+  const [viewMode, setViewMode] = useState('split');
   const [activePrediction, setActivePrediction] = useState(GANG_PREDICTIONS[0]);
+  const [timeFilter, setTimeFilter] = useState('all');
 
-  // Date Range Filter State
-  const [timeFilter, setTimeFilter] = useState('all'); // 'all' | '2024' | '2026'
-
-  // InvestigatorWall state
   const [activeCaseData, setActiveCaseData] = useState(null);
   const [loadingCase, setLoadingCase] = useState(false);
 
@@ -193,8 +188,8 @@ export default function NetworkPage() {
     const fetchNetworkData = async () => {
       const res = await fetchWithFallback('/api/firs', DEMO_FIRS, { timeoutMs: 2000 });
       let firsList = [];
-      if (Array.isArray(res?.data?.firs) && res.data.firs.length >= 50) firsList = res.data.firs;
-      else if (Array.isArray(res?.data) && res.data.length >= 50) firsList = res.data;
+      if (Array.isArray(res?.data?.firs) && res.data.firs.length >= 10) firsList = res.data.firs;
+      else if (Array.isArray(res?.data) && res.data.length >= 10) firsList = res.data;
       else firsList = DEMO_FIRS.firs;
 
       const fullGraph = buildNetworkFromFirs(firsList);
@@ -206,7 +201,6 @@ export default function NetworkPage() {
     fetchNetworkData();
   }, []);
 
-  // Dynamically Filtered Edges based on timeFilter
   const filteredEdges = useMemo(() => {
     if (timeFilter === 'all') return edges;
     return edges.filter(e => {
@@ -220,81 +214,71 @@ export default function NetworkPage() {
     setPanelOpen(true);
     setLoadingCase(true);
 
-    const storedFir = getFIRFromStore(nodeId);
-    const clickedNode = nodes.find(n => n.id === nodeId);
-    const labelName = clickedNode ? clickedNode.label.replace(/\n/g, ' - ') : 'Case Record';
-
-    if (storedFir || (nodeId && nodeId.includes('/'))) {
-      const firData = storedFir || DEMO_FIRS.firs.find(f => f.case_number === nodeId) || {
-        case_number: nodeId,
-        crime_type: clickedNode?.crime_types?.[0] || 'vehicle_theft',
-        date_filed: clickedNode?.first_crime_date || '2024-06-01',
-        location_name: clickedNode?.district || 'Bengaluru Urban',
-        case_status: 'open',
-        description: `Official CCTNS FIR case entry for ${nodeId}. Interlinked on criminal intelligence network.`,
-        police_station: 'KSP Command Center PS'
-      };
-
-      setActiveCaseData({
-        fir: firData,
-        accused: [
-          {
-            full_name: firData.accused_name || firData.investigation_office || 'Primary Suspect',
-            alias: 'Accused',
-            age: 32,
-            gender: 'Male',
-            prior_convictions: 4,
-            modus_operandi: firData.description || 'Repeat offense recorded in CCTNS database.',
-            risk_score: firData.risk_score || 85,
-          }
-        ],
-        victims: [
-          { full_name: 'Complainant', age: 38, gender: 'Male', occupation: 'Citizen', district_name: firData.district_name || 'Karnataka', vulnerability_score: 60 }
-        ],
-        related_firs: [
-          { case_number: firData.case_number, crime_type: firData.crime_type_code || 'crime', date_filed: firData.date_filed || '2024-06-01', link_reason: 'Interlinked CCTNS Case' }
-        ],
-        case_summary: `Official CCTNS Network Dossier for FIR ${firData.case_number}. Dynamic network correlation verified across district hubs.`
-      });
-    } else {
-      setActiveCaseData({
-        fir: {
-          case_number: `SUSPECT-DOSSIER-${nodeId}`,
-          crime_type: clickedNode?.crime_types?.[0] || 'organized_crime',
-          date_filed: '2024-06-01',
-          location_name: clickedNode?.district || 'Karnataka State',
-          case_status: 'under_surveillance',
-          description: `Criminal Profile for ${labelName}. Key node in inter-district syndicate network.`,
-          police_station: 'KSP Intelligence Cell'
-        },
-        accused: [
-          {
-            full_name: labelName,
-            alias: clickedNode?.role || 'Syndicate Leader',
-            age: 34,
-            gender: 'Male',
-            prior_convictions: clickedNode?.total_firs || 6,
-            modus_operandi: `Coordinates crime operations across ${clickedNode?.district || 'multiple sectors'}.`,
-            risk_score: clickedNode?.risk_score || 90,
-          }
-        ],
-        victims: [
-          { full_name: 'State of Karnataka', age: 0, gender: 'N/A', occupation: 'Public Sector', district_name: 'Karnataka', vulnerability_score: 90 }
-        ],
-        related_firs: [
-          { case_number: 'KAR/BEN/2024/1726', crime_type: 'drug_offence', date_filed: '2024-06-01', link_reason: 'Primary Syndicate Link' },
-          { case_number: 'KAR/RAI/2024/0123', crime_type: 'vehicle_theft', date_filed: '2024-06-01', link_reason: 'Vehicle Theft Hub' }
-        ],
-        case_summary: `Full Suspect Dossier & Network Mapping for ${labelName}.`
-      });
+    let storedFir = getFIRFromStore(nodeId);
+    if (!storedFir) {
+      storedFir = DEMO_FIRS.firs.find(f => f.case_number === nodeId || f.case_number?.includes(nodeId));
     }
+
+    const clickedNode = nodes.find(n => n.id === nodeId);
+    if (!storedFir && clickedNode) {
+      const accusedName = clickedNode.label?.replace(/\n.*/, '')?.trim();
+      storedFir = DEMO_FIRS.firs.find(f => 
+        (f.accused_name && f.accused_name.toLowerCase().includes(accusedName.toLowerCase())) ||
+        (f.case_number && f.case_number.includes(nodeId))
+      );
+    }
+
+    const firData = storedFir || DEMO_FIRS.firs[0];
+    const accusedPersonName = firData.accused_name || clickedNode?.label || 'Vikram Malhotra';
+
+    setActiveCaseData({
+      fir: {
+        case_number: firData.case_number || nodeId,
+        crime_type: firData.crime_type || firData.crime_type_code || 'vehicle_theft',
+        date_filed: firData.date_filed || '2024-06-01',
+        location_name: firData.location_name || firData.district_name || 'Bengaluru Urban',
+        case_status: firData.status || firData.case_status || 'open',
+        description: firData.description || 'Verified CCTNS first information report statement filed at Karnataka State Police command center.',
+        police_station: firData.police_station || 'KSP Intelligence Cell PS',
+        district_name: firData.district_name || 'Bengaluru Urban'
+      },
+      accused: [
+        {
+          full_name: accusedPersonName,
+          alias: 'The Snake',
+          age: 34,
+          gender: ['mahika', 'bhavani', 'saanvi', 'anamika', 'meghana', 'sanya', 'janaki', 'vaishnavi', 'bhavna', 'radha'].some(fn => (accusedPersonName || '').toLowerCase().includes(fn)) ? 'Female' : 'Male',
+          district_name: firData.district_name || 'Bengaluru Urban',
+          occupation: 'Fence / Chopshop Logistics',
+          prior_convictions: 6,
+          risk_score: firData.risk_score || 88,
+          modus_operandi: firData.description || 'Inter-district night heist using fake ANPR plates.'
+        }
+      ],
+      victims: [
+        {
+          full_name: firData.complainant_name || 'KSP Commercial Unit',
+          age: 42,
+          gender: 'Male',
+          occupation: 'Citizen / Commercial Unit',
+          district_name: firData.district_name || 'Bengaluru Urban',
+          vulnerability_score: 65
+        }
+      ],
+      related_firs: [
+        { case_number: 'KAR/BEN/2024/1726', crime_type: 'drug_offence', date_filed: '2024-06-01', link_reason: 'Primary Syndicate Link' },
+        { case_number: 'KAR/RAI/2024/0123', crime_type: 'vehicle_theft', date_filed: '2024-06-01', link_reason: 'Vehicle Theft Hub' }
+      ],
+      case_summary: firData.description || 'Official CCTNS Network Dossier verified across district hubs.'
+    });
+
     setLoadingCase(false);
   };
 
   return (
     <div className="flex flex-col h-full min-h-screen p-5 sm:p-7 max-w-[1700px] mx-auto text-[var(--text-primary)] font-sans">
       
-      {/* ── TOP EXECUTIVE TITLE BAR ────────────────────────────────────────── */}
+      {/* TOP TITLE BAR */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]/50">
         <div>
           <div className="flex items-center gap-2.5">
@@ -312,7 +296,6 @@ export default function NetworkPage() {
 
         {/* View Switcher & Time Window Filter */}
         <div className="flex items-center gap-3 flex-wrap">
-          {/* Time Filter Pills */}
           <div className="flex items-center gap-1 bg-[var(--surface-1)] p-1 rounded-xl border border-[var(--border)]/50 text-xs font-semibold">
             <span className="text-[10px] text-[var(--text-secondary)] uppercase font-bold px-2">Window:</span>
             {['all', '2025', '2026'].map((t) => (
@@ -330,7 +313,6 @@ export default function NetworkPage() {
             ))}
           </div>
 
-          {/* View Mode Tabs */}
           <div className="flex items-center gap-1 bg-[var(--surface-1)] p-1 rounded-xl border border-[var(--border)]/50 text-xs font-semibold">
             <button
               onClick={() => setViewMode('split')}
@@ -349,7 +331,7 @@ export default function NetworkPage() {
               }`}
             >
               <Share2 className="w-3.5 h-3.5" />
-              <span>Network Graph</span>
+              <span>Graph Only</span>
             </button>
 
             <button
@@ -359,143 +341,88 @@ export default function NetworkPage() {
               }`}
             >
               <MapPin className="w-3.5 h-3.5" />
-              <span>Spatial Map</span>
+              <span>Map Only</span>
             </button>
 
             <button
               onClick={() => setViewMode('prediction')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg cursor-pointer transition-all ${
-                viewMode === 'prediction' ? 'bg-rose-600 text-white font-bold shadow-sm' : 'text-rose-600 hover:bg-rose-50'
+                viewMode === 'prediction' ? 'bg-rose-600 text-white font-bold shadow-sm' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
-              <Zap className="w-3.5 h-3.5" />
-              <span>Attack Forecast</span>
+              <Zap className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+              <span>Threat Forecast</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* ── GANG ATTACK PREDICTION MODEL & RISK MATRIX (HERO FORECAST BANNER) ─────── */}
-      <div className="mt-4 p-5 rounded-2xl bg-gradient-to-r from-[var(--surface-1)] via-[var(--surface-1)] to-[var(--surface-2)] border border-[var(--border)]/50 shadow-sm space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[var(--border)]/40">
-          <div className="flex items-center gap-2">
-            <ShieldAlert className="w-5 h-5 text-rose-600 animate-pulse" />
-            <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--text-primary)] font-heading">
-              DRISHTI Gang Attack Forecast & Predictive Threat Model
-            </h2>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold text-rose-600 bg-rose-50 dark:bg-rose-900/20 px-2.5 py-0.5 rounded border border-rose-300 dark:border-rose-700">
-              HIGH PROBABILITY FORECAST (87%)
-            </span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-          <div className="p-3.5 rounded-xl bg-[var(--surface-0)] border border-[var(--border)]/40 space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">Imminent Target Corridor</span>
-            <p className="font-extrabold text-sm text-[var(--text-primary)]">{activePrediction.predicted_location}</p>
-            <p className="text-[11px] font-semibold text-rose-600">Predicted Window: {activePrediction.predicted_window}</p>
-          </div>
-
-          <div className="p-3.5 rounded-xl bg-[var(--surface-0)] border border-[var(--border)]/40 space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">Primary Crime Vector & MO</span>
-            <p className="font-bold text-xs text-[var(--text-primary)]">{activePrediction.primary_crime}</p>
-            <p className="text-[11px] text-[var(--text-secondary)] leading-tight">{activePrediction.vector_summary}</p>
-          </div>
-
-          <div className="p-3.5 rounded-xl bg-[var(--surface-0)] border border-[var(--border)]/40 space-y-1 flex flex-col justify-between">
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">Counter-Patrol Action Plan</span>
-              <p className="text-[11px] font-medium text-[var(--text-primary)] mt-0.5">{activePrediction.suggested_action}</p>
-            </div>
-            <button
-              onClick={() => router.push('/dashboard/map')}
-              className="w-full py-1.5 rounded-lg bg-blue-600 text-white font-bold text-[11px] flex items-center justify-center gap-1 cursor-pointer hover:bg-blue-700 transition-colors mt-2"
-            >
-              <span>Deploy GIS Patrol Route</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* ── MAIN BODY VIEWS ─────────────────────────────────────────────────── */}
-      <div className="flex-1 mt-6">
+      {/* MAIN WORKSPACE CONTENT */}
+      <div className="mt-5 flex-1 flex flex-col">
         {viewMode === 'split' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-            {/* Left: D3 Chrono Criminal Graph */}
-            <div className="rounded-2xl overflow-hidden border border-[var(--border)]/50 bg-[var(--surface-1)] p-4 shadow-sm space-y-3">
-              <div className="flex items-center justify-between px-1">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch flex-1">
+            <div className="lg:col-span-7 flex flex-col rounded-2xl overflow-hidden border border-[var(--border)]/50 bg-[var(--surface-1)] shadow-sm p-4">
+              <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]/40 mb-3">
                 <div className="flex items-center gap-2">
                   <Share2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  <h3 className="text-xs font-bold font-heading uppercase tracking-wider text-[var(--text-primary)]">
+                  <span className="text-xs font-bold font-heading text-[var(--text-primary)] uppercase tracking-wider">
                     Co-Accused Network Graph ({nodes.length} Nodes · {filteredEdges.length} Links)
-                  </h3>
+                  </span>
                 </div>
-                <span className="text-[10px] font-mono font-semibold text-[var(--text-secondary)]">Click suspect to open dossier</span>
+                <span className="text-[10px] font-mono text-[var(--text-secondary)]">Click suspect to open dossier</span>
               </div>
-              <ChronoCriminalGraph
-                nodes={nodes}
-                edges={filteredEdges}
-                date_range={{ min: '2024-01-01', max: '2026-12-31' }}
-                onNodeClick={handleNodeClick}
-                height={560}
-              />
+              <div className="flex-1 min-h-[550px]">
+                <ChronoCriminalGraph
+                  nodes={nodes}
+                  edges={filteredEdges}
+                  onNodeClick={handleNodeClick}
+                  height={550}
+                />
+              </div>
             </div>
 
-            {/* Right: Leaflet Spatial Map View */}
-            <div className="rounded-2xl overflow-hidden border border-[var(--border)]/50 bg-[var(--surface-1)] p-4 shadow-sm space-y-3">
-              <div className="flex items-center justify-between px-1">
+            <div className="lg:col-span-5 flex flex-col rounded-2xl overflow-hidden border border-[var(--border)]/50 bg-[var(--surface-1)] shadow-sm p-4">
+              <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]/40 mb-3">
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-rose-500" />
-                  <h3 className="text-xs font-bold font-heading uppercase tracking-wider text-[var(--text-primary)]">
+                  <MapPin className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                  <span className="text-xs font-bold font-heading text-[var(--text-primary)] uppercase tracking-wider">
                     Geo-Spatial Gang Surveillance Map
-                  </h3>
+                  </span>
                 </div>
-                <span className="text-[10px] font-mono font-semibold text-[var(--text-secondary)]">Fixed GPS Coordinates</span>
+                <span className="text-[10px] font-mono text-[var(--text-secondary)]">Fixed GPS Coordinates</span>
               </div>
-              <NetworkMapView
-                nodes={nodes}
-                edges={filteredEdges}
-                selectedNodeId={selectedNodeId}
-                onNodeClick={handleNodeClick}
-                height={560}
-              />
+              <div className="flex-1 min-h-[550px]">
+                <NetworkMapView
+                  nodes={nodes}
+                  edges={filteredEdges}
+                  selectedNodeId={selectedNodeId}
+                  onNodeClick={handleNodeClick}
+                  height={550}
+                />
+              </div>
             </div>
           </div>
         )}
 
         {viewMode === 'graph' && (
-          <div className="rounded-2xl overflow-hidden border border-[var(--border)]/50 bg-[var(--surface-1)] p-5 shadow-sm space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold font-heading uppercase tracking-wider text-[var(--text-primary)]">
-                Full-Screen Co-Accused Network Graph ({nodes.length} Nodes)
-              </h3>
-            </div>
+          <div className="flex-1 flex flex-col rounded-2xl overflow-hidden border border-[var(--border)]/50 bg-[var(--surface-1)] shadow-sm p-4">
             <ChronoCriminalGraph
               nodes={nodes}
               edges={filteredEdges}
-              date_range={{ min: '2024-01-01', max: '2026-12-31' }}
               onNodeClick={handleNodeClick}
-              height={680}
+              height={650}
             />
           </div>
         )}
 
         {viewMode === 'map' && (
-          <div className="rounded-2xl overflow-hidden border border-[var(--border)]/50 bg-[var(--surface-1)] p-5 shadow-sm space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold font-heading uppercase tracking-wider text-[var(--text-primary)]">
-                Full-Screen Geo-Spatial Gang Surveillance Map
-              </h3>
-            </div>
+          <div className="flex-1 flex flex-col rounded-2xl overflow-hidden border border-[var(--border)]/50 bg-[var(--surface-1)] shadow-sm p-4">
             <NetworkMapView
               nodes={nodes}
               edges={filteredEdges}
               selectedNodeId={selectedNodeId}
               onNodeClick={handleNodeClick}
-              height={680}
+              height={650}
             />
           </div>
         )}
@@ -544,34 +471,50 @@ export default function NetworkPage() {
         )}
       </div>
 
-      {/* INVESTIGATOR CHRONICLE MODAL OVERLAY */}
+      {/* ── SMOOTH UNLOCKED SCROLLING NEWSPAPER DOSSIER MODAL WITH TOP STICKY CLOSE BUTTON & SIDE-SCREEN CLICK CLOSE ── */}
       {panelOpen && activeCaseData && (
-        <div className="fixed inset-0 bg-[#F5F2EB] flex flex-col z-[99999] overflow-y-auto animate-newspaper-spin">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-300 shrink-0 bg-[#F5F2EB]/95 sticky top-0 z-30 backdrop-blur-md">
-            <div className="flex items-center gap-2.5 text-slate-800">
-              <ShieldAlert className="w-5 h-5 text-red-600" />
-              <h3 className="text-base font-extrabold font-serif tracking-wider uppercase">
-                Investigator Chronicle — Case Intelligence File
-              </h3>
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setPanelOpen(false);
+            }
+          }}
+          className="fixed inset-0 z-[99999] bg-slate-900/30 backdrop-blur-md overflow-y-auto p-4 sm:p-6 md:p-8 flex justify-center items-start scroll-smooth cursor-pointer"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-5xl my-4 sm:my-8 bg-[#FAF7F2] rounded-3xl shadow-2xl overflow-hidden border-2 border-slate-300 animate-newspaper-spin cursor-default"
+          >
+            
+            {/* Sticky Header with Prominent Red Close Cross (X) Button */}
+            <div className="sticky top-0 z-50 flex items-center justify-between px-6 py-3.5 bg-white border-b border-slate-200 text-slate-900 shadow-xs">
+              <div className="flex items-center gap-2.5">
+                <ShieldAlert className="w-5 h-5 text-rose-600" />
+                <span className="text-xs font-black uppercase tracking-wider font-mono text-slate-900">
+                  INVESTIGATOR CHRONICLE — CASE INTELLIGENCE FILE
+                </span>
+              </div>
+              
+              <button
+                onClick={() => setPanelOpen(false)}
+                className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs transition-all cursor-pointer shadow-md flex items-center gap-1.5 hover:scale-105"
+                title="Close FIR Dossier"
+              >
+                <X className="w-4 h-4 stroke-[3]" />
+                <span>Close Chronicle (Esc)</span>
+              </button>
             </div>
-            <button
-              onClick={() => setPanelOpen(false)}
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-red-600 text-white font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5"
-            >
-              <X className="w-4 h-4" />
-              <span>Close Chronicle</span>
-            </button>
-          </div>
 
-          <div className="flex-1 p-6 md:p-8 lg:p-10 max-w-[1200px] w-full mx-auto">
-            <InvestigatorWall
-              fir={activeCaseData.fir}
-              accused={activeCaseData.accused}
-              victims={activeCaseData.victims}
-              related_firs={activeCaseData.related_firs}
-              case_summary={activeCaseData.case_summary}
-              isLoading={loadingCase}
-            />
+            <div className="p-4 sm:p-6 md:p-8">
+              <InvestigatorWall
+                fir={activeCaseData.fir}
+                accused={activeCaseData.accused}
+                victims={activeCaseData.victims}
+                related_firs={activeCaseData.related_firs}
+                case_summary={activeCaseData.case_summary}
+                isLoading={loadingCase}
+              />
+            </div>
           </div>
         </div>
       )}

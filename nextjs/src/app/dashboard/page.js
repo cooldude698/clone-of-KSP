@@ -573,62 +573,82 @@ export default function DashboardPage() {
 
       </div>
 
-      {/* ── INVESTIGATOR CHRONICLE DOSSIER MODAL ── */}
+      {/* ── INVESTIGATOR CHRONICLE DOSSIER MODAL WITH SIDE-SCREEN CLICK CLOSE ── */}
       <AnimatePresence>
         {selectedFIR && (
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-md overflow-y-auto">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.96 }}
-              className="relative w-full max-w-5xl my-8"
+          <div
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setSelectedFIR(null);
+              }
+            }}
+            className="fixed inset-0 z-[99999] bg-slate-900/30 backdrop-blur-md overflow-y-auto p-4 sm:p-6 md:p-8 flex justify-center items-start scroll-smooth cursor-pointer"
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-5xl my-4 sm:my-8 bg-[#FAF7F2] rounded-3xl shadow-2xl overflow-hidden border-2 border-slate-300 animate-newspaper-spin cursor-default"
             >
-              <button
-                onClick={() => setSelectedFIR(null)}
-                className="absolute -top-10 right-0 z-50 px-4 py-1.5 rounded-full bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all flex items-center gap-1.5 shadow-lg cursor-pointer"
-              >
-                <X className="w-3.5 h-3.5" />
-                <span>Close Chronicle Dossier</span>
-              </button>
-              <InvestigatorWall
-                fir={{
-                  case_number: selectedFIR.case_number || 'KAR/BLR/2026/04921',
-                  crime_type: selectedFIR.crime_type || selectedFIR.crime_type_code || 'Vehicle Theft',
-                  date_filed: selectedFIR.date_filed || '2026-07-22',
-                  location_name: selectedFIR.location_name || selectedFIR.district_name || 'Silk Board PS',
-                  case_status: selectedFIR.status || selectedFIR.case_status || 'open',
-                  description: selectedFIR.description || 'Target vehicle theft and commercial chopshop transport operation.',
-                  police_station: selectedFIR.police_station || 'Bengaluru Urban East PS',
-                }}
-                accused={[
-                  {
-                    full_name: selectedFIR.accused_name || 'Ramesh Kumar',
-                    alias: 'The Snake',
-                    age: 34,
-                    gender: 'Male',
-                    district_name: selectedFIR.district_name || 'Bengaluru Urban',
-                    occupation: 'Fence / Chopshop Logistics',
-                    prior_convictions: 6,
-                    risk_score: selectedFIR.risk_score || 94,
-                    modus_operandi: 'Inter-district night heist using fake ANPR plates.'
-                  }
-                ]}
-                victims={[
-                  {
-                    full_name: selectedFIR.complainant_name || 'KSP Commercial Unit',
-                    age: 42,
-                    gender: 'Male',
-                    district_name: selectedFIR.district_name || 'Bengaluru Urban',
-                    vulnerability_score: 65,
-                  }
-                ]}
-                related_firs={[
-                  { case_number: 'KAR/BLR/2026/01184', crime_type: 'Armed Robbery', date_filed: '2026-07-20', link_reason: 'Matching MO & Getaway Vehicle' },
-                  { case_number: 'KAR/MYS/2026/00199', crime_type: 'Physical Assault', date_filed: '2026-07-15', link_reason: 'Co-Accused Communication Log' }
-                ]}
-                case_summary={selectedFIR.description || 'Verified CCTNS first information report statement filed at Karnataka State Police command center.'}
-              />
-            </motion.div>
+              
+              {/* Sticky Top Header with Prominent Red Close Cross (X) Button */}
+              <div className="sticky top-0 z-50 flex items-center justify-between px-6 py-3.5 bg-white border-b border-slate-200 text-slate-900 shadow-xs">
+                <div className="flex items-center gap-2.5">
+                  <ShieldAlert className="w-5 h-5 text-rose-600" />
+                  <span className="text-xs font-black uppercase tracking-wider font-mono text-slate-900">
+                    INVESTIGATOR CHRONICLE — CASE INTELLIGENCE FILE
+                  </span>
+                </div>
+                
+                <button
+                  onClick={() => setSelectedFIR(null)}
+                  className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs transition-all cursor-pointer shadow-md flex items-center gap-1.5 hover:scale-105"
+                  title="Close FIR Dossier"
+                >
+                  <X className="w-4 h-4 stroke-[3]" />
+                  <span>Close Chronicle (Esc)</span>
+                </button>
+              </div>
+
+              <div className="p-4 sm:p-6 md:p-8">
+                <InvestigatorWall
+                  fir={{
+                    case_number: selectedFIR.case_number || 'KAR/BLR/2026/04921',
+                    crime_type: selectedFIR.crime_type || selectedFIR.crime_type_code || 'Vehicle Theft',
+                    date_filed: selectedFIR.date_filed || '2026-07-22',
+                    location_name: selectedFIR.location_name || selectedFIR.district_name || 'Silk Board PS',
+                    case_status: selectedFIR.status || selectedFIR.case_status || 'open',
+                    description: selectedFIR.description || 'Target vehicle theft and commercial chopshop transport operation.',
+                    police_station: selectedFIR.police_station || 'Bengaluru Urban East PS',
+                  }}
+                  accused={[
+                    {
+                      full_name: selectedFIR.accused_name || 'Ramesh Kumar',
+                      alias: 'The Snake',
+                      age: 34,
+                      gender: 'Male',
+                      district_name: selectedFIR.district_name || 'Bengaluru Urban',
+                      occupation: 'Fence / Chopshop Logistics',
+                      prior_convictions: 6,
+                      risk_score: selectedFIR.risk_score || 94,
+                      modus_operandi: 'Inter-district night heist using fake ANPR plates.'
+                    }
+                  ]}
+                  victims={[
+                    {
+                      full_name: selectedFIR.complainant_name || 'KSP Commercial Unit',
+                      age: 42,
+                      gender: 'Male',
+                      district_name: selectedFIR.district_name || 'Bengaluru Urban',
+                      vulnerability_score: 65,
+                    }
+                  ]}
+                  related_firs={[
+                    { case_number: 'KAR/BLR/2026/01184', crime_type: 'Armed Robbery', date_filed: '2026-07-20', link_reason: 'Matching MO & Getaway Vehicle' },
+                    { case_number: 'KAR/MYS/2026/00199', crime_type: 'Physical Assault', date_filed: '2026-07-15', link_reason: 'Co-Accused Communication Log' }
+                  ]}
+                  case_summary={selectedFIR.description || 'Verified CCTNS first information report statement filed at Karnataka State Police command center.'}
+                />
+              </div>
+            </div>
           </div>
         )}
       </AnimatePresence>

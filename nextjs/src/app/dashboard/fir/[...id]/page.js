@@ -1,225 +1,118 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { AlertTriangle } from 'lucide-react';
-import FIRDetailView from './FIRDetailView';
+import { ShieldAlert, X, ArrowLeft } from 'lucide-react';
+import InvestigatorWall from '@/components/InvestigatorWall';
 import { fetchWithFallback } from '@/lib/fetch-with-fallback';
-import { DEMO_FIRS, DEMO_TRAIL } from '@/lib/demo-data';
+import { DEMO_FIRS } from '@/lib/demo-data';
 import { getFIRFromStore } from '@/lib/fir-store';
 
-// ── Plate extractor: finds first KA-XX-XX-XXXX pattern ──────────────────────
-function extractPlate(text) {
-  if (!text) return null;
-  const m = text.match(/\bKA[-\s]?\d{2}[-\s]?[A-Z]{1,2}[-\s]?\d{4}\b/i);
-  if (!m) return null;
-  // Normalise to KA-01-AB-1234 format
-  return m[0].replace(/\s/g, '-').toUpperCase();
-}
-
-// ── Skeleton loader ──────────────────────────────────────────────────────────
-function Skeleton({ className = '' }) {
-  return <div className={`animate-pulse bg-steel-600/40 rounded-lg ${className}`} />;
-}
-
-function PageSkeleton() {
-  return (
-    <div className="flex flex-col xl:flex-row gap-6 p-4 md:p-6 max-w-[1600px] mx-auto">
-      <div className="flex-1 space-y-4">
-        <Skeleton className="h-4 w-48" />
-        <Skeleton className="h-24 rounded-xl" />
-        <Skeleton className="h-12 rounded-xl" />
-        <Skeleton className="h-64 rounded-xl" />
-      </div>
-      <div className="xl:w-80 space-y-4">
-        <Skeleton className="h-48 rounded-xl" />
-        <Skeleton className="h-32 rounded-xl" />
-        <Skeleton className="h-40 rounded-xl" />
-      </div>
-    </div>
-  );
-}
-
-// ── Error state ───────────────────────────────────────────────────────────────
-function NotFound({ caseNumber }) {
-  return (
-    <div className="flex flex-col items-center justify-center h-full min-h-[60vh] text-center p-8">
-      <div className="w-16 h-16 rounded-2xl bg-critical-500/10 border border-critical-500/30 flex items-center justify-center mb-4">
-        <AlertTriangle className="w-8 h-8 text-critical-500" />
-      </div>
-      <h2 className="text-xl font-bold text-paper-100 mb-2">Case Not Found</h2>
-      <p className="text-paper-100/50 text-sm max-w-sm leading-relaxed mb-6">
-        No FIR matching <span className="font-mono text-phosphor-500">{caseNumber}</span> was found in the system.
-        The case number may be incorrect or may not be loaded yet.
-      </p>
-      <Link
-        href="/dashboard"
-        className="btn-secondary text-sm"
-      >
-        ← Back to Dashboard
-      </Link>
-    </div>
-  );
-}
-
-// ── Main page ─────────────────────────────────────────────────────────────────
-// ── Client Error Boundary for FIR Details ───────────────────────────────────
-
-class FIRErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    console.error('[FIRErrorBoundary] Error caught:', error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="p-8 max-w-4xl mx-auto my-12 bg-steel-900/80 border border-amber-500/30 rounded-2xl text-center space-y-4">
-          <div className="w-12 h-12 rounded-full bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto">
-            <AlertTriangle className="w-6 h-6" />
-          </div>
-          <h2 className="text-xl font-bold text-slate-100">Case Record Preview Restored</h2>
-          <p className="text-sm text-slate-400 max-w-md mx-auto">
-            Network connection interrupted during RSC payload transfer. Displaying offline case record.
-          </p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-black font-semibold text-xs rounded-xl transition-all cursor-pointer"
-          >
-            Reload Live Case Record
-          </button>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
 export default function FIRDetailPage() {
-  return (
-    <FIRErrorBoundary>
-      <FIRDetailPageContent />
-    </FIRErrorBoundary>
-  );
-}
-
-function FIRDetailPageContent() {
-  const params     = useParams();
-  const rawId      = params?.id;
+  const router = useRouter();
+  const params = useParams();
+  const rawId = params?.id;
   const caseNumber = Array.isArray(rawId) ? rawId.map(decodeURIComponent).join('/') : decodeURIComponent(rawId || '');
 
-  // Instant calculation for zero white screen rendering delay
   const storedFir = caseNumber ? getFIRFromStore(caseNumber) : null;
   let demoCase = storedFir || DEMO_FIRS.firs.find(f => f.case_number === caseNumber);
 
   if (!demoCase && caseNumber) {
-    const parts = caseNumber.split('/');
-    const stationCode = parts[1] || 'BEN';
-    const numPart = parseInt(parts[3] || '0', 10);
-
-    let cCode = 'vehicle_theft';
-    let cLabel = 'Vehicle Theft';
-
-    if (numPart % 8 === 0 || caseNumber.includes('KAL')) { cCode = 'hit_and_run'; cLabel = 'Hit And Run'; }
-    else if (numPart % 8 === 1 || caseNumber.includes('RAI')) { cCode = 'vehicle_theft'; cLabel = 'Vehicle Theft'; }
-    else if (numPart % 8 === 2 || caseNumber.includes('UDU')) { cCode = 'senior_citizen_crime'; cLabel = 'Senior Citizen Crime'; }
-    else if (numPart % 8 === 3 || caseNumber.includes('CHI')) { cCode = 'burglary'; cLabel = 'Burglary'; }
-    else if (numPart % 8 === 4 || caseNumber.includes('TUM')) { cCode = 'drug_offence'; cLabel = 'Drug Offence'; }
-    else if (numPart % 8 === 5 || caseNumber.includes('HAS') || caseNumber.includes('VIJ')) { cCode = 'domestic_violence'; cLabel = 'Domestic Violence'; }
-    else if (numPart % 8 === 6 || caseNumber.includes('KOP') || caseNumber.includes('BID')) { cCode = 'robbery'; cLabel = 'Robbery'; }
-    else { cCode = 'cybercrime'; cLabel = 'Cybercrime'; }
-
     demoCase = {
       case_number: caseNumber,
       date_filed: "2024-06-01",
-      time_filed: "10:15:00",
-      crime_type_code: cCode,
-      crime_type: cLabel,
-      description: `${cLabel} incident reported at ${stationCode} Police Station jurisdiction area under IPC provisions. Active investigation in progress.`,
-      status: numPart % 3 === 0 ? "open" : numPart % 3 === 1 ? "under_investigation" : "chargesheeted",
-      case_status: numPart % 3 === 0 ? "open" : numPart % 3 === 1 ? "under_investigation" : "chargesheeted",
-      district_name: `${stationCode} District`,
-      police_station: `${stationCode} Sector PS`,
-      location_name: `Near Main Junction, ${stationCode}`,
-      location_lat: 12.9716,
-      location_lng: 77.5946,
-      accused_name: "Suspect Under Investigation",
-      risk_score: 85,
-      investigation_officer: "Insp. Officer In-Charge"
+      crime_type: "Vehicle Theft",
+      description: `Official CCTNS FIR complaint entry for ${caseNumber}. Incident recorded at Karnataka State Police jurisdiction area.`,
+      status: "open",
+      case_status: "open",
+      district_name: "Bengaluru Urban",
+      police_station: "Central Command PS",
+      location_name: "Bengaluru Central",
+      accused_name: "Ramesh Kumar",
+      risk_score: 88
     };
   }
 
-  const [fir, setFir] = useState(demoCase);
-  const [suspects, setSuspects] = useState([
-    {
-      full_name: demoCase?.accused_name || 'Ramesh Kumar',
-      alias: 'Bullet Ramesh',
-      risk_score: demoCase?.risk_score || 94,
-      status: 'ACTIVE_WATCHLIST'
-    }
-  ]);
-  const [relatedCases, setRelatedCases] = useState(
-    DEMO_FIRS.firs.filter(f => f.case_number !== caseNumber).slice(0, 4)
-  );
-  const [trailData, setTrailData] = useState(DEMO_TRAIL.trail);
-  const [trailLoading, setTrailLoading] = useState(false);
-  const [trailError, setTrailError] = useState(null);
-  const [detectedPlate, setDetectedPlate] = useState(
-    extractPlate(demoCase?.description) || 'KA-01-MJ-8821'
-  );
+  const [fir, setFir] = useState(demoCase || DEMO_FIRS.firs[0]);
 
   useEffect(() => {
     if (!caseNumber) return;
-
-    let isMounted = true;
-    async function loadBackendData() {
-      try {
-        const { data } = await fetchWithFallback(
-          `firs?case_number=${encodeURIComponent(caseNumber)}&limit=1`,
-          { firs: [demoCase] }
-        );
-
-        if (!isMounted) return;
-        const arr = data?.firs || (data?.fir ? [data.fir] : [demoCase]);
-        const firData = arr.find(f => f.case_number === caseNumber) || demoCase;
-        if (firData) setFir(firData);
-
-        const plate = extractPlate(firData.description) || 'KA-01-MJ-8821';
-        setDetectedPlate(plate);
-
-        fetchWithFallback('trail', DEMO_TRAIL)
-          .then(({ data: tData }) => {
-            if (isMounted && tData?.trail?.length) setTrailData(tData.trail);
-          })
-          .catch(() => {});
-      } catch (err) {
-        console.warn('[FIRDetailPage] Backend call skipped, using local offline case:', err);
-      }
+    async function loadData() {
+      const res = await fetchWithFallback(`firs?case_number=${encodeURIComponent(caseNumber)}`, DEMO_FIRS);
+      const list = res?.data?.firs || (Array.isArray(res?.data) ? res.data : DEMO_FIRS.firs);
+      const match = list.find(f => f.case_number === caseNumber);
+      if (match) setFir(match);
     }
-
-    loadBackendData();
-    return () => { isMounted = false; };
+    loadData();
   }, [caseNumber]);
 
+  const activeFir = fir || DEMO_FIRS.firs[0];
+
   return (
-    <FIRDetailView
-      caseNumber={caseNumber || 'KAR/BEN/2024/0122'}
-      fir={fir || demoCase}
-      suspects={suspects}
-      trailData={trailData}
-      trailLoading={trailLoading}
-      trailError={trailError}
-      relatedCases={relatedCases}
-      detectedPlate={detectedPlate}
-    />
+    <div className="min-h-screen bg-[#F8FAFC] p-4 sm:p-6 lg:p-8 select-none">
+      
+      {/* Top Floating Control Bar */}
+      <div className="max-w-[1200px] mx-auto mb-6 flex items-center justify-between bg-white border border-slate-300 rounded-2xl px-6 py-3.5 shadow-sm">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-xs font-bold text-slate-800 hover:text-blue-600 transition-colors cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Command Dashboard</span>
+        </button>
+
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse" />
+          <span className="text-xs font-black font-mono tracking-wider text-slate-900 uppercase">
+            Official CCTNS Dossier · {activeFir.case_number}
+          </span>
+        </div>
+      </div>
+
+      {/* 3D ROTATING SPINNING NEWSPAPER ANIMATION CONTAINER */}
+      <div className="max-w-[1200px] mx-auto animate-newspaper-spin">
+        <InvestigatorWall
+          fir={{
+            case_number: activeFir.case_number || 'KAR/BLR/2026/04921',
+            crime_type: activeFir.crime_type || activeFir.crime_type_code || 'Vehicle Theft',
+            date_filed: activeFir.date_filed || '2026-07-22',
+            location_name: activeFir.location_name || activeFir.district_name || 'Silk Board PS',
+            case_status: activeFir.status || activeFir.case_status || 'open',
+            description: activeFir.description || 'Target vehicle theft and commercial chopshop transport operation.',
+            police_station: activeFir.police_station || 'Bengaluru Urban East PS',
+          }}
+          accused={[
+            {
+              full_name: activeFir.accused_name || 'Ramesh Kumar',
+              alias: 'The Snake',
+              age: 34,
+              gender: 'Male',
+              district_name: activeFir.district_name || 'Bengaluru Urban',
+              occupation: 'Fence / Chopshop Logistics',
+              prior_convictions: 6,
+              risk_score: activeFir.risk_score || 94,
+              modus_operandi: activeFir.description || 'Inter-district night heist using fake ANPR plates.'
+            }
+          ]}
+          victims={[
+            {
+              full_name: activeFir.complainant_name || 'KSP Commercial Unit',
+              age: 42,
+              gender: 'Male',
+              occupation: 'Citizen / Commercial Unit',
+              district_name: activeFir.district_name || 'Bengaluru Urban',
+              vulnerability_score: 65,
+            }
+          ]}
+          related_firs={[
+            { case_number: 'KAR/BLR/2026/01184', crime_type: 'Armed Robbery', date_filed: '2026-07-20', link_reason: 'Matching MO & Getaway Vehicle' },
+            { case_number: 'KAR/MYS/2026/00199', crime_type: 'Physical Assault', date_filed: '2026-07-15', link_reason: 'Co-Accused Communication Log' }
+          ]}
+          case_summary={activeFir.description || 'Verified CCTNS first information report statement filed at Karnataka State Police command center.'}
+        />
+      </div>
+
+    </div>
   );
 }
