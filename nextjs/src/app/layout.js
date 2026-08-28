@@ -31,19 +31,25 @@ export const metadata = {
   },
 };
 
-// Inline script that runs synchronously BEFORE any content renders.
+// Inline script that runs synchronously BEFORE any content renders to enforce dark mode
 const themeScript = `
 (function() {
   try {
-    localStorage.setItem('theme', 'light');
-    document.documentElement.classList.remove('dark');
-  } catch(e) {}
+    const saved = localStorage.getItem('theme');
+    if (saved === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
+  } catch(e) {
+    document.documentElement.classList.add('dark');
+  }
 })();
 `;
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${montserrat.variable} ${googleSans.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`dark ${montserrat.variable} ${googleSans.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=3" />
@@ -55,11 +61,10 @@ export default function RootLayout({ children }) {
         {/* Blocking script prevents FOUC — runs before CSS paint */}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="bg-white text-gray-900 font-sans antialiased transition-colors duration-200">
+      <body className="bg-[#09090B] text-[#F8FAFC] dark:bg-[#09090B] dark:text-[#F8FAFC] font-sans antialiased transition-colors duration-200">
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
-          forcedTheme="light"
+          defaultTheme="dark"
           enableSystem={false}
         >
           {children}
@@ -68,4 +73,3 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
-
