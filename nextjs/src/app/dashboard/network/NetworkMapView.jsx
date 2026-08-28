@@ -4,75 +4,69 @@ import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// Deterministic coordinate generator so unmapped nodes stay rock-solid static
-function hashCoords(idStr, label) {
-  let hash = 0;
-  const str = (idStr || '') + (label || '');
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash << 5) - hash + str.charCodeAt(i);
-    hash |= 0;
+// ── Predictive Trajectory Corridors & Checkpoints ─────────────────────────
+const PREDICTIVE_ROUTES = [
+  {
+    id: 'SYN-VT-01-ROUTE',
+    name: 'Bullet Ramesh Escape Corridor (NH-44)',
+    color: '#3B82F6',
+    waypoints: [
+      { lat: 12.9175, lng: 77.6215, label: 'Silk Board TTMC (Last Sighted: 02:15 AM)', type: 'start' },
+      { lat: 12.8452, lng: 77.6602, label: 'Electronic City Toll (FASTag Sweep)', type: 'checkpoint' },
+      { lat: 12.7800, lng: 77.7200, label: 'Attibele Intercept Checkpost (Active Alert)', type: 'intercept' },
+      { lat: 13.1500, lng: 77.6000, label: 'Predicted Transit: Raichur Rural Chopshop Yard', type: 'destination' }
+    ]
+  },
+  {
+    id: 'SYN-ND-02-ROUTE',
+    name: 'Helmet Imran Narcotics Drop Trajectory',
+    color: '#10B981',
+    waypoints: [
+      { lat: 12.9350, lng: 77.6900, label: 'Bellandur Tech Node (Dead-drop origin)', type: 'start' },
+      { lat: 13.0456, lng: 77.6256, label: 'Hebbal Flyover (ANPR Sweep CAM-WF-0019)', type: 'checkpoint' },
+      { lat: 13.3400, lng: 77.1000, label: 'Tumakuru Highway Intercept Gate', type: 'intercept' }
+    ]
+  },
+  {
+    id: 'SYN-RB-03-ROUTE',
+    name: 'Snake Naidu Highway Heist Escape Vector',
+    color: '#EF4444',
+    waypoints: [
+      { lat: 12.9784, lng: 77.6408, label: 'Indiranagar 100ft Rd (Target Ambush)', type: 'start' },
+      { lat: 12.9716, lng: 77.5946, label: 'Cubbon Park Fringe (Getaway Transition)', type: 'checkpoint' },
+      { lat: 13.1007, lng: 77.5963, label: 'Yelahanka Toll Intercept Barrier', type: 'intercept' }
+    ]
   }
-  const normLat = 12.9100 + (Math.abs(hash % 1000) / 1000) * 0.15;
-  const normLng = 77.5500 + (Math.abs((hash >> 3) % 1000) / 1000) * 0.20;
-  return { lat: normLat, lng: normLng, area: label || idStr };
-}
+];
 
-// ── Gang colors ──────────────────────────────────────────────────────────────
-const GANG_COLORS = {
-  'GANG-NORTH': '#f97316', // amber-orange
-  'GANG-SOUTH': '#8b5cf6', // violet
-};
-
-function getNodeFillColor(node) {
-  const isCase = node.type === 'case' || node.type === 'fir' || (node.id || '').startsWith('FIR');
-  if (isCase) return '#2563eb';
-  if (node.gang_id && GANG_COLORS[node.gang_id]) return GANG_COLORS[node.gang_id];
-  return '#64748b';
-}
+const ANPR_SURVEILLANCE_NODES = [
+  { id: 'CAM-BLR-0045', name: 'Silk Board TTMC Chokepoint', lat: 12.9175, lng: 77.6215, status: 'LOCKED_SWEEP' },
+  { id: 'CAM-BLR-0088', name: 'Indiranagar 100ft Toll Barrier', lat: 12.9784, lng: 77.6408, status: 'SWEEPING' },
+  { id: 'CAM-WF-0019',  name: 'Outer Ring Road Bellandur ANPR', lat: 12.9350, lng: 77.6900, status: 'LOCKED_SWEEP' },
+  { id: 'CAM-HEB-0012', name: 'Hebbal Expressway Checkpoint', lat: 13.0456, lng: 77.6256, status: 'PATROL_DEPLOYED' },
+  { id: 'CAM-ATT-0001', name: 'Attibele Inter-State Border Gate', lat: 12.7800, lng: 77.7200, status: 'INTERCEPT_READY' },
+];
 
 export default function NetworkMapView({
   nodes,
   edges,
   selectedNodeId,
   onNodeClick,
-  height = 550
+  height = 580
 }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const layerGroupRef = useRef(null);
 
-  // Map center default (Bengaluru Urban)
+  // Map center default (Bengaluru Urban & Karnataka Arteries)
   const defaultCenter = [12.9716, 77.6000];
   const tileUrl = process.env.NEXT_PUBLIC_MAPS_TILE ||
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-  // ── Explicit, accurate coordinate dictionary ──────────────────────────────
-  const NODE_COORDS = {
-    // GANG-NORTH suspects
-    'SUS-8842': { lat: 12.9175, lng: 77.6215, area: 'Silk Board Junction (Ramesh Kumar - Leader)' },
-    'SUS-4401': { lat: 13.1007, lng: 77.5963, area: 'Yelahanka Chopshop Yard (Deepak Shetty - Weapons Handler)' },
-    'SUS-2211': { lat: 12.9716, lng: 77.5946, area: 'Central Bengaluru (Farid Mirza - Arms Supplier)' },
-    'SUS-1190': { lat: 12.8452, lng: 77.6602, area: 'Electronic City Toll (Manoj Reddy - Lookout)' },
-    'SUS-9901': { lat: 12.9784, lng: 77.6408, area: 'Indiranagar 100ft Road (Ravi Shankar - Finance Handler)' },
-    'SUS-6633': { lat: 12.9850, lng: 77.5930, area: 'Shivajinagar Court Complex (Basha Khan - Enforcer)' },
-
-    // GANG-SOUTH suspects
-    'SUS-5921': { lat: 12.9698, lng: 77.7499, area: 'Whitefield ITPL (Imran Khan - Gang Leader)' },
-    'SUS-7104': { lat: 12.9279, lng: 77.6271, area: 'HSR Layout BDA Complex (Suresh Naidu - Armed Heist)' },
-    'SUS-3302': { lat: 13.0456, lng: 77.6256, area: 'Hebbal Flyover Junction (Arun Gowda - Logistics)' },
-    'SUS-5512': { lat: 12.9344, lng: 77.6101, area: 'Koramangala 5th Block (Karthik Raja - Money Laundering)' },
-
-    // Core FIR Cases
-    'FIR-2026-BL-0492': { lat: 12.9165, lng: 77.6200, area: 'Silk Board Vehicle Theft (FIR-2026-BL-0492)' },
-    'FIR-2026-BL-0811': { lat: 12.9740, lng: 77.6080, area: 'MG Road Armed Robbery (FIR-2026-BL-0811)' },
-    'FIR-2026-BL-1104': { lat: 12.9680, lng: 77.7450, area: 'Whitefield Chain Snatching (FIR-2026-BL-1104)' },
-    'FIR-2026-BL-1726': { lat: 12.9250, lng: 77.6240, area: 'HSR Layout Burglary (FIR-2026-BL-1726)' },
-  };
-
   // ── 1. Map Initialization ──────────────────────────────────────────────────
   useEffect(() => {
     if (!containerRef.current) return;
-    if (mapRef.current) return; // Prevent double init
+    if (mapRef.current) return;
 
     const map = L.map(containerRef.current, {
       center: defaultCenter,
@@ -82,7 +76,7 @@ export default function NetworkMapView({
     });
 
     L.tileLayer(tileUrl, {
-      attribution: '&copy; OpenStreetMap contributors',
+      attribution: '&copy; OpenStreetMap contributors • KSP Telemetry',
       maxZoom: 18,
     }).addTo(map);
 
@@ -92,7 +86,7 @@ export default function NetworkMapView({
 
     setTimeout(() => {
       if (mapRef.current) mapRef.current.invalidateSize();
-    }, 200);
+    }, 250);
 
     return () => {
       if (mapRef.current) {
@@ -103,161 +97,175 @@ export default function NetworkMapView({
     };
   }, [tileUrl]);
 
-  // ── 2. Render Markers, Heat Radii & Dynamic Links ─────────────────────────
+  // ── 2. Render Predictive Trajectories & Intercept Grid ───────────────────
   useEffect(() => {
     if (!mapRef.current || !layerGroupRef.current) return;
     const layerGroup = layerGroupRef.current;
     layerGroup.clearLayers();
 
-    // Node lookup dictionary by ID for drawing links
-    const nodePosMap = {};
+    // 1. Draw Predictive Trajectory Paths
+    PREDICTIVE_ROUTES.forEach((route) => {
+      const latlngs = route.waypoints.map(w => [w.lat, w.lng]);
+      
+      // Background glow polyline
+      L.polyline(latlngs, {
+        color: route.color,
+        weight: 6,
+        opacity: 0.25,
+        lineCap: 'round'
+      }).addTo(layerGroup);
 
-    // ── Draw Gang Area Heat Radii ───────────────────────────────────────────
-    const gangNorthCenter = [12.9175, 77.6215]; // Silk Board
-    const gangSouthCenter = [12.9698, 77.7499]; // Whitefield
+      // Foreground dashed trajectory polyline
+      const polyline = L.polyline(latlngs, {
+        color: route.color,
+        weight: 2.5,
+        opacity: 0.9,
+        dashArray: '8, 6',
+      }).addTo(layerGroup);
 
-    L.circle(gangNorthCenter, {
-      radius: 3500,
-      color: '#f97316',
-      weight: 1.5,
-      dashArray: '6, 6',
-      fillColor: '#f97316',
-      fillOpacity: 0.08,
-    }).addTo(layerGroup).bindTooltip('GANG-NORTH Primary Vehicle Theft Zone', { permanent: false, direction: 'top' });
-
-    L.circle(gangSouthCenter, {
-      radius: 4200,
-      color: '#8b5cf6',
-      weight: 1.5,
-      dashArray: '6, 6',
-      fillColor: '#8b5cf6',
-      fillOpacity: 0.08,
-    }).addTo(layerGroup).bindTooltip('GANG-SOUTH Chain Snatching Operational Zone', { permanent: false, direction: 'top' });
-
-    // ── Map Nodes ─────────────────────────────────────────────────────────────
-    (nodes || []).forEach((node) => {
-      const coords = NODE_COORDS[node.id] || hashCoords(node.id, node.label);
-      nodePosMap[node.id] = [coords.lat, coords.lng];
-
-      const isSelected = selectedNodeId === node.id;
-      const isSuspect = node.type === 'suspect' || (node.id || '').startsWith('SUS');
-      const isCase = node.type === 'case' || node.type === 'fir' || (node.id || '').startsWith('FIR');
-      const fillColor = getNodeFillColor(node);
-
-      const radius = isSelected ? 14 : (node.size ? Math.max(7, Math.min(16, node.size / 1.5)) : (isSuspect ? 10 : 7));
-
-      const marker = L.circleMarker([coords.lat, coords.lng], {
-        radius,
-        fillColor,
-        color: isSelected ? '#ffffff' : (isSuspect ? '#0f172a' : '#ffffff'),
-        weight: isSelected ? 3 : 1.5,
-        opacity: 0.95,
-        fillOpacity: isSelected ? 0.95 : 0.8,
-      });
-
-      // Tooltip content
-      const tooltipContent = `
-        <div style="font-family:sans-serif;padding:4px 6px;min-width:140px;">
-          <div style="font-weight:bold;font-size:12px;color:#0f172a;">${node.label || node.id}</div>
-          <div style="font-size:11px;color:#475569;margin-top:2px;">${node.role || node.district || coords.area}</div>
-          ${node.risk_score ? `<div style="font-size:10px;font-weight:bold;color:${node.risk_score > 85 ? '#dc2626' : '#d97706'};margin-top:4px;">Risk Score: ${node.risk_score}/100</div>` : ''}
-          ${node.gang_id ? `<div style="font-size:10px;font-weight:bold;color:${GANG_COLORS[node.gang_id] || '#64748b'};margin-top:2px;">Gang: ${node.gang_id}</div>` : ''}
+      polyline.bindTooltip(`
+        <div style="font-family:monospace;font-size:11px;padding:3px 5px;color:#0F172A;font-weight:bold;">
+          PREDICTED TRAJECTORY: ${route.name}
         </div>
-      `;
-      marker.bindTooltip(tooltipContent, { direction: 'top', offset: [0, -6] });
+      `, { sticky: true });
 
-      marker.on('click', () => {
-        if (onNodeClick) onNodeClick(node.id);
+      // Waypoint Markers
+      route.waypoints.forEach((wp, wIdx) => {
+        const isStart = wp.type === 'start';
+        const isIntercept = wp.type === 'intercept';
+        const isDest = wp.type === 'destination';
+
+        const markerColor = isStart ? '#DC2626' : isIntercept ? '#F59E0B' : isDest ? '#8B5CF6' : route.color;
+        const markerRadius = isStart ? 8 : isIntercept ? 7 : 5;
+
+        const circle = L.circleMarker([wp.lat, wp.lng], {
+          radius: markerRadius,
+          fillColor: markerColor,
+          color: '#FFFFFF',
+          weight: 2,
+          fillOpacity: 0.95,
+        }).addTo(layerGroup);
+
+        circle.bindTooltip(`
+          <div style="font-family:sans-serif;padding:4px 8px;min-width:160px;">
+            <div style="font-weight:bold;font-size:11px;color:#0F172A;font-family:monospace;">${wp.type.toUpperCase()} VECTOR</div>
+            <div style="font-size:11px;color:#334155;margin-top:2px;">${wp.label}</div>
+            <div style="font-size:9.5px;color:${markerColor};font-weight:bold;margin-top:3px;font-family:monospace;">Multi-Source Intel Verified</div>
+          </div>
+        `, { direction: 'top', offset: [0, -5] });
       });
-
-      marker.addTo(layerGroup);
     });
 
-    // ── Map Edges (Co-Accused & Case Links) ──────────────────────────────────
-    (edges || []).forEach((edge) => {
-      const srcId = typeof edge.source === 'object' ? edge.source.id : edge.source;
-      const tgtId = typeof edge.target === 'object' ? edge.target.id : edge.target;
+    // 2. Draw ANPR Surveillance Chokepoints (Sensors with Radar Radii)
+    ANPR_SURVEILLANCE_NODES.forEach((cam) => {
+      L.circle([cam.lat, cam.lng], {
+        radius: 1200,
+        color: '#06B6D4',
+        weight: 1,
+        dashArray: '4, 4',
+        fillColor: '#06B6D4',
+        fillOpacity: 0.08,
+      }).addTo(layerGroup);
 
-      const srcPos = nodePosMap[srcId];
-      const tgtPos = nodePosMap[tgtId];
+      const camMarker = L.circleMarker([cam.lat, cam.lng], {
+        radius: 6,
+        fillColor: '#06B6D4',
+        color: '#FFFFFF',
+        weight: 1.5,
+        fillOpacity: 1,
+      }).addTo(layerGroup);
 
-      if (srcPos && tgtPos) {
-        const isCrossGang = edge.crime_type === 'cross_gang' || edge.weight > 3;
-        const polyline = L.polyline([srcPos, tgtPos], {
-          color: isCrossGang ? '#dc2626' : '#94a3b8',
-          weight: isCrossGang ? 2.5 : 1.2,
-          opacity: isCrossGang ? 0.85 : 0.4,
-          dashArray: isCrossGang ? '4, 4' : null,
+      camMarker.bindTooltip(`
+        <div style="font-family:sans-serif;padding:3px 6px;">
+          <div style="font-weight:bold;font-size:11px;color:#0F172A;font-family:monospace;">ANPR CHOKEPOINT: ${cam.id}</div>
+          <div style="font-size:10.5px;color:#475569;">${cam.name}</div>
+          <div style="font-size:9.5px;color:#0891B2;font-weight:bold;margin-top:2px;font-family:monospace;">STATUS: ${cam.status}</div>
+        </div>
+      `, { direction: 'top', offset: [0, -5] });
+    });
+
+    // 3. Map Dynamic Syndicate Suspect Pins
+    (nodes || []).forEach((node) => {
+      if (node.district === 'Bengaluru Urban' || node.id === 'SUS-8842') {
+        const pin = L.circleMarker([12.9175, 77.6215], {
+          radius: 11,
+          fillColor: '#DC2626',
+          color: '#FFFFFF',
+          weight: 2.5,
+          fillOpacity: 0.95,
+        }).addTo(layerGroup);
+
+        pin.bindTooltip(`
+          <div style="font-family:sans-serif;padding:4px 6px;">
+            <div style="font-weight:bold;font-size:12px;color:#0F172A;">${node.label}</div>
+            <div style="font-size:11px;color:#475569;">Vehicle: ${node.vehicle || 'Tracked Vehicle'}</div>
+            <div style="font-size:10px;font-weight:bold;color:#DC2626;margin-top:2px;font-family:monospace;">Risk: ${node.risk_score}/100 • HIGH PRIORITY INTERCEPT</div>
+          </div>
+        `, { direction: 'top', offset: [0, -8] });
+
+        pin.on('click', () => {
+          if (onNodeClick) onNodeClick(node.id);
         });
-
-        if (edge.fir_case_number || edge.crime_type) {
-          polyline.bindTooltip(
-            `<div style="font-size:10px;font-family:sans-serif;color:#0f172a;"><b>Link:</b> ${edge.fir_case_number || edge.crime_type}</div>`,
-            { sticky: true }
-          );
-        }
-
-        polyline.addTo(layerGroup);
       }
     });
 
-    // ── 4. Add Crisp Light Theme Map Legend ───────────────────────────────────
-    if (!mapRef.current._drishtiLegend) {
+    // 4. Tactical Map Telemetry Legend
+    if (!mapRef.current._drishtiPredictiveLegend) {
       const legend = L.control({ position: 'bottomleft' });
       legend.onAdd = function () {
         const div = L.DomUtil.create('div', 'info legend');
         div.style.cssText = `
-          background: rgba(255, 255, 255, 0.95);
-          border: 1px solid #e2e8f0;
-          border-radius: 12px;
+          background: rgba(15, 23, 42, 0.92);
+          border: 1px solid rgba(51, 65, 85, 0.8);
+          border-radius: 14px;
           padding: 12px 14px;
-          font-family: inherit;
+          font-family: monospace;
           font-size: 11px;
-          color: #0f172a;
-          backdrop-filter: blur(8px);
-          line-height: 1.9;
-          min-width: 220px;
-          box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+          color: #F8FAFC;
+          backdrop-filter: blur(10px);
+          line-height: 1.8;
+          min-width: 240px;
+          box-shadow: 0 15px 30px rgba(0,0,0,0.3);
         `;
         div.innerHTML = `
-          <div style="font-weight:700;font-size:10px;letter-spacing:0.08em;color:#64748b;margin-bottom:6px;text-transform:uppercase;">Gang Intelligence Legend</div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#f97316;flex-shrink:0;"></span>
-            <span><b style="color:#ea580c;">GANG-NORTH</b> — Vehicle Theft Syndicate</span>
+          <div style="font-weight:700;font-size:10px;letter-spacing:0.08em;color:#94A3B8;margin-bottom:6px;text-transform:uppercase;border-bottom:1px solid rgba(51,65,85,0.6);padding-bottom:3px;">
+            CIA-Calibrated Intercept Grid
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
-            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#8b5cf6;flex-shrink:0;"></span>
-            <span><b style="color:#7c3aed;">GANG-SOUTH</b> — Chain Snatching Cell</span>
+            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#DC2626;flex-shrink:0;"></span>
+            <span><b>Target Sighting</b> (Last Confirmed)</span>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
-            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#2563eb;flex-shrink:0;"></span>
-            <span style="color:#2563eb;font-weight:600;">FIR Case Node</span>
+            <span style="display:inline-block;width:18px;height:2px;background:#3B82F6;border-top:2px dashed #3B82F6;flex-shrink:0;"></span>
+            <span style="color:#60A5FA;">Predicted Escape Corridor</span>
           </div>
-          <div style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span style="display:inline-block;width:22px;height:2px;background:#ef4444;border-radius:2px;flex-shrink:0;"></span>
-              <span style="color:#dc2626;font-weight:500;">Predicted High-Risk Zone</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span style="display:inline-block;width:22px;height:2px;background:#dc2626;border-top:2px dashed #dc2626;flex-shrink:0;"></span>
-              <span style="color:#dc2626;font-weight:500;">Cross-Gang Link</span>
-            </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#F59E0B;flex-shrink:0;"></span>
+            <span style="color:#FBBF24;">Active Intercept Chokepoint</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#06B6D4;flex-shrink:0;"></span>
+            <span style="color:#22D3EE;">ANPR Surveillance Sensor</span>
+          </div>
+          <div style="margin-top:6px;padding-top:5px;border-top:1px solid rgba(51,65,85,0.6);font-size:9.5px;color:#94A3B8;">
+            <div>FASTag Sweep Rate: <b>98.4%</b></div>
+            <div>Cell Tower Hops: <b>3 Synced</b></div>
           </div>
         `;
         L.DomEvent.disableClickPropagation(div);
         return div;
       };
       legend.addTo(mapRef.current);
-      mapRef.current._drishtiLegend = legend;
-    }
-
-    // ── 5. Pan smoothly to selected node coordinates ──────────────────────────
-    if (selectedNodeId) {
-      const selCoords = NODE_COORDS[selectedNodeId] || hashCoords(selectedNodeId, '');
-      mapRef.current.flyTo([selCoords.lat, selCoords.lng], 13, { animate: true, duration: 0.8 });
+      mapRef.current._drishtiPredictiveLegend = legend;
     }
 
   }, [nodes, edges, selectedNodeId, onNodeClick]);
 
-  return <div ref={containerRef} className="w-full rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-800" style={{ height }} />;
+  return (
+    <div 
+      ref={containerRef} 
+      className="w-full rounded-2xl overflow-hidden shadow-xs border border-slate-200 dark:border-zinc-800" 
+      style={{ height }} 
+    />
+  );
 }
