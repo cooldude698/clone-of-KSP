@@ -661,23 +661,6 @@ export default function ChronoCriminalGraph({
           </span>
         </div>
 
-        {/* Speed Selector */}
-        <div className="flex items-center gap-1 bg-[var(--surface-0)] p-1 rounded-lg border border-[var(--border)]/40 shrink-0">
-          {[1, 5, 20].map((s) => (
-            <button
-              key={s}
-              onClick={() => setSpeed(s)}
-              className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
-                speed === s
-                  ? "bg-blue-600 text-white font-bold border border-blue-400 shadow-md shadow-blue-500/20"
-                  : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-              }`}
-            >
-              {s}x
-            </button>
-          ))}
-        </div>
-
       </div>
     </div>
   );
