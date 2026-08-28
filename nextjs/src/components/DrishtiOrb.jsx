@@ -227,15 +227,15 @@ const DrishtiOrb = ({
       }}
     >
 
-      {/* ── LIVE LISTENING & TRANSCRIPT PILL (Minimalist HUD) ── */}
-      {!isDismissed && (liveTranscript || pendingTranscript) && (
-        <div className="w-80 max-w-[90vw] rounded-2xl overflow-hidden mb-2 animate-fade-in shadow-2xl relative">
+      {/* ── LIVE LISTENING & INTELLIGENCE RESPONSE HUD CARD ── */}
+      {!isDismissed && (liveTranscript || pendingTranscript || orbResponse) && (
+        <div className="w-80 sm:w-96 max-w-[92vw] rounded-2xl overflow-hidden mb-2 animate-fade-in shadow-2xl relative">
           <div
             style={{
-              background: 'rgba(15, 23, 42, 0.92)',
-              backdropFilter: 'blur(20px)',
+              background: 'rgba(15, 23, 42, 0.95)',
+              backdropFilter: 'blur(24px)',
             }}
-            className="px-3.5 py-2.5 border border-slate-700/80 rounded-2xl relative z-10 text-white shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+            className="px-4 py-3 border border-slate-700/80 rounded-2xl relative z-10 text-white shadow-[0_15px_45px_rgba(0,0,0,0.6)]"
           >
             {/* Live transcript while listening */}
             {liveTranscript && !pendingTranscript && (
@@ -282,16 +282,53 @@ const DrishtiOrb = ({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={(e) => { e.stopPropagation(); onConfirmSend?.(); }}
-                    className="flex-1 py-1 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all shadow-sm"
+                    className="flex-1 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all shadow-sm"
                   >
                     Send Query
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); onCancelTranscript?.(); }}
-                    className="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white/70 text-[10px] font-bold rounded-lg transition-all"
+                    className="px-2.5 py-1.5 bg-white/10 hover:bg-white/20 text-white/70 text-[10px] font-bold rounded-lg transition-all"
                   >
                     Cancel
                   </button>
+                </div>
+              </div>
+            )}
+
+            {/* Voice response bubble */}
+            {!liveTranscript && !pendingTranscript && orbResponse && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between pb-1.5 border-b border-slate-700/60">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                    <span className="text-[10px] text-blue-300 uppercase tracking-wider font-bold font-mono">
+                      DRISHTI INTELLIGENCE
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {onReadAloud && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onReadAloud(); }}
+                        className="text-slate-400 hover:text-white hover:bg-white/10 px-1.5 py-0.5 rounded cursor-pointer transition-all text-xs"
+                        title="Read Aloud"
+                      >
+                        🔊
+                      </button>
+                    )}
+                    <button
+                      onClick={handleDismissBubble}
+                      className="text-slate-400 hover:text-white hover:bg-white/10 px-1 py-0.5 rounded cursor-pointer transition-all text-xs"
+                      title="Dismiss"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+
+                {/* Render Rich Intelligence Response */}
+                <div className="max-h-72 overflow-y-auto drishti-scrollbar pr-1">
+                  <PoliceIntelligenceRenderer text={orbResponse} isDark={true} mode="bubble" />
                 </div>
               </div>
             )}

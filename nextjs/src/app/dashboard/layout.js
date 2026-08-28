@@ -205,9 +205,6 @@ export default function DashboardLayout({ children }) {
     // Dismiss proactive suggestion if open
     setProactiveSuggestion(null);
 
-    // Open Copilot side drawer so answers are cleanly displayed without floating obstructions
-    setIsPanelOpen(true);
-
     setOrbState('thinking');
     setStateOverrideLabel('Thinking…');
     setSessionLogs(prev => [...prev, { role: 'user', content: queryText, timestamp: ts() }]);
@@ -399,8 +396,8 @@ export default function DashboardLayout({ children }) {
     if (!pttActiveRef.current) return;
     pttActiveRef.current = false;
 
-    // Give the recognition engine 300ms to finalize its last speech event
-    await new Promise(r => setTimeout(r, 300));
+    // Give the recognition engine 200ms to finalize its last speech event
+    await new Promise(r => setTimeout(r, 200));
 
     // stopListeningAndGetTranscript reads directly from refs (never stale)
     const finalQuery = (await stopListeningAndGetTranscript()).trim();
@@ -408,11 +405,10 @@ export default function DashboardLayout({ children }) {
 
     if (!finalQuery) return;
 
-    // ── CONFIRM-TO-SEND: show the transcript in the bubble ──
-    // The user must press Enter / click Send to dispatch the query.
-    // This replaces the old auto-send behaviour.
-    setPendingTranscript(finalQuery);
-  }, [stopListeningAndGetTranscript]);
+    // Automatically send voice query upon release for smooth, instant response
+    setPendingTranscript('');
+    handleQuery(finalQuery);
+  }, [stopListeningAndGetTranscript, handleQuery]);
 
   const handleConfirmSend = useCallback(() => {
     if (!pendingTranscript.trim()) return;
