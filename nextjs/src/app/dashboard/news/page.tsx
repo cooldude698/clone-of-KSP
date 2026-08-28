@@ -1,10 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Newspaper, RefreshCw, AlertCircle, Radio, ChevronDown } from 'lucide-react';
+import { Newspaper, RefreshCw, AlertCircle, Radio } from 'lucide-react';
 import NewsCard from '@/components/NewsCard';
-import Skeleton from '@/components/ui/Skeleton';
-import EmptyState from '@/components/ui/EmptyState';
 import Button from '@/components/ui/Button';
 
 const INDIAN_STATES = [
@@ -56,7 +54,7 @@ export default function LiveNewsPage() {
     setPage(1);
     try {
       const param = encodeURIComponent(selectedState);
-      const res = await fetch(`/api/news?state=${param}&page=1&refresh=true&t=${Date.now()}`);
+      const res = await fetch(`/api/news?state=${param}&page=1`);
       const rawText = await res.text();
       let data: any = {};
       try {
@@ -72,7 +70,7 @@ export default function LiveNewsPage() {
               title: 'Karnataka Police Deploy AI-Powered ANPR Grid Across High-Density Corridors',
               description: 'The Karnataka State Police command center has activated real-time ANPR surveillance across Bengaluru to detect repeat offenders and stolen vehicles.',
               url: 'https://ksp.karnataka.gov.in',
-              image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&auto=format&fit=crop&q=80',
+              image: 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=1200&auto=format&fit=crop&q=80',
               publishedAt: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
               source: 'Deccan Herald',
             },
@@ -80,7 +78,7 @@ export default function LiveNewsPage() {
               title: 'Inter-District Gang Apprehended Following Multi-City Trail Analysis in Mysuru',
               description: 'Special tactical units intercepted four suspects linked to high-value vehicle thefts following cross-jurisdictional CCTV trail mapping.',
               url: 'https://ksp.karnataka.gov.in',
-              image: 'https://images.unsplash.com/photo-1589578527966-fdac0f44566c?w=800&auto=format&fit=crop&q=80',
+              image: 'https://images.unsplash.com/photo-1589578527966-fdac0f44566c?w=1200&auto=format&fit=crop&q=80',
               publishedAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
               source: 'The Hindu',
             },
@@ -88,9 +86,33 @@ export default function LiveNewsPage() {
               title: 'Bengaluru Cyber Crime Division Neutralizes Fake Law Enforcement Scam Ring',
               description: 'Officers busted a sophisticated digital arrest scam operating out of multi-state call centers targeting senior citizens.',
               url: 'https://ksp.karnataka.gov.in',
-              image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&auto=format&fit=crop&q=80',
+              image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&auto=format&fit=crop&q=80',
               publishedAt: new Date(Date.now() - 4 * 3600 * 1000).toISOString(),
               source: 'Times of India',
+            },
+            {
+              title: 'State Police Issues High Alert and ANPR Watchlist Update for Highway Tolls',
+              description: 'All major toll plazas across NH-44 and Peripheral Ring Road have updated ANPR blacklists for absconding suspects.',
+              url: 'https://ksp.karnataka.gov.in',
+              image: 'https://images.unsplash.com/photo-1508847154043-be5407fcaa5a?w=1200&auto=format&fit=crop&q=80',
+              publishedAt: new Date(Date.now() - 6 * 3600 * 1000).toISOString(),
+              source: 'Indian Express',
+            },
+            {
+              title: 'Coastal Security Police Conduct Joint Maritime Surveillance Exercise Near Mangaluru',
+              description: 'Enhanced radar tracking and patrol vessel coordination completed along Karnataka\'s 320km coastal corridor.',
+              url: 'https://ksp.karnataka.gov.in',
+              image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1200&auto=format&fit=crop&q=80',
+              publishedAt: new Date(Date.now() - 9 * 3600 * 1000).toISOString(),
+              source: 'Deccan Chronicle',
+            },
+            {
+              title: 'Hubballi-Dharwad Police Launch Community Crime Watch and Rapid Patrol Units',
+              description: 'New quick-response motor patrols integrated with GIS mapping to reduce response times below 7 minutes.',
+              url: 'https://ksp.karnataka.gov.in',
+              image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1200&auto=format&fit=crop&q=80',
+              publishedAt: new Date(Date.now() - 14 * 3600 * 1000).toISOString(),
+              source: 'Kannada Prabha',
             },
           ];
 
@@ -99,32 +121,30 @@ export default function LiveNewsPage() {
       setHasMore(data.hasMore ?? false);
       setLastUpdated(new Date());
 
-      if (data.error) {
+      if (data.error && data.isFallback) {
         setError(data.error);
+      } else {
+        setError(null);
       }
     } catch (err: any) {
-      setError(null);
+      console.error('Failed to fetch news feed:', err);
+      setError('Error connecting to news stream. Showing offline fallback feed.');
     } finally {
       setLoading(false);
     }
   }, [selectedState]);
 
-  // Load more function for pagination (appends next page results)
+  // Load more pages
   const handleLoadMore = async () => {
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
-    const nextPage = page + 1;
-
     try {
+      const nextPage = page + 1;
       const param = encodeURIComponent(selectedState);
       const res = await fetch(`/api/news?state=${param}&page=${nextPage}`);
-      const rawText = await res.text();
-      let data: any = {};
-      try {
-        data = rawText ? JSON.parse(rawText) : {};
-      } catch (_) {}
+      const data = await res.json();
 
-      if (data.articles && data.articles.length > 0) {
+      if (data.articles && Array.isArray(data.articles) && data.articles.length > 0) {
         setArticles((prev) => {
           const existingUrls = new Set(prev.map((a) => a.url));
           const newUnique = data.articles.filter((a: Article) => !existingUrls.has(a.url));
@@ -143,12 +163,10 @@ export default function LiveNewsPage() {
     }
   };
 
-  // Initial fetch and fetch on state change
   useEffect(() => {
     fetchNews();
   }, [fetchNews]);
 
-  // Auto-refresh every 5 minutes
   useEffect(() => {
     const interval = setInterval(() => {
       fetchNews();
@@ -156,7 +174,6 @@ export default function LiveNewsPage() {
     return () => clearInterval(interval);
   }, [fetchNews]);
 
-  // Timer to update "Last updated: X min ago" in IBM Plex Mono font
   useEffect(() => {
     const timer = setInterval(() => {
       if (!lastUpdated) return;
@@ -175,25 +192,24 @@ export default function LiveNewsPage() {
   }, [lastUpdated]);
 
   return (
-    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6">
-      {/* ── HEADER & CONTROL BAR ────────────────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-steel-600/30">
+    <div className="space-y-6 max-w-7xl mx-auto p-4 sm:p-6">
+      {/* ── HEADER ─────────────────────────────────────────────────────────── */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
           <div className="flex items-center gap-2">
-            {/* EXISTING Phosphor-500 LIVE dot signature component */}
             <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-phosphor-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-phosphor-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-600"></span>
             </span>
-            <span className="text-[10px] font-mono tracking-widest text-phosphor-500 uppercase font-semibold">
+            <span className="text-[10px] font-mono tracking-widest text-blue-600 dark:text-blue-400 uppercase font-semibold">
               LIVE BROADCAST
             </span>
           </div>
-          <h1 className="text-xl md:text-2xl font-bold text-paper-100 mt-1 flex items-center gap-2">
-            <Newspaper className="w-6 h-6 text-phosphor-500" />
+          <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1 flex items-center gap-2">
+            <Newspaper className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             Live Crime & Police Intelligence Feed
           </h1>
-          <p className="text-xs text-paper-100/60 mt-0.5">
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
             Real-time automated incident and law enforcement surveillance stream sourced via GNews.
           </p>
         </div>
@@ -202,17 +218,17 @@ export default function LiveNewsPage() {
         <div className="flex flex-wrap items-center gap-3">
           {/* State Select Dropdown */}
           <div className="flex items-center gap-1.5">
-            <label htmlFor="state-filter" className="text-xs font-mono text-paper-100/60 hidden sm:inline">
+            <label htmlFor="state-filter" className="text-xs font-mono text-slate-600 dark:text-slate-400 hidden sm:inline">
               State:
             </label>
             <select
               id="state-filter"
               value={selectedState}
               onChange={(e) => setSelectedState(e.target.value)}
-              className="px-3.5 py-2 rounded-md bg-steel-700 border border-steel-600/50 text-xs font-sans text-paper-100 focus:outline-none focus:border-phosphor-500 transition-all cursor-pointer shadow-sm"
+              className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-sans text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer shadow-sm"
             >
               {INDIAN_STATES.map((st) => (
-                <option key={st} value={st} className="bg-steel-700 text-paper-100">
+                <option key={st} value={st} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
                   {st}
                 </option>
               ))}
@@ -225,116 +241,87 @@ export default function LiveNewsPage() {
             disabled={loading}
             variant="secondary"
             size="sm"
-            className="flex items-center gap-1.5 text-xs font-mono"
+            className="flex items-center gap-1.5 text-xs font-mono bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span>Refresh</span>
           </Button>
 
-          {/* Last Updated Timestamp in IBM Plex Mono */}
-          <div className="text-xs font-mono text-paper-100/50 bg-steel-700/50 px-2.5 py-1.5 rounded border border-steel-600/30 flex items-center gap-1.5">
-            <Radio className="w-3 h-3 text-phosphor-500" />
+          {/* Last Updated Timestamp */}
+          <div className="text-xs font-mono text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center gap-1.5">
+            <Radio className="w-3 h-3 text-blue-600 dark:text-blue-400" />
             <span>Last updated: {minsAgo}</span>
           </div>
 
           {/* Total Available Articles Badge */}
           {totalArticles > 0 && (
-            <div className="text-xs font-mono text-paper-100/80 bg-steel-700 px-3 py-1.5 rounded border border-steel-600/40">
-              Showing <span className="text-phosphor-500 font-bold">{articles.length}</span> of{' '}
+            <div className="text-xs font-mono text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+              Showing <span className="text-blue-600 dark:text-blue-400 font-bold">{articles.length}</span> of{' '}
               <span className="font-bold">{totalArticles.toLocaleString('en-IN')}</span> articles
             </div>
           )}
         </div>
       </div>
 
-      {/* Soft warning alert banner if using fallback data */}
+      {/* Warning alert banner */}
       {error && articles.length > 0 && (
-        <div className="px-4 py-2.5 rounded-lg bg-warn-500/10 border border-warn-500/30 text-warn-500 text-xs font-mono flex items-center justify-between">
+        <div className="px-4 py-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-xs font-mono flex items-center justify-between">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
           <button
             onClick={fetchNews}
-            className="text-[11px] underline hover:text-paper-100 ml-2 shrink-0"
+            className="text-[11px] underline hover:text-slate-900 dark:hover:text-slate-100 ml-2 shrink-0 font-semibold"
           >
             Retry API
           </button>
         </div>
       )}
 
-      {/* ── CONTENT GRID / SKELETON / EMPTY / ERROR STATES ─────────────────── */}
+      {/* ── CONTENT GRID ────────────────────────────────────────────────── */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="p-4 rounded-lg bg-steel-700 border border-steel-600/40 space-y-3">
-              <Skeleton className="w-full h-40 rounded-md" />
-              <Skeleton className="w-3/4 h-5 rounded" />
-              <Skeleton className="w-full h-4 rounded" />
-              <Skeleton className="w-2/3 h-4 rounded" />
-              <div className="pt-2 flex justify-between">
-                <Skeleton className="w-1/3 h-3 rounded" />
-                <Skeleton className="w-1/4 h-3 rounded" />
-              </div>
+            <div key={i} className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+              <div className="w-full h-44 rounded-lg bg-slate-200 dark:bg-slate-800 animate-pulse" />
+              <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-3/4 animate-pulse" />
+              <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded w-full animate-pulse" />
+              <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded w-2/3 animate-pulse" />
             </div>
           ))}
         </div>
-      ) : error && articles.length === 0 ? (
-        <EmptyState
-          icon={AlertCircle}
-          title="Unable to Load Live News Feed"
-          description={error}
-          className="py-16"
-        >
-          <Button onClick={fetchNews} variant="primary" size="sm" className="mt-4">
-            Try Again
-          </Button>
-        </EmptyState>
-      ) : articles.length === 0 ? (
-        <EmptyState
-          icon={Newspaper}
-          title={`No Crime Reports Found for ${selectedState}`}
-          description="There are currently no active crime or law enforcement intelligence reports recorded for this region."
-          className="py-16"
-        />
-      ) : (
+      ) : articles.length > 0 ? (
         <>
-          {/* News Grid (1 col mobile, 2 tablet, 3 desktop) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {articles.map((article, idx) => (
               <NewsCard key={`${article.url}-${idx}`} article={article} index={idx} />
             ))}
           </div>
 
-          {/* Load More Button Pagination */}
+          {/* Load More Button */}
           {hasMore && (
-            <div className="flex flex-col items-center justify-center pt-6">
+            <div className="flex justify-center pt-6">
               <Button
                 onClick={handleLoadMore}
                 disabled={loadingMore}
                 variant="secondary"
                 size="md"
-                className="flex items-center gap-2 font-mono text-xs px-6 py-2.5 border-steel-600 hover:border-phosphor-500"
+                className="px-6 py-2.5 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 shadow-sm"
               >
                 {loadingMore ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin text-phosphor-500" />
-                    <span>Loading Next Page...</span>
-                  </>
+                  <span className="flex items-center gap-2 text-xs font-mono">
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    Loading Articles...
+                  </span>
                 ) : (
-                  <>
-                    <span>Load More News</span>
-                    <ChevronDown className="w-4 h-4 text-phosphor-500" />
-                  </>
+                  <span className="text-xs font-mono font-semibold">Load More Articles</span>
                 )}
               </Button>
-              <p className="text-[11px] font-mono text-paper-100/50 mt-2">
-                Page {page} • Showing {articles.length} of {totalArticles.toLocaleString('en-IN')} total results
-              </p>
             </div>
           )}
         </>
-      )}
+      ) : null}
     </div>
   );
 }
