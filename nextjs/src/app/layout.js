@@ -35,12 +35,8 @@ export const metadata = {
 const themeScript = `
 (function() {
   try {
-    const saved = localStorage.getItem('theme');
-    if (saved === 'light') {
-      document.documentElement.classList.remove('dark');
-    } else {
-      document.documentElement.classList.add('dark');
-    }
+    localStorage.setItem('theme', 'dark');
+    document.documentElement.classList.add('dark');
   } catch(e) {
     document.documentElement.classList.add('dark');
   }

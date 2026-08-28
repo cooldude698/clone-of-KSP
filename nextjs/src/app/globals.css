@@ -10,26 +10,26 @@
 
 /* ─── LIGHT & DARK THEME TOKENS ────────── */
 :root {
-  /* Dynamic Light Surface & UI Mapping */
-  --background:        #F4F5F8;
-  --foreground:        #09090B;
-  --surface-0:         #F4F5F8;
-  --surface-1:         #FFFFFF;
-  --surface-2:         #F1F3F6;
-  --border:            #E2E8F0;
-  --border-subtle:     #F1F5F9;
-  --text-primary:      #09090B;
-  --text-secondary:    #64748B;
-  --text-muted:        #94A3B8;
-  --muted-foreground:  #64748B;
-  --accent:            #09090B;
-  --accent-light:      #2563EB;
-  --accent-glow:       rgba(37, 99, 235, 0.12);
-  --cyan-accent:       #0284C7;
-  --cyan-glow:         rgba(2, 132, 199, 0.15);
-  --status-critical:   #DC2626; /* Alert red */
-  --status-warning:    #D97706; /* Amber warning */
-  --status-success:    #16A34A; /* Emerald success */
+  /* Default Dark Cyber Surface & UI Tokens */
+  --background:        #09090B;
+  --foreground:        #F8FAFC;
+  --surface-0:         #09090B;
+  --surface-1:         #18181B;
+  --surface-2:         #27272A;
+  --border:            #27272A;
+  --border-subtle:     #1F1F23;
+  --text-primary:      #F8FAFC;
+  --text-secondary:    #94A3B8;
+  --text-muted:        #64748B;
+  --muted-foreground:  #94A3B8;
+  --accent:            #F8FAFC;
+  --accent-light:      #3B82F6;
+  --accent-glow:       rgba(59, 130, 246, 0.2);
+  --cyan-accent:       #38BDF8;
+  --cyan-glow:         rgba(56, 189, 248, 0.2);
+  --status-critical:   #EF4444; /* Alert red */
+  --status-warning:    #F59E0B; /* Amber warning */
+  --status-success:    #10B981; /* Emerald success */
 
   /* ── Legacy aliases ── */
   --color-void-000:       var(--surface-0);
