@@ -250,18 +250,23 @@ const useDrishtiVoice = ({
       const mimeType = audioBlob.type || 'audio/webm;codecs=opus';
       const langCode = lang?.startsWith('kn') ? 'kn' : 'en';
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1200);
+
       // Call /server/drishtiVoice → proxied to Catalyst Function by next.config.mjs
       const res = await fetch('/server/drishtiVoice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode: 'stt', audioBase64: base64, mimeType, lang: langCode }),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
       const data = await res.json();
       if (data.source === 'zia' && data.transcript) {
         return data.transcript;
       }
-    } catch (err) {
-      console.warn('[DrishtiVoice] Zia STT call failed:', err.message);
+    } catch (_) {
+      // Fallback silently and immediately to browser transcript
     }
     return null; // null = fall through to browser SpeechRecognition
   }, []);

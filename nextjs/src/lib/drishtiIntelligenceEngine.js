@@ -192,28 +192,37 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
   const historyText = (history || []).map(h => h.content || '').join(' ').toLowerCase();
   const contextQuery = `${q} ${historyText}`;
 
-  // ── 1. GREETING & CONVERSATIONAL INTENTS ─────────────────────────────────────
-  if (
-    q === 'hi' || q === 'hello' || q === 'hey' || q === 'jai hind' || 
-    q.includes('good morning') || q.includes('good evening') || q.includes('namaste') ||
-    q === 'ನಮಸ್ಕಾರ' || q === 'ಜೈ ಹಿಂದ್' || q === 'नमस्ते' || q === 'जय हिंद'
-  ) {
+  // ── 1. GREETINGS, CONVERSATIONAL & IDENTITY INTENTS ──────────────────────────
+  const isGreeting = 
+    q === 'hi' || q === 'hello' || q === 'hey' || q.startsWith('hi ') || q.startsWith('hello ') || q.startsWith('hey ') ||
+    q.includes('how are you') || q.includes('how do you do') || q.includes('how are things') || q.includes('how r u') ||
+    q.includes('how are you doing') || q.includes('whats up') || q.includes("what's up") ||
+    q.includes('good morning') || q.includes('good evening') || q.includes('good afternoon') || q.includes('good night') ||
+    q.includes('namaste') || q.includes('jai hind') || q.includes('ನಮಸ್ಕಾರ') || q.includes('ಜೈ ಹಿಂದ್') || q.includes('नमस्ते') || q.includes('जय हिंद');
+
+  const isIdentityOrHelp = 
+    q.includes('who are you') || q.includes('what are you') || q.includes('what is your name') || 
+    q.includes('what can you do') || q.includes('help me') || q.includes('what is drishti') || 
+    q.includes('who made you') || q.includes('your capabilities') || q.includes('ನಿನ್ನ ಹೆಸರು') || q.includes('ನೀವು ಯಾರು') ||
+    q.includes('तुम कौन हो') || q.includes('तुम्हारा नाम');
+
+  if (isGreeting || isIdentityOrHelp) {
     if (isKannada) {
       return {
-        answer: `ಜೈ ಹಿಂದ್, ಸರ್! ದೃಷ್ಟಿ (DRISHTI AI) ಕರ್ತವ್ಯದಲ್ಲಿದೆ. ಕರ್ನಾಟಕ ರಾಜ್ಯ ಪೊಲೀಸ್ ಸಿಸಿಟಿಎನ್‌ಎಸ್ ಮತ್ತು ಗುಪ್ತಚರ ದತ್ತಸಂಚಯ ಸಂಪೂರ್ಣವಾಗಿ ಸಕ್ರಿಯವಾಗಿದೆ.\n\nಇಂದು ನಿಮ್ಮ ತನಿಖೆಯಲ್ಲಿ ನಾನು ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ, ಸರ್? ನೀವು ಶಂಕಿತರ ಪಟ್ಟಿ, ಪ್ರಕರಣದ ವಿವರಗಳು, ವಾಹನ ಶೋಧನೆ ಅಥವಾ ಸ್ಥಳ ಮಹಜರು SOP ಬಗ್ಗೆ ಕೇಳಬಹುದು.`,
-        suggestions: ['ಇತ್ತೀಚಿನ ವಾಹನ ಕಳವು ಪ್ರಕರಣಗಳು', 'ನಮ್ಮ ಪ್ರಮುಖ ಗುರಿಗಳು (Target Suspects)', 'ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಅಪರಾಧ ಹಾಟ್‌ಸ್ಪಾಟ್'],
+        answer: `ಜೈ ಹಿಂದ್, ಸರ್! ನಾನು ದೃಷ್ಟಿ (DRISHTI AI) — ಕರ್ನಾಟಕ ರಾಜ್ಯ ಪೊಲೀಸ್ ಗುಪ್ತಚರ ಸಹಾಯಕ. ನಾನು ಸಂಪೂರ್ಣವಾಗಿ ಸಕ್ರಿಯವಾಗಿದ್ದೇನೆ.\n\nಇಂದು ನಿಮ್ಮ ತನಿಖೆಯಲ್ಲಿ ನಾನು ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ, ಸರ್? ನೀವು ಶಂಕಿತರ ಪಟ್ಟಿ, ಪ್ರಕರಣದ ವಿವರಗಳು, ವಾಹನ ಶೋಧನೆ ಅಥವಾ ಸ್ಥಳ ಮಹಜರು SOP ಬಗ್ಗೆ ಕೇಳಬಹುದು.`,
+        suggestions: ['ಇತ್ತೀಚಿನ ವಾಹನ ಕಳವು ಪ್ರಕರಣಗಳು', 'ಪ್ರಮುಖ ಗುರಿ ಶಂಕಿತರು (Target Suspects)', 'ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಅಪರಾಧ ಹಾಟ್‌ಸ್ಪಾಟ್', 'ಸ್ಥಳ ಮಹಜರು SOP'],
         kpis: { active_firs: allFirs.length, repeat_offenders: SUSPECTS_INTEL.length, grid_status: 'ONLINE' }
       };
     }
     if (isHindi) {
       return {
-        answer: `जय हिंद, सर! दृष्टि (DRISHTI AI) ऑन-ड्यूटी सक्रिय है। कर्नाटक पुलिस CCTNS और सर्विलांस ग्रिड पूरी तरह सिंक्रोनाइज़्ड हैं।\n\nआज आपकी जांच में मैं कैसे सहायता कर सकता हूँ, सर? आप वांछित संदिग्धों, केस फाइलों, ANPR वाहन ट्रैकिंग या पुलिस SOP के बारे में पूछ सकते हैं।`,
-        suggestions: ['नवीनतम वाहन चोरी मामले (Vehicle Theft)', 'शीर्ष वांछित संदिग्ध (Target Suspects)', 'सिल्क बोर्ड क्राइम एनालिसिस'],
+        answer: `जय हिंद, सर! मैं दृष्टि (DRISHTI AI) हूँ — कर्नाटक राज्य पुलिस इंटेलिजेंस असिस्टेंट। मैं पूरी तरह सक्रिय और ऑन-ड्यूटी हूँ।\n\nआज आपकी जांच में मैं कैसे सहायता कर सकता हूँ, सर? आप वांछित संदिग्धों, केस फाइलों, ANPR वाहन ट्रैकिंग या पुलिस SOP के बारे में पूछ सकते हैं।`,
+        suggestions: ['नवीनतम वाहन चोरी मामले (Vehicle Theft)', 'शीर्ष वांछित संदिग्ध (Target Suspects)', 'सिल्क board क्राइम एनालिसिस', 'पंचनामा SOP'],
         kpis: { active_firs: allFirs.length, repeat_offenders: SUSPECTS_INTEL.length, grid_status: 'ONLINE' }
       };
     }
     return {
-      answer: `Jai Hind, Inspector! DRISHTI AI is on active duty, synchronized with Karnataka State Police CCTNS datastores and the statewide ANPR grid.\n\nHow may I assist your command shift today, Sir? You can query active target suspects, inspect specific FIR dockets, track vehicles via CCTV, or generate spot panchanamas.`,
+      answer: `Jai Hind, Officer! I am doing well and on active duty. DRISHTI AI is fully operational, synchronized with Karnataka State Police CCTNS datastores and the statewide ANPR grid.\n\nHow may I assist your command shift today, Sir? You can query active target suspects, inspect specific FIR dockets, track vehicles via CCTV, or generate spot panchanamas.`,
       suggestions: ['Latest Vehicle Theft Cases', 'Show Clearance & Target Suspects', 'Inspect Ramesh Kumar Dossier', 'Analyze Silk Board Crime Hotspot'],
       kpis: { active_firs: allFirs.length, repeat_offenders: SUSPECTS_INTEL.length, grid_status: 'ONLINE' }
     };
