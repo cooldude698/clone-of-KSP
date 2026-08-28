@@ -1393,17 +1393,17 @@ export default function ChatPage() {
   const isEmpty = messages.length === 0;
 
   return (
-    <div className="flex h-full relative overflow-hidden bg-[#F8F9FB] dark:bg-[#09090B] text-gray-900 dark:text-gray-100 font-sans">
+    <div className="flex h-full relative overflow-hidden bg-[var(--surface-0)] text-[var(--text-primary)] font-sans">
       <div className="flex-grow flex flex-col h-full min-w-0 transition-all duration-300 relative z-10">
         {/* Header Command Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-3.5 bg-white/80 dark:bg-[#18181B]/80 backdrop-blur-md border-b border-gray-200/80 dark:border-gray-800 shadow-xs z-20">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-3.5 bg-[var(--surface-1)] backdrop-blur-md border-b border-[var(--border)] shadow-xs z-20">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center p-1.5 shadow-xs flex-shrink-0">
               <DrishtiEmblem className="w-full h-full" color="currentColor" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-sm font-bold text-gray-900 dark:text-white font-sans tracking-tight">
+                <h2 className="text-sm font-bold text-[var(--text-primary)] font-sans tracking-tight">
                   DRISHTI Co-Pilot
                 </h2>
                 <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 text-[9px] font-mono px-2 py-0.5 rounded-full font-bold">
@@ -1411,7 +1411,7 @@ export default function ChatPage() {
                   LIVE GRID
                 </span>
               </div>
-              <p className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">
+              <p className="text-[10px] text-[var(--text-secondary)] font-medium">
                 Karnataka Police AI Intelligence & Multilingual RAG Engine
               </p>
             </div>

@@ -192,9 +192,9 @@ export default function LiveNewsPage() {
   }, [lastUpdated]);
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto p-4 sm:p-6">
+    <div className="w-full max-w-7xl mx-auto space-y-6 text-[var(--text-primary)] font-sans">
       {/* ── HEADER ─────────────────────────────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">
         <div>
           <div className="flex items-center gap-2">
             <span className="relative flex h-2.5 w-2.5">
@@ -205,11 +205,11 @@ export default function LiveNewsPage() {
               LIVE BROADCAST
             </span>
           </div>
-          <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1 flex items-center gap-2">
-            <Newspaper className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+          <h1 className="text-xl font-bold text-[var(--text-primary)] tracking-tight mt-1 flex items-center gap-2">
+            <Newspaper className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             Live Crime & Police Intelligence Feed
           </h1>
-          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">
             Real-time automated incident and law enforcement surveillance stream sourced via GNews.
           </p>
         </div>

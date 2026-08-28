@@ -401,22 +401,22 @@ export default function LogsPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-full bg-[var(--surface-0)] flex flex-col transition-colors duration-300">
-      {/* ── Top Header ── */}
-      <div className="px-6 py-5 border-b border-[var(--border)] bg-[var(--surface-1)] backdrop-blur-md sticky top-0 z-20">
+    <div className="w-full max-w-7xl mx-auto space-y-6 pb-12 text-[var(--text-primary)] font-sans">
+      {/* ── Top Header Container ── */}
+      <div className="space-y-4 pb-4 border-b border-[var(--border)]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-500 shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-500 shadow-xs">
               <Bot className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-extrabold text-[var(--text-primary)] font-mono tracking-tight">DRISHTI AI Subject Log Cards</h1>
+                <h1 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">DRISHTI AI Subject Log Cards</h1>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
                   {sessionCards.length} Cards Saved
                 </span>
               </div>
-              <p className="text-xs text-[var(--text-secondary)] font-mono">
+              <p className="text-xs text-[var(--text-secondary)] mt-0.5 font-mono">
                 Conversations grouped automatically by person & topic
               </p>
             </div>

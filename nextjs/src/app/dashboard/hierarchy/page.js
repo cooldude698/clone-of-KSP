@@ -94,18 +94,18 @@ export default function HierarchyPage() {
   });
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12 font-sans text-zinc-900 dark:text-zinc-50">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12 font-sans text-[var(--text-primary)]">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--border)] pb-4">
         <div className="flex items-center gap-3.5">
           <div className="w-11 h-11 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 flex items-center justify-center font-bold shadow-xs">
             <Building2 className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-xl font-black text-zinc-950 dark:text-white tracking-tight">
+            <h1 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">
               KSP Jurisdictional Units & Command Directory
             </h1>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 font-mono">
+            <p className="text-xs text-[var(--text-secondary)] mt-0.5 font-mono">
               Station House Officers · KGID Personnel Master · Court Jurisdiction Mappings
             </p>
           </div>

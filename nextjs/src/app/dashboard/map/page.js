@@ -204,31 +204,31 @@ export default function MapPage() {
     : null;
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-[calc(100vh-8rem)] rounded-2xl overflow-hidden border border-[var(--border)] bg-[var(--surface-0)] text-[var(--text-primary)] font-sans shadow-sm">
 
       {/* ── Sidebar ── */}
-      <div className="w-72 flex-shrink-0 border-r border-steel-600/40 flex flex-col bg-steel-700">
+      <div className="w-72 flex-shrink-0 border-r border-[var(--border)] flex flex-col bg-[var(--surface-1)]">
 
         {/* Header */}
-        <div className="p-4 border-b border-steel-600/40">
+        <div className="p-4 border-b border-[var(--border)]">
           <div className="flex items-center justify-between mb-1">
-            <h2 className="text-sm font-bold text-paper-100">Crime Hotspot Map</h2>
+            <h2 className="text-sm font-bold text-[var(--text-primary)]">Crime Hotspot Map</h2>
             <button
               id="btn-refresh-map"
               onClick={() => fetchHotspots({ district: filterDistrict, crime_type: filterCrimeType })}
               disabled={loading}
-              className="text-paper-100/40 hover:text-paper-100/80 disabled:opacity-30 transition-colors"
+              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-30 transition-colors"
               title="Refresh"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             </button>
           </div>
-          <p className="text-xs text-paper-100/50">Karnataka State · Live data</p>
+          <p className="text-xs text-[var(--text-secondary)]">Karnataka State · Live data</p>
 
           {/* Last updated + cache badge */}
           <div className="flex items-center gap-2 mt-2 flex-wrap">
             {lastUpdated && (
-              <div className="flex items-center gap-1 text-[10px] text-paper-100/30">
+              <div className="flex items-center gap-1 text-[10px] text-[var(--text-secondary)] font-mono">
                 <Clock className="w-3 h-3" />
                 {formatTime(lastUpdated)}
               </div>

@@ -280,12 +280,12 @@ export default function AnalyticsPage() {
     : null;
 
   return (
-    <div className="p-6 space-y-6 animate-fade-in">
+    <div className="w-full max-w-7xl mx-auto space-y-6 animate-fade-in text-[var(--text-primary)]">
       {/* ── Page Header ── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">
         <div>
-          <h2 className="text-base font-bold text-paper-100">Crime Analytics</h2>
-          <p className="text-xs text-paper-100/50 mt-0.5">
+          <h1 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">Crime Analytics & Intelligence Trends</h1>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">
             Karnataka State — {monthsBack === 999 ? 'All Time' : `Last ${monthsBack} months`}
           </p>
         </div>
@@ -293,7 +293,7 @@ export default function AnalyticsPage() {
         <div className="flex items-center gap-3 flex-wrap">
           {usingCache && <CachedBadge />}
           {lastUpdated && (
-            <span className="text-xs text-paper-100/40 flex items-center gap-1">
+            <span className="text-xs text-[var(--text-secondary)] flex items-center gap-1 font-mono">
               <Clock className="w-3 h-3" />
               Updated {formatTime(lastUpdated)}
             </span>
@@ -302,14 +302,14 @@ export default function AnalyticsPage() {
             id="btn-refresh-analytics"
             onClick={() => fetchAnalyticsData(true)}
             disabled={refreshing || loading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-steel-600/40 border border-steel-600/50 hover:bg-steel-600/70 text-xs text-paper-100/80 font-medium transition-all disabled:opacity-40"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:bg-[var(--surface-2)] text-xs text-[var(--text-primary)] font-medium transition-all disabled:opacity-40 shadow-xs"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
             {refreshing ? 'Refreshing…' : 'Refresh'}
           </button>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-phosphor-500/10 border border-phosphor-500/20">
-            <BarChart2 className="w-3.5 h-3.5 text-phosphor-500" />
-            <span className="text-xs text-phosphor-500 font-medium">Live Analytics (10s)</span>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20">
+            <BarChart2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+            <span className="text-[11px] text-blue-600 dark:text-blue-400 font-semibold">Live Analytics (10s)</span>
           </div>
         </div>
       </div>

@@ -1087,24 +1087,24 @@ export default function GeoTrailPage() {
   }, [trailData]);
 
   return (
-    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6 bg-void-000 text-paper-100 min-h-screen">
+    <div className="w-full max-w-7xl mx-auto space-y-6 text-[var(--text-primary)] font-sans">
       {/* ── HEADER ROW ────────────────────────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-steel-600/50">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">
         <div className="flex flex-col justify-center">
           <div className="flex items-center gap-2">
             <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-phosphor-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-phosphor-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-600"></span>
             </span>
-            <span className="text-[10px] font-mono tracking-widest text-phosphor-500 uppercase font-semibold">
+            <span className="text-[10px] font-mono tracking-widest text-blue-600 dark:text-blue-400 uppercase font-semibold">
               TACTICAL ANPR RECONSTRUCTION
             </span>
           </div>
-          <h1 className="text-xl md:text-2xl font-bold text-paper-100 mt-1 flex items-center gap-2.5 font-sans">
-            <Navigation className="w-6 h-6 text-phosphor-500 shrink-0" />
+          <h1 className="text-xl font-bold text-[var(--text-primary)] tracking-tight mt-1 flex items-center gap-2.5">
+            <Navigation className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
             Suspect Geo-Trail Tracker
           </h1>
-          <p className="text-xs text-paper-100/60 mt-0.5 font-sans">
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">
             Trace vehicle movements, analyze time-speed gaps, and project escape heading vectors.
           </p>
         </div>

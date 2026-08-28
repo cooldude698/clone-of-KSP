@@ -116,10 +116,10 @@ export default function DashboardPage() {
         <div className="lg:col-span-8 flex flex-col justify-between space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              <h1 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">
                 {t('nav.dashboard', 'Dashboard')}
               </h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-xs text-[var(--text-secondary)] mt-0.5">
                 Karnataka State Police · Sector 4 Tactical Command & Analytics
               </p>
             </div>

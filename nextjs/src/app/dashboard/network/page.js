@@ -261,9 +261,9 @@ export default function NetworkPage() {
   };
 
   return (
-    <div className="min-h-full flex flex-col font-sans space-y-5 pb-12">
+    <div className="w-full max-w-7xl mx-auto space-y-6 pb-12 font-sans text-[var(--text-primary)]">
       {/* 1. TOP HEADER & EXECUTIVE KPI BANNER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-[#18181B] p-5 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-xs">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[var(--surface-1)] p-5 rounded-2xl border border-[var(--border)] shadow-xs">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-blue-600/10 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-600/20 shadow-xs">
@@ -271,14 +271,14 @@ export default function NetworkPage() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white font-heading tracking-tight">
+                <h1 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">
                   Criminal Syndicate & Gang Nexus
                 </h1>
                 <span className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/25 text-[10px] font-mono px-2 py-0.5 rounded-full font-bold uppercase">
                   5 Active Rings
                 </span>
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 font-medium">
+              <p className="text-xs text-[var(--text-secondary)] mt-0.5 font-medium">
                 Karnataka Police Cross-District Multi-Hop Intelligence & Organized Crime Matrix
               </p>
             </div>
