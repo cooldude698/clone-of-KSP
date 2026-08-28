@@ -1015,6 +1015,13 @@ export default function DashboardLayout({ children }) {
             stopSpeaking();
             setOrbState('idle');
           }}
+          isSpeaking={isSpeaking || orbState === 'speaking'}
+          onStopSpeaking={() => {
+            stopSpeaking();
+            setOrbState('idle');
+          }}
+          suggestions={response?.follow_up_suggestions || []}
+          onSelectSuggestion={(sug) => handleQuery(sug)}
         />
       )}
 
