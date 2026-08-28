@@ -1,0 +1,653 @@
+/* ═══════════════════════════════════════════════════════
+   DRISHTI — Tactical AI Co-Pilot Design System
+   Fonts: Montserrat (Headlines) · Google Sans / Plus Jakarta Sans (Body) · JetBrains Mono (Data) · Noto Sans Kannada · Playfair Display (Newspaper)
+   ═══════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+Kannada:wght@400;500;600;700&family=Playfair+Display:wght@400;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── LIGHT & DARK THEME TOKENS ────────── */
+:root {
+  /* Default Crisp Light Surface & UI Tokens */
+  --background:        #F8FAFC;
+  --foreground:        #0F172A;
+  --surface-0:         #FFFFFF;
+  --surface-1:         #F1F5F9;
+  --surface-2:         #E2E8F0;
+  --border:            #E2E8F0;
+  --border-subtle:     #CBD5E1;
+  --text-primary:      #0F172A;
+  --text-secondary:    #475569;
+  --text-muted:        #64748B;
+  --muted-foreground:  #64748B;
+  --accent:            #1D6FBF;
+  --accent-light:      #2563EB;
+  --accent-glow:       rgba(37, 99, 235, 0.15);
+  --cyan-accent:       #0284C7;
+  --cyan-glow:         rgba(2, 132, 199, 0.15);
+  --status-critical:   #DC2626;
+  --status-warning:    #D97706;
+  --status-success:    #059669;
+
+  /* ── Legacy aliases ── */
+  --color-void-000:       #FFFFFF;
+  --color-steel-700:      #FFFFFF;
+  --color-steel-600:      #E2E8F0;
+  --color-phosphor-500:   #1D6FBF;
+  --color-warn-500:       #D97706;
+  --color-critical-500:   #DC2626;
+  --color-stamp-red-500:  #DC2626;
+  --color-success-500:    #059669;
+  --color-paper-100:      #0F172A;
+
+  --scroll-track: #F1F5F9;
+  --scroll-thumb: #CBD5E1;
+
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+}
+
+.dark {
+  --background:        #09090B;
+  --foreground:        #F8FAFC;
+  --surface-0:         #09090B;
+  --surface-1:         #18181B;
+  --surface-2:         #27272A;
+  --border:            #27272A;
+  --border-subtle:     #1F1F23;
+  --text-primary:      #F8FAFC;
+  --text-secondary:    #94A3B8;
+  --text-muted:        #64748B;
+  --muted-foreground:  #94A3B8;
+  --accent:            #F8FAFC;
+  --accent-light:      #3B82F6;
+  --accent-glow:       rgba(59, 130, 246, 0.2);
+  --cyan-accent:       #38BDF8;
+  --cyan-glow:         rgba(56, 189, 248, 0.2);
+  --status-critical:   #EF4444;
+  --status-warning:    #F59E0B;
+  --status-success:    #10B981;
+
+  --color-void-000:       #09090B;
+  --color-steel-700:      #18181B;
+  --color-steel-600:      #27272A;
+  --color-phosphor-500:   #F8FAFC;
+  --color-warn-500:       var(--status-warning);
+  --color-critical-500:   var(--status-critical);
+  --color-stamp-red-500:  var(--status-critical);
+  --color-success-500:    var(--status-success);
+  --color-paper-100:      #F8FAFC;
+
+  --scroll-track: #09090B;
+  --scroll-thumb: #27272A;
+}
+
+
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════
+   STRICT DUAL-FONT REWIRING (MONTSERRAT & GOOGLE SANS ONLY)
+   ═══════════════════════════════════════════════════════ */
+
+/* 1. Universal Body, Text, Controls, Forms, Navigation & Badges (Google Sans) */
+*,
+*::before,
+*::after,
+html,
+body,
+p,
+span,
+a,
+input,
+select,
+textarea,
+option,
+label,
+li,
+td,
+th,
+div,
+form,
+button,
+nav,
+aside,
+main,
+section,
+header,
+footer,
+.font-sans,
+.font-mono,
+.font-data,
+.badge,
+.btn-primary,
+.btn-secondary {
+  font-family: var(--font-google-sans), 'Google Sans', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* 2. All Headlines, Section Titles, Brand Logo & Card Headers (Montserrat ONLY) */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+h1 *,
+h2 *,
+h3 *,
+h4 *,
+h5 *,
+h6 *,
+.font-headline,
+.font-heading,
+.font-title,
+.heading-text,
+.case-stamp,
+.brand-title,
+.card-header,
+.modal-header {
+  font-family: var(--font-montserrat), 'Montserrat', 'Google Sans', sans-serif !important;
+  letter-spacing: -0.015em;
+}
+
+/* Code block exemption */
+code,
+pre {
+  font-family: 'JetBrains Mono', 'Courier New', monospace !important;
+}
+
+/* Kannada font exemption */
+.font-kannada {
+  font-family: 'Noto Sans Kannada', var(--font-google-sans), sans-serif !important;
+}
+
+html,
+body {
+  max-width: 100vw;
+  background-color: var(--surface-0);
+  color: var(--text-primary);
+  font-feature-settings: 'cv01', 'cv02', 'cv03', 'cv04';
+  transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--scroll-track);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* ═══════════════════════════════════════════════════════
+   ADVANCED TACTICAL & GLASS UTILITIES
+   ═══════════════════════════════════════════════════════ */
+
+/* High-tech glass card */
+.glass-panel {
+  background: rgba(24, 24, 27, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+:root:not(.dark) .glass-panel {
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.08), 0 2px 8px 0 rgba(0, 0, 0, 0.04);
+  border: 1px solid #E2E8F0;
+}
+
+/* Glow Border & Accents */
+.glow-card {
+  position: relative;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glow-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 6px 20px -3px var(--accent-glow);
+}
+
+.glow-accent {
+  box-shadow: 0 0 25px -4px var(--accent-glow);
+}
+
+/* Tactical scan grid */
+.cyber-grid-bg {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+:root:not(.dark) .cyber-grid-bg {
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+}
+
+/* Pulse beacon indicator */
+.beacon-dot {
+  position: relative;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--status-critical);
+}
+.beacon-dot::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--status-critical);
+  animation: beaconPulse 1.8s infinite cubic-bezier(0, 0.2, 0.8, 1);
+}
+
+@keyframes beaconPulse {
+  0% { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* JetBrains Mono — data only */
+.font-data,
+.font-mono {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Noto Sans Kannada */
+.font-kannada {
+  font-family: 'Noto Sans Kannada', 'Manrope', sans-serif;
+}
+
+/* Standard card */
+.card, .glass-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover, .glass-card:hover {
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+/* ═══════════════════════════════════════════════════════
+   STATUS BADGE UTILITIES
+   ═══════════════════════════════════════════════════════ */
+
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-family: 'Manrope', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid;
+}
+
+.badge-critical {
+  color: var(--status-critical);
+  border-color: var(--status-critical);
+  background: transparent;
+}
+
+.badge-warning {
+  color: var(--status-warning);
+  border-color: var(--status-warning);
+  background: transparent;
+}
+
+.badge-success {
+  color: var(--status-success);
+  border-color: var(--status-success);
+  background: transparent;
+}
+
+/* ═══════════════════════════════════════════════════════
+   BUTTON UTILITIES
+   Primary uses --accent sparingly; secondary is outlined
+   ═══════════════════════════════════════════════════════ */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: #FFFFFF;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-google-sans), sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px -2px var(--accent-glow);
+  transition: all 0.15s ease;
+}
+
+.btn-primary:hover  { opacity: 0.88; }
+.btn-primary:active { opacity: 0.75; }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-secondary:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+/* Map override for dark/light themes */
+.leaflet-container {
+  background: var(--color-void-000) !important;
+  z-index: 1 !important;
+}
+
+.leaflet-pane {
+  z-index: 2 !important;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 10 !important;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--color-steel-700) !important;
+  color: var(--color-paper-100) !important;
+  border: 1px solid var(--color-steel-600) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PRINT / PDF — HIGH-FIDELITY LAW ENFORCEMENT REPORTING
+   ═══════════════════════════════════════════════════════ */
+@media print {
+  /* Reset html & body to visible clean white paper canvas */
+  html, body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    font-size: 10.5pt !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 12mm 12mm 14mm 12mm;
+  }
+
+  /* Automatically hide non-printable UI chrome elements across ALL pages */
+  nav,
+  aside,
+  header,
+  footer,
+  button:not(.print-visible),
+  .no-print,
+  .print\:hidden,
+  [data-no-print="true"],
+  .fixed,
+  .sticky {
+    display: none !important;
+  }
+
+  /* Force all main containers, grid layouts, and cards to expand naturally without sidebar offsets */
+  main,
+  #main-content,
+  .min-h-screen,
+  div,
+  section,
+  article {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    box-shadow: none !important;
+    position: static !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Ensure text colors, tables, and borders are high-contrast black & dark navy */
+  * {
+    color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    text-shadow: none !important;
+  }
+
+  .text-white, .text-slate-100, .text-gray-100, .text-zinc-100 {
+    color: #0f172a !important;
+  }
+
+  .text-slate-400, .text-gray-400, .text-zinc-400, .text-slate-500 {
+    color: #334155 !important;
+  }
+
+  /* Convert dark background containers into clean white bordered paper cards */
+  .bg-slate-900, .bg-zinc-900, .bg-black, .bg-gray-900, .bg-slate-950, .bg-zinc-950, .bg-\[\#18181B\], .bg-\[\#09090B\] {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
+  }
+
+  .border-slate-800, .border-zinc-800, .border-gray-800 {
+    border-color: #cbd5e1 !important;
+  }
+
+  /* Prevent awkward page break cuts inside sections, cards, and tables */
+  .print-section, .break-inside-avoid, tr, table, .rounded-2xl, .rounded-xl {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Headings & Badges */
+  .print-h1 { font-size: 16pt; font-weight: 800; color: #0f172a; margin-bottom: 4pt; }
+  .print-h2 { font-size: 12pt; font-weight: 700; color: #1e3a8a; margin-bottom: 6pt; border-bottom: 1.5pt solid #1e3a8a; padding-bottom: 3pt; }
+  .print-h3 { font-size: 10.5pt; font-weight: 600; color: #0f172a; margin-bottom: 4pt; }
+  .print-label { font-size: 8pt; text-transform: uppercase; letter-spacing: 0.06em; color: #475569; font-weight: 700; }
+  .print-value { font-size: 9.5pt; color: #0f172a; }
+  .print-mono  { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 8.5pt; }
+
+  .print-table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+  .print-table th {
+    background: #f1f5f9;
+    color: #0f172a;
+    font-weight: 700;
+    text-align: left;
+    padding: 4pt 6pt;
+    border-bottom: 1.5pt solid #94a3b8;
+    font-size: 8pt;
+    text-transform: uppercase;
+  }
+  .print-table td { padding: 4pt 6pt; border-bottom: 0.5pt solid #e2e8f0; vertical-align: top; }
+  .print-table tr:last-child td { border-bottom: none; }
+  .print-table tr:nth-child(even) td { background: #f8fafc; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   DRISHTI VOICE PANEL — Custom scrollbar & animations
+   ═══════════════════════════════════════════════════════ */
+.drishti-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.drishti-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.drishti-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+}
+.drishti-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Slide-in animations for panels */
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.animate-slide-in {
+  animation: slideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes scan {
+  0%, 100% { top: 0%; opacity: 0.3; }
+  50% { top: 92%; opacity: 1; }
+}
+
+@keyframes scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* 3D Newspaper Opening & Unfolding Animations */
+@keyframes newspaperSpin {
+  0% {
+    transform: scale(0.05) rotate(-720deg);
+    opacity: 0;
+    filter: blur(8px);
+  }
+  60% {
+    transform: scale(1.02) rotate(0deg);
+    opacity: 1;
+    filter: blur(0px);
+  }
+  80% {
+    transform: scale(0.99);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-newspaper-spin {
+  animation: newspaperSpin 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: center center;
+}
+
+@keyframes pageUnfold {
+  0% {
+    transform: perspective(2000px) rotateY(-95deg);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: perspective(2000px) rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+
+
+
+.animate-page-unfold {
+  animation: pageUnfold 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both;
+  transform-origin: left center;
+  backface-visibility: hidden;
+}
+
+/* Fix high-contrast text on primary backgrounds in light mode */
+.bg-phosphor-500.text-paper-100,
+.bg-phosphor-500 .text-paper-100,
+.bg-critical-500.text-paper-100,
+.bg-critical-500 .text-paper-100,
+.bg-success-500.text-paper-100,
+.bg-success-500 .text-paper-100 {
+  color: #FAF6F0 !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   LEAFLET MAP CONTROLS OVERRIDES — REMOVE WHITE BOX SPOTS
+   ═══════════════════════════════════════════════════════ */
+.leaflet-control-container .leaflet-control-zoom,
+.leaflet-control-container .leaflet-bar {
+  border: 1px solid var(--border) !important;
+  background: var(--surface-1) !important;
+  backdrop-filter: blur(12px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+.leaflet-control-container .leaflet-control-zoom a {
+  background-color: var(--surface-1) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+.leaflet-control-container .leaflet-control-zoom a:hover {
+  background-color: var(--surface-2) !important;
+  color: var(--accent) !important;
+}
+
+.leaflet-control-attribution {
+  background: var(--surface-1) !important;
+  color: var(--text-secondary) !important;
+  font-size: 9px !important;
+  border-radius: 4px !important;
+  opacity: 0.7 !important;
+}
+.leaflet-control-attribution a {
+  color: var(--text-secondary) !important;
+}
