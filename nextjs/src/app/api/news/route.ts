@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 const cache = new Map<string, { timestamp: number; data: any }>();
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-// 15 Curated, 100% unique tactical police, security, and surveillance images (No duplicate Lady Justice statues)
+// 15 Curated, 100% unique tactical police, urban security, and metro surveillance images
 const UNIQUE_POLICE_IMAGES = [
   'https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=1200&auto=format&fit=crop&q=80', // 0: Police emergency patrol car / lights
   'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&auto=format&fit=crop&q=80', // 1: Cyber Command surveillance monitors
@@ -13,7 +13,7 @@ const UNIQUE_POLICE_IMAGES = [
   'https://images.unsplash.com/photo-1508847154043-be5407fcaa5a?w=1200&auto=format&fit=crop&q=80', // 3: Coastal Security speed patrol vessel
   'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&auto=format&fit=crop&q=80', // 4: Forensic science laboratory
   'https://images.unsplash.com/photo-1606567595334-d39972c85dbe?w=1200&auto=format&fit=crop&q=80', // 5: Police motorcycle rapid response unit
-  'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1200&auto=format&fit=crop&q=80', // 6: Airport & transit security checkpoint
+  'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1200&auto=format&fit=crop&q=80', // 6: Modern Metro Train & Metropolitan City Corridor
   'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1200&auto=format&fit=crop&q=80', // 7: Tactical intelligence command room
   'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1200&auto=format&fit=crop&q=80', // 8: Cyber security code matrix grid
   'https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=1200&auto=format&fit=crop&q=80', // 9: CCTV ANPR surveillance lens
@@ -28,6 +28,11 @@ const UNIQUE_POLICE_IMAGES = [
 function getUniqueImageForIndex(title: string, index: number): string {
   const t = (title || '').toLowerCase();
 
+  // Explicit keyword mapping for Metro / Metropolitan articles
+  if (t.includes('metro') || t.includes('metros') || t.includes('ncrb') || t.includes('bengaluru ranks') || t.includes('urban') || t.includes('transit')) {
+    return UNIQUE_POLICE_IMAGES[6]; // Modern Metro Train & Metropolitan City Corridor
+  }
+
   // Topic-preferred starting offsets
   let preferredOffset = index;
   if (t.includes('cyber') || t.includes('scam') || t.includes('bot') || t.includes('online')) preferredOffset = 1;
@@ -36,7 +41,6 @@ function getUniqueImageForIndex(title: string, index: number): string {
   else if (t.includes('coastal') || t.includes('maritime') || t.includes('sea') || t.includes('mangaluru')) preferredOffset = 3;
   else if (t.includes('forensic') || t.includes('lab') || t.includes('evidence') || t.includes('van')) preferredOffset = 4;
   else if (t.includes('court') || t.includes('dgp') || t.includes('cm') || t.includes('fir') || t.includes('statute')) preferredOffset = 12;
-  else if (t.includes('rescue') || t.includes('youth') || t.includes('myanmar') || t.includes('checkpoint')) preferredOffset = 6;
 
   // Combine index + offset to guarantee distinct photo per card position
   const selectedIndex = (preferredOffset + index * 3) % UNIQUE_POLICE_IMAGES.length;
@@ -69,12 +73,12 @@ const MOCK_CRIME_NEWS = [
     source: 'Times of India',
   },
   {
-    title: 'State Police Issues High Alert and ANPR Watchlist Update for Highway Tolls',
-    description: 'All major toll plazas across NH-44 and Peripheral Ring Road have updated ANPR blacklists for absconding suspects.',
+    title: 'Violent crimes spike in Karnataka in 2024; Bengaluru ranks third among metros: NCRB data',
+    description: 'Latest law enforcement and public security briefing reported by The New Indian Express.',
     url: 'https://ksp.karnataka.gov.in',
-    image: UNIQUE_POLICE_IMAGES[9],
+    image: UNIQUE_POLICE_IMAGES[6], // Metro Rapid Transit
     publishedAt: new Date(Date.now() - 6 * 3600 * 1000).toISOString(),
-    source: 'Indian Express',
+    source: 'The New Indian Express',
   },
   {
     title: 'Coastal Security Police Conduct Joint Maritime Surveillance Exercise Near Mangaluru',
@@ -132,7 +136,7 @@ export async function GET(request: Request) {
           title: art.title || 'Untitled Crime Report',
           description: art.description || '',
           url: art.url || '#',
-          image: art.image && !art.image.includes('photo-1589829545856') ? art.image : getUniqueImageForIndex(art.title, idx),
+          image: art.image && !art.image.includes('photo-1589829545856') && !art.image.includes('photo-1436491865332') ? art.image : getUniqueImageForIndex(art.title, idx),
           publishedAt: art.publishedAt || new Date().toISOString(),
           source: typeof art.source === 'object' ? art.source?.name || 'GNews' : art.source || 'GNews',
         }));
@@ -150,7 +154,7 @@ export async function GET(request: Request) {
       }
     }
 
-    // 3. Keyless Fallback: Google News RSS Search with Guaranteed 100% Unique Image Distribution
+    // 3. Keyless Fallback: Google News RSS Search with Guaranteed Metro Image Mapping
     try {
       const rssQuery = isAllIndia ? 'crime police Karnataka India' : `crime police ${stateParam}`;
       const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(rssQuery)}&hl=en-IN&gl=IN&ceid=IN:en`;
