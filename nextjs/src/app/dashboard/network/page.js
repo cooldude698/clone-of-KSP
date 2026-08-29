@@ -1251,86 +1251,135 @@ export default function NetworkPage() {
         )}
       </AnimatePresence>
 
-      {/* ── ADD CLUE / DETAIL MODAL ── */}
+      {/* ── PREMIUM POLICE EVIDENCE NOTE & PIN MODAL ── */}
       <AnimatePresence>
         {isAddPinModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#1e2024] border-2 border-stone-700 text-stone-100 rounded-2xl max-w-md w-full shadow-2xl p-5 space-y-4 relative font-mono"
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="bg-[#1e2229] border-2 border-stone-600 text-stone-100 rounded-3xl max-w-lg w-full shadow-[0_25px_60px_rgba(0,0,0,0.85)] p-6 space-y-5 relative font-mono overflow-hidden"
             >
+              {/* Pushpin at Top Center */}
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-gradient-to-tr from-red-800 to-red-400 border-2 border-white shadow-lg z-30 flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-white/80" />
+              </div>
+
+              {/* Close Button */}
               <button
                 onClick={() => setIsAddPinModalOpen(false)}
-                className="absolute top-4 right-4 p-1.5 rounded-lg bg-stone-800 text-stone-400 hover:text-white"
+                className="absolute top-4 right-4 p-2 rounded-xl bg-stone-800/80 hover:bg-stone-700 text-stone-400 hover:text-white transition cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
 
-              <div className="pb-3 border-b border-stone-700">
-                <h3 className="text-sm font-bold text-white uppercase">
-                  📌 Pin New Detail / Lead to Wall
+              {/* Header */}
+              <div className="space-y-1 pt-2 pb-3 border-b border-stone-700/80">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-400 text-[10px] font-bold uppercase tracking-wider">
+                    CCTNS FIELD MEMO
+                  </span>
+                  <span className="text-[10px] text-stone-400 font-mono">
+                    REF: #{selectedSyndicate.id}
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-white uppercase tracking-tight flex items-center gap-2">
+                  <StickyNote className="w-4 h-4 text-amber-400" />
+                  <span>Log Field Clue & Evidence Note</span>
                 </h3>
-                <p className="text-xs text-stone-400 mt-0.5">
-                  Attach field observation or forensic clue regarding {selectedSyndicate.name}.
+                <p className="text-xs text-stone-400">
+                  Target Syndicate: <strong className="text-stone-200">{selectedSyndicate.name}</strong>
                 </p>
               </div>
 
-              <form onSubmit={handleAddCustomPin} className="space-y-3 text-xs">
-                <div className="space-y-1">
-                  <label className="text-stone-300 font-bold">Clue / Observation *</label>
+              <form onSubmit={handleAddCustomPin} className="space-y-4 text-xs">
+                {/* Observation Textarea */}
+                <div className="space-y-1.5">
+                  <label className="text-stone-300 font-bold flex items-center justify-between text-xs">
+                    <span>Field Observation / Evidence Lead *</span>
+                    <span className="text-[10px] text-stone-500 font-normal">Marked for Pinboard</span>
+                  </label>
                   <textarea
                     required
                     rows={3}
-                    placeholder="e.g. Sighted black Pulsar near Silk Board flyover at 23:15 hrs..."
+                    placeholder="e.g. Sighted suspect switching to Bajaj Pulsar (KA-01-MJ-8821) near Balay Circle at 23:40 hrs..."
                     value={newPinNote.text}
                     onChange={(e) => setNewPinNote({ ...newPinNote, text: e.target.value })}
-                    className="w-full p-2.5 rounded-xl bg-stone-900 border border-stone-700 text-stone-100 focus:outline-none focus:border-amber-400"
+                    className="w-full p-3 rounded-2xl bg-[#14161a] border border-stone-700 text-stone-100 placeholder:text-stone-600 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/50 text-xs leading-relaxed font-sans"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1">
-                    <label className="text-stone-300 font-bold">Category Tag</label>
-                    <select
-                      value={newPinNote.tag}
-                      onChange={(e) => setNewPinNote({ ...newPinNote, tag: e.target.value })}
-                      className="w-full p-2 rounded-xl bg-stone-900 border border-stone-700 text-stone-100 focus:outline-none"
-                    >
-                      <option value="ANPR HIT">ANPR HIT</option>
-                      <option value="FIELD SIGHTING">FIELD SIGHTING</option>
-                      <option value="WEAPON CLUE">WEAPON CLUE</option>
-                      <option value="MULE ACCOUNT">MULE ACCOUNT</option>
-                      <option value="INFORMER INTEL">INFORMER INTEL</option>
-                    </select>
+                {/* Category Chips Selector */}
+                <div className="space-y-1.5">
+                  <label className="text-stone-300 font-bold block text-xs">
+                    Intel Classification Tag
+                  </label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      { id: 'ANPR HIT', label: 'ANPR Hit', color: 'border-rose-500/50 text-rose-400 bg-rose-950/30' },
+                      { id: 'FIELD SIGHTING', label: 'Field Sighting', color: 'border-amber-500/50 text-amber-400 bg-amber-950/30' },
+                      { id: 'WEAPON CLUE', label: 'Weapon / Tool', color: 'border-red-500/50 text-red-400 bg-red-950/30' },
+                      { id: 'MULE ACCOUNT', label: 'Mule Bank / Crypto', color: 'border-cyan-500/50 text-cyan-400 bg-cyan-950/30' },
+                      { id: 'INFORMER INTEL', label: 'Informer Intel', color: 'border-emerald-500/50 text-emerald-400 bg-emerald-950/30' },
+                    ].map(tagItem => {
+                      const isSelected = newPinNote.tag === tagItem.id;
+                      return (
+                        <button
+                          key={tagItem.id}
+                          type="button"
+                          onClick={() => setNewPinNote({ ...newPinNote, tag: tagItem.id })}
+                          className={`px-3 py-1.5 rounded-xl border text-[11px] font-bold transition-all cursor-pointer ${
+                            isSelected
+                              ? 'bg-amber-500 text-stone-950 border-amber-400 shadow-md font-extrabold scale-102'
+                              : 'bg-stone-900/60 border-stone-700 text-stone-400 hover:border-stone-500 hover:text-stone-200'
+                          }`}
+                        >
+                          {tagItem.label}
+                        </button>
+                      );
+                    })}
                   </div>
+                </div>
 
-                  <div className="space-y-1">
-                    <label className="text-stone-300 font-bold">Officer Sign-Off</label>
+                {/* Officer Sign-off Input */}
+                <div className="space-y-1.5">
+                  <label className="text-stone-300 font-bold block text-xs">
+                    Investigating Officer / Unit
+                  </label>
+                  <div className="flex items-center gap-2 p-2.5 rounded-2xl bg-[#14161a] border border-stone-700">
+                    <Shield className="w-4 h-4 text-stone-400 shrink-0" />
                     <input
                       type="text"
                       value={newPinNote.author}
                       onChange={(e) => setNewPinNote({ ...newPinNote, author: e.target.value })}
-                      className="w-full p-2 rounded-xl bg-stone-900 border border-stone-700 text-stone-100 focus:outline-none"
+                      placeholder="e.g. Insp. V. Sharma (KSP CCB)"
+                      className="w-full bg-transparent text-stone-100 text-xs focus:outline-none placeholder:text-stone-600 font-mono"
                     />
                   </div>
                 </div>
 
-                <div className="pt-2 flex items-center justify-end gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsAddPinModalOpen(false)}
-                    className="px-3.5 py-1.5 rounded-xl bg-stone-800 text-stone-400 hover:text-white"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-1.5 rounded-xl bg-amber-500 text-stone-950 font-bold hover:bg-amber-400 cursor-pointer"
-                  >
-                    Pin to Wall
-                  </button>
+                {/* Actions */}
+                <div className="pt-3 border-t border-stone-700/80 flex items-center justify-between">
+                  <span className="text-[10px] text-stone-500 font-mono">
+                    * Clue will pin organically to wall
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsAddPinModalOpen(false)}
+                      className="px-4 py-2 rounded-xl bg-stone-800/80 hover:bg-stone-700 text-stone-400 hover:text-white font-bold text-xs transition cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-black text-xs transition shadow-lg flex items-center gap-1.5 cursor-pointer active:scale-98"
+                    >
+                      <Pin className="w-3.5 h-3.5 fill-current" />
+                      <span>Pin to Investigation Wall</span>
+                    </button>
+                  </div>
                 </div>
               </form>
             </motion.div>
