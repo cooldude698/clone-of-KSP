@@ -49,6 +49,9 @@ const useDrishtiVoice = ({
   const mediaStreamRef = useRef(null);
   const isMediaRecordingRef = useRef(false);
 
+  // Restart counter to avoid infinite SpeechRecognition loop
+  const recognitionRestartCountRef = useRef(0);
+
   // Fix 1: retry counter for network errors
   const retryCountRef = useRef(0);
   const MAX_RETRIES = 2;
@@ -101,6 +104,7 @@ const useDrishtiVoice = ({
     rec.onresult = (event) => {
       setError(null);
       consecutiveErrorsRef.current = 0;
+      recognitionRestartCountRef.current = 0; // reset on successful recognition
       let newFinal = '';
       let newInterim = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -167,12 +171,11 @@ const useDrishtiVoice = ({
 
     rec.onend = () => {
       isRecognitionRunningRef.current = false;
-      if (isPttPressedRef.current) {
-        // User wants mic to STAY ON continuously — restart recognition!
+      if (isPttPressedRef.current && recognitionRestartCountRef.current < 3) {
+        recognitionRestartCountRef.current++;
         try {
           rec.start();
         } catch (_) {
-          // If start fails, retry after brief tick
           setTimeout(() => {
             if (isPttPressedRef.current && !isRecognitionRunningRef.current) {
               try { rec.start(); } catch (_) {}
@@ -180,6 +183,7 @@ const useDrishtiVoice = ({
           }, 150);
         }
       } else {
+        recognitionRestartCountRef.current = 0;
         setIsListening(false);
       }
     };
@@ -277,6 +281,7 @@ const useDrishtiVoice = ({
     setIsListening(true);
     langRef.current = lang;
     retryCountRef.current = 0;
+    recognitionRestartCountRef.current = 0;
     accumulatedFinalRef.current = '';
     lastInterimRef.current = '';
     setLiveTranscript('');
@@ -344,31 +349,37 @@ const useDrishtiVoice = ({
     // If MediaRecorder was active, stop it and send to Zia STT
     if (isMediaRecordingRef.current && mediaRecorderRef.current) {
       isMediaRecordingRef.current = false;
-      await new Promise(resolve => {
-        const rec = mediaRecorderRef.current;
-        rec.onstop = async () => {
-          // Stop the mic stream
-          if (mediaStreamRef.current) {
-            mediaStreamRef.current.getTracks().forEach(t => t.stop());
-            mediaStreamRef.current = null;
-          }
-          // Try Zia STT with collected audio
-          const chunks = audioChunksRef.current;
-          audioChunksRef.current = [];
-          if (chunks.length > 0) {
-            const mimeType = rec.mimeType || 'audio/webm;codecs=opus';
-            const blob = new Blob(chunks, { type: mimeType });
-            const ziaTranscript = await sendToZiaSTT(blob, langRef.current);
-            if (ziaTranscript) {
-              accumulatedFinalRef.current = ziaTranscript;
-              liveTranscriptRef.current = ziaTranscript;
-              setLiveTranscript(ziaTranscript);
+      await Promise.race([
+        new Promise(resolve => {
+          const rec = mediaRecorderRef.current;
+          rec.onstop = async () => {
+            if (mediaStreamRef.current) {
+              mediaStreamRef.current.getTracks().forEach(t => t.stop());
+              mediaStreamRef.current = null;
             }
-          }
-          resolve();
-        };
-        try { rec.stop(); } catch (_) { resolve(); }
-      });
+            const chunks = audioChunksRef.current;
+            audioChunksRef.current = [];
+            if (chunks.length > 0) {
+              const mimeType = rec.mimeType || 'audio/webm;codecs=opus';
+              const blob = new Blob(chunks, { type: mimeType });
+              const ziaTranscript = await sendToZiaSTT(blob, langRef.current);
+              if (ziaTranscript) {
+                accumulatedFinalRef.current = ziaTranscript;
+                liveTranscriptRef.current = ziaTranscript;
+                setLiveTranscript(ziaTranscript);
+              }
+            }
+            resolve();
+          };
+          try { rec.stop(); } catch (_) { resolve(); }
+        }),
+        new Promise(resolve => setTimeout(resolve, 2000)) // 2s safety timeout — never hang
+      ]);
+      // Always clean up stream even if timeout fired
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach(t => t.stop());
+        mediaStreamRef.current = null;
+      }
       mediaRecorderRef.current = null;
     } else {
       // Clean up stream if MediaRecorder wasn't running

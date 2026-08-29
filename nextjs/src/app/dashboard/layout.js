@@ -60,7 +60,7 @@ function detectLocalIntent(query) {
 
   const nav = (path, reply, followUpQuery) => ({ type: 'navigate', path, reply, followUpQuery });
 
-  // Pure Standalone Greetings (only if no query follows)
+  // Pure Standalone Greetings
   if (/^(hi|hello|hey|whats\s*up|what's\s*up|greetings|hello\s*drishti|hi\s*drishti|drishti|good\s*morning|good\s*afternoon|good\s*evening|नमस्ते|हेलो|हाय|ನಮಸ್ಕಾರ)$/.test(q)) {
     return { type: 'greeting', reply: isHindi ? 'नमस्ते सर। दृष्टि एआई सक्रिय है। आज मैं आपकी कैसे मदद कर सकता हूं?' : isKannada ? 'ನಮಸ್ಕಾರ ಸರ್, ದೃಷ್ಟಿ ಎಐ ಕರ್ತವ್ಯದಲ್ಲಿದೆ. ತನಿಖೆಯಲ್ಲಿ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?' : 'Jai Hind, Sir. DRISHTI AI is active. How may I assist your command shift today?' };
   }
@@ -70,39 +70,128 @@ function detectLocalIntent(query) {
     return { type: 'confirm', reply: isHindi ? 'ठीक है सर, कार्रवाई जारी है।' : isKannada ? 'ಸರಿ ಸರ್, ಪ್ರಕ್ರಿಯೆ ಚಾಲನೆಯಲ್ಲಿದೆ.' : 'On it, Sir.' };
   }
 
-  // ONLY intercept explicit page navigation directives
-  const isDirectNav =
-    q.startsWith('go to') || q.startsWith('navigate to') || q.startsWith('switch to') ||
-    q.startsWith('open page') || q.startsWith('open tab') || q.startsWith('ಲೆ ಚಲೊ') || q.startsWith('ತೆರೆ');
+  // ─── NAVIGATION INTENT DETECTION ───────────────────────────────────────────
+  // Matches both formal ("navigate to crime map") and casual officer speech
+  // ("open crime map", "show crime map", "take me to surveillance", "check FIR", etc.)
 
-  if (isDirectNav) {
-    if (q.includes('surveillance') || q.includes('cctv') || q.includes('camera')) {
-      return nav('/dashboard/surveillance', 'Opening Surveillance & CCTV grid, Sir.', null);
+  const hasNavVerb = /\b(go\s*to|navigate\s*to|switch\s*to|open|show|take\s*me\s*to|bring\s*up|launch|pull\s*up|view|check|display|load|jump\s*to)\b/.test(q);
+
+  if (hasNavVerb || q.startsWith('ತೆರೆ') || q.startsWith('ಲೆ ಚಲೊ')) {
+
+    // Surveillance / CCTV / Camera
+    if (/\b(surveillance|cctv|camera|feed|live\s*feed|camera\s*grid|watch)\b/.test(q)) {
+      return nav('/dashboard/surveillance', 
+        isHindi ? 'सर, निगरानी और सीसीटीवी ग्रिड खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಕಣ್ಗಾವಲು ಮತ್ತು ಸಿಸಿಟಿವಿ ಗ್ರಿಡ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Surveillance & CCTV grid, Sir.', null);
     }
-    if (q.includes('map') || q.includes('hotspot')) {
-      return nav('/dashboard/map', 'Opening Crime Map, Sir.', null);
+
+    // Crime Map / Hotspot Map
+    if (/\b(crime\s*map|hotspot|heat\s*map|map|geography|location|district\s*map)\b/.test(q)) {
+      return nav('/dashboard/map', 
+        isHindi ? 'सर, अपराध मानचित्र खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಅಪರಾಧ ನಕ್ಷೆ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Crime Hotspot Map, Sir.', null);
     }
-    if (q.includes('fir') || q.includes('registry')) {
-      return nav('/dashboard/fir', 'Opening FIR Registry, Sir.', null);
+
+    // FIR / Case Registry
+    if (/\b(fir|case\s*file|case\s*list|registry|first\s*information|cases|complaints)\b/.test(q)) {
+      return nav('/dashboard/fir', 
+        isHindi ? 'सर, एफआईआर रजिस्ट्री खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಎಫ್ಐಆರ್ ರಿಜಿಸ್ಟ್ರಿ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening FIR Registry, Sir.', null);
     }
-    if (q.includes('suspect') || q.includes('roster')) {
-      return nav('/dashboard/suspect', 'Opening Suspect Roster, Sir.', null);
+
+    // Suspect / Accused Roster
+    if (/\b(suspect|accused|criminal|wanted|roster|offender|watchlist)\b/.test(q)) {
+      return nav('/dashboard/suspect', 
+        isHindi ? 'सर, संदिग्ध सूची खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಅನುಮಾನಿತರ ಪಟ್ಟಿ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Suspect Roster, Sir.', null);
     }
-    if (q.includes('network') || q.includes('nexus')) {
-      return nav('/dashboard/network', 'Opening Network Graph, Sir.', null);
+
+    // Network Graph / Criminal Nexus
+    if (/\b(network|nexus|gang|syndicate|connections|graph|link\s*analysis|criminal\s*network)\b/.test(q)) {
+      return nav('/dashboard/network', 
+        isHindi ? 'सर, नेटवर्क ग्राफ खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ನೆಟ್‌ವರ್ಕ್ ಗ್ರಾಫ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Criminal Network Graph, Sir.', null);
     }
-    if (q.includes('analytics')) {
-      return nav('/dashboard/analytics', 'Opening Analytics, Sir.', null);
+
+    // Analytics / Statistics
+    if (/\b(analytics|statistics|stats|analysis|data|charts|reports|trends)\b/.test(q)) {
+      return nav('/dashboard/analytics', 
+        isHindi ? 'सर, एनालिटिक्स डैशबोर्ड खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಅನಾಲಿಟಿಕ್ಸ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Analytics Dashboard, Sir.', null);
     }
-    if (q.includes('chat') || q.includes('copilot')) {
-      return nav('/dashboard/chat', 'Opening Co-Pilot Chat, Sir.', null);
+
+    // Co-Pilot Chat
+    if (/\b(chat|co.?pilot|copilot|assistant|ai\s*chat|conversation|intelligence\s*chat)\b/.test(q)) {
+      return nav('/dashboard/chat', 
+        isHindi ? 'सर, को-पायलट चैट खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಕೋ-ಪೈಲಟ್ ಚಾಟ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Co-Pilot Intelligence Chat, Sir.', null);
     }
-    if (q.includes('overview') || q.includes('home') || q.includes('dashboard')) {
-      return nav('/dashboard', 'Going to Overview, Sir.', null);
+
+    // Logs / AI Context Log / History
+    if (/\b(log|logs|history|context\s*log|ai\s*log|session|past\s*query|query\s*history)\b/.test(q)) {
+      return nav('/dashboard/logs', 
+        isHindi ? 'सर, एआई लॉग खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಎಐ ಲಾಗ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening AI Context Logs, Sir.', null);
+    }
+
+    // KSP Units / HR / Hierarchy
+    if (/\b(hierarchy|unit|hr|police\s*station|station|personnel|officers|ksp\s*unit)\b/.test(q)) {
+      return nav('/dashboard/hierarchy', 
+        isHindi ? 'सर, केएसपी यूनिट और पदानुक्रम खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಕೆಎಸ್ಪಿ ಘಟಕ ಮತ್ತು ಕ್ರಮಾನುಗತ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening KSP Units & HR, Sir.', null);
+    }
+
+    // Acts & Statutes / Legal
+    if (/\b(act|statute|legal|law|ipc|bns|section|legal\s*reference|acts)\b/.test(q)) {
+      return nav('/dashboard/statutes', 
+        isHindi ? 'सर, अधिनियम और धाराएं खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಕಾಯಿದೆ ಮತ್ತು ಸೆಕ್ಷನ್‌ಗಳನ್ನು ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Acts & Legal Sections, Sir.', null);
+    }
+
+    // Live News
+    if (/\b(news|headlines|live\s*news|latest\s*news|media|press)\b/.test(q)) {
+      return nav('/dashboard/news', 
+        isHindi ? 'सर, लाइव न्यूज़ खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಲೈವ್ ನ್ಯೂಸ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Live News Feed, Sir.', null);
+    }
+
+    // Panchanama
+    if (/\b(panchanama|panchanama\s*draft|spot\s*report|seizure\s*memo)\b/.test(q)) {
+      return nav('/dashboard/fir/panchanama', 
+        isHindi ? 'सर, पंचनामा ड्राफ्टर खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಪಂಚನಾಮ ಡ್ರಾಫ್ಟರ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Panchanama Auto-Drafter, Sir.', null);
+    }
+
+    // Geo Trail
+    if (/\b(trail|geo\s*trail|gps|movement|tracking\s*trail|route)\b/.test(q)) {
+      return nav('/dashboard/trail',
+        isHindi ? 'सर, जियो ट्रेल खोल रहा हूं।' :
+        isKannada ? 'ಸರ್, ಜಿಯೋ ಟ್ರೇಲ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Geo Trail, Sir.', null);
+    }
+
+    // Overview / Home / Dashboard
+    if (/\b(overview|home|dashboard|main\s*screen|command\s*center)\b/.test(q)) {
+      return nav('/dashboard', 
+        isHindi ? 'सर, ओवरव्यू डैशबोर्ड खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಮುಖ್ಯ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Going to Overview, Sir.', null);
     }
   }
 
-  // All other queries — questions, clearance targets, suspect lookups, legal SOPs — flow to the live AI engine!
+  // All other queries flow to the live AI engine
   return null;
 }
 
@@ -188,6 +277,46 @@ export default function DashboardLayout({ children }) {
     onSpeakEnd: () => setOrbState('idle'),
     onError: () => { },
   });
+
+  // ─── Permanent Mute State & Safe TTS ─────────────────────────────
+  const [isMuted, setIsMuted] = useState(false);
+  const isMutedRef = useRef(false);
+  useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
+
+  const handleToggleMute = useCallback(() => {
+    setIsMuted(prev => {
+      const next = !prev;
+      if (next) stopSpeaking();
+      return next;
+    });
+  }, [stopSpeaking]);
+
+  const safeSpeak = useCallback((text, lang) => {
+    if (isMutedRef.current) return;
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+
+    try {
+      window.speechSynthesis.cancel();
+      const targetLang = lang || 'en-IN';
+      const cleanText = cleanTextForSpeech(text);
+      if (!cleanText) return;
+
+      const utt = new SpeechSynthesisUtterance(cleanText);
+      utt.lang = targetLang;
+      utt.rate = 0.95;
+      utt.pitch = 1.0;
+
+      // Select best matching voice for clear pronunciation
+      const voices = window.speechSynthesis.getVoices() || [];
+      const bestVoice = voices.find(v => v.lang === targetLang) ||
+        voices.find(v => v.lang.startsWith(targetLang.split('-')[0]));
+      if (bestVoice) utt.voice = bestVoice;
+
+      window.speechSynthesis.speak(utt);
+    } catch (e) {
+      console.warn('TTS speech trigger warning:', e);
+    }
+  }, []);
 
   // ─── Change 5: handleQuery with local intent ─────────────────────
   const ts = () => new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
@@ -305,6 +434,19 @@ export default function DashboardLayout({ children }) {
       setResponse(compatResponse);
       originalResponseRef.current = { text: text, lang: data.language || targetLang || 'en' };
 
+      // Generate contextual smart suggestions based on the new session history
+      try {
+        const { generateContextualSuggestions } = await import('@/lib/drishtiIntelligenceEngine');
+        const updatedLogs = [...sessionLogs, { role: 'user', content: queryText, timestamp: ts() }];
+        const smartSuggestions = generateContextualSuggestions(updatedLogs, pathname, targetLang);
+        if (smartSuggestions.length > 0) {
+          try {
+            localStorage.setItem('drishti_smart_suggestions', JSON.stringify(smartSuggestions));
+            window.dispatchEvent(new Event('storage'));
+          } catch (_) {}
+        }
+      } catch (_) {}
+
       if (text) {
         setSessionLogs(prev => [...prev, { role: 'assistant', content: text, timestamp: ts() }]);
         setOrbState('speaking');
@@ -341,6 +483,18 @@ export default function DashboardLayout({ children }) {
           if (Array.isArray(parsed) && parsed.length > 0) setSessionLogs(parsed);
         }
       } catch (_) { }
+
+      // Handle pending query from context log suggestion click
+      try {
+        const pendingQuery = localStorage.getItem('drishti_pending_query');
+        if (pendingQuery) {
+          localStorage.removeItem('drishti_pending_query');
+          setIsPanelOpen(true);
+          setTimeout(() => {
+            handleQuery(pendingQuery);
+          }, 500);
+        }
+      } catch (_) {}
     }
 
     const handleOpenOrbWithLogs = (e) => {
@@ -457,33 +611,6 @@ export default function DashboardLayout({ children }) {
     if (timeKey === 'evening') return `Good evening, ${role}. I'm here to assist. Say the word and I'll brief you on recent activity.`;
     return `Good evening, ${role}. Night shift active. I'll keep watch. Just say the word if you need anything.`;
   }, []);
-
-  // ─── Permanent Mute State ──────────────────────────────────────────
-  const [isMuted, setIsMuted] = useState(false);
-  const isMutedRef = useRef(false);
-  useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
-
-  const handleToggleMute = useCallback(() => {
-    setIsMuted(prev => {
-      const next = !prev;
-      if (next) stopSpeaking();
-      return next;
-    });
-  }, [stopSpeaking]);
-
-  const safeSpeak = useCallback((text, lang) => {
-    if (isMutedRef.current) return;
-    const cleanText = cleanTextForSpeech(text);
-    if (!cleanText) return;
-
-    try {
-      const targetLang = lang || getLocale(language);
-      // Use neural speak() from useDrishtiVoice (EdgeTTS / Zia neural audio)
-      speak(cleanText, targetLang);
-    } catch (e) {
-      console.warn('TTS speech trigger warning:', e);
-    }
-  }, [speak, language]);
 
   // ─── Greeting on first open ──────────────────────────────────────
   const triggerGreeting = useCallback(() => {
