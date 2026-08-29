@@ -328,36 +328,37 @@ export default function MapView3D({ filtered = [], selectedHotspot, setSelectedH
           onClick={() => setOrbitMode(m => !m)}
           title={orbitMode ? 'Switch to Pan mode (drag to move map)' : 'Switch to Orbit mode (drag to rotate 360°)'}
           style={{
-            position:'absolute', top:12, left:12, zIndex:10,
-            background: orbitMode ? 'rgba(59,130,246,0.92)' : 'rgba(15,23,42,0.80)',
-            backdropFilter:'blur(8px)', border:'1px solid rgba(255,255,255,0.15)',
-            borderRadius:8, padding:'6px 12px', fontFamily:'monospace', fontSize:11,
+            position:'absolute', top:12, left:178, zIndex:10,
+            background: orbitMode ? 'rgba(37,99,235,0.92)' : 'rgba(15,23,42,0.82)',
+            backdropFilter:'blur(10px)', border:'1px solid rgba(255,255,255,0.18)',
+            borderRadius:10, padding:'7px 13px', fontFamily:'monospace', fontSize:11,
             color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', gap:6,
-            boxShadow:'0 4px 12px rgba(0,0,0,0.3)',
-            transition:'background 0.2s',
+            boxShadow:'0 4px 14px rgba(0,0,0,0.3)',
+            transition:'all 0.2s',
           }}>
           {orbitMode ? '🔄 Orbit ON' : '🖐 Pan Mode'}
-          <span style={{ fontSize:9, opacity:0.7, marginLeft:2 }}>
+          <span style={{ fontSize:9, opacity:0.75, marginLeft:2 }}>
             {orbitMode ? 'drag=rotate' : 'drag=pan'}
           </span>
         </button>
       )}
 
-      {/* Route status badge */}
+      {/* Route status badge (positioned bottom-right so bottom-left is clear for 3D/2D switch) */}
       {ready && (
         <div style={{
-          position:'absolute', bottom:12, left:12, zIndex:10,
-          background:'rgba(15,23,42,0.75)', backdropFilter:'blur(8px)',
-          borderRadius:8, padding:'5px 10px', fontFamily:'monospace', fontSize:10,
+          position:'absolute', bottom:14, right:14, zIndex:10,
+          background:'rgba(15,23,42,0.82)', backdropFilter:'blur(10px)',
+          borderRadius:10, padding:'6px 12px', fontFamily:'monospace', fontSize:10,
           color: routeStatus==='real' ? '#10b981' : '#f59e0b',
-          border:'1px solid rgba(51,65,85,0.5)', pointerEvents:'none',
+          border:'1px solid rgba(255,255,255,0.15)', pointerEvents:'none',
+          boxShadow:'0 4px 14px rgba(0,0,0,0.3)',
           display:'flex', alignItems:'center', gap:6,
         }}>
           <span style={{ width:6,height:6,borderRadius:'50%',
             background: routeStatus==='real'?'#10b981':'#f59e0b',
             display:'inline-block',flexShrink:0 }} />
           {routeStatus==='real' ? 'Live road routes via OSRM' : 'Routes: loading…'}
-          &nbsp;·&nbsp; Right-click drag = free rotate
+          &nbsp;·&nbsp; Right-click = 360° rotate
         </div>
       )}
 

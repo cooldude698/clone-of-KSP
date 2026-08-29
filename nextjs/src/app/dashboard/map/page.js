@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Layers, WifiOff, RefreshCw, Clock, Box, Map } from 'lucide-react';
+import { Layers, WifiOff, RefreshCw, Clock, Box, Map, SlidersHorizontal, ChevronLeft, X, Flame } from 'lucide-react';
 
 import { fetchWithFallback } from '@/lib/fetch-with-fallback';
 import { DEMO_HOTSPOTS } from '@/lib/demo-data';
@@ -40,13 +40,6 @@ const MOCK_HOTSPOTS_FALLBACK = [
   { lat: 12.9141, lng: 77.5998, area: 'JP Nagar',   count: 15, severity: 'medium',   district: 'Bengaluru Urban', top_crime_types: ['theft'] },
 ];
 
-// ── Severity mapping ──────────────────────────────────────────────────────
-/**
- * Maps a numeric severity_score from /server/hotspots/ to the string severity
- * used by MapView (critical/high/medium/low).
- * Thresholds: ≥9 → critical | ≥7 → high | ≥5 → medium | <5 → low
- * Spot-check: severity_score=9.5 → "critical" ✓
- */
 function scoreToSeverity(score) {
   if (score >= 9) return 'critical';
   if (score >= 7) return 'high';
@@ -54,21 +47,6 @@ function scoreToSeverity(score) {
   return 'low';
 }
 
-/** Map a raw hotspot from /server/hotspots/ to the shape MapView expects. */
-function mapHotspot(h) {
-  return {
-    lat: h.cell_lat,
-    lng: h.cell_lng,
-    area: h.area_name || `${h.district} Zone`,
-    count: h.crime_count,
-    severity: scoreToSeverity(h.severity_score ?? 0),
-    district: h.district || '',
-    top_crime_types: h.top_crime_types || [],
-    severity_score: h.severity_score,
-  };
-}
-
-// ── Colour maps (unchanged from original) ────────────────────────────────
 const SEVERITY_HEX = {
   critical: '#c8372d',
   high:     '#e05a3a',
@@ -77,13 +55,12 @@ const SEVERITY_HEX = {
 };
 const SEVERITY_RADIUS = { critical: 22, high: 16, medium: 12, low: 8 };
 const SEVERITY_DOT_CLASS = {
-  critical: 'bg-critical-500',
-  high:     'bg-warn-500',
-  medium:   'bg-warn-500/60',
-  low:      'bg-phosphor-500',
+  critical: 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]',
+  high:     'bg-amber-500',
+  medium:   'bg-yellow-400',
+  low:      'bg-emerald-500',
 };
 
-// ── Filter option lists ───────────────────────────────────────────────────
 const DISTRICTS = [
   'all',
   'Bengaluru Urban',
@@ -108,36 +85,27 @@ const CRIME_TYPES = [
   'hit_and_run',
 ];
 
-// ── Skeleton list item ────────────────────────────────────────────────────
 function SkeletonItem() {
   return (
-    <div className="w-full p-3 rounded-lg bg-steel-600/20 border border-steel-600/40 space-y-2 animate-pulse">
+    <div className="w-full p-2.5 rounded-xl bg-white/5 border border-white/10 space-y-2 animate-pulse">
       <div className="flex items-center gap-2">
-        <div className="w-2.5 h-2.5 rounded-full bg-steel-500/50 flex-shrink-0" />
-        <div className="h-3.5 bg-steel-500/50 rounded w-28" />
-        <div className="h-3 bg-steel-500/30 rounded w-8 ml-auto" />
+        <div className="w-2.5 h-2.5 rounded-full bg-white/20 flex-shrink-0" />
+        <div className="h-3.5 bg-white/20 rounded w-24" />
+        <div className="h-3 bg-white/10 rounded w-8 ml-auto" />
       </div>
-      <div className="h-2.5 bg-steel-500/30 rounded w-36 ml-4" />
+      <div className="h-2.5 bg-white/10 rounded w-32 ml-4" />
     </div>
   );
 }
 
-// ── Cached data badge (matches dashboard Task 2 style) ────────────────────
-function CachedBadge() {
-  return (
-    <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-warn-500/10 border border-warn-500/30 text-warn-500 text-[10px] font-semibold">
-      <WifiOff className="w-3 h-3" />
-      Cached data
-    </div>
-  );
-}
-
-// ── Main Page ─────────────────────────────────────────────────────────────
 export default function MapPage() {
   const [mounted, setMounted] = useState(false);
-  const [is3D, setIs3D] = useState(true); // default: 3D city view
+  const [is3D, setIs3D] = useState(true);
 
-  // Live data state (pre-filled for instant 0ms mount)
+  // Clever space-saving drawer state: starts collapsed so map gets 100% viewport
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Live data state
   const [hotspots, setHotspots]       = useState(MOCK_HOTSPOTS_FALLBACK);
   const [loading, setLoading]         = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -151,11 +119,8 @@ export default function MapPage() {
 
   const [selectedHotspot, setSelectedHotspot] = useState(null);
 
-  const abortRef = useRef(null);
-
   useEffect(() => { setMounted(true); }, []);
 
-  // ── Fetch function — called on mount and whenever backend filters change ──
   const fetchHotspots = useCallback(async ({ district, crime_type } = {}) => {
     setLoading(true);
     setError(null);
@@ -184,7 +149,7 @@ export default function MapPage() {
       setLastUpdated(new Date());
       setError(null);
     } catch (err) {
-      if (err.name === 'AbortError') return; // Superseded by newer request — ignore
+      if (err.name === 'AbortError') return;
       console.error('[MapPage] hotspots fetch failed:', err.message);
       setError('Failed to load live hotspot data.');
       setHotspots(MOCK_HOTSPOTS_FALLBACK);
@@ -194,19 +159,15 @@ export default function MapPage() {
     }
   }, []);
 
-  // Initial fetch on mount
   useEffect(() => {
     fetchHotspots({ district: filterDistrict, crime_type: filterCrimeType });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Re-fetch when backend-level filters change (district or crime_type)
-  // Note: severity is a computed field — filtered client-side after fetch
   useEffect(() => {
     fetchHotspots({ district: filterDistrict, crime_type: filterCrimeType });
   }, [filterDistrict, filterCrimeType, fetchHotspots]);
 
-  // ── Client-side severity filter applied on top of fetched data ───────────
   const filtered = filterSeverity === 'all'
     ? hotspots
     : hotspots.filter(h => h.severity === filterSeverity);
@@ -219,155 +180,186 @@ export default function MapPage() {
     : null;
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] rounded-2xl overflow-hidden border border-[var(--border)] bg-[var(--surface-0)] text-[var(--text-primary)] font-sans shadow-sm">
+    <div className="relative w-full h-[calc(100vh-7.5rem)] rounded-2xl overflow-hidden border border-[var(--border)] bg-[var(--surface-0)] text-[var(--text-primary)] font-sans shadow-lg">
 
-      {/* ── Sidebar ── */}
-      <div className="w-72 flex-shrink-0 border-r border-[var(--border)] flex flex-col bg-[var(--surface-1)]">
-
-        {/* Header */}
-        <div className="p-4 border-b border-[var(--border)]">
-          <div className="flex items-center justify-between mb-1">
-            <h2 className="text-sm font-bold text-[var(--text-primary)]">Crime Hotspot Map</h2>
-            <button
-              id="btn-refresh-map"
-              onClick={() => fetchHotspots({ district: filterDistrict, crime_type: filterCrimeType })}
-              disabled={loading}
-              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-30 transition-colors"
-              title="Refresh"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            </button>
+      {/* ── 1. Clever Left Panel: Floating Collapsible Intelligence HUD ── */}
+      {!sidebarOpen ? (
+        /* Collapsed Floating Trigger Pill */
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="absolute top-3 left-3 z-[1001] flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-900/85 hover:bg-slate-900/95 backdrop-blur-xl border border-white/20 text-white shadow-2xl transition-all duration-200 group hover:scale-[1.02]"
+          title="Open Hotspot Intelligence Drawer & Filters"
+        >
+          <div className="w-6 h-6 rounded-lg bg-blue-600/30 border border-blue-400/40 flex items-center justify-center text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+            <SlidersHorizontal className="w-3.5 h-3.5" />
           </div>
-          <p className="text-xs text-[var(--text-secondary)]">Karnataka State · Live data</p>
-
-          {/* Last updated + cache badge */}
-          <div className="flex items-center gap-2 mt-2 flex-wrap">
-            {lastUpdated && (
-              <div className="flex items-center gap-1 text-[10px] text-[var(--text-secondary)] font-mono">
-                <Clock className="w-3 h-3" />
-                {formatTime(lastUpdated)}
+          <span className="text-xs font-semibold tracking-wide">Hotspot Intel</span>
+          <span className="px-1.5 py-0.5 rounded-md bg-white/10 text-blue-300 font-mono text-[10px] font-bold border border-white/10">
+            {filtered.length}
+          </span>
+        </button>
+      ) : (
+        /* Expanded Floating Tactical Drawer */
+        <div className="absolute top-3 left-3 bottom-20 w-80 max-w-[calc(100vw-2.5rem)] z-[1002] bg-slate-950/90 dark:bg-slate-950/95 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-[0_16px_40px_rgba(0,0,0,0.45)] flex flex-col overflow-hidden animate-in fade-in slide-in-from-left-4 duration-200">
+          
+          {/* Header */}
+          <div className="p-3.5 border-b border-white/10 flex items-center justify-between bg-white/[0.03]">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-blue-600/30 border border-blue-500/40 flex items-center justify-center text-blue-400">
+                <Flame className="w-4 h-4 text-amber-400 animate-pulse" />
               </div>
-            )}
-            {usingCache && <CachedBadge />}
-          </div>
-        </div>
-
-        {/* ── Filters ── */}
-        <div className="p-4 border-b border-steel-600/40 space-y-4">
-
-          {/* Severity — client-side */}
-          <div>
-            <p className="text-[10px] text-paper-100/50 uppercase tracking-wider mb-1.5 font-semibold">Severity</p>
-            <div className="flex flex-wrap gap-1">
-              {['all', 'critical', 'high', 'medium', 'low'].map((s) => (
-                <button
-                  key={s}
-                  id={`filter-severity-${s}`}
-                  onClick={() => setFilterSeverity(s)}
-                  className={`px-2.5 py-1 rounded-md text-xs font-medium capitalize transition-all
-                    ${filterSeverity === s
-                      ? 'bg-phosphor-500 text-white'
-                      : 'bg-steel-600/40 text-paper-100/60 hover:text-paper-100 border border-steel-600/50'}`}
-                >
-                  {s}
-                </button>
-              ))}
+              <div>
+                <h2 className="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
+                  Hotspot Intelligence
+                  <span className="px-1.5 py-0.2 rounded-full bg-red-500/20 text-red-400 text-[10px] font-mono font-bold border border-red-500/30">
+                    {filtered.length}
+                  </span>
+                </h2>
+                <p className="text-[10px] text-white/50">Karnataka Tactical Grid</p>
+              </div>
             </div>
-          </div>
 
-          {/* District — triggers re-fetch */}
-          <div>
-            <label htmlFor="filter-district" className="text-[10px] text-paper-100/50 uppercase tracking-wider mb-1.5 font-semibold block">
-              District
-            </label>
-            <select
-              id="filter-district"
-              value={filterDistrict}
-              onChange={e => { setFilterDistrict(e.target.value); setSelectedHotspot(null); }}
-              className="w-full bg-steel-600/40 border border-steel-600/50 text-paper-100/80 text-xs rounded-md px-2.5 py-1.5 focus:outline-none focus:border-phosphor-500/60"
-            >
-              {DISTRICTS.map(d => (
-                <option key={d} value={d} className="bg-steel-700">
-                  {d === 'all' ? 'All Districts' : d}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Crime Type — triggers re-fetch */}
-          <div>
-            <label htmlFor="filter-crime-type" className="text-[10px] text-paper-100/50 uppercase tracking-wider mb-1.5 font-semibold block">
-              Crime Type
-            </label>
-            <select
-              id="filter-crime-type"
-              value={filterCrimeType}
-              onChange={e => { setFilterCrimeType(e.target.value); setSelectedHotspot(null); }}
-              className="w-full bg-steel-600/40 border border-steel-600/50 text-paper-100/80 text-xs rounded-md px-2.5 py-1.5 focus:outline-none focus:border-phosphor-500/60"
-            >
-              {CRIME_TYPES.map(c => (
-                <option key={c} value={c} className="bg-steel-700">
-                  {c === 'all' ? 'All Crime Types' : c.replace(/_/g, ' ')}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* ── Hotspot list ── */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-2">
-          {loading ? (
-            Array.from({ length: 5 }).map((_, i) => <SkeletonItem key={i} />)
-          ) : filtered.length === 0 ? (
-            <div className="p-4 text-center text-xs text-paper-100/40">
-              No hotspots match the current filters.
-            </div>
-          ) : (
-            filtered.map((h, i) => (
+            <div className="flex items-center gap-1">
               <button
-                key={i}
-                onClick={() => setSelectedHotspot(h)}
-                className={`w-full text-left p-3 rounded-lg border transition-all
-                  ${selectedHotspot?.area === h.area
-                    ? 'bg-steel-600/60 border-phosphor-500/40'
-                    : 'bg-steel-600/20 border-steel-600/40 hover:bg-steel-600/40'}`}
+                onClick={() => fetchHotspots({ district: filterDistrict, crime_type: filterCrimeType })}
+                disabled={loading}
+                className="p-1.5 rounded-lg text-white/60 hover:text-white hover:bg-white/10 disabled:opacity-30 transition-colors"
+                title="Refresh data"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${SEVERITY_DOT_CLASS[h.severity]}`} />
-                    <span className="text-sm text-paper-100/90 font-medium truncate max-w-[140px]">{h.area}</span>
-                  </div>
-                  <span className="text-xs font-mono font-bold text-paper-100/80">{h.count}</span>
-                </div>
-                <div className="flex items-center gap-1.5 mt-1 ml-4">
-                  <p className="text-[10px] text-paper-100/40 capitalize">{h.severity}</p>
-                  {h.top_crime_types?.[0] && (
-                    <>
-                      <span className="text-[10px] text-paper-100/20">·</span>
-                      <p className="text-[10px] text-paper-100/35 capitalize">
-                        {h.top_crime_types[0].replace(/_/g, ' ')}
-                      </p>
-                    </>
-                  )}
-                </div>
+                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
               </button>
-            ))
-          )}
-        </div>
-
-        {/* ── Legend ── */}
-        <div className="p-4 border-t border-steel-600/40 space-y-1.5">
-          {Object.entries(SEVERITY_DOT_CLASS).map(([sev, cls]) => (
-            <div key={sev} className="flex items-center gap-2">
-              <div className={`w-2.5 h-2.5 rounded-full ${cls}`} />
-              <span className="text-xs text-paper-100/50 capitalize">{sev}</span>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="p-1.5 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+                title="Collapse panel"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      {/* ── Map area ── */}
-      <div className="flex-1 relative">
+          {/* Filters section */}
+          <div className="p-3 border-b border-white/10 space-y-2.5 bg-white/[0.01]">
+            {/* Severity pills */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">Severity</span>
+                {lastUpdated && (
+                  <span className="text-[9px] text-white/40 font-mono flex items-center gap-1">
+                    <Clock className="w-2.5 h-2.5" />
+                    {formatTime(lastUpdated)}
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-1">
+                {['all', 'critical', 'high', 'medium', 'low'].map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setFilterSeverity(s)}
+                    className={`px-2 py-0.5 rounded-md text-[11px] font-medium capitalize transition-all ${
+                      filterSeverity === s
+                        ? 'bg-blue-600 text-white font-semibold shadow-sm'
+                        : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10 border border-white/10'
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* District dropdown */}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-[9px] text-white/40 uppercase tracking-wider mb-1 font-semibold block">
+                  District
+                </label>
+                <select
+                  value={filterDistrict}
+                  onChange={e => { setFilterDistrict(e.target.value); setSelectedHotspot(null); }}
+                  className="w-full bg-slate-900/90 border border-white/15 text-white text-[11px] rounded-lg px-2 py-1 focus:outline-none focus:border-blue-500"
+                >
+                  {DISTRICTS.map(d => (
+                    <option key={d} value={d} className="bg-slate-900 text-white">
+                      {d === 'all' ? 'All Districts' : d}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[9px] text-white/40 uppercase tracking-wider mb-1 font-semibold block">
+                  Crime Type
+                </label>
+                <select
+                  value={filterCrimeType}
+                  onChange={e => { setFilterCrimeType(e.target.value); setSelectedHotspot(null); }}
+                  className="w-full bg-slate-900/90 border border-white/15 text-white text-[11px] rounded-lg px-2 py-1 focus:outline-none focus:border-blue-500"
+                >
+                  {CRIME_TYPES.map(c => (
+                    <option key={c} value={c} className="bg-slate-900 text-white">
+                      {c === 'all' ? 'All Crimes' : c.replace(/_/g, ' ')}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Hotspots scroll list */}
+          <div className="flex-1 overflow-y-auto p-2.5 space-y-1.5 custom-scrollbar">
+            {loading ? (
+              Array.from({ length: 5 }).map((_, i) => <SkeletonItem key={i} />)
+            ) : filtered.length === 0 ? (
+              <div className="p-4 text-center text-xs text-white/40 font-mono">
+                No hotspots match filter.
+              </div>
+            ) : (
+              filtered.map((h, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSelectedHotspot(h)}
+                  className={`w-full text-left p-2.5 rounded-xl border transition-all ${
+                    selectedHotspot?.area === h.area
+                      ? 'bg-blue-600/30 border-blue-400/50 shadow-md'
+                      : 'bg-white/[0.03] border-white/10 hover:bg-white/[0.08] hover:border-white/20'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${SEVERITY_DOT_CLASS[h.severity]}`} />
+                      <span className="text-xs text-white/90 font-medium truncate">{h.area}</span>
+                    </div>
+                    <span className="text-[11px] font-mono font-bold text-amber-400 ml-2 flex-shrink-0">
+                      {h.count} FIRs
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 mt-1 ml-4.5 text-[10px] text-white/40">
+                    <span className="capitalize text-white/60">{h.severity}</span>
+                    {h.top_crime_types?.[0] && (
+                      <>
+                        <span>·</span>
+                        <span className="truncate text-white/50">{h.top_crime_types[0].replace(/_/g, ' ')}</span>
+                      </>
+                    )}
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+
+          {/* Footer Legend */}
+          <div className="px-3 py-2 border-t border-white/10 bg-white/[0.02] flex items-center justify-between text-[10px] text-white/50 font-mono">
+            <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" /> Crit</div>
+            <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500" /> High</div>
+            <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-400" /> Med</div>
+            <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500" /> Low</div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 2. Full Width Map Engine ── */}
+      <div className="w-full h-full relative">
         {mounted && (
           is3D ? (
             <MapView3D
@@ -388,90 +380,98 @@ export default function MapPage() {
           )
         )}
 
-        {/* Selected hotspot detail card */}
+        {/* Selected hotspot detail card (floats above lower-left bar) */}
         {selectedHotspot && (
-          <div className="absolute bottom-6 left-4 bg-steel-700/95 backdrop-blur border border-steel-600/60 rounded-xl p-4 shadow-2xl z-[1000] max-w-xs">
+          <div className="absolute bottom-18 left-4 bg-slate-950/90 backdrop-blur-xl border border-white/20 rounded-2xl p-4 shadow-2xl z-[1000] max-w-xs animate-in fade-in slide-in-from-bottom-2">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <div className={`w-2.5 h-2.5 rounded-full ${SEVERITY_DOT_CLASS[selectedHotspot.severity]}`} />
-                  <h3 className="text-sm font-bold text-paper-100">{selectedHotspot.area}</h3>
+                  <h3 className="text-sm font-bold text-white">{selectedHotspot.area}</h3>
                 </div>
-                <p className="text-2xl font-bold font-mono text-warn-500">{selectedHotspot.count}</p>
-                <p className="text-xs text-paper-100/50">incidents this period</p>
-                <p className="text-xs text-paper-100/50 mt-1 capitalize">Severity: {selectedHotspot.severity}</p>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-2xl font-bold font-mono text-amber-400">{selectedHotspot.count}</p>
+                  <p className="text-[11px] text-white/50">incidents registered</p>
+                </div>
+                <p className="text-xs text-white/60 mt-1 capitalize">Severity: <span className="font-semibold text-white">{selectedHotspot.severity}</span></p>
                 {selectedHotspot.district && (
-                  <p className="text-xs text-paper-100/40 mt-0.5">{selectedHotspot.district}</p>
+                  <p className="text-xs text-white/40 mt-0.5">{selectedHotspot.district}</p>
                 )}
                 {selectedHotspot.top_crime_types?.length > 0 && (
-                  <p className="text-xs text-paper-100/40 mt-0.5 capitalize">
-                    Top crimes: {selectedHotspot.top_crime_types.map(c => c.replace(/_/g, ' ')).join(', ')}
+                  <p className="text-[11px] text-white/50 mt-1 capitalize">
+                    Primary: {selectedHotspot.top_crime_types.map(c => c.replace(/_/g, ' ')).join(', ')}
                   </p>
                 )}
               </div>
               <button
                 onClick={() => setSelectedHotspot(null)}
-                className="text-paper-100/40 hover:text-paper-100/80 text-xs transition-colors flex-shrink-0"
+                className="text-white/40 hover:text-white text-xs transition-colors flex-shrink-0 p-1"
+                title="Dismiss"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
           </div>
         )}
 
-        {/* Map overlay badges + 3D/2D Toggle */}
-        <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
+        {/* ── 3. [LIVE CRIME MAP, 3D 2D, Hotspots] Shifted to LOWER LEFT ── */}
+        <div className="absolute bottom-4 left-4 z-[1000] flex flex-wrap items-center gap-2">
           {/* Header badge */}
-          <div className="bg-steel-700/90 backdrop-blur border border-steel-600/60 rounded-lg px-3 py-2 flex items-center gap-2">
-            <Layers className="w-3.5 h-3.5 text-phosphor-500" />
-            <span className="text-xs text-paper-100/80 font-medium">Live Crime Map</span>
+          <div className="bg-slate-900/85 backdrop-blur-xl border border-white/15 rounded-xl px-3 py-2 flex items-center gap-2 shadow-xl">
+            <Layers className="w-3.5 h-3.5 text-blue-400" />
+            <span className="text-xs text-white font-medium">Live Crime Map</span>
           </div>
 
-          {/* 3D / 2D Toggle */}
-          <div className="bg-steel-700/90 backdrop-blur border border-steel-600/60 rounded-lg p-1 flex gap-1">
+          {/* 3D / 2D Switcher */}
+          <div className="bg-slate-900/85 backdrop-blur-xl border border-white/15 rounded-xl p-1 flex items-center gap-1 shadow-xl">
             <button
               id="btn-map-3d"
               onClick={() => setIs3D(true)}
-              title="3D City View"
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
+              title="3D City Extrusions"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 is3D
-                  ? 'bg-phosphor-500 text-white shadow-sm'
-                  : 'text-paper-100/50 hover:text-paper-100/80'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'text-white/60 hover:text-white hover:bg-white/10'
               }`}
             >
-              <Box className="w-3 h-3" />
+              <Box className="w-3.5 h-3.5" />
               3D
             </button>
             <button
               id="btn-map-2d"
               onClick={() => setIs3D(false)}
-              title="2D Topographic View"
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
+              title="2D Topographic Grid"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 !is3D
-                  ? 'bg-phosphor-500 text-white shadow-sm'
-                  : 'text-paper-100/50 hover:text-paper-100/80'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'text-white/60 hover:text-white hover:bg-white/10'
               }`}
             >
-              <Map className="w-3 h-3" />
+              <Map className="w-3.5 h-3.5" />
               2D
             </button>
           </div>
 
           {/* Hotspot count */}
-          <div className="bg-steel-700/90 backdrop-blur border border-steel-600/60 rounded-lg px-3 py-2 text-xs text-paper-100/50 font-mono text-center">
-            {loading ? (
-              <span className="animate-pulse">Loading…</span>
-            ) : (
-              `${filtered.length} hotspot${filtered.length !== 1 ? 's' : ''}`
-            )}
+          <div className="bg-slate-900/85 backdrop-blur-xl border border-white/15 rounded-xl px-3 py-2 text-xs text-white/80 font-mono shadow-xl flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            <span>
+              {loading ? (
+                'Loading…'
+              ) : (
+                `${filtered.length} hotspot${filtered.length !== 1 ? 's' : ''}`
+              )}
+            </span>
           </div>
+
           {usingCache && (
-            <div className="bg-warn-500/10 backdrop-blur border border-warn-500/30 rounded-lg px-3 py-2 flex items-center gap-1.5">
-              <WifiOff className="w-3 h-3 text-warn-500" />
-              <span className="text-[10px] text-warn-500 font-semibold">Cached data</span>
+            <div className="bg-amber-500/20 backdrop-blur-xl border border-amber-500/40 rounded-xl px-3 py-2 flex items-center gap-1.5 shadow-xl">
+              <WifiOff className="w-3.5 h-3.5 text-amber-400" />
+              <span className="text-[10px] text-amber-300 font-semibold">Cached</span>
             </div>
           )}
         </div>
+
       </div>
     </div>
   );
