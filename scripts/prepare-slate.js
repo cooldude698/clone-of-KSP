@@ -181,3 +181,23 @@ require('./server.js');
 `;
 fs.writeFileSync(catalystStartPath, catalystStartContent, 'utf-8');
 console.log('  ✔ catalyst-start.js (port bridge) written to standalone/nextjs');
+
+// 9. Patch hardcoded local machine paths in standalone outputs → /home/runner
+//    (Catalyst containers use /home/runner as the working directory)
+const LOCAL_MACHINE_PATH = rootDir; // e.g. /Users/.../kspdatathon2026-main
+const CATALYST_RUNTIME_PATH = '/home/runner';
+
+function patchFilePaths(filePath) {
+  if (!fs.existsSync(filePath)) return;
+  let content = fs.readFileSync(filePath, 'utf-8');
+  if (content.includes(LOCAL_MACHINE_PATH)) {
+    content = content.split(LOCAL_MACHINE_PATH).join(CATALYST_RUNTIME_PATH);
+    fs.writeFileSync(filePath, content, 'utf-8');
+    console.log(`  ✔ Patched local path in ${path.basename(filePath)}`);
+  }
+}
+
+patchFilePaths(path.join(standalonePkgDir, 'server.js'));
+patchFilePaths(path.join(standalonePkgDir, '.next', 'required-server-files.json'));
+
+console.log('--- All done! AppSail-ready standalone build complete ---');
