@@ -50,7 +50,8 @@
       "source": "dist-slate",
       "ignore": [
         "**/node_modules/**",
-        "**/.next/cache/**",
+        "**/.next/**",
+        "**/.open-next/**",
         "**/.git/**",
         "**/.cache/**",
         "**/*.log",

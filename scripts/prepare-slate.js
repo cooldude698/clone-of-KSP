@@ -211,13 +211,7 @@ for (const d of ['src', 'public', 'scripts']) {
   const src = path.join(nextDir, d);
   if (fs.existsSync(src)) fs.cpSync(src, path.join(distSlateNext, d), { recursive: true });
 }
-if (fs.existsSync(path.join(nextDir, '.next'))) {
-  fs.cpSync(path.join(nextDir, '.next'), path.join(distSlateNext, '.next'), { recursive: true });
-  fs.rmSync(path.join(distSlateNext, '.next', 'cache'), { recursive: true, force: true });
-  fs.rmSync(path.join(distSlateNext, '.next', 'standalone'), { recursive: true, force: true });
-  fs.rmSync(path.join(distSlateNext, '.next', 'trace'), { recursive: true, force: true });
-}
-console.log('  ✔ dist-slate/nextjs bundle synchronized for Catalyst Slate');
+console.log('  ✔ dist-slate/nextjs source bundle synchronized for Catalyst Slate');
 
 console.log('--- All done! Slate and AppSail ready ---');
 
