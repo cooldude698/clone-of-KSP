@@ -8,8 +8,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "postbuild": "node scripts/sync-opennext-manifests.js",
-    "start": "node start-appsail.js",
+    "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
