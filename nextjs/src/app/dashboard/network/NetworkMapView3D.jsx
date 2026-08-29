@@ -4,6 +4,27 @@ import { useEffect, useRef, useState } from 'react';
 
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/positron';
 
+function loadMaplibre() {
+  return new Promise((resolve) => {
+    if (window.maplibregl) { resolve(window.maplibregl); return; }
+    if (!document.getElementById('maplibre-gl-css')) {
+      const link = document.createElement('link');
+      link.id = 'maplibre-gl-css'; link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css';
+      document.head.appendChild(link);
+    }
+    if (document.getElementById('maplibre-gl-js')) {
+      const check = setInterval(() => { if (window.maplibregl) { clearInterval(check); resolve(window.maplibregl); } }, 50);
+      return;
+    }
+    const script = document.createElement('script');
+    script.id  = 'maplibre-gl-js';
+    script.src = 'https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js';
+    script.onload = () => resolve(window.maplibregl);
+    document.head.appendChild(script);
+  });
+}
+
 const PREDICTIVE_ROUTES = [
   {
     id: 'SYN-VT-01-ROUTE', name: 'Bullet Ramesh Escape Corridor (NH-44)', color: '#3B82F6',
@@ -38,15 +59,6 @@ const ANPR_NODES = [
   { id: 'CAM-HEB-0012', name: 'Hebbal Expressway',      lng: 77.6256, lat: 13.0456, status: 'PATROL_DEPLOYED' },
   { id: 'CAM-ATT-0001', name: 'Attibele Border Gate',   lng: 77.7200, lat: 12.7800, status: 'INTERCEPT_READY' },
 ];
-
-function injectCSS() {
-  if (document.getElementById('maplibre-gl-css')) return;
-  const link = document.createElement('link');
-  link.id   = 'maplibre-gl-css';
-  link.rel  = 'stylesheet';
-  link.href = 'https://unpkg.com/maplibre-gl@6/dist/maplibre-gl.css';
-  document.head.appendChild(link);
-}
 
 function routesGeoJSON() {
   return {
@@ -86,12 +98,10 @@ export default function NetworkMapView3D({ nodes = [], selectedNodeId, onNodeCli
   // ── Load maplibre-gl dynamically — NO static import at all ───────────────
   useEffect(() => {
     if (mapRef.current || !containerRef.current) return;
-
-    injectCSS();
     let map;
     let cancelled = false;
 
-    import('maplibre-gl').then((ml) => {
+    loadMaplibre().then((ml) => {
       if (cancelled || mapRef.current) return;
 
       map = new ml.Map({
