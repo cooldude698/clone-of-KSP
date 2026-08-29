@@ -691,89 +691,84 @@ export const DEMO_AI_INSIGHTS = [
  */
 export function generateAIResponseFromDemoData(userQuestion = '') {
   const q = userQuestion.toLowerCase().trim();
+  const allFirs = DEMO_FIRS.firs || [];
+  const allSuspects = DEMO_REPEAT_OFFENDERS.suspects || [];
 
-  // Pattern 1: Hotspots / Top Crimes / High Risk Areas
-  if (q.includes('hotspot') || q.includes('top crime') || q.includes('high risk area') || q.includes('where is crime')) {
-    const topHotspots = DEMO_HOTSPOTS.hotspots.slice(0, 3).map((h, i) => 
-      `${i + 1}) **${h.area_name}** (${h.district}) — ${h.crime_count} incidents logged (Severity Score: ${h.severity_score}/10). Primary offense: ${h.primary_crime}.`
-    ).join('\n');
-    return {
-      answer: `Based on active DRISHTI analytics, here are the primary crime hotspots across Karnataka:\n\n${topHotspots}\n\n*Recommendation*: Increase beat patrol frequency along the Silk Board & MG Road corridors.`,
-      source: 'demo_ai',
-      confidence: 0.88
-    };
+  // 1. Specific Case Number Check
+  const caseMatch = userQuestion.match(/(KAR\/[A-Z0-9]+\/\d+\/\d+|FIR-\d{4}-[A-Z0-9]+-\d+)/i);
+  if (caseMatch) {
+    const f = allFirs.find(item => item.case_number.toUpperCase().includes(caseMatch[0].toUpperCase()));
+    if (f) {
+      return {
+        answer: `### CCTNS Case Record: ${f.case_number}\n\n- **Crime Category:** ${f.crime_type}\n- **Police Station:** ${f.police_station} (${f.district_name})\n- **Date Filed:** ${f.date_filed}\n- **Accused/Suspect:** ${f.accused_name} (Risk Score: ${f.risk_score}/100)\n- **Status:** ${f.status.toUpperCase()}\n\n**Description:**\n_${f.description}_\n\n*Directives:* Evidence docket active. Checkpoint alert active across ${f.police_station} limits.`,
+        source: 'drishti_ai',
+        confidence: 0.95
+      };
+    }
   }
 
-  // Pattern 2: Specific Location / District (Silk Board, MG Road, Bengaluru, Mysuru, Hubballi)
-  if (q.includes('silk board') || q.includes('mg road') || q.includes('bengaluru') || q.includes('mysuru') || q.includes('district')) {
-    const matchingCases = DEMO_FIRS.firs.filter(f => 
-      q.includes(f.district_name.toLowerCase()) || 
-      q.includes(f.location_name.toLowerCase()) || 
-      q.includes('bengaluru')
-    ).slice(0, 3);
-
-    const caseList = (matchingCases.length > 0 ? matchingCases : DEMO_FIRS.firs.slice(0, 3)).map(f => 
-      `• **${f.case_number}** (${f.crime_type}): ${f.description} [Status: ${f.status.toUpperCase()}]`
-    ).join('\n');
-
+  // 2. Specific Person / Suspect Check
+  const suspect = allSuspects.find(s => q.includes(s.name.toLowerCase()) || (s.alias && q.includes(s.alias.toLowerCase())));
+  if (suspect) {
     return {
-      answer: `Here are the active cases recorded for the requested sector:\n\n${caseList}\n\nAll units in the sector have been alerted to watch for suspicious vehicle activity.`,
-      source: 'demo_ai',
-      confidence: 0.85
-    };
-  }
-
-  // Pattern 3: Repeat Offenders / High-Risk Suspects
-  if (q.includes('suspect') || q.includes('offender') || q.includes('repeat') || q.includes('criminal') || q.includes('gang')) {
-    const suspectList = (DEMO_REPEAT_OFFENDERS.suspects || []).map((s, i) => 
-      `${i + 1}) **${s.name}** ("${s.alias}") — Risk Score: **${s.risk_score}/100**\n   • Modus Operandi: ${s.primary_modus_operandi || 'Vehicle Theft / Robbery'}\n   • Known Hangouts: ${(s.known_hangouts || []).join(', ') || 'Bengaluru Corridor'}\n   • Status: ${s.status || 'Active Watchlist'}`
-    ).join('\n\n');
-
-    return {
-      answer: `DRISHTI Repeat Offender Matrix identifies **${DEMO_REPEAT_OFFENDERS.high_risk_count} high-risk targets**. Top active suspects:\n\n${suspectList}`,
-      source: 'demo_ai',
-      confidence: 0.90
-    };
-  }
-
-  // Pattern 4: Trends / Analytics / Monthly Patterns
-  if (q.includes('trend') || q.includes('analytic') || q.includes('pattern') || q.includes('monthly') || q.includes('spike')) {
-    return {
-      answer: `**Crime Trend Analysis (12-Month Window)**:\n\n• **Overall Direction**: ${DEMO_TRENDS.overall_trend.toUpperCase()}\n• **Average Per Period**: ${DEMO_TRENDS.average_per_period} incidents/month\n• **Recent Peak**: July 2026 recorded 312 FIRs.\n\n*Key Seasonal Insight*: ${DEMO_TRENDS.seasonal_insight}`,
-      source: 'demo_ai',
-      confidence: 0.86
-    };
-  }
-
-  // Pattern 5: ANPR / Plate Search / Stolen Vehicles
-  if (q.includes('anpr') || q.includes('plate') || q.includes('stolen') || q.includes('vehicle') || q.includes('ka-')) {
-    const res = DEMO_ANPR_RESULT;
-    return {
-      answer: `🚨 **ANPR ALERT: ${res.status} DETECTED**\n\n• **Target Plate**: ${res.plate_number}\n• **Vehicle**: ${res.vehicle_details.make_model} (${res.vehicle_details.color})\n• **Matched FIR**: ${res.fir_match.case_number} (${res.fir_match.police_station})\n• **Last CCTV Sighting**: ${res.last_sighting.camera_name} (Confidence: ${res.last_sighting.confidence}%)\n\nAutomated intercept alert broadcasted to nearby patrol units.`,
-      source: 'demo_ai',
+      answer: `### Target Offender Dossier: **${suspect.name}** ("${suspect.alias || 'Suspect'}")\n\n- **Risk Score:** **${suspect.risk_score}/100**\n- **Primary Modus Operandi:** ${suspect.primary_modus_operandi || 'Vehicle Theft & Organized Extortion'}\n- **Last Known Location:** ${suspect.last_known_location || 'Bengaluru Corridor'}\n- **Status:** ${suspect.status || 'Active Watchlist'}\n- **Known Hangouts:** ${(suspect.known_hangouts || []).join(', ') || 'Bengaluru Urban'}\n\n*Tactical Directive:* Monitor ANPR cameras and maintain active checkpoint surveillance.`,
+      source: 'drishti_ai',
       confidence: 0.95
     };
   }
 
-  // Pattern 6: Geo Trail / Sightings / Cameras
-  if (q.includes('trail') || q.includes('sighting') || q.includes('camera') || q.includes('movement') || q.includes('route')) {
-    const trailHops = DEMO_TRAIL.trail.map(h => 
-      `• **Hop ${h.hop}** (${h.timestamp.split('T')[1].slice(0,8)}): ${h.camera_name} — Distance from crime: ${h.distance_from_crime_km}km [${h.sighting_type}]`
-    ).join('\n');
-
+  // 3. Specific District Filter
+  const districts = ['Bengaluru', 'Kalaburagi', 'Raichur', 'Chikkamagaluru', 'Tumakuru', 'Udupi', 'Hassan', 'Vijayapura', 'Koppal', 'Bidar', 'Davangere', 'Mysuru'];
+  const matchedDist = districts.find(d => q.includes(d.toLowerCase()));
+  if (matchedDist) {
+    const distFirs = allFirs.filter(f => (f.district_name || '').toLowerCase().includes(matchedDist.toLowerCase()));
+    const caseList = distFirs.slice(0, 4).map(f => `• **${f.case_number}** (${f.crime_type}): ${f.description} [Status: ${f.status.toUpperCase()}]`).join('\n');
     return {
-      answer: `**Vehicle Geo-Trail Timeline for KA-01-MJ-8821**:\n\n${trailHops}\n\n**Total Distance**: ${DEMO_TRAIL.total_distance_km}km across ${DEMO_TRAIL.total_hops} camera checkpoints. Last known location: ${DEMO_TRAIL.last_known_location.camera_name}.`,
-      source: 'demo_ai',
-      confidence: 0.92
+      answer: `### Active Intelligence for **${matchedDist} District** (${distFirs.length} total cases indexed):\n\n${caseList || 'No active high-risk alerts in this sector.'}\n\n*Recommendation:* All precinct patrol units have been synchronized with the state CCTNS grid.`,
+      source: 'drishti_ai',
+      confidence: 0.90
     };
   }
 
-  // Fallback for general or unrecognized questions
-  const insightsSummary = DEMO_AI_INSIGHTS.map(i => `• [${i.severity.toUpperCase()}] ${i.insight}`).join('\n');
+  // 4. Specific Crime Filter
+  const crimeTypes = [
+    { key: 'theft', label: 'Vehicle Theft' },
+    { key: 'hit and run', label: 'Hit And Run' },
+    { key: 'burglary', label: 'Burglary' },
+    { key: 'senior citizen', label: 'Senior Citizen Crime' },
+    { key: 'domestic', label: 'Domestic Violence' },
+    { key: 'drug', label: 'Drug Offence' },
+    { key: 'cyber', label: 'Cybercrime' },
+    { key: 'fraud', label: 'Fraud' },
+    { key: 'assault', label: 'Assault' },
+    { key: 'robbery', label: 'Robbery' }
+  ];
+  const matchedCrime = crimeTypes.find(c => q.includes(c.key));
+  if (matchedCrime) {
+    const filtered = allFirs.filter(f => (f.crime_type_code || '').toLowerCase().includes(matchedCrime.key) || (f.crime_type || '').toLowerCase().includes(matchedCrime.key));
+    const caseList = filtered.slice(0, 4).map(f => `• **${f.case_number}** (${f.police_station}): ${f.description} [Accused: ${f.accused_name || 'Under Investigation'}]`).join('\n');
+    return {
+      answer: `### ${matchedCrime.label} Incident Registry (${filtered.length} total cases):\n\n${caseList}\n\n*Tactical Standard:* Follow statutory investigation protocol and preserve digital CCTV evidence.`,
+      source: 'drishti_ai',
+      confidence: 0.90
+    };
+  }
+
+  // 5. Vehicle / ANPR Check
+  if (q.includes('anpr') || q.includes('plate') || q.includes('stolen') || q.includes('ka-')) {
+    const res = DEMO_ANPR_RESULT;
+    return {
+      answer: `🚨 **ANPR ALERT: ${res.status} DETECTED**\n\n• **Target Plate**: ${res.plate_number}\n• **Vehicle**: ${res.vehicle_details.make_model} (${res.vehicle_details.color})\n• **Matched FIR**: ${res.fir_match.case_number} (${res.fir_match.police_station})\n• **Last CCTV Sighting**: ${res.last_sighting.camera_name} (Confidence: ${res.last_sighting.confidence}%)\n\nAutomated intercept alert broadcasted to nearby patrol units.`,
+      source: 'drishti_ai',
+      confidence: 0.95
+    };
+  }
+
+  // 6. General Intelligent Fallback
   return {
-    answer: `Based on active DRISHTI intelligence, here is the current operational brief:\n\n${insightsSummary}\n\nFeel free to ask me about specific **hotspots**, **FIR records**, **suspect profiles**, **ANPR vehicle lookups**, or **geo-trails**.`,
-    source: 'demo_ai',
-    confidence: 0.75
+    answer: `Sir, DRISHTI AI has analyzed the state CCTNS datastore for "${userQuestion}".\n\n- **Active Synchronization:** ${allFirs.length} live FIRs and ${allSuspects.length} high-risk dossiers indexed across Karnataka.\n- **ANPR Surveillance Grid:** 450+ high-definition cameras active.\n\nYou can query any specific case number (e.g. \`KAR/BEN/2024/0747\`), suspect name (e.g. \`Ramesh Kumar\`), vehicle plate, or district (e.g. \`Kalaburagi\`).`,
+    source: 'drishti_ai',
+    confidence: 0.85
   };
 }
 

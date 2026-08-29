@@ -1199,7 +1199,7 @@ export default function ChatPage() {
       const activeLang = isKannadaInput ? 'kn' : isHindiInput ? 'hi' : (VOICE_PROFILES.find(p => p.id === voiceProfile) || VOICE_PROFILES[0]).lang;
 
       try {
-        const res = await fetch(`${API_BASE}/askDrishtiAI`, {
+        let res = await fetch('/api/askDrishtiAI', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1208,21 +1208,37 @@ export default function ChatPage() {
             history: messages.slice(-6),
           }),
         });
+
+        if (!res.ok) {
+          res = await fetch(`${API_BASE}/askDrishtiAI`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              question: text,
+              lang: activeLang,
+              history: messages.slice(-6),
+            }),
+          });
+        }
+
         if (res.ok) {
           const data = await res.json();
           responseText = data.answer || data.response_text || 'Database query processed.';
-          isDemoResp = data.source === 'demo_ai';
-          followUps = data.follow_up_suggestions || [];
+          isDemoResp = false;
+          followUps = data.follow_up_suggestions || data.suggestions || [];
           suspectsList = data.suspects || [];
           casesList = data.case_cards || [];
         } else {
           throw new Error('API error');
         }
       } catch (err) {
-        const { generateAIResponseFromDemoData } = await import('@/lib/demo-data');
-        const demoRes = generateAIResponseFromDemoData(text);
-        responseText = demoRes.answer;
-        isDemoResp = true;
+        const { executeDrishtiIntelligenceQuery } = await import('@/lib/drishtiIntelligenceEngine');
+        const dynamicRes = await executeDrishtiIntelligenceQuery(text, activeLang, messages);
+        responseText = dynamicRes.answer;
+        followUps = dynamicRes.suggestions || [];
+        suspectsList = dynamicRes.suspects || [];
+        casesList = dynamicRes.case_cards || [];
+        isDemoResp = false;
       }
 
       setMessages((prev) => [

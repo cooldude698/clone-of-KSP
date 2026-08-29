@@ -6,8 +6,8 @@
  * criminal network link analysis, BNS/IPC legal mappings, and tactical recommendations.
  */
 
-import { DEMO_FIRS } from './demo-data.js';
-import { UPLOADED_FIRS } from './uploadedFirsStore.js';
+import { DEMO_FIRS, DEMO_HOTSPOTS, DEMO_TRENDS, DEMO_TRAIL, DEMO_ANPR_RESULT } from './demo-data.js';
+import { UPLOADED_FIRS, UPLOADED_SUSPECTS } from './uploadedFirsStore.js';
 
 // All active Karnataka State Police districts
 const DISTRICTS = [
@@ -91,6 +91,24 @@ const SUSPECTS_INTEL = [
     tactical_action: 'Issue immediate CFCFRMS transaction freeze via 1930 Helpline portal, trace IP log routing, and notify Whitefield CEN Police Station.'
   },
   {
+    name: 'Anand Gowda',
+    alias: 'Jayanagar Anand',
+    cctns_id: 'SUS-8842',
+    risk_score: 72,
+    risk_level: 'HIGH',
+    gravity: 'Heinous',
+    primary_crime: 'Extortion & Chain Snatching Syndicate',
+    ipc_sections: ['IPC §384', 'IPC §379', 'IPC §506', 'BNS §308'],
+    districts: ['Bengaluru Urban'],
+    active_firs: ['KAR/BEN/2024/0747', 'KAR/BEN/2024/0114', 'KAR/BEN/2024/0125'],
+    last_known_location: 'Jayanagar 4th Block Complex, Bengaluru',
+    last_known_vehicle: 'Stolen KTM Duke (KA-05-EV-9012)',
+    anpr_camera: 'CAM-BLR-0042 (Jayanagar 4th Block Circle)',
+    status: 'ACTIVE WATCHLIST',
+    mo_summary: 'Targeting commuters near commercial complexes and transit stations. Rides modified KTM motorcycle with forged registration plates.',
+    tactical_action: 'Deploy Hoysala patrols near Jayanagar 4th Block and monitor South Bengaluru CCTV junction cameras.'
+  },
+  {
     name: 'Anand Shinde',
     alias: 'Buda Anand',
     cctns_id: 'SUS-9012',
@@ -125,6 +143,42 @@ const SUSPECTS_INTEL = [
     status: 'Bank Accounts Under Surveillance',
     mo_summary: 'Creates spoofed banking login pages and uses mule bank accounts across rural Tumakuru & Chikkamagaluru to siphon off OTP funds.',
     tactical_action: 'Freeze 14 identified mule accounts via State Cyber Cell and cross-examine CDR call detail records.'
+  },
+  {
+    name: 'Vikram Singh',
+    alias: 'Highway Vikram',
+    cctns_id: 'SUS-1209',
+    risk_score: 88,
+    risk_level: 'HIGH',
+    gravity: 'Heinous',
+    primary_crime: 'Hit and Run Collision & Reckless Endangerment',
+    ipc_sections: ['IPC §279', 'IPC §304A', 'BNS §106'],
+    districts: ['Kalaburagi', 'Davangere'],
+    active_firs: ['KAR/KAL/2024/0330', 'KAR/KAL/2024/0102', 'KAR/KAL/2024/0106', 'KAR/DAV/2024/2111'],
+    last_known_location: 'Near Murty Circle, Kalaburagi Rural PS corridor',
+    last_known_vehicle: 'Mahindra Bolero (KA-32-N-8801)',
+    anpr_camera: 'CAM-KAL-0014 (Murty Circle Approach)',
+    status: 'Summons Issued',
+    mo_summary: 'Reckless commercial transit vehicle operations causing multiple hit-and-run collisions during afternoon transit hours.',
+    tactical_action: 'Impound offending transit vehicle and execute forensic speed reconstruction.'
+  },
+  {
+    name: 'Vikram Reddy',
+    alias: 'Gold Vicky',
+    cctns_id: 'SUS-4412',
+    risk_score: 84,
+    risk_level: 'MEDIUM-HIGH',
+    gravity: 'Heinous',
+    primary_crime: 'Residential Burglary & Gold Theft Syndicate',
+    ipc_sections: ['IPC §457', 'IPC §380', 'BNS §305', 'BNS §331'],
+    districts: ['Chikkamagaluru'],
+    active_firs: ['KAR/CHI/2024/0901', 'KAR/CHI/2024/0126', 'KAR/CHI/2024/0127'],
+    last_known_location: 'Ganesh Marg, Chikkamagaluru Market precinct',
+    last_known_vehicle: 'Bajaj Discover (KA-18-Q-4521)',
+    anpr_camera: 'CAM-CHI-0005 (Market PS Gate)',
+    status: 'Active Investigation',
+    mo_summary: 'Executes late-night residential break-ins targeting locked houses during festival weekends.',
+    tactical_action: 'Conduct night beat patrols near residential colonies and cross-examine local pawn brokers.'
   }
 ];
 
@@ -173,523 +227,635 @@ const LEGAL_SOPS = {
       'Pack, label, and affix official station wax seal on all seized articles in front of panchas.',
       'Record detailed spot observation narrative in Kannada/English and obtain physical signatures of both panchas and I.O.'
     ]
+  },
+  ndps: {
+    title: 'NDPS Act Seizure & Commercial Contraband Procedure',
+    acts: ['NDPS Act 1985 §21, §29, §50, §52A', 'BNSS §105'],
+    steps: [
+      'Issue notice to accused regarding statutory right under Section 50 NDPS to be searched before Gazetted Officer or Magistrate.',
+      'Execute field drug detection test using certified chemical testing kit in presence of independent panchas.',
+      'Weigh gross and net contraband on calibrated scale, draw duplicate representative samples of 5g/24g.',
+      'Affix official lac seal, record inventory, and submit formal report under Section 57 NDPS to superior officer within 48 hours.',
+      'Apply to jurisdictional Magistrate under Section 52A NDPS for certification of inventory and disposal orders.'
+    ]
   }
 };
 
 /**
  * Main Autonomous Reasoning Entrypoint
+ * Dynamically synthesizes the actual answer to what the user explicitly requested.
+ * 
  * @param {string} question - User question
  * @param {string} lang - 'en' | 'kn' | 'hi'
  * @param {Array} history - Previous chat messages
  */
 export async function executeDrishtiIntelligenceQuery(question, lang = 'en', history = []) {
-  const q = (question || '').toLowerCase().trim();
-  const isKannada = /[\u0C80-\u0CFF]/.test(question) || lang === 'kn';
-  const isHindi = /[\u0900-\u097F]/.test(question) || lang === 'hi';
+  try {
+    const rawQuestion = (question || '').trim();
+    const q = rawQuestion.toLowerCase();
+    const isKannada = /[\u0C80-\u0CFF]/.test(rawQuestion) || lang === 'kn';
+    const isHindi = /[\u0900-\u097F]/.test(rawQuestion) || lang === 'hi';
 
-  // Gather combined live FIRs (Uploaded + Static)
-  const allFirs = DEMO_FIRS.firs || [];
-  const historyText = (history || []).map(h => h.content || '').join(' ').toLowerCase();
-  const contextQuery = `${q} ${historyText}`;
+    // Combine all registered FIRs (uploaded + baseline)
+    const allFirs = DEMO_FIRS.firs || [];
+    const allSuspects = [...SUSPECTS_INTEL, ...UPLOADED_SUSPECTS];
 
-  // ── 1. GREETINGS, CONVERSATIONAL & IDENTITY INTENTS ──────────────────────────
-  const isGreeting = 
-    q === 'hi' || q === 'hello' || q === 'hey' || q.startsWith('hi ') || q.startsWith('hello ') || q.startsWith('hey ') ||
-    q.includes('how are you') || q.includes('how do you do') || q.includes('how are things') || q.includes('how r u') ||
-    q.includes('how are you doing') || q.includes('whats up') || q.includes("what's up") ||
-    q.includes('good morning') || q.includes('good evening') || q.includes('good afternoon') || q.includes('good night') ||
-    q.includes('namaste') || q.includes('jai hind') || q.includes('ನಮಸ್ಕಾರ') || q.includes('ಜೈ ಹಿಂದ್') || q.includes('नमस्ते') || q.includes('जय हिंद');
-
-  const isIdentityOrHelp = 
-    q.includes('who are you') || q.includes('what are you') || q.includes('what is your name') || 
-    q.includes('what can you do') || q.includes('help me') || q.includes('what is drishti') || 
-    q.includes('who made you') || q.includes('your capabilities') || q.includes('ನಿನ್ನ ಹೆಸರು') || q.includes('ನೀವು ಯಾರು') ||
-    q.includes('तुम कौन हो') || q.includes('तुम्हारा नाम');
-
-  if (isGreeting || isIdentityOrHelp) {
-    if (isKannada) {
-      let out = `### 🛡️ ಕರ್ನಾಟಕ ರಾಜ್ಯ ಪೊಲೀಸ್ ಗುಪ್ತಚರ ಕಮಾಂಡ್ ಗ್ರಿಡ್\n`;
-      out += `ದೃಷ್ಟಿ ಎಐ (DRISHTI AI) ಸಂಪೂರ್ಣವಾಗಿ ಸಕ್ರಿಯವಾಗಿದ್ದು, ರಾಜ್ಯದ ಸಿಸಿಟಿಎನ್‌ಎಸ್ ಮತ್ತು 450+ ANPR ಕಣ್ಗಾವಲು ಜಾಲದೊಂದಿಗೆ ಸಿಂಕ್ರೊನೈಸ್ ಆಗಿದೆ.\n\n`;
-      out += `| ಕಾರ್ಯಾಚರಣೆಯ ವಿಭಾಗ | ಲಭ್ಯವಿರುವ ಮಾಹಿತಿ |\n`;
-      out += `| :--- | :--- |\n`;
-      out += `| **ಪ್ರಮುಖ ಗುರಿ ಶಂಕಿತರು** | ಅಪರಾಧಿಗಳ ಡಾಕ್ಯೂಮೆಂಟ್, ರಿಸ್ಕ್ ಸ್ಕೋರ್ ಮತ್ತು ಎಂ.ಒ. |\n`;
-      out += `| **ANPR ವಾಹನ ಕಣ್ಗಾವಲು** | ಕದ್ದ ವಾಹನ ಶೋಧನೆ, ಟೋಲ್ ಪ್ಲಾಜಾ ಲೈವ್ ಅಲರ್ಟ್ |\n`;
-      out += `| **ಪ್ರಕರಣಗಳ ತನಿಖೆ** | ಎಫ್‌ಐಆರ್ ದಾಖಲೆಗಳು ಮತ್ತು ಕಾಯ್ದೆಗಳು (BNS/IPC) |\n`;
-      out += `| **ಸ್ಥಳ ಮಹಜರು** | ಸ್ವಯಂಚಾಲಿತ ಪಂಚನಾಮ ಡ್ರಾಫ್ಟಿಂಗ್ |\n\n`;
-      out += `ಇಂದು ನಿಮ್ಮ ಕರ್ತವ್ಯದಲ್ಲಿ ನಾನು ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ, ಸರ್?`;
-
+    // ── 1. GREETINGS & CASUAL HELLOS ───────────────────────────────────────────
+    if (/^(hi|hello|hey|greetings|good\s*morning|good\s*afternoon|good\s*evening|jai\s*hind|namaste|नमस्ते|हेलो|हाय|ನಮಸ್ಕಾರ|ಜೈ ಹಿಂದ್)$/i.test(q) ||
+        q.includes('how are you') || q.includes('who are you') || q.includes('what can you do') || q.includes('help me') || q.includes('what is drishti')) {
+      if (isKannada) {
+        return {
+          answer: `ಜೈ ಹಿಂದ್, ಸರ್! ದೃಷ್ಟಿ (DRISHTI AI) ಕರ್ತವ್ಯದಲ್ಲಿದೆ. ಕರ್ನಾಟಕ ರಾಜ್ಯ ಪೊಲೀಸ್ ಸಿಸಿಟಿಎನ್‌ಎಸ್ ಮತ್ತು ಗುಪ್ತಚರ ದತ್ತಸಂಚಯ ಸಂಪೂರ್ಣವಾಗಿ ಸಕ್ರಿಯವಾಗಿದೆ.\n\nಇಂದು ನಿಮ್ಮ ತನಿಖೆಯಲ್ಲಿ ನಾನು ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ, ಸರ್? ನೀವು ನಿರ್ದಿಷ್ಟ ಪ್ರಕರಣ, ಶಂಕಿತರ ಹಿನ್ನೆಲೆ, ವಾಹನ ಸಂಖ್ಯೆ ಅಥವಾ ಸ್ಥಳದ ಅಪರಾಧ ಮಾಹಿತಿಯನ್ನು ಕೇಳಬಹುದು.`,
+          suggestions: ['ಇತ್ತೀಚಿನ ವಾಹನ ಕಳವು ಪ್ರಕರಣಗಳು', 'ನಮ್ಮ ಪ್ರಮುಖ ಗುರಿಗಳು (Target Suspects)', 'ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಅಪರಾಧ ಹಾಟ್‌ಸ್ಪಾಟ್', 'ಕಲಬುರಗಿ ಪ್ರಕರಣಗಳ ಪಟ್ಟಿ'],
+          kpis: { active_firs: allFirs.length, repeat_offenders: allSuspects.length, grid_status: 'ONLINE' }
+        };
+      }
+      if (isHindi) {
+        return {
+          answer: `जय हिंद, सर! दृष्टि (DRISHTI AI) ऑन-ड्यूटी सक्रिय है। कर्नाटक पुलिस CCTNS और सर्विलांस ग्रिड पूरी तरह सिंक्रोनाइज़्ड हैं।\n\nआज आपकी जांच में मैं कैसे सहायता कर सकता हूँ, सर? आप किसी भी केस नंबर, संदिग्ध के नाम, वाहन नंबर या जिले के अपराध आंकड़ों के बारे में पूछ सकते हैं।`,
+          suggestions: ['नवीनतम वाहन चोरी मामले', 'शीर्ष वांछित संदिग्ध (Target Suspects)', 'सिल्क बोर्ड क्राइम एनालिसिस', 'कलवारगी केस रिपोर्ट'],
+          kpis: { active_firs: allFirs.length, repeat_offenders: allSuspects.length, grid_status: 'ONLINE' }
+        };
+      }
       return {
-        answer: out,
-        suggestions: ['ಇತ್ತೀಚಿನ ವಾಹನ ಕಳವು ಪ್ರಕರಣಗಳು', 'ಪ್ರಮುಖ ಗುರಿ ಶಂಕಿತರು (Target Suspects)', 'ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಅಪರಾಧ ಹಾಟ್‌ಸ್ಪಾಟ್', 'ಸ್ಥಳ ಮಹಜರು SOP'],
-        kpis: { active_firs: allFirs.length, repeat_offenders: SUSPECTS_INTEL.length, grid_status: 'ONLINE' }
-      };
-    }
-    if (isHindi) {
-      let out = `### 🛡️ कर्नाटक राज्य पुलिस इंटेलिजेंस कमांड ग्रिड\n`;
-      out += `दृष्टि एआई (DRISHTI AI) पूरी तरह सक्रिय है और राज्यव्यापी CCTNS और 450+ ANPR सर्विलांस कैमरों से कनेक्टेड है।\n\n`;
-      out += `| इंटेलिजेंस कार्यक्षेत्र | उपलब्ध संचालन |\n`;
-      out += `| :--- | :--- |\n`;
-      out += `| **वांछित संदिग्ध** | आपराधिक प्रोफाइल, रिस्क स्कोर और सक्रिय केस |\n`;
-      out += `| **ANPR वाहन ट्रैकिंग** | संदिग्ध वाहन ट्रैकिंग और हॉटलिस्ट अलर्ट |\n`;
-      out += `| **CCTNS केस फाइलें** | FIR विवरण और कानूनी धाराएं (BNS/IPC) |\n`;
-      out += `| **स्पॉट पंचनामा** | स्वचालित पंचनामा ड्राफ्टिंग SOP |\n\n`;
-      out += `आज आपकी शिफ्ट में मैं कैसे सहायता कर सकता हूँ, सर?`;
-
-      return {
-        answer: out,
-        suggestions: ['नवीनतम वाहन चोरी मामले (Vehicle Theft)', 'शीर्ष वांछित संदिग्ध (Target Suspects)', 'सिल्क बोर्ड क्राइम एनालिसिस', 'पंचनामा SOP'],
-        kpis: { active_firs: allFirs.length, repeat_offenders: SUSPECTS_INTEL.length, grid_status: 'ONLINE' }
+        answer: `Jai Hind, Inspector! DRISHTI AI is on active duty, synchronized with Karnataka State Police CCTNS datastores and the statewide surveillance grid.\n\nHow may I assist your command shift today, Sir? You can ask about any specific case docket, search for a suspect or vehicle registration number, inspect district crime analytics, or review legal SOPs.`,
+        suggestions: ['Show Top Clearance Target Suspects', 'Latest Vehicle Theft Cases in Bengaluru', 'Inspect Silk Board Hotspot', 'Kalaburagi Crime Statistics'],
+        kpis: { active_firs: allFirs.length, repeat_offenders: allSuspects.length, grid_status: 'ONLINE' }
       };
     }
 
-    let out = `### 🛡️ KSP Intelligence Command Grid Online\n`;
-    out += `DRISHTI AI is active and synchronized across Karnataka State Police CCTNS datastores and 450+ ANPR surveillance nodes.\n\n`;
-    out += `| Core Intelligence Vector | Available Operations |\n`;
-    out += `| :--- | :--- |\n`;
-    out += `| **Clearance Targets** | Suspect dossiers, threat ratings, MO patterns & linked FIRs |\n`;
-    out += `| **ANPR Camera Grid** | Stolen vehicle tracking, toll corridors & hotlist hits |\n`;
-    out += `| **Case Investigation** | FIR docket search, statutory mappings (IPC §379 / BNS §303) |\n`;
-    out += `| **Tactical Directives** | Spot panchanama drafting & dynamic nakabandi deployments |\n\n`;
-    out += `How may I assist your command shift today, Sir?`;
-
-    return {
-      answer: out,
-      suggestions: ['Latest Vehicle Theft Cases', 'Show Clearance & Target Suspects', 'Inspect Ramesh Kumar Dossier', 'Analyze Silk Board Crime Hotspot'],
-      kpis: { active_firs: allFirs.length, repeat_offenders: SUSPECTS_INTEL.length, grid_status: 'ONLINE' }
-    };
-  }
-
-  // ── 2. SPECIFIC CRIME CATEGORY QUERIES (VEHICLE THEFT, NARCOTICS, CYBER, ROBBERY, ETC.) ────
-  // Handles typos: 'veichle', 'thefet', 'stolen', 'bike', 'car', 'auto', 'narcotics', 'mdma', 'drugs'
-  const isVehicleTheft = 
-    q.includes('veichle') || q.includes('vehicle') || q.includes('theft') || q.includes('stolen') || 
-    q.includes('bike') || q.includes('car') || q.includes('motorcycle') || q.includes('auto') || 
-    q.includes('ವಾಹನ') || q.includes('ಕಳವು') || q.includes('ಚೋರಿ') || q.includes('वाहन') || q.includes('चोरी');
-
-  const isNarcotics = 
-    q.includes('drug') || q.includes('narcotic') || q.includes('mdma') || q.includes('contraband') || 
-    q.includes('ndps') || q.includes('ganja') || q.includes('ಮಾದಕದ್ರವ್ಯ') || q.includes('ಡ್ರಗ್ಸ್') || q.includes('ड्रग्स') || q.includes('नशीले');
-
-  const isCybercrime = 
-    q.includes('cyber') || q.includes('phishing') || q.includes('fraud') || q.includes('cheating') || 
-    q.includes('crypto') || q.includes('1930') || q.includes('ಸೈಬರ್') || q.includes('ವಂಚನೆ') || q.includes('साइबर') || q.includes('धोखाधड़ी');
-
-  const isRobbery = 
-    q.includes('robbery') || q.includes('snatch') || q.includes('armed') || q.includes('extortion') || 
-    q.includes('highway') || q.includes('ದರೋಡೆ') || q.includes('ಸುಲಿಗೆ') || q.includes('लूट') || q.includes('डकैती');
-
-  if (isVehicleTheft) {
-    const theftFirs = allFirs.filter(f => 
-      (f.crime_type_code || '').includes('theft') || 
-      (f.crime_type || '').toLowerCase().includes('theft') ||
-      (f.description || '').toLowerCase().includes('stolen') ||
-      (f.description || '').toLowerCase().includes('theft') ||
-      (f.description || '').toLowerCase().includes('motorcycle')
-    );
-
-    const latestCase = theftFirs[0] || {
-      case_number: 'KAR/BEN/2024/0747',
-      crime_type: 'Vehicle Theft',
-      district_name: 'Bengaluru Urban',
-      police_station: 'Bengaluru Urban Central PS',
-      date_filed: '2024-06-01',
-      time_filed: '01:32:00',
-      location_name: 'Near Keer Circle, Bengaluru Urban',
-      accused_name: 'Ramesh Kumar',
-      risk_score: 94,
-      status: 'chargesheeted',
-      description: 'Stolen motorcycle and hatchback logged near Keer Circle corridor using electronic master keys.'
-    };
-
-    const leadSuspect = SUSPECTS_INTEL.find(s => s.name.toLowerCase().includes('ramesh')) || SUSPECTS_INTEL[0];
-
-    if (isKannada) {
-      let out = `ಸರ್, ಸಿಸಿಟಿಎನ್‌ಎಸ್ ದತ್ತಸಂಚಯದ ಪ್ರಕಾರ ಇತ್ತೀಚಿನ **ವಾಹನ ಕಳವು ಪ್ರಕರಣ (Latest Vehicle Theft FIR)** ದಾಖಲೆಯ ವಿವರಗಳು:\n\n`;
-      out += `### ಪ್ರಕರಣ ಸಂಖ್ಯೆ: [${latestCase.case_number}](/dashboard/fir/${encodeURIComponent(latestCase.case_number)})\n`;
-      out += `- **ಘಟನಾ ಸ್ಥಳ:** ${latestCase.location_name} (${latestCase.police_station}, ${latestCase.district_name})\n`;
-      out += `- **ದಿನಾಂಕ & ಸಮಯ:** ${latestCase.date_filed} ${latestCase.time_filed} ಗಂಟೆಗೆ\n`;
-      out += `- **ಕಾನೂನು ಕಲಂಗಳು:** IPC §379 / BNS §303 (ದಂಡ ಸಂಹಿತೆ ವಾಹನ ಕಳವು)\n`;
-      out += `- **ಪ್ರಮುಖ ಶಂಕಿತ ಆರೋಪಿ:** **${latestCase.accused_name || leadSuspect.name}** (ಅಪಾಯ ಮಟ್ಟ: \`${latestCase.risk_score || leadSuspect.risk_score}/100\`)\n`;
-      out += `- **ಶಂಕಿತ ವಾಹನ:** \`${leadSuspect.last_known_vehicle}\`\n`;
-      out += `- **ಕಣ್ಗಾವಲು ಎಚ್ಚರಿಕೆ:** ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಜಂಕ್ಷನ್ ${leadSuspect.anpr_camera} ಕ್ಯಾಮೆರಾ ಜಾಲದಲ್ಲಿ ಎಚ್ಚರಿಕೆ ರವಾನಿಸಲಾಗಿದೆ.\n\n`;
-      out += `**ತನಿಖಾಧಿಕಾರಿಯ ಶಿಫಾರಸು:** ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಮತ್ತು ಹೊಸೂರು ರಸ್ತೆ ನಿರ್ಗಮನ ಚೆಕ್‌ಪೋಸ್ಟ್‌ಗಳಲ್ಲಿ ತಕ್ಷಣ ಮೊಬೈಲ್ ಇಂಟರ್‌ಸೆಪ್ಟರ್ ನಿಯೋಜಿಸಿ, ಸರ್.`;
-
-      return {
-        answer: out,
-        case_cards: theftFirs.slice(0, 3),
-        suspects: [leadSuspect],
-        suggestions: [
-          'ರಮೇಶ್ ಕುಮಾರ್ ಪೂರ್ಣ ಡಾಕ್ಯುಮೆಂಟ್',
-          'ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ANPR ಕ್ಯಾಮೆರಾ ಟ್ರೇಸ್',
-          'ವಾಹನ ಕಳವು ತನಿಖಾ SOP (BNS §303)'
-        ],
-        kpis: { total_thefts: theftFirs.length, syndicate: 'Ramesh Kumar Ring', alert_status: 'ACTIVE_ANPR' }
-      };
-    }
-
-    if (isHindi) {
-      let out = `सर, CCTNS डेटाबेस के अनुसार नवीनतम **वाहन चोरी (Latest Vehicle Theft FIR)** का विवरण निम्नलिखित है:\n\n`;
-      out += `### केस नंबर: [${latestCase.case_number}](/dashboard/fir/${encodeURIComponent(latestCase.case_number)})\n`;
-      out += `- **घटना स्थल:** ${latestCase.location_name} (${latestCase.police_station}, ${latestCase.district_name})\n`;
-      out += `- **दिनांक व समय:** ${latestCase.date_filed} समय ${latestCase.time_filed} बजे\n`;
-      out += `- **लागू धाराएं:** IPC §379 / BNS §303 (वाहन चोरी अपराध)\n`;
-      out += `- **मुख्य संदिग्ध:** **${latestCase.accused_name || leadSuspect.name}** (उर्फ "${leadSuspect.alias}" | जोखिम: \`${leadSuspect.risk_score}/100\`)\n`;
-      out += `- **संदिग्ध वाहन:** \`${leadSuspect.last_known_vehicle}\`\n`;
-      out += `- **ANPR कैमरा अलर्ट:** ${leadSuspect.anpr_camera} पर स्वचालित ट्रैकिंग सक्रिय है।\n\n`;
-      out += `**कमांडेंट कार्रवाई सिफारिश:** होसुर रोड और सिल्क बोर्ड टोल प्लाजा पर तुरंत नाकाबंदी और चेकिंग तैनात करने की सिफारिश की जाती है, सर।`;
-
-      return {
-        answer: out,
-        case_cards: theftFirs.slice(0, 3),
-        suspects: [leadSuspect],
-        suggestions: [
-          'रमेश कुमार का पूरा डोजियर',
-          'सिल्क बोर्ड ANPR लाइव फीड',
-          'वाहन चोरी SOP (BNS §303)'
-        ],
-        kpis: { total_thefts: theftFirs.length, syndicate: 'Ramesh Kumar Ring', alert_status: 'ACTIVE_ANPR' }
-      };
-    }
-
-    let out = `### 📋 Case Docket: [${latestCase.case_number}](/dashboard/fir/${encodeURIComponent(latestCase.case_number)})\n\n`;
-    out += `| Parameter | Incident & Intelligence Details |\n`;
-    out += `| :--- | :--- |\n`;
-    out += `| **Crime Category** | **${latestCase.crime_type}** (IPC §379 / BNS §303) |\n`;
-    out += `| **Police Station** | ${latestCase.police_station} (${latestCase.district_name}) |\n`;
-    out += `| **Date & Time Filed** | **${latestCase.date_filed}** at ${latestCase.time_filed} hrs |\n`;
-    out += `| **Location of Occurrence** | ${latestCase.location_name} |\n`;
-    out += `| **Prime Accused Syndicate** | **${latestCase.accused_name || leadSuspect.name}** (Alias: *"${leadSuspect.alias}"* | Risk: \`${latestCase.risk_score || leadSuspect.risk_score}/100\`) |\n`;
-    out += `| **Flagged Vehicle** | \`${leadSuspect.last_known_vehicle}\` |\n`;
-    out += `| **Last ANPR Sighting** | ${leadSuspect.last_known_location} via *${leadSuspect.anpr_camera}* |\n`;
-    out += `| **Investigation Status** | \`${(latestCase.status || 'CHARGESHEETED').toUpperCase()}\` |\n\n`;
-
-    out += `### Modus Operandi & Pattern Analysis:\n`;
-    out += `_${latestCase.description}_\n\n`;
-    out += `The perpetrator bypasses two-wheeler and hatchback immobilizers between 10:00 PM and 04:00 AM using frequency jammer tools and master ignition bypasses, subsequently routing stolen units across the Raichur–Bidar border corridor.\n\n`;
-
-    out += `### 🎯 Immediate Tactical Directive:\n`;
-    out += `1. **ANPR Hot-List Trigger:** License plate \`KA-01-MJ-8821\` is actively flagged on 450+ cameras across Hosur Road & Electronic City Toll Plazas.\n`;
-    out += `2. **Interceptor Dispatch:** Alert Hoysala patrol units along Silk Board TTMC service lanes.\n`;
-    out += `3. **Evidence Preservation:** Seize CCTV recordings from ${latestCase.police_station} radial perimeter within 2 km.`;
-
-    return {
-      answer: out,
-      case_cards: theftFirs.slice(0, 3),
-      suspects: [leadSuspect],
-      suggestions: [
-        'Open Ramesh Kumar Full Dossier',
-        'ANPR Camera Trace for KA-01-MJ-8821',
-        'View All 11 Vehicle Theft FIRs in Bengaluru',
-        'Vehicle Theft Investigation SOP (BNS §303)'
-      ],
-      kpis: { total_thefts: theftFirs.length, lead_syndicate: 'Ramesh Kumar Ring', anpr_hits: 'Active on 450+ Nodes' }
-    };
-  }
-
-  if (isNarcotics) {
-    const drugFirs = allFirs.filter(f => (f.crime_type_code || '').includes('drug') || (f.crime_type || '').toLowerCase().includes('drug'));
-    const latestCase = drugFirs[0] || allFirs[3];
-    const suspect = SUSPECTS_INTEL.find(s => s.name.includes('Imran')) || SUSPECTS_INTEL[1];
-
-    let out = `### 📋 Active Narcotics Incident: [${latestCase.case_number}](/dashboard/fir/${encodeURIComponent(latestCase.case_number)})\n`;
-    out += `- **Offense:** Commercial MDMA & Synthetic Narcotics Contraband (NDPS §21(c) / §29)\n`;
-    out += `- **Jurisdiction:** ${latestCase.police_station} (${latestCase.district_name})\n`;
-    out += `- **Occurrence:** ${latestCase.location_name} at ${latestCase.time_filed} hrs\n`;
-    out += `- **Lead Trafficker:** **${suspect.name}** (Alias: *"${suspect.alias}"* | Threat Score: \`${suspect.risk_score}/100\`)\n`;
-    out += `- **Transit Vehicle:** \`${suspect.last_known_vehicle}\` (Last tracked at ${suspect.last_known_location})\n\n`;
-    out += `**Strategic Action:** Coordinate with CCB Anti-Narcotics Wing and execute financial asset freezing under NDPS Section 68F.`;
-
-    return {
-      answer: out,
-      case_cards: drugFirs.slice(0, 3),
-      suspects: [suspect],
-      suggestions: [
-        'Open Imran Khan Narcotics Dossier',
-        'NDPS Seizure & Panchanama SOP',
-        'Outer Ring Road CCTV Stream',
-        'View All Active Drug Offence Cases'
-      ],
-      kpis: { total_cases: drugFirs.length, syndicate: 'Helmet Imran Network', threat_level: 'CRITICAL' }
-    };
-  }
-
-  // ── 3. CLEARANCE TARGETS / SUSPECT ROSTER / WANTED OFFENDERS ─────────────────
-  const isTargetQuery = 
-    q.includes('clearance') || q.includes('target') || q.includes('clearn') || q.includes('wanted') || 
-    q.includes('suspect') || q.includes('offender') || q.includes('criminal') || q.includes('roster') || 
-    q.includes('arrest') || q.includes('warrant') || q.includes('top priority') || q.includes('syndicate') ||
-    q.includes('ಆರೋಪಿ') || q.includes('ಶಂಕಿತ') || q.includes('ಗುರಿ') || q.includes('अपराधी') || q.includes('वांछित') || q.includes('टारगेट');
-
-  if (isTargetQuery && !q.includes('fir-') && !q.includes('kar/')) {
-    const criticalSuspects = SUSPECTS_INTEL.filter(s => s.risk_score >= 88);
+    // ── 2. SPECIFIC CASE / FIR NUMBER SEARCH ───────────────────────────────────
+    const caseMatch = rawQuestion.match(/(KAR\/[A-Z0-9]+\/\d+\/\d+|FIR-\d{4}-[A-Z0-9]+-\d+)/i) ||
+                      rawQuestion.match(/\b\d{4}\b/);
     
-    if (isKannada) {
-      let out = `ಸರ್, ಕರ್ನಾಟಕ ರಾಜ್ಯ ಪೊಲೀಸ್ ಗುಪ್ತಚರ ವಿಭಾಗದ ಪ್ರಸ್ತುತ **ಅಧಿಕ-ಆದ್ಯತೆಯ ಗುರಿ ಶಂಕಿತರು (Top Clearance Targets)** ಈ ಕೆಳಗಿನಂತಿವೆ:\n\n`;
-      criticalSuspects.forEach((s, idx) => {
-        out += `### ${idx + 1}. ${s.name} (ಅಲಿಯಾಸ್: "${s.alias}") — ${s.cctns_id}\n`;
-        out += `- **ಅಪಾಯ ಮಟ್ಟ:** \`${s.risk_score}/100\` (${s.risk_level})\n`;
-        out += `- **ಪ್ರಮುಖ ಅಪರಾಧ:** ${s.primary_crime}\n`;
-        out += `- **ಕಾನೂನು ಕಲಂಗಳು:** ${s.ipc_sections.join(', ')}\n`;
-        out += `- **ಕೊನೆಯದಾಗಿ ಕಂಡ ಸ್ಥಳ:** ${s.last_known_location}\n`;
-        out += `- **ಸಕ್ರಿಯ ವಾಹನ:** ${s.last_known_vehicle}\n`;
-        out += `- **ಪ್ರಸ್ತುತ ಸ್ಥಿತಿ:** \`${s.status}\`\n`;
-        out += `- **ಕಾರ್ಯಾಚರಣಾ ತಂತ್ರ:** ${s.tactical_action}\n\n`;
+    // Check if user specifically requested an exact case
+    if (caseMatch && (q.includes('fir') || q.includes('case') || q.includes('docket') || q.includes('kar/') || q.includes('fir-') || q.includes('file') || q.includes('details'))) {
+      const matchStr = caseMatch[0].toUpperCase();
+      const matchedCase = allFirs.find(f => 
+        (f.case_number || '').toUpperCase().includes(matchStr) ||
+        (f.crime_no || '').toUpperCase().includes(matchStr)
+      );
+
+      if (matchedCase) {
+        let out = `### 📋 CCTNS Case Docket: [${matchedCase.case_number}](/dashboard/fir/${encodeURIComponent(matchedCase.case_number)})\n\n`;
+        out += `| Parameter | Incident & Intelligence Record |\n`;
+        out += `| :--- | :--- |\n`;
+        out += `| **Case Number** | \`${matchedCase.case_number}\` (Crime No: \`${matchedCase.crime_no || 'N/A'}\`) |\n`;
+        out += `| **Classification** | **${matchedCase.crime_type || matchedCase.crime_type_code}** (${matchedCase.gravity || 'Heinous'}) |\n`;
+        out += `| **Jurisdiction** | **${matchedCase.police_station}**, ${matchedCase.district_name} |\n`;
+        out += `| **Date & Time Filed** | **${matchedCase.date_filed}** at ${matchedCase.time_filed || '12:00:00'} hrs |\n`;
+        out += `| **Investigating Officer** | ${matchedCase.investigation_office || 'Insp. Command Team'} |\n`;
+        out += `| **Prime Accused / Suspect** | **${matchedCase.accused_name || 'Under Identification'}** (Risk Score: \`${matchedCase.risk_score || 80}/100\`) |\n`;
+        out += `| **Incident Location** | ${matchedCase.location_name} |\n`;
+        out += `| **Investigation Status** | \`${(matchedCase.status || matchedCase.case_status || 'UNDER_INVESTIGATION').toUpperCase()}\` |\n\n`;
+        
+        out += `### Incident Summary:\n_${matchedCase.description}_\n\n`;
+        out += `**Tactical Action Directive:** Review physical evidentiary files, cross-reference surrounding CCTV cameras from ${matchedCase.police_station} limits, and verify witness records.`;
+
+        return {
+          answer: out,
+          case_cards: [matchedCase],
+          suggestions: [
+            `Open Case Docket ${matchedCase.case_number}`,
+            `Inspect Accused ${matchedCase.accused_name || 'Suspect'}`,
+            'Generate Spot Panchanama for This Case',
+            'Download Case PDF Report'
+          ],
+          kpis: { case_status: matchedCase.status, risk_score: `${matchedCase.risk_score || 80}/100`, station: matchedCase.police_station }
+        };
+      }
+    }
+
+    // ── 3. SPECIFIC PERSON / SUSPECT / ACCUSED LOOKUP ───────────────────────────
+    const suspectKeywords = [
+      { key: 'ramesh', name: 'Ramesh Kumar' },
+      { key: 'bullet', name: 'Ramesh Kumar' },
+      { key: 'imran', name: 'Imran Khan' },
+      { key: 'helmet', name: 'Imran Khan' },
+      { key: 'suresh', name: 'Suresh Naidu' },
+      { key: 'snake', name: 'Suresh Naidu' },
+      { key: 'vikram malhotra', name: 'Vikram Malhotra' },
+      { key: 'vicky', name: 'Vikram Malhotra' },
+      { key: 'anand gowda', name: 'Anand Gowda' },
+      { key: 'gowda', name: 'Anand Gowda' },
+      { key: 'anand shinde', name: 'Anand Shinde' },
+      { key: 'shinde', name: 'Anand Shinde' },
+      { key: 'bhavani', name: 'Bhavani Karpe' },
+      { key: 'karpe', name: 'Bhavani Karpe' },
+      { key: 'vikram singh', name: 'Vikram Singh' },
+      { key: 'vikram reddy', name: 'Vikram Reddy' },
+      { key: 'chetan shetty', name: 'Chetan Shetty' },
+      { key: 'mahika', name: 'Mahika Ramachandran' },
+      { key: 'saanvi', name: 'Saanvi Dara' },
+      { key: 'zakir', name: 'Zakir Hussain' },
+      { key: 'zakir hussain', name: 'Zakir Hussain' }
+    ];
+
+    const matchedPersonEntry = suspectKeywords.find(item => q.includes(item.key));
+
+    // Handle "Zakir Hussain" or unindexed person inquiry specifically
+    if (matchedPersonEntry?.name === 'Zakir Hussain' || (q.includes('zakir') && q.includes('hussain'))) {
+      return {
+        answer: `Sir, no criminal dossier or case file was found for **"Zakir Hussain"** in the Karnataka State Police CCTNS database.\n\n- **Database Status:** Unindexed / No Active Criminal History\n- **Surveillance Check:** No active ANPR or Watchlist flags recorded.\n\n*Recommendation:* Please verify the spelling, National Crime ID, or associated FIR number with the state records bureau.`,
+        suspects: [],
+        suggestions: ['Search by FIR Number', 'Check Clearance Target Suspects', 'Open Overview Command Dashboard'],
+        kpis: { search_status: 'NO_RECORD', database: 'KSP_CCTNS' }
+      };
+    }
+
+    if (matchedPersonEntry) {
+      const suspectProfile = allSuspects.find(s => s.name.toLowerCase().includes(matchedPersonEntry.name.toLowerCase()));
+      if (suspectProfile) {
+        const linkedFirs = allFirs.filter(f => 
+          (f.accused_name || '').toLowerCase().includes(suspectProfile.name.toLowerCase()) ||
+          (f.description || '').toLowerCase().includes(suspectProfile.name.toLowerCase()) ||
+          (suspectProfile.active_firs || []).includes(f.case_number)
+        );
+
+        let out = `### 👤 Target Offender Dossier: **${suspectProfile.name}** ("${suspectProfile.alias}" | \`${suspectProfile.cctns_id || 'CCTNS-ID'}\`)\n\n`;
+        out += `| Parameter | Intelligence & Surveillance Record |\n`;
+        out += `| :--- | :--- |\n`;
+        out += `| **Threat Rating** | Risk Score: **\`${suspectProfile.risk_score}/100\`** (${suspectProfile.risk_level || 'HIGH'} Gravity) |\n`;
+        out += `| **Primary Offense** | **${suspectProfile.primary_crime}** |\n`;
+        out += `| **Statutes / Sections** | ${(suspectProfile.ipc_sections || []).join(', ') || 'IPC §379 / BNS §303'} |\n`;
+        out += `| **Active Jurisdictions** | ${(suspectProfile.districts || []).join(', ') || 'Bengaluru Urban'} |\n`;
+        out += `| **Last Known Sighting** | ${suspectProfile.last_known_location || 'Bengaluru Urban Corridor'} |\n`;
+        out += `| **Flagged Vehicle** | \`${suspectProfile.last_known_vehicle || 'Under Verification'}\` |\n`;
+        out += `| **Surveillance Node** | ${suspectProfile.anpr_camera || 'State Highway ANPR Grid'} |\n`;
+        out += `| **Status** | **${suspectProfile.status || 'Active Watchlist'}** |\n\n`;
+
+        out += `### Modus Operandi (M.O.):\n_${suspectProfile.mo_summary}_\n\n`;
+        out += `### 🎯 Tactical Action Directive:\n${suspectProfile.tactical_action}\n\n`;
+
+        if (linkedFirs.length > 0) {
+          out += `### Connected CCTNS Case Dockets (${linkedFirs.length} Cases):\n`;
+          linkedFirs.forEach(f => {
+            out += `- [${f.case_number}](/dashboard/fir/${encodeURIComponent(f.case_number)}) — **${f.crime_type || f.crime_type_code}** (${f.police_station}, ${f.district_name}) [Status: \`${f.status.toUpperCase()}\`]\n`;
+          });
+        }
+
+        return {
+          answer: out,
+          suspects: [suspectProfile],
+          case_cards: linkedFirs.slice(0, 3),
+          suggestions: [
+            `Trace Vehicle ${suspectProfile.last_known_vehicle ? suspectProfile.last_known_vehicle.split('(')[1]?.replace(')', '') || suspectProfile.name : suspectProfile.name}`,
+            `View Connected Cases for ${suspectProfile.name}`,
+            'Open Live Criminal Network Graph',
+            'Generate Suspect Arrest Warrant Memo'
+          ],
+          kpis: { suspect_risk: `${suspectProfile.risk_score}/100`, total_firs: linkedFirs.length, confidence: '98.4%' }
+        };
+      }
+    }
+
+    // ── 4. SPECIFIC VEHICLE / ANPR SEARCH ──────────────────────────────────────
+    const plateMatch = rawQuestion.match(/\b([A-Z]{2}[-\s]?\d{2}[-\s]?[A-Z]{1,3}[-\s]?\d{4})\b/i);
+    if (plateMatch || q.includes('anpr') || q.includes('camera sighting') || q.includes('trail') || q.includes('ka-')) {
+      const plate = plateMatch ? plateMatch[0].toUpperCase().replace(/\s/g, '-') : 'KA-01-MJ-8821';
+      const trail = DEMO_TRAIL;
+      const anpr = DEMO_ANPR_RESULT;
+
+      let out = `### 🚨 ANPR Surveillance & Camera Geo-Trail for **\`${plate}\`**\n\n`;
+      out += `- **Alert Severity:** **${anpr.severity}** (${anpr.status})\n`;
+      out += `- **Vehicle Model:** ${anpr.vehicle_details.make_model} (${anpr.vehicle_details.color})\n`;
+      out += `- **Associated Case:** [${anpr.fir_match.case_number}](/dashboard/fir/${encodeURIComponent(anpr.fir_match.case_number)}) (${anpr.fir_match.police_station})\n`;
+      out += `- **Total Tracked Hops:** ${trail.total_hops} camera checkpoints across ${trail.total_distance_km} km\n\n`;
+
+      out += `### Chronological Camera Sightings:\n`;
+      trail.trail.forEach(hop => {
+        out += `${hop.hop}. **${hop.camera_name}** (\`${hop.camera_id}\`) at **${hop.timestamp.split('T')[1].slice(0, 5)} hrs** — Confidence: \`${hop.confidence}%\` [${hop.sighting_type}]\n`;
       });
-      out += `**ತನಿಖಾಧಿಕಾರಿಯ ಕಾರ್ಯತಂತ್ರ ಶಿಫಾರಸು:** ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಹಾಗೂ ಹೊರವರ್ತುಲ ರಸ್ತೆಗಳಲ್ಲಿ ANPR ಕ್ಯಾಮೆರಾ ಎಚ್ಚರಿಕೆಯನ್ನು ತಕ್ಷಣ ಕಾರ್ಯಗತಗೊಳಿಸಲು ಸೂಚಿಸುತ್ತೇನೆ, ಸರ್.`;
+
+      out += `\n**Tactical Recommendation:** Last sighting recorded near **${trail.last_known_location.camera_name}**. Mobilize Hoysala interceptor units to set up perimeter nakabandis along radial exit corridors.`;
+
+      return {
+        answer: out,
+        suggestions: [
+          'Open Live Surveillance Grid',
+          'View Geo Trail on Map',
+          `Inspect Case Docket ${anpr.fir_match.case_number}`,
+          'Broadcast Interceptor Alert'
+        ],
+        kpis: { plate, sightings: trail.total_hops, alert_level: 'CRITICAL', confidence: '98.4%' }
+      };
+    }
+
+    // ── 5. SPECIFIC DISTRICT / LOCATION ANALYSIS ───────────────────────────────
+    const DISTRICT_MAP = [
+      { name: 'Bengaluru Urban', aliases: ['bengaluru', 'bangalore', 'silk board', 'indiranagar', 'whitefield', 'koramangala', 'jayanagar', 'ಬೆಂಗಳೂರು', 'ಬ್ಯಾಂಗಲೋರ್', 'बेंगलुरु', 'बैंगलोर'] },
+      { name: 'Kalaburagi', aliases: ['kalaburagi', 'gulbarga', 'ಕಲಬುರಗಿ', 'ಗುಲ್ಬರ್ಗ', 'कलबुर्गी', 'गुलबर्गा'] },
+      { name: 'Raichur', aliases: ['raichur', 'ರಾಯಚೂರು', 'रायचूर'] },
+      { name: 'Chikkamagaluru', aliases: ['chikkamagaluru', 'chikmagalur', 'ಚಿಕ್ಕಮಗಳೂರು', 'चिकमगलूर'] },
+      { name: 'Tumakuru', aliases: ['tumakuru', 'tumkur', 'ತುಮಕೂರು', 'तुमकुरु'] },
+      { name: 'Udupi', aliases: ['udupi', 'ಉಡುಪಿ', 'उडुपी'] },
+      { name: 'Hassan', aliases: ['hassan', 'ಹಾಸನ', 'हासन'] },
+      { name: 'Vijayapura', aliases: ['vijayapura', 'bijapur', 'ವಿಜಯಪುರ', 'ಬಿಜಾಪುರ', 'विजयपुरा', 'बीजापुर'] },
+      { name: 'Koppal', aliases: ['koppal', 'ಕೊಪ್ಪಳ', 'कोप्पल'] },
+      { name: 'Bidar', aliases: ['bidar', 'ಬೀದರ್', 'बीदर'] },
+      { name: 'Davangere', aliases: ['davangere', 'ದಾವಣಗೆರೆ', 'दावणगेरे'] },
+      { name: 'Mysuru Urban', aliases: ['mysuru', 'mysore', 'ಮೈಸೂರು', 'मैसूरु'] }
+    ];
+
+    const matchedDistrictEntry = DISTRICT_MAP.find(entry => entry.aliases.some(alias => q.includes(alias)));
+    if (matchedDistrictEntry) {
+      const matchedDistrict = matchedDistrictEntry.name;
+      const districtFirs = allFirs.filter(f => (f.district_name || '').toLowerCase().includes(matchedDistrict.toLowerCase().split(' ')[0]));
       
-      return {
-        answer: out,
-        suspects: criticalSuspects,
-        suggestions: ['ರಮೇಶ್ ಕುಮಾರ್ ಪೂರ್ಣ ಡಾಕ್ಯುಮೆಂಟ್', 'ಇಮ್ರಾನ್ ಖಾನ್ ಮಾದಕವಸ್ತು ಜಾಲ', 'ಸುರೇಶ್ ನಾಯ್ಡು ವಾರಂಟ್ ಜಾರಿ'],
-        kpis: { active_targets: criticalSuspects.length, highest_risk: '96/100 (Imran Khan)', avg_resolution: '84.2%' }
-      };
-    }
-
-    if (isHindi) {
-      let out = `सर, कर्नाटक राज्य पुलिस इंटेलिजेंस ग्रिड के **शीर्ष वांछित क्लीयरेंस टारगेट्स (Priority Clearance Targets)** का विवरण निम्नलिखित है:\n\n`;
-      criticalSuspects.forEach((s, idx) => {
-        out += `### ${idx + 1}. ${s.name} (उर्फ: "${s.alias}") — ${s.cctns_id}\n`;
-        out += `- **जोखिम स्कोर:** \`${s.risk_score}/100\` (${s.risk_level})\n`;
-        out += `- **मुख्य अपराध:** ${s.primary_crime}\n`;
-        out += `- **लागू धाराएं:** ${s.ipc_sections.join(', ')}\n`;
-        out += `- **अंतिम ज्ञात स्थान:** ${s.last_known_location}\n`;
-        out += `- **संदिग्ध वाहन:** ${s.last_known_vehicle}\n`;
-        out += `- **स्थिति:** \`${s.status}\`\n`;
-        out += `- **रणनीतिक कार्रवाई:** ${s.tactical_action}\n\n`;
+      // Calculate crime types in this district
+      const crimeCounts = {};
+      districtFirs.forEach(f => {
+        const ct = f.crime_type || f.crime_type_code || 'Other';
+        crimeCounts[ct] = (crimeCounts[ct] || 0) + 1;
       });
-      out += `**कमांडेंट रणनीति सिफारिश:** सिल्क बोर्ड और प्रमुख हाईवे टोल प्लाजा पर तुरंत नाकाबंदी और ANPR स्वचालित चेकिंग सक्रिय करने की सिफारिश की जाती है, सर।`;
+
+      const topCrimes = Object.entries(crimeCounts).sort((a, b) => b[1] - a[1]).map(([name, count]) => `**${name}** (${count})`).join(', ');
+
+      let out = '';
+      if (isKannada) {
+        out += `### 📍 ಸಿಸಿಟಿಎನ್‌ಎಸ್ ಜಿಲ್ಲಾ ಅಪರಾಧ ವರದಿ: **${matchedDistrict}**\n\n`;
+        out += `- **ಒಟ್ಟು ನೋಂದಾಯಿತ ಪ್ರಕರಣಗಳು:** **${districtFirs.length} ಸಕ್ರಿಯ ಎಫ್‌ಐಆರ್‌ಗಳು** ಲಭ್ಯವಿವೆ.\n`;
+        out += `- **ಪ್ರಮುಖ ಅಪರಾಧಗಳ ವಿವರ:** ${topCrimes || 'ಆಸ್ತಿ ಮತ್ತು ಹಲ್ಲೆ ಅಪರಾಧಗಳು'}.\n`;
+        out += `- **ಠಾಣೆಗಳು:** ${Array.from(new Set(districtFirs.map(f => f.police_station))).join(', ') || 'ಜಿಲ್ಲಾ ಕಮಾಂಡ್'}.\n\n`;
+        out += `### ಇತ್ತೀಚಿನ ಪ್ರಕರಣಗಳು (${matchedDistrict}):\n`;
+        districtFirs.slice(0, 5).forEach((f, idx) => {
+          out += `${idx + 1}. [${f.case_number}](/dashboard/fir/${encodeURIComponent(f.case_number)}) — **${f.crime_type}** (${f.police_station}) | ಆರೋಪಿ: **${f.accused_name || 'ಗುರುತಿಸಲಾಗುತ್ತಿದೆ'}** [ಸ್ಥಿತಿ: \`${f.status.toUpperCase()}\`]\n   _${f.description}_\n`;
+        });
+        out += `\n**ಕಾರ್ಯಾಚರಣೆ ನಿರ್ದೇಶನ:** ${matchedDistrict} ವ್ಯಾಪ್ತಿಯಲ್ಲಿ ಗಸ್ತು ತೀವ್ರಗೊಳಿಸಿ ಮತ್ತು ಎಎನ್‌ಪಿಆರ್ ಕ್ಯಾಮೆರಾ ಕಣ್ಗಾವಲು ಸಕ್ರಿಯವಾಗಿರಿಸಿ, ಸರ್.`;
+      } else if (isHindi) {
+        out += `### 📍 CCTNS जिला अपराध रिपोर्ट: **${matchedDistrict}**\n\n`;
+        out += `- **कुल पंजीकृत मामले:** **${districtFirs.length} सक्रिय FIRs** दर्ज हैं।\n`;
+        out += `- **प्रमुख अपराध वितरण:** ${topCrimes || 'संपत्ति एवं हमला अपराध'}.\n`;
+        out += `- **संबंधित थाने:** ${Array.from(new Set(districtFirs.map(f => f.police_station))).join(', ') || 'जिला कमान'}.\n\n`;
+        out += `### हालिया मामले (${matchedDistrict}):\n`;
+        districtFirs.slice(0, 5).forEach((f, idx) => {
+          out += `${idx + 1}. [${f.case_number}](/dashboard/fir/${encodeURIComponent(f.case_number)}) — **${f.crime_type}** (${f.police_station}) | आरोपी: **${f.accused_name || 'जांच जारी'}** [स्थिति: \`${f.status.toUpperCase()}\`]\n   _${f.description}_\n`;
+        });
+        out += `\n**कार्यवाही निर्देश:** ${matchedDistrict} क्षेत्र में संवेदनशील चौकियों पर गश्त बढ़ाएं और ANPR ग्रिड अलर्ट सक्रिय रखें।`;
+      } else {
+        out += `### 📍 CCTNS District Crime Brief: **${matchedDistrict}**\n\n`;
+        out += `- **Total Registered Cases:** **${districtFirs.length} active FIRs** indexed.\n`;
+        out += `- **Primary Crime Distribution:** ${topCrimes || 'General Property & Assault Offenses'}.\n`;
+        out += `- **Jurisdictional Police Stations:** ${Array.from(new Set(districtFirs.map(f => f.police_station))).join(', ') || 'District Command'}.\n\n`;
+        out += `### Recent Case Dockets in ${matchedDistrict}:\n`;
+        districtFirs.slice(0, 5).forEach((f, idx) => {
+          out += `${idx + 1}. [${f.case_number}](/dashboard/fir/${encodeURIComponent(f.case_number)}) — **${f.crime_type}** (${f.police_station}) | Accused: **${f.accused_name || 'Unidentified'}** [Status: \`${f.status.toUpperCase()}\`]\n   _${f.description}_\n`;
+        });
+        out += `\n**Command Directive:** Maintain high-visibility patrols in high-density corridors within ${matchedDistrict} and sync local camera grids to the state ANPR cluster.`;
+      }
 
       return {
         answer: out,
-        suspects: criticalSuspects,
-        suggestions: ['रमेश कुमार का पूरा डोजियर', 'इमरान खान सिंडिकेट जांच', 'सुरेश नाईडू वारंट स्टेटस'],
-        kpis: { active_targets: criticalSuspects.length, highest_risk: '96/100 (Imran Khan)', avg_resolution: '84.2%' }
-      };
-    }
-
-    let out = `### Top Priority Clearance Targets & Repeat Offenders\n\n`;
-    criticalSuspects.forEach((s, idx) => {
-      out += `### ${idx + 1}. ${s.name} (Alias: "${s.alias}") — \`${s.cctns_id}\`\n`;
-      out += `- **Threat Assessment:** Risk Score **\`${s.risk_score}/100\`** (${s.risk_level} Gravity)\n`;
-      out += `- **Primary Offense Vector:** ${s.primary_crime}\n`;
-      out += `- **Statutory Penal Codes:** ${s.ipc_sections.join(', ')}\n`;
-      out += `- **Last ANPR Sighting:** ${s.last_known_location} via *${s.anpr_camera}*\n`;
-      out += `- **Linked Vehicle:** \`${s.last_known_vehicle}\`\n`;
-      out += `- **Legal Status:** **${s.status}** (${s.active_firs.length} Active Connected FIRs)\n`;
-      out += `- **Modus Operandi:** _${s.mo_summary}_\n`;
-      out += `- **🎯 Recommended Tactical Directive:** ${s.tactical_action}\n\n`;
-    });
-    out += `\n**TACTICAL COMMAND SUMMARY:**\n- **Immediate Priority 1:** Intercept **Ramesh Kumar** on Hosur Road Corridor prior to inter-state vehicle dispatch.\n- **Immediate Priority 2:** Execute financial freezing on **Imran Khan** distribution channels under NDPS §68F.\n- **Immediate Priority 3:** Issue statewide Non-Bailable Warrant (NBW) broadcast for **Suresh Naidu**.`;
-
-    return {
-      answer: out,
-      suspects: criticalSuspects,
-      suggestions: [
-        'Open Ramesh Kumar Full Dossier',
-        'ANPR Camera Trace for KA-01-MJ-8821',
-        'Imran Khan Narcotics Syndicate Map',
-        'Execute Suresh Naidu NBW Alert'
-      ],
-      kpis: { active_targets: criticalSuspects.length, highest_risk: '96/100', avg_resolution: '84.2%' }
-    };
-  }
-
-  // ── 4. INDIVIDUAL SUSPECT DEEP-DIVE ──────────────────────────────────────────
-  const matchedSuspect = SUSPECTS_INTEL.find(s => 
-    q.includes(s.name.toLowerCase()) || 
-    q.includes(s.alias.toLowerCase()) || 
-    q.includes((s.name.split(' ')[0] || '').toLowerCase()) ||
-    (contextQuery.includes(s.name.toLowerCase()) && (q.includes('he') || q.includes('his') || q.includes('vehicle') || q.includes('status') || q.includes('score')))
-  );
-
-  if (matchedSuspect) {
-    const relatedFirs = allFirs.filter(f => 
-      (f.accused_name || '').toLowerCase().includes(matchedSuspect.name.toLowerCase()) ||
-      (f.description || '').toLowerCase().includes(matchedSuspect.name.toLowerCase())
-    );
-
-    let out = `### Active Target Dossier: **${matchedSuspect.name}** ("${matchedSuspect.alias}" | \`${matchedSuspect.cctns_id}\`)\n\n`;
-    out += `| Parameter | Intelligence Record |\n`;
-    out += `| :--- | :--- |\n`;
-    out += `| **Threat Rating** | \`${matchedSuspect.risk_score}/100\` (${matchedSuspect.risk_level} Gravity) |\n`;
-    out += `| **Primary Syndicate** | ${matchedSuspect.primary_crime} |\n`;
-    out += `| **Statutes Mapped** | ${matchedSuspect.ipc_sections.join(', ')} |\n`;
-    out += `| **Active Jurisdictions** | ${matchedSuspect.districts.join(', ')} |\n`;
-    out += `| **Last Sighting** | ${matchedSuspect.last_known_location} |\n`;
-    out += `| **Camera Feed** | ${matchedSuspect.anpr_camera} |\n`;
-    out += `| **Flagged Vehicle** | \`${matchedSuspect.last_known_vehicle}\` |\n`;
-    out += `| **Status** | **${matchedSuspect.status}** |\n\n`;
-    
-    out += `### Modus Operandi (M.O.) Pattern:\n${matchedSuspect.mo_summary}\n\n`;
-    out += `### 🎯 Strategic Police Directive:\n${matchedSuspect.tactical_action}\n\n`;
-
-    if (relatedFirs.length > 0) {
-      out += `### Connected CCTNS Case Dockets (${relatedFirs.length} Cases):\n`;
-      relatedFirs.slice(0, 4).forEach(f => {
-        out += `- [${f.case_number}](/dashboard/fir/${encodeURIComponent(f.case_number)}) — **${f.crime_type}** (${f.police_station}) | Status: \`${f.status.toUpperCase()}\`\n`;
-      });
-    }
-
-    return {
-      answer: out,
-      suspects: [matchedSuspect],
-      case_cards: relatedFirs.slice(0, 3),
-      suggestions: [
-        `Trace Vehicle ${matchedSuspect.last_known_vehicle.split('(')[1]?.replace(')', '') || 'ANPR'}`,
-        `View Connected Cases for ${matchedSuspect.name}`,
-        'Deploy Tactical Nakabandi at Last Sighting',
-        'Generate Suspect Arrest Warrant Memo'
-      ],
-      kpis: { suspect_risk: `${matchedSuspect.risk_score}/100`, total_firs: relatedFirs.length || matchedSuspect.active_firs.length, confidence: '98.4%' }
-    };
-  }
-
-  // ── 5. SPECIFIC CASE / FIR NUMBER LOOKUP ─────────────────────────────────────
-  const caseRegex = /(KAR\/[A-Z0-9]+\/\d+\/\d+|FIR-\d{4}-[A-Z0-9]+-\d+)/i;
-  const caseMatch = question.match(caseRegex);
-
-  if (caseMatch || q.includes('fir') || q.includes('case') || q.includes('docket')) {
-    let targetCase = null;
-    if (caseMatch) {
-      targetCase = allFirs.find(f => (f.case_number || '').toUpperCase() === caseMatch[0].toUpperCase());
-    }
-    
-    if (!targetCase && allFirs.length > 0) {
-      targetCase = allFirs[0];
-    }
-
-    if (targetCase) {
-      let out = `### CCTNS Case Record: **${targetCase.case_number}**\n\n`;
-      out += `- **Case Registration:** \`${targetCase.case_number}\` (Crime No: \`${targetCase.crime_no || 'N/A'}\`)\n`;
-      out += `- **Crime Classification:** **${targetCase.crime_type || targetCase.crime_type_code}** (${targetCase.gravity || 'Heinous'})\n`;
-      out += `- **Police Station:** ${targetCase.police_station} (${targetCase.district_name})\n`;
-      out += `- **Date & Time Filed:** ${targetCase.date_filed} at ${targetCase.time_filed || '12:00:00'}\n`;
-      out += `- **Investigating Officer:** **${targetCase.investigation_office || 'Insp. Command Team'}**\n`;
-      out += `- **Prime Accused / Suspect:** **${targetCase.accused_name || 'Under Active Identification'}** (Risk Score: \`${targetCase.risk_score || 85}/100\`)\n`;
-      out += `- **Location of Occurrence:** ${targetCase.location_name}\n`;
-      out += `- **Case Investigation Status:** \`${(targetCase.status || targetCase.case_status || 'UNDER_INVESTIGATION').toUpperCase()}\`\n\n`;
-      out += `**Incident Narrative:**\n_${targetCase.description}_\n\n`;
-      out += `**Tactical Next Steps:** Inspect the full evidentiary docket, review CCTV feeds from ${targetCase.police_station} precinct, and execute witness cross-examination.`;
-
-      return {
-        answer: out,
-        case_cards: [targetCase],
-        suggestions: [
-          `Open Case Docket ${targetCase.case_number}`,
-          `Inspect Accused ${targetCase.accused_name || 'Suspect'}`,
-          'Generate Spot Panchanama for This FIR',
-          'Download Case PDF Report'
+        case_cards: districtFirs.slice(0, 4),
+        suggestions: isKannada ? [
+          `${matchedDistrict} ಅಪರಾಧ ನಕ್ಷೆ ತೆರೆಯಿರಿ`,
+          `${matchedDistrict} ಎಲ್ಲ ಪ್ರಕರಣಗಳ ಪಟ್ಟಿ`,
+          'ಶಂಕಿತರ ಪಟ್ಟಿ ವೀಕ್ಷಿಸಿ'
+        ] : isHindi ? [
+          `${matchedDistrict} क्राइम मैप देखें`,
+          `${matchedDistrict} के सभी मामले`,
+          'संदिग्धों की सूची'
+        ] : [
+          `Open Crime Map for ${matchedDistrict}`,
+          `View All ${districtFirs.length} Cases in ${matchedDistrict}`,
+          'Show Target Suspects Roster',
+          'Open Live Surveillance Grid'
         ],
-        kpis: { case_status: targetCase.status, risk_score: `${targetCase.risk_score || 85}/100`, station: targetCase.police_station }
+        kpis: { district: matchedDistrict, total_cases: districtFirs.length, clearance_rate: '78.5%' }
       };
+    }
+
+    // ── 6. SPECIFIC CRIME CATEGORY FILTER ──────────────────────────────────────
+    const CRIME_CATEGORY_MAP = [
+      { key: 'hit_and_run', name: 'Hit And Run', aliases: ['hit and run', 'accident', 'collision', 'ಅಪಘಾತ', 'ಹಿಟ್ ಅಂಡ್ ರನ್', 'दुर्घटना', 'टक्कर'] },
+      { key: 'burglary', name: 'Burglary', aliases: ['burglary', 'housebreak', 'break-in', 'ಮನೆಗಳ್ಳತನ', 'ಕನ್ನಗಳ್ಳತನ', 'सेंधमारी', 'घर में चोरी'] },
+      { key: 'senior_citizen_crime', name: 'Senior Citizen Crime', aliases: ['senior citizen', 'elderly', 'ಹಿರಿಯ ನಾಗರಿಕ', 'वरिष्ठ नागरिक'] },
+      { key: 'domestic_violence', name: 'Domestic Violence', aliases: ['domestic', 'harassment', 'ಗೃಹ ಹಿಂಸಾಚಾರ', 'ಕೌಟುಂಬಿಕ ಹಿಂಸೆ', 'घरेलू हिंसा'] },
+      { key: 'drug_offence', name: 'Drug Offence', aliases: ['drug', 'narcotic', 'mdma', 'contraband', 'ganja', 'ndps', 'ಮಾದಕದ್ರವ್ಯ', 'ಡ್ರಗ್ಸ್', 'ड्रग्स', 'नशीले'] },
+      { key: 'cybercrime', name: 'Cybercrime', aliases: ['cyber', 'phishing', 'online scam', '1930', 'ಸೈಬರ್', 'ಆನ್‌ಲೈನ್ ವಂಚನೆ', 'साइबर'] },
+      { key: 'fraud', name: 'Fraud', aliases: ['fraud', 'cheating', 'ವಂಚನೆ', 'ಮೋಸ', 'धोखाधड़ी'] },
+      { key: 'assault', name: 'Assault', aliases: ['assault', 'fight', 'physical altercation', 'ಹಲ್ಲೆ', 'ಜಗಳ', 'हमला', 'मारपीट'] },
+      { key: 'vehicle_theft', name: 'Vehicle Theft', aliases: ['vehicle theft', 'theft', 'stolen', 'bike', 'motorcycle', 'car theft', 'ವಾಹನ ಕಳವು', 'ಕಳ್ಳತನ', 'ವಾಹನ ಚೋರಿ', 'वाहन चोरी', 'चोरी'] },
+      { key: 'robbery', name: 'Robbery', aliases: ['robbery', 'chain snatching', 'armed', 'extortion', 'highway robbery', 'ದರೋಡೆ', 'ಸುಲಿಗೆ', 'ಚಿನ್ನದ ಸರಗಳ್ಳತನ', 'लूट', 'डकैती', 'छीनाझपटी'] }
+    ];
+
+    const matchedCategoryEntry = CRIME_CATEGORY_MAP.find(entry => entry.aliases.some(alias => q.includes(alias)));
+    if (matchedCategoryEntry) {
+      const categoryFirs = allFirs.filter(f => 
+        (f.crime_type_code || '').toLowerCase().includes(matchedCategoryEntry.key) ||
+        (f.crime_type || '').toLowerCase().includes(matchedCategoryEntry.name.toLowerCase())
+      );
+
+      let out = `### 📊 CCTNS Crime Report: **${matchedCategoryEntry.name}**\n\n`;
+      out += `- **Total Registered Dockets:** **${categoryFirs.length} cases** indexed across Karnataka.\n`;
+      out += `- **Top Affected Districts:** ${Array.from(new Set(categoryFirs.map(f => f.district_name))).slice(0, 4).join(', ')}.\n\n`;
+
+      out += `### Latest Indexed ${matchedCategoryEntry.name} FIRs:\n`;
+      categoryFirs.slice(0, 4).forEach((f, idx) => {
+        out += `${idx + 1}. [${f.case_number}](/dashboard/fir/${encodeURIComponent(f.case_number)}) — **${f.district_name}** (${f.police_station}) | Date: **${f.date_filed}**\n   - **Accused / Sighted:** **${f.accused_name || 'Under Identification'}** (Risk: \`${f.risk_score || 80}/100\`)\n   - **Description:** _${f.description}_\n\n`;
+      });
+
+      out += `**Tactical Investigation Standard:** Apply specialized statutory SOP guidelines and initiate evidence tagging in CCTNS.`;
+
+      return {
+        answer: out,
+        case_cards: categoryFirs.slice(0, 3),
+        suggestions: [
+          `Open Crime Map for ${matchedCategoryEntry.name}`,
+          `Review ${matchedCategoryEntry.name} Investigation SOP`,
+          'Show High-Risk Suspects Roster',
+          'Open Live Surveillance Grid'
+        ],
+        kpis: { crime_category: matchedCategoryEntry.name, total_cases: categoryFirs.length, active_status: 'SYNCHRONIZED' }
+      };
+    }
+
+    // ── 7. STATISTICAL & AGGREGATE SUMMARY QUERIES ─────────────────────────────
+    if (q.includes('how many') || q.includes('statistics') || q.includes('stats') || q.includes('total cases') || q.includes('compare') || q.includes('breakdown') || q.includes('trends')) {
+      const totalFirs = allFirs.length;
+      const chargesheeted = allFirs.filter(f => f.status === 'chargesheeted').length;
+      const openCases = allFirs.filter(f => f.status === 'open' || f.status === 'under_investigation').length;
+      const closedCases = allFirs.filter(f => f.status === 'closed').length;
+
+      let out = `### 📈 Karnataka State Police — CCTNS Operational Statistics\n\n`;
+      out += `| Metric | Current Operational Status |\n`;
+      out += `| :--- | :--- |\n`;
+      out += `| **Total Active FIR Dockets** | **${totalFirs} cases** synchronized |\n`;
+      out += `| **Chargesheeted (Resolved)** | **${chargesheeted} cases** (${Math.round((chargesheeted / totalFirs) * 100)}% resolution rate) |\n`;
+      out += `| **Under Active Investigation** | **${openCases} cases** |\n`;
+      out += `| **High-Risk Repeat Offenders** | **${allSuspects.length} targets** tracked on ANPR grid |\n`;
+      out += `| **Surveillance Camera Grid** | **450+ high-definition nodes** active (98.4% uptime) |\n\n`;
+
+      out += `### District Case Volume Summary:\n`;
+      DISTRICTS.slice(0, 6).forEach(d => {
+        const count = allFirs.filter(f => (f.district_name || '').toLowerCase().includes(d.toLowerCase().split(' ')[0])).length;
+        out += `- **${d}:** ${count} registered dockets\n`;
+      });
+
+      return {
+        answer: out,
+        suggestions: [
+          'Open Analytics Dashboard',
+          'View Crime Hotspot Map',
+          'Show Repeat Offenders Matrix',
+          'Inspect High Priority FIRs'
+        ],
+        kpis: { total_firs: totalFirs, chargesheeted, open_cases: openCases, grid_status: '100% OPERATIONAL' }
+      };
+    }
+
+    // ── 8. LEGAL SOPS & STATUTES ───────────────────────────────────────────────
+    if (q.includes('sop') || q.includes('section') || q.includes('ipc') || q.includes('bns') || q.includes('panchanama') || q.includes('1930') || q.includes('ndps') || q.includes('law')) {
+      let sopKey = 'theft';
+      if (q.includes('cyber') || q.includes('1930') || q.includes('fraud')) sopKey = 'cyber';
+      else if (q.includes('robbery') || q.includes('snatch')) sopKey = 'robbery';
+      else if (q.includes('panchanama') || q.includes('seizure')) sopKey = 'panchanama';
+      else if (q.includes('ndps') || q.includes('drug')) sopKey = 'ndps';
+
+      const sop = LEGAL_SOPS[sopKey];
+
+      let out = `### ⚖️ Standard Operating Procedure (SOP): **${sop.title}**\n\n`;
+      out += `### Governing Statutory Provisions:\n`;
+      sop.acts.forEach(a => { out += `- **${a}**\n`; });
+      out += `\n### Mandatory Procedural Steps for Investigating Officers:\n`;
+      sop.steps.forEach((s, idx) => {
+        out += `${idx + 1}. ${s}\n`;
+      });
+      out += `\n**Evidentiary Compliance Notice:** Ensure all digital timestamps, seizure memos, and witness statements are uploaded to CCTNS within the statutory compliance window, Sir.`;
+
+      return {
+        answer: out,
+        suggestions: [
+          'Open Panchanama Auto-Drafter',
+          'Review Vehicle Theft SOP',
+          'Review Cyber Fraud 1930 SOP',
+          'NDPS Contraband Seizure Protocol'
+        ],
+        kpis: { sop_status: 'MANDATORY', framework: 'BNS 2023 / BNSS' }
+      };
+    }
+
+    // ── 9. DYNAMIC MULTI-TOKEN SEMANTIC SYNTHESIS (FOR NOVEL / UNINDEXED QUERIES) ──
+    const tokens = q.split(/\s+/).filter(w => w.length > 2 && !['the', 'and', 'for', 'with', 'what', 'where', 'when', 'show', 'open', 'give', 'tell', 'about', 'this', 'that', 'please', 'can', 'you'].includes(w));
+    
+    const correlatedFirs = allFirs.filter(f => {
+      const corpus = `${f.case_number} ${f.crime_type} ${f.police_station} ${f.district_name} ${f.description} ${f.accused_name} ${f.location_name}`.toLowerCase();
+      return tokens.some(token => corpus.includes(token));
+    });
+
+    const correlatedSuspects = allSuspects.filter(s => {
+      const corpus = `${s.name} ${s.alias} ${s.primary_crime} ${(s.districts || []).join(' ')} ${s.last_known_location}`.toLowerCase();
+      return tokens.some(token => corpus.includes(token));
+    });
+
+    let out = `### 🔍 DRISHTI Operational Intelligence: **"${rawQuestion}"**\n\n`;
+
+    if (correlatedFirs.length > 0) {
+      out += `### Correlated CCTNS Case Dockets (${correlatedFirs.length} Matches Found):\n`;
+      correlatedFirs.slice(0, 3).forEach((f, idx) => {
+        out += `${idx + 1}. [${f.case_number}](/dashboard/fir/${encodeURIComponent(f.case_number)}) — **${f.crime_type}** (${f.police_station}, ${f.district_name})\n   - Accused / Sighted: **${f.accused_name || 'Under Identification'}** | Status: \`${f.status.toUpperCase()}\`\n   - Incident: _${f.description}_\n\n`;
+      });
+    }
+
+    if (correlatedSuspects.length > 0) {
+      out += `### Associated Offender Watchlists:\n`;
+      correlatedSuspects.slice(0, 2).forEach(s => {
+        out += `- **${s.name}** ("${s.alias}") — Risk Score: \`${s.risk_score}/100\` | Last Sighted: ${s.last_known_location} (${s.last_known_vehicle || 'N/A'})\n`;
+      });
+      out += `\n`;
+    }
+
+    if (correlatedFirs.length === 0 && correlatedSuspects.length === 0) {
+      out += `Sir, I have cross-checked the active CCTNS records, surveillance camera logs, and repeat offender matrices for your query.\n\n`;
+      out += `- **Active Database Sync:** 51 live FIRs and ${allSuspects.length} high-risk dossiers indexed across Karnataka.\n`;
+      out += `- **Statewide ANPR Grid:** Active monitoring across 450+ cameras with automated plate alerts.\n`;
+      out += `- **Investigative Guidance:** If you are looking for a specific incident, you can search by case number (e.g. \`KAR/BEN/2024/0747\`), suspect name (e.g. \`Ramesh Kumar\`), vehicle plate, or district name.\n`;
+    } else {
+      out += `**Tactical Action Directive:** Review the correlated case files above, inspect associated physical evidence in CCTNS, and deploy mobile beat patrols as required.`;
+    }
+
+    return {
+      answer: out,
+      suspects: correlatedSuspects.length > 0 ? correlatedSuspects : allSuspects.slice(0, 2),
+      case_cards: correlatedFirs.slice(0, 3),
+      suggestions: [
+        'Show Top Clearance Target Suspects',
+        'Open Live Geospatial Crime Map',
+        'Open Surveillance Camera Grid',
+        'Inspect Latest Vehicle Theft Cases'
+      ],
+      kpis: { matched_cases: correlatedFirs.length, matched_suspects: correlatedSuspects.length, status: 'LIVE_SEARCH' }
+    };
+
+  } catch (err) {
+    console.error('[drishtiIntelligenceEngine] Error:', err);
+    return {
+      answer: `DRISHTI AI is active and monitoring the Karnataka State Police intelligence grid, Sir. How may I assist your command shift?`,
+      suspects: SUSPECTS_INTEL.slice(0, 2),
+      case_cards: DEMO_FIRS.firs.slice(0, 2),
+      suggestions: ['Show Target Suspects Roster', 'Open Crime Hotspot Map', 'Latest Vehicle Theft Cases'],
+      kpis: { status: 'ONLINE', mode: 'RECOVERY' }
+    };
+  }
+}
+
+/**
+ * generateContextualSuggestions — Proactive AI smart suggestions
+ * Analyzes recent sessionLogs to surface context-aware follow-up actions.
+ * Uses NO external APIs — pure local reasoning from the session history.
+ * 
+ * @param {Array} sessionLogs - Array of {role, content, timestamp} objects
+ * @param {string} currentPath - Current page path e.g. '/dashboard/map'
+ * @param {string} lang - 'en' | 'kn' | 'hi'
+ * @returns {Array} Array of suggestion objects: { id, icon, text, action, priority, category }
+ */
+export function generateContextualSuggestions(sessionLogs, currentPath = '/dashboard', lang = 'en') {
+  const suggestions = [];
+  const logs = Array.isArray(sessionLogs) ? sessionLogs : [];
+  
+  // Build a combined text of recent interactions for pattern matching
+  const recentText = logs
+    .slice(-12) // look at last 12 messages
+    .map(l => (l.content || '').toLowerCase())
+    .join(' ');
+
+  const isKannada = lang === 'kn';
+  const isHindi = lang === 'hi';
+  const t = (en, kn, hi) => isKannada ? kn : isHindi ? hi : en;
+
+  let id = 0;
+  const add = (icon, text, action, priority, category) => {
+    suggestions.push({ id: `ctx-${++id}`, icon, text, action, priority, category });
+  };
+
+  // ── SUSPECT-RELATED PATTERNS ─────────────────────────────────────────────
+  const suspectNames = ['ramesh kumar', 'bullet ramesh', 'imran khan', 'helmet imran', 
+    'suresh naidu', 'snake naidu', 'vikram malhotra', 'anand shinde', 'bhavani karpe', 'anand gowda', 'zakir hussain'];
+  
+  const mentionedSuspect = suspectNames.find(name => recentText.includes(name));
+  if (mentionedSuspect) {
+    const displayName = mentionedSuspect.split(' ').map(w => w[0].toUpperCase() + w.slice(1)).join(' ');
+    add('🎯', 
+      t(`Open full dossier for ${displayName}`, `${displayName} ಸಂಪೂರ್ಣ ಫೈಲ್ ತೆರೆಯಿರಿ`, `${displayName} की पूरी फ़ाइल खोलें`),
+      `Show complete criminal dossier for ${displayName}`, 'high', 'suspect');
+    
+    if (!currentPath.includes('/network')) {
+      add('🕸️', 
+        t(`View ${displayName}'s criminal network`, `${displayName} ಅಪರಾಧ ಜಾಲ ವೀಕ್ಷಿಸಿ`, `${displayName} का आपराधिक नेटवर्क देखें`),
+        `open network graph`, 'medium', 'navigate');
     }
   }
 
-  // ── 6. GEOSPATIAL & HOTSPOT QUERIES ──────────────────────────────────────────
-  const isHotspotQuery = 
-    q.includes('hotspot') || q.includes('map') || q.includes('area') || q.includes('location') || 
-    q.includes('silk board') || q.includes('indiranagar') || q.includes('koramangala') || 
-    q.includes('kalaburagi') || q.includes('raichur') || q.includes('bengaluru') || q.includes('mysuru');
-
-  if (isHotspotQuery) {
-    const targetDistrict = DISTRICTS.find(d => q.includes(d.toLowerCase().split(' ')[0])) || 'Bengaluru Urban';
-    const districtFirs = allFirs.filter(f => (f.district_name || '').toLowerCase().includes(targetDistrict.toLowerCase().split(' ')[0]));
-
-    let out = `### Geospatial Hotspot Analysis: **${targetDistrict}**\n\n`;
-    out += `1. **Silk Board Junction Corridor (Bengaluru South)**\n`;
-    out += `   - Primary Vector: Inter-District Vehicle Theft (38% volume) & Transit Fencing.\n`;
-    out += `   - Vulnerability Window: 22:00 hrs – 04:00 hrs (Peak Night Hours).\n`;
-    out += `   - Key ANPR Node: \`CAM-BLR-0045\` (Silk Board TTMC Approach).\n`;
-    out += `   - Primary Target Suspect: **Ramesh Kumar (Bullet Ramesh)**.\n\n`;
-
-    out += `2. **Indiranagar 100ft Road & Central Precinct**\n`;
-    out += `   - Primary Vector: Robbery, Chain Snatching, & Commercial Extortion.\n`;
-    out += `   - Vulnerability Window: 18:00 hrs – 23:30 hrs.\n`;
-    out += `   - Key ANPR Node: \`CAM-BLR-0088\`.\n`;
-    out += `   - Primary Target Suspect: **Suresh Naidu (Snake Naidu)**.\n\n`;
-
-    out += `3. **Whitefield & ITPB Tech Corridor**\n`;
-    out += `   - Primary Vector: High-Value Financial Cyber Fraud & Extortion.\n`;
-    out += `   - Lead Target: **Vikram Malhotra** (Whitefield CEN PS).\n\n`;
-
-    out += `**TACTICAL COMMAND RECOMMENDATION:**\n`;
-    out += `- Shift 2 additional Hoysala patrol units to Silk Board service lanes during 10 PM - 4 AM.\n`;
-    out += `- Enable automated ANPR license plate alert sweeps across the Hosur Road boundary.`;
-
-    return {
-      answer: out,
-      suggestions: [
-        'Open Live Geospatial Crime Map',
-        'View ANPR Surveillance Streams',
-        'Top Vehicle Theft Suspects in Bengaluru',
-        'Deploy Tactical Beat Patrol Directive'
-      ],
-      kpis: { analyzed_firs: districtFirs.length || 51, hotspot_count: 5, grid_uptime: '99.8%' }
-    };
+  // ── FIR / CASE NUMBER PATTERNS ────────────────────────────────────────────
+  const firMatch = recentText.match(/fir[\s\-\/]*([\w\-\/]{4,20})/i) || 
+                   recentText.match(/kar\/\w+\/\d{4}\/\d{4}/i) ||
+                   recentText.match(/fir-\d{4}-[a-z]{2}-\d{4}/i);
+  if (firMatch) {
+    const firNum = firMatch[0].toUpperCase().replace(/\s/g, '');
+    add('📄', 
+      t(`Export PDF report for ${firNum}`, `${firNum} ಪಿಡಿಎಫ್ ರಿಪೋರ್ಟ್ ಡೌನ್ಲೋಡ್`, `${firNum} के लिए PDF रिपोर्ट`),
+      `Generate PDF report for case ${firNum}`, 'medium', 'case');
+    
+    add('📝',
+      t(`Draft Panchanama for ${firNum}`, `${firNum} ಗಾಗಿ ಪಂಚನಾಮ ತಯಾರಿಸಿ`, `${firNum} के लिए पंचनामा तैयार करें`),
+      `open panchanama`, 'medium', 'navigate');
   }
 
-  // ── 7. LEGAL SECTIONS & POLICE INVESTIGATION SOPS ─────────────────────────────
-  const isLegalQuery = 
-    q.includes('sop') || q.includes('section') || q.includes('ipc') || q.includes('bns') || 
-    q.includes('379') || q.includes('392') || q.includes('420') || q.includes('1930') || 
-    q.includes('panchanama') || q.includes('ndps') || q.includes('procedure') || q.includes('law');
-
-  if (isLegalQuery) {
-    let sopKey = 'theft';
-    if (q.includes('cyber') || q.includes('420') || q.includes('1930') || q.includes('fraud')) sopKey = 'cyber';
-    else if (q.includes('robbery') || q.includes('392') || q.includes('snatch')) sopKey = 'robbery';
-    else if (q.includes('panchanama') || q.includes('seizure') || q.includes('spot')) sopKey = 'panchanama';
-
-    const sop = LEGAL_SOPS[sopKey];
-
-    let out = `### Standard Operating Procedure (SOP): **${sop.title}**\n\n`;
-    out += `### Governing Legal Framework:\n`;
-    sop.acts.forEach(a => { out += `- **${a}**\n`; });
-    out += `\n### Mandatory Investigation Steps:\n`;
-    sop.steps.forEach((s, idx) => {
-      out += `${idx + 1}. ${s}\n`;
-    });
-    out += `\n**Evidentiary Compliance Notice:** Ensure all digital timestamps, seizure memos, and witness statements are uploaded to CCTNS within the statutory 24-hour compliance window, Sir.`;
-
-    return {
-      answer: out,
-      suggestions: [
-        'Open Panchanama Auto-Drafter',
-        'Review Vehicle Theft SOP',
-        'Review Cyber Fraud 1930 SOP',
-        'Verify Station Case Compliance'
-      ],
-      kpis: { sop_status: 'MANDATORY', legal_framework: 'BNS 2023 + Cr.P.C', compliance_window: '24 Hours' }
-    };
+  // ── VEHICLE / ANPR PATTERNS ────────────────────────────────────────────────
+  const vehicleMatch = recentText.match(/\bka[\s\-]*\d{2}[\s\-]*[a-z]{1,3}[\s\-]*\d{4}\b/i);
+  if (vehicleMatch) {
+    const plate = vehicleMatch[0].toUpperCase().replace(/\s/g, '-');
+    add('📷',
+      t(`Track ${plate} on ANPR cameras`, `${plate} ವಾಹನ ಎಎನ್ಪಿಆರ್ ಟ್ರ್ಯಾಕ್`, `${plate} ANPR पर ट्रैक करें`),
+      `Check ANPR camera sightings for vehicle ${plate}`, 'high', 'vehicle');
+    
+    if (!currentPath.includes('/surveillance')) {
+      add('📹',
+        t(`Open Surveillance for ${plate} sightings`, `${plate} ಕ್ಯಾಮೆರಾ ದೃಷ್ಟಿ ತೆರೆಯಿರಿ`, `${plate} सर्विलांस खोलें`),
+        `open surveillance`, 'medium', 'navigate');
+    }
   }
 
-  // ── 8. DEFAULT DEEP POLICE INTELLIGENCE SYNTHESIS (FALLBACK) ────────────────
-  const topSuspects = SUSPECTS_INTEL.slice(0, 3);
-  
-  let out = `### 1. Operational Surveillance & CCTNS Status:\n`;
-  out += `- **Synchronized Cases:** 51 active FIR dockets indexed across 6 key Karnataka districts.\n`;
-  out += `- **High-Gravity Offence Distribution:** Vehicle Theft (38%), Commercial Narcotics (22%), Armed Robbery (20%), Cyber Extortion (20%).\n`;
-  out += `- **Statewide Surveillance Grid:** 450+ ANPR cameras active with 98.4% uptime.\n\n`;
+  // ── LOCATION / HOTSPOT PATTERNS ───────────────────────────────────────────
+  const locations = ['silk board', 'indiranagar', 'whitefield', 'itpb', 'hebbal', 
+    'jayanagar', 'electronic city', 'koramangala', 'bellandur', 'outer ring road'];
+  const mentionedLocation = locations.find(loc => recentText.includes(loc));
+  if (mentionedLocation) {
+    const displayLoc = mentionedLocation.split(' ').map(w => w[0].toUpperCase() + w.slice(1)).join(' ');
+    if (!currentPath.includes('/map')) {
+      add('🗺️',
+        t(`View ${displayLoc} on Crime Map`, `${displayLoc} ಅಪರಾಧ ನಕ್ಷೆಯಲ್ಲಿ ನೋಡಿ`, `${displayLoc} क्राइम मैप पर देखें`),
+        `open crime map`, 'medium', 'navigate');
+    }
+    add('📊',
+      t(`Analyze crime pattern near ${displayLoc}`, `${displayLoc} ಸಮೀಪ ಅಪರಾಧ ವಿಶ್ಲೇಷಣೆ`, `${displayLoc} के पास अपराध विश्लेषण`),
+      `Show crime analysis for ${displayLoc} area`, 'medium', 'analysis');
+  }
 
-  out += `### 2. Immediate High-Priority Clearance Targets:\n`;
-  topSuspects.forEach((s, idx) => {
-    out += `${idx + 1}. **${s.name}** ("${s.alias}") — Risk Score: \`${s.risk_score}/100\` | Last Sighting: ${s.last_known_location} (${s.last_known_vehicle})\n`;
-  });
+  // ── DRUG / NARCOTICS PATTERNS ─────────────────────────────────────────────
+  if (/\b(drug|narcotic|ndps|mdma|ganja|contraband|seizure)\b/.test(recentText)) {
+    add('⚗️',
+      t('View NDPS Drug Seizure SOP', 'ಎನ್ಡಿಪಿಎಸ್ ಜಪ್ತಿ ಎಸ್ಒಪಿ ತೆರೆಯಿರಿ', 'NDPS जब्ती SOP देखें'),
+      'Show NDPS drug seizure SOP and procedure', 'high', 'legal');
+    add('🔗',
+      t("Map Imran Khan's narcotics supply network", "ಇಮ್ರಾನ್ ಖಾನ್ ಮಾದಕ ದ್ರವ್ಯ ಜಾಲ ನಕ್ಷೆ", "इमरान खान नार्कोटिक्स नेटवर्क"),
+      "Show criminal network for Imran Khan narcotics syndicate", 'high', 'suspect');
+  }
 
-  out += `\n### 3. Recommended Tactical Action:\n`;
-  out += `- Maintain dynamic nakabandis at Silk Board Junction & Hosur Road exit corridors.\n`;
-  out += `- Cross-reference any suspect vehicle sightings against the live ANPR watchlist.\n`;
-  out += `- For formal arrest warrants or spot panchanamas, utilize the automated CCTNS drafting workbench.`;
+  // ── CYBER CRIME PATTERNS ──────────────────────────────────────────────────
+  if (/\b(cyber|fraud|phishing|1930|upi|online\s*scam|digital|crypto|hack)\b/.test(recentText)) {
+    add('🛡️',
+      t('Cyber Fraud 1930 Helpline SOP', 'ಸೈಬರ್ ಮೋಸ 1930 ಸಹಾಯ ವಾಣಿ SOP', 'साइबर धोखाधड़ी 1930 SOP'),
+      'Show cyber fraud 1930 helpline SOP', 'high', 'legal');
+    add('💻',
+      t("Check Vikram Malhotra cyber extortion dossier", "ವಿಕ್ರಮ್ ಮಲ್ಹೋತ್ರಾ ಸೈಬರ್ ಫೈಲ್", "विक्रम मल्होत्रा साइबर मामला"),
+      "Show complete criminal dossier for Vikram Malhotra", 'medium', 'suspect');
+  }
 
-  return {
-    answer: out,
-    suspects: topSuspects,
-    suggestions: [
-      'Show Latest Vehicle Theft Cases',
-      'Show Full Target Suspects Roster',
-      'Inspect Ramesh Kumar Vehicle Theft File',
-      'Open Surveillance ANPR Camera Desk'
-    ],
-    kpis: { active_firs: allFirs.length, repeat_offenders: SUSPECTS_INTEL.length, grid_status: 'ACTIVE' }
-  };
+  // ── ROBBERY / THEFT PATTERNS ──────────────────────────────────────────────
+  if (/\b(robbery|theft|vehicle\s*theft|chain\s*snatch|loot|stolen)\b/.test(recentText)) {
+    add('🚗',
+      t('View Vehicle Theft Investigation SOP', 'ವಾಹನ ಕಳ್ಳತನ ತನಿಖೆ SOP', 'वाहन चोरी जांच SOP'),
+      'Show vehicle theft SOP and investigation procedure', 'high', 'legal');
+    add('👤',
+      t("Track Bullet Ramesh vehicle theft syndicate", "ಬುಲೆಟ್ ರಮೇಶ್ ಟ್ರ್ಯಾಕ್ ಮಾಡಿ", "बुलेट रमेश ट्रैक करें"),
+      "Show complete criminal dossier for Ramesh Kumar", 'medium', 'suspect');
+  }
+
+  // ── PAGE-BASED CONTEXTUAL SUGGESTIONS ────────────────────────────────────
+  if (currentPath === '/dashboard') {
+    if (!recentText) {
+      add('📋', 
+        t('View latest high-priority FIRs', 'ಇತ್ತೀಚಿನ ಆದ್ಯತೆ ಎಫ್ಐಆರ್ ನೋಡಿ', 'नवीनतम प्राथमिकता FIR देखें'),
+        'Show latest high priority active FIRs', 'medium', 'case');
+      add('🎯',
+        t('Check top clearance targets today', 'ಇಂದಿನ ಉನ್ನತ ಗುರಿಗಳನ್ನು ತಪಾಸಣೆ ಮಾಡಿ', 'आज के शीर्ष लक्ष्य देखें'),
+        'Show clearance target suspects', 'medium', 'suspect');
+    }
+  }
+
+  if (currentPath.includes('/fir')) {
+    add('🗺️',
+      t('View FIR locations on Crime Map', 'ಎಫ್ಐಆರ್ ಸ್ಥಳಗಳನ್ನು ನಕ್ಷೆಯಲ್ಲಿ ನೋಡಿ', 'FIR स्थान नक्शे पर देखें'),
+      'open crime map', 'low', 'navigate');
+  }
+
+  if (currentPath.includes('/map') || currentPath.includes('/surveillance')) {
+    add('👥',
+      t('Cross-reference suspects at this location', 'ಈ ಸ್ಥಳದ ಅನುಮಾನಿತರನ್ನು ಪರಿಶೀಲಿಸಿ', 'इस स्थान के संदिग्धों की जांच करें'),
+      'Show suspects near Silk Board Junction area', 'medium', 'suspect');
+  }
+
+  if (currentPath.includes('/suspect')) {
+    add('🕸️',
+      t('Map criminal network connections', 'ಅಪರಾಧ ಜಾಲ ಸಂಪರ್ಕ ನಕ್ಷೆ', 'आपराधिक नेटवर्क मैप'),
+      'open network graph', 'medium', 'navigate');
+  }
+
+  // Deduplicate and sort by priority (high > medium > low)
+  const priorityOrder = { high: 0, medium: 1, low: 2 };
+  const unique = suggestions.filter((s, i, arr) => arr.findIndex(x => x.text === s.text) === i);
+  unique.sort((a, b) => (priorityOrder[a.priority] || 1) - (priorityOrder[b.priority] || 1));
+
+  return unique.slice(0, 5);
 }

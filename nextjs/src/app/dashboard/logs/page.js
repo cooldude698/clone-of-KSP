@@ -4,13 +4,14 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Shield, Search, Trash2, Download, MessageSquare, AlertCircle, 
-  User, MapPin, Calendar, Clock, ChevronRight, X, Filter,
-  FileText, CheckCircle2, ArrowUpRight, Volume2, Radio,
+  User, MapPin, Calendar, Clock, ChevronRight, X, Filter, Bot,
+  FileText, CheckCircle2, ArrowUpRight, Volume2, Radio, Sparkles,
   ShieldAlert, ShieldCheck, Car, Crosshair, Terminal,
-  Database, RefreshCw, Layers, Compass, Sparkles, UserCheck
+  Database, RefreshCw, Layers, Compass, UserCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PoliceIntelligenceRenderer from '@/components/PoliceIntelligenceRenderer';
+import { generateContextualSuggestions } from '@/lib/drishtiIntelligenceEngine';
 
 // Default pre-populated structured session cards for Police Officers
 const DEFAULT_SESSION_CARDS = [
@@ -497,6 +498,69 @@ export default function LogsPage() {
 
       {/* ── Main Content Grid ── */}
       <div className="flex-1 p-4 sm:p-7 overflow-auto">
+        {/* ── AI Context Smart Suggestions ── */}
+        {(() => {
+          // Collect all messages from all session cards for context
+          const allMessages = sessionCards.flatMap(c => c.messages || []);
+          const contextSuggestions = generateContextualSuggestions(allMessages, '/dashboard/logs', 'en');
+          
+          if (contextSuggestions.length === 0) return null;
+          
+          return (
+            <div className="max-w-7xl mx-auto mb-6 p-4 rounded-2xl border bg-gradient-to-r from-blue-500/10 via-indigo-500/5 to-purple-500/10 border-blue-500/20 shadow-sm backdrop-blur-sm">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-base">🤖</span>
+                <span className="text-xs font-bold uppercase tracking-widest text-blue-400 font-mono">
+                  DRISHTI Smart Suggestions
+                </span>
+                <span className="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/15 text-blue-400 border border-blue-500/20 font-bold font-mono">
+                  AI CONTEXT
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {contextSuggestions.map(suggestion => (
+                  <button
+                    key={suggestion.id}
+                    onClick={() => {
+                      // If it's a navigation suggestion, navigate; otherwise open orb with the query
+                      const isNav = suggestion.action.startsWith('open ') && !suggestion.action.includes('dossier') && !suggestion.action.includes('Show') && !suggestion.action.includes('Check') && !suggestion.action.includes('Track');
+                      if (isNav) {
+                        const navMap = {
+                          'open crime map': '/dashboard/map',
+                          'open surveillance': '/dashboard/surveillance',
+                          'open network graph': '/dashboard/network',
+                          'open panchanama': '/dashboard/fir/panchanama',
+                        };
+                        const path = navMap[suggestion.action];
+                        if (path) { router.push(path); return; }
+                      }
+                      // Otherwise fire as a Drishti query via the orb
+                      if (typeof window !== 'undefined') {
+                        window.dispatchEvent(new CustomEvent('drishti-open-orb', {
+                          detail: {
+                            messages: [{ role: 'user', content: suggestion.action, timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) }]
+                          }
+                        }));
+                        // Also trigger the query immediately
+                        try {
+                          localStorage.setItem('drishti_pending_query', suggestion.action);
+                          window.dispatchEvent(new Event('storage'));
+                        } catch (_) {}
+                      }
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs border transition-all bg-[var(--surface-1)] hover:bg-blue-500/15 border-[var(--border)] hover:border-blue-500/30 text-[var(--text-primary)] hover:text-blue-400 font-medium font-mono cursor-pointer shadow-sm"
+                  >
+                    <span>{suggestion.icon}</span>
+                    <span>{suggestion.text}</span>
+                    {suggestion.priority === 'high' && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse ml-0.5" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
         {filteredCards.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
             <div className="w-14 h-14 rounded-2xl bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 flex items-center justify-center text-slate-400">
