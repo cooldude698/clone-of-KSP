@@ -5,19 +5,28 @@ import {
   Scale, BookOpen, Search, Shield, Filter,
   FileCheck, AlertTriangle, ChevronRight, CheckCircle2, Bookmark, Gavel,
   Copy, Check, Sparkles, X, ArrowUpRight, ShieldAlert, Award, FileText,
-  HelpCircle, AlertCircle, Info
+  HelpCircle, AlertCircle, Info, Lock, Unlock, Car, ShieldCheck, Zap,
+  Crosshair, Laptop, Binary, FlaskConical, Target, HeartHandshake, Eye
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const STATUTES_DATA = [
   {
+    id: 'ipc-379',
     actCode: 'IPC',
     actName: 'Indian Penal Code, 1860 / Bharatiya Nyaya Sanhita, 2023',
     section: '379',
     bnsSection: 'BNS § 303(2)',
     title: 'Punishment for Theft & Motor Vehicle Larceny',
     crimeHead: 'Crimes Against Property',
-    crimeSubHead: 'Vehicle Theft / Motor Vehicle Larceny',
+    crimeSubHead: 'Vehicle Theft & Larceny',
+    theme: {
+      accent: 'from-blue-600 to-indigo-700',
+      badgeBg: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+      borderHover: 'hover:border-blue-500/40',
+      glow: 'group-hover:shadow-blue-500/10',
+      illustration: 'car'
+    },
     gravity: 'Non-Heinous',
     bailable: false,
     cognizable: true,
@@ -28,57 +37,73 @@ const STATUTES_DATA = [
     totalCasesActive: 1420,
     arrestGuideline: 'Section 41A CrPC / Sec 35 BNSS Notice mandatory unless recorded flight risk or repeat habitual offender.',
     essentialIngredients: [
-      'Dishonest intention to take movable property.',
-      'Property taken out of possession of another without their consent.',
-      'Actual moving of the property in order to accomplish taking.',
+      'Dishonest intention to take movable property out of possession.',
+      'Property taken without the lawful possessor’s consent.',
+      'Actual moving of the property in order to effect such taking.',
       'Ownership or lawful possession established via RC / Invoice.'
     ],
     investigationChecklist: [
-      'Seizure Panchanama (Mahazar) under Section 100 CrPC / 105 BNSS at place of recovery.',
-      'Vehicle Chassis & Engine number verification via VAHAN portal.',
-      'CCTV / ANPR trajectory footage extraction & Section 65B IEA / 63 BSA certificate.',
-      'Statement of complainant & witnesses under Sec 161 CrPC / 180 BNSS.'
+      'Seizure Panchanama (Mahazar) under Sec 100 CrPC / 105 BNSS at recovery locus.',
+      'Vehicle Chassis & Engine number verification via VAHAN database.',
+      'CCTV / ANPR trajectory footage extraction & Sec 65B IEA / 63 BSA certificate.',
+      'Statement of complainant & eyewitnesses under Sec 161 CrPC / 180 BNSS.'
     ],
     landmarkPrecedent: 'State of Maharashtra v. Vishwanath (AIR 1980 SC 697) — Transfer of physical possession constitutes theft even if temporary.'
   },
   {
+    id: 'ipc-392',
     actCode: 'IPC',
     actName: 'Indian Penal Code, 1860 / Bharatiya Nyaya Sanhita, 2023',
     section: '392',
     bnsSection: 'BNS § 309(4)',
     title: 'Punishment for Robbery & Highway Dacoity',
     crimeHead: 'Crimes Against Property',
-    crimeSubHead: 'Armed Robbery / Highway Heist',
+    crimeSubHead: 'Armed Robbery & Highway Heist',
+    theme: {
+      accent: 'from-amber-500 to-orange-600',
+      badgeBg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+      borderHover: 'hover:border-amber-500/40',
+      glow: 'group-hover:shadow-amber-500/10',
+      illustration: 'robbery'
+    },
     gravity: 'Heinous',
     bailable: false,
     cognizable: true,
     compoundable: false,
-    triableBy: 'Court of Session / Magistrate of First Class',
+    triableBy: 'Court of Session / Magistrate First Class',
     maxPunishment: 'Rigorous imprisonment up to 10 years and fine; highway robbery up to 14 years',
     avgConvictionRate: 74,
     totalCasesActive: 890,
-    arrestGuideline: 'Immediate arrest under Sec 41(1) CrPC. Mandatory custodial interrogation for recovery of weapon and looted valuables.',
+    arrestGuideline: 'Immediate arrest under Sec 41(1) CrPC. Mandatory custodial interrogation for recovery of weapon and looted property.',
     essentialIngredients: [
-      'Theft or extortion with wrongful restraint, fear of instant death, or instant hurt.',
-      'Force or threat applied for committing theft or carrying away stolen property.',
+      'Theft or extortion with wrongful restraint or fear of instant death/hurt.',
+      'Force or threat applied for committing theft or carrying away stolen goods.',
       'Active participation of offender with overt aggressive act.'
     ],
     investigationChecklist: [
       'Scene of Crime examination with Forensic Fingerprint Expert.',
       'Test Identification Parade (TIP) of suspects before Judicial Magistrate.',
-      'Recovery of stolen property / weapon under Section 27 Evidence Act / Sec 23 BSA.',
+      'Recovery of stolen property / weapon under Sec 27 Evidence Act / Sec 23 BSA.',
       'Call Detail Records (CDR) & Tower dump analysis for gang movement.'
     ],
     landmarkPrecedent: 'Rajesh Govind Jagesha v. State of Maharashtra (1999) 8 SCC 428 — Identification in TIP is substantive corroborative evidence.'
   },
   {
+    id: 'ipc-302',
     actCode: 'IPC',
     actName: 'Indian Penal Code, 1860 / Bharatiya Nyaya Sanhita, 2023',
     section: '302',
     bnsSection: 'BNS § 103(1)',
     title: 'Punishment for Murder & First-Degree Homicide',
     crimeHead: 'Crimes Against Body',
-    crimeSubHead: 'Homicide / Murder',
+    crimeSubHead: 'Homicide & Murder',
+    theme: {
+      accent: 'from-rose-600 to-red-700',
+      badgeBg: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
+      borderHover: 'hover:border-rose-500/40',
+      glow: 'group-hover:shadow-rose-500/10',
+      illustration: 'murder'
+    },
     gravity: 'Heinous',
     bailable: false,
     cognizable: true,
@@ -102,13 +127,21 @@ const STATUTES_DATA = [
     landmarkPrecedent: 'Bachan Singh v. State of Punjab (1980) 2 SCC 684 — "Rarest of Rare" doctrine for capital punishment.'
   },
   {
+    id: 'ipc-307',
     actCode: 'IPC',
     actName: 'Indian Penal Code, 1860 / Bharatiya Nyaya Sanhita, 2023',
     section: '307',
     bnsSection: 'BNS § 109(1)',
     title: 'Attempt to Murder & Grievous Assault with Deadly Weapon',
     crimeHead: 'Crimes Against Body',
-    crimeSubHead: 'Assault / Grievous Hurt',
+    crimeSubHead: 'Assault & Grievous Hurt',
+    theme: {
+      accent: 'from-orange-600 to-amber-700',
+      badgeBg: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20',
+      borderHover: 'hover:border-orange-500/40',
+      glow: 'group-hover:shadow-orange-500/10',
+      illustration: 'assault'
+    },
     gravity: 'Heinous',
     bailable: false,
     cognizable: true,
@@ -132,6 +165,7 @@ const STATUTES_DATA = [
     landmarkPrecedent: 'State of Maharashtra v. Balram Bama Patil (1983) 2 SCC 28 — Bodily injury not mandatory; intention and capability suffice.'
   },
   {
+    id: 'it-66d',
     actCode: 'ITACT',
     actName: 'Information Technology Act, 2000 (Amended 2008)',
     section: '66D',
@@ -139,6 +173,13 @@ const STATUTES_DATA = [
     title: 'Cheating by Personation Using Computer Resource & Digital Phishing',
     crimeHead: 'Cyber & Economic Crimes',
     crimeSubHead: 'Financial Fraud & Digital Phishing',
+    theme: {
+      accent: 'from-cyan-600 to-teal-700',
+      badgeBg: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20',
+      borderHover: 'hover:border-cyan-500/40',
+      glow: 'group-hover:shadow-cyan-500/10',
+      illustration: 'cyber'
+    },
     gravity: 'Non-Heinous',
     bailable: true,
     cognizable: true,
@@ -162,6 +203,7 @@ const STATUTES_DATA = [
     landmarkPrecedent: 'Shreya Singhal v. Union of India (2015) 5 SCC 1 — Strict procedural safeguards for digital evidence admissibility.'
   },
   {
+    id: 'ndps-20b',
     actCode: 'NDPS',
     actName: 'Narcotic Drugs and Psychotropic Substances Act, 1985',
     section: '20B',
@@ -169,6 +211,13 @@ const STATUTES_DATA = [
     title: 'Contravention in Relation to Cannabis & Synthetic Contraband',
     crimeHead: 'Narcotics & Contraband',
     crimeSubHead: 'Commercial Drug Trafficking',
+    theme: {
+      accent: 'from-emerald-600 to-teal-700',
+      badgeBg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+      borderHover: 'hover:border-emerald-500/40',
+      glow: 'group-hover:shadow-emerald-500/10',
+      illustration: 'narcotics'
+    },
     gravity: 'Heinous',
     bailable: false,
     cognizable: true,
@@ -192,6 +241,7 @@ const STATUTES_DATA = [
     landmarkPrecedent: 'State of Punjab v. Baldev Singh (1999) 6 SCC 172 — Strict compliance with Section 50 search mandate is mandatory.'
   },
   {
+    id: 'arms-25',
     actCode: 'ARMS',
     actName: 'The Arms Act, 1959 (Amended 2019)',
     section: '25',
@@ -199,6 +249,13 @@ const STATUTES_DATA = [
     title: 'Possession & Trafficking of Unlicensed Firearms',
     crimeHead: 'Violent Crime & Gangs',
     crimeSubHead: 'Armed Gang & Illegal Weaponry',
+    theme: {
+      accent: 'from-slate-700 to-zinc-900',
+      badgeBg: 'bg-slate-500/10 text-slate-700 dark:text-slate-300 border-slate-500/20',
+      borderHover: 'hover:border-slate-500/40',
+      glow: 'group-hover:shadow-slate-500/10',
+      illustration: 'arms'
+    },
     gravity: 'Heinous',
     bailable: false,
     cognizable: true,
@@ -222,6 +279,7 @@ const STATUTES_DATA = [
     landmarkPrecedent: 'Paras Ram v. State of Haryana (1992) Supp (1) SCC 671 — Possession must be conscious and physical for Section 25.'
   },
   {
+    id: 'pocso-4',
     actCode: 'POCSO',
     actName: 'Protection of Children from Sexual Offences Act, 2012',
     section: '4',
@@ -229,6 +287,13 @@ const STATUTES_DATA = [
     title: 'Punishment for Penetrative Sexual Assault on Minor',
     crimeHead: 'Child & Women Safety',
     crimeSubHead: 'Special POCSO Offenses',
+    theme: {
+      accent: 'from-purple-600 to-pink-700',
+      badgeBg: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
+      borderHover: 'hover:border-purple-500/40',
+      glow: 'group-hover:shadow-purple-500/10',
+      illustration: 'pocso'
+    },
     gravity: 'Heinous',
     bailable: false,
     cognizable: true,
@@ -257,17 +322,85 @@ const ACT_FILTERS = [
   { id: 'all', label: 'All Statutes' },
   { id: 'IPC', label: 'IPC / BNS' },
   { id: 'NDPS', label: 'NDPS Act' },
-  { id: 'ITACT', label: 'IT Act' },
+  { id: 'ITACT', label: 'Cyber IT' },
   { id: 'ARMS', label: 'Arms Act' },
-  { id: 'POCSO', label: 'POCSO Act' }
+  { id: 'POCSO', label: 'POCSO' }
 ];
 
 const BAIL_FILTERS = [
   { id: 'all', label: 'All Bail Statuses' },
   { id: 'non-bailable', label: 'Non-Bailable' },
   { id: 'bailable', label: 'Bailable' },
-  { id: 'heinous', label: 'Heinous Crimes' }
+  { id: 'heinous', label: 'Heinous Offenses' }
 ];
+
+// Helper to render custom vector illustrations for each card
+function StatuteIllustration({ type }) {
+  switch (type) {
+    case 'car':
+      return (
+        <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border border-blue-500/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0 shadow-inner">
+          <Car className="w-5 h-5" />
+          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse" />
+        </div>
+      );
+    case 'robbery':
+      return (
+        <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0 shadow-inner">
+          <ShieldAlert className="w-5 h-5" />
+          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
+        </div>
+      );
+    case 'murder':
+      return (
+        <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-red-500/20 border border-rose-500/30 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0 shadow-inner">
+          <Target className="w-5 h-5" />
+          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500" />
+        </div>
+      );
+    case 'assault':
+      return (
+        <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/20 to-amber-500/20 border border-orange-500/30 flex items-center justify-center text-orange-600 dark:text-orange-400 shrink-0 shadow-inner">
+          <Zap className="w-5 h-5" />
+          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-orange-500" />
+        </div>
+      );
+    case 'cyber':
+      return (
+        <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-teal-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400 shrink-0 shadow-inner">
+          <Binary className="w-5 h-5" />
+          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse" />
+        </div>
+      );
+    case 'narcotics':
+      return (
+        <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0 shadow-inner">
+          <FlaskConical className="w-5 h-5" />
+          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-500" />
+        </div>
+      );
+    case 'arms':
+      return (
+        <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-slate-500/20 to-zinc-500/20 border border-slate-500/30 flex items-center justify-center text-slate-700 dark:text-slate-300 shrink-0 shadow-inner">
+          <Crosshair className="w-5 h-5" />
+          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-slate-500" />
+        </div>
+      );
+    case 'pocso':
+      return (
+        <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0 shadow-inner">
+          <HeartHandshake className="w-5 h-5" />
+          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-purple-500" />
+        </div>
+      );
+    default:
+      return (
+        <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 flex items-center justify-center text-slate-700 dark:text-slate-300 shrink-0">
+          <Scale className="w-5 h-5" />
+        </div>
+      );
+  }
+}
 
 export default function StatutesPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -303,40 +436,40 @@ export default function StatutesPage() {
 
   return (
     <div className="space-y-4 max-w-7xl mx-auto pb-12 font-sans text-slate-900 dark:text-slate-100">
-      {/* ─── SLEEK, COMPACT HERO HEADER ─── */}
+      {/* ─── COMMAND HEADER WITH STATS ─── */}
       <div className="bg-white dark:bg-zinc-900/90 rounded-2xl p-4 sm:p-5 border border-slate-200/90 dark:border-zinc-800 shadow-2xs space-y-3.5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 flex items-center justify-center font-bold shadow-2xs shrink-0">
-              <Gavel className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 flex items-center justify-center font-bold shadow-2xs shrink-0">
+              <Gavel className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
                   KSP Statutory Acts & Legal Repository
                 </h1>
-                <span className="font-mono text-[10px] font-semibold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-800/50">
+                <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-800/50">
                   IPC ↔ BNS Dual Ref
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Bail Classifications · Statutory Penalties · Conviction Benchmarks Master
+                Investigative Checklists · Bail Classifications · Judicial Precedents Matrix
               </p>
             </div>
           </div>
 
-          {/* Quick Metrics Pills */}
-          <div className="flex items-center gap-2 text-xs">
-            <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 font-semibold">
-              <span className="font-bold text-indigo-600 dark:text-indigo-400">{STATUTES_DATA.length}</span> Statutes
+          {/* Metric Summary Badges */}
+          <div className="flex items-center gap-2 text-xs flex-wrap">
+            <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 font-semibold border border-slate-200/60 dark:border-zinc-700/60">
+              <span className="font-bold text-indigo-600 dark:text-indigo-400">{STATUTES_DATA.length}</span> Active Sections
             </span>
-            <span className="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200/40 dark:border-rose-900/40 font-semibold">
+            <span className="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200/50 dark:border-rose-900/50 font-semibold">
               <span className="font-bold">{STATUTES_DATA.filter(s => !s.bailable).length}</span> Non-Bailable
             </span>
           </div>
         </div>
 
-        {/* Search & Filter Bar */}
+        {/* Search Bar & Dropdown */}
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 pt-1 border-t border-slate-100 dark:border-zinc-800">
           <div className="sm:col-span-8 relative">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -370,7 +503,7 @@ export default function StatutesPage() {
           </div>
         </div>
 
-        {/* Compact Statute Filter Chips */}
+        {/* Category Pills Bar */}
         <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
           {ACT_FILTERS.map((act) => {
             const isActive = selectedAct === act.id;
@@ -378,7 +511,7 @@ export default function StatutesPage() {
               <button
                 key={act.id}
                 onClick={() => setSelectedAct(act.id)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition ${
+                className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
                   isActive
                     ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-2xs'
                     : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-200/60 dark:border-zinc-700/60'
@@ -391,7 +524,7 @@ export default function StatutesPage() {
         </div>
       </div>
 
-      {/* ─── COMPACT STATUTORY CARDS GRID ─── */}
+      {/* ─── BEAUTIFULLY ILLUSTRATED CARDS GRID ─── */}
       {filteredStatutes.length === 0 ? (
         <div className="bg-white dark:bg-zinc-900 p-8 rounded-2xl text-center space-y-2 border border-slate-200 dark:border-zinc-800">
           <Gavel className="w-8 h-8 text-slate-300 mx-auto" />
@@ -404,101 +537,112 @@ export default function StatutesPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredStatutes.map((item, idx) => (
             <div
               key={idx}
-              className="bg-white dark:bg-zinc-900 rounded-xl p-3.5 border border-slate-200/90 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 shadow-2xs flex flex-col justify-between transition-all duration-150"
+              className={`group bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-slate-200/80 dark:border-zinc-800 ${item.theme.borderHover} shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between relative overflow-hidden`}
             >
-              <div className="space-y-2.5">
-                {/* Header Badges: Section Code + BNS + Bail */}
-                <div className="flex items-center justify-between gap-1.5">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-900 dark:bg-zinc-800 dark:text-slate-100 border border-slate-200 dark:border-zinc-700">
-                      {item.actCode} § {item.section}
-                    </span>
-                    <span className="font-mono text-[10px] font-semibold px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200/40 dark:border-indigo-800/40">
-                      {item.bnsSection}
-                    </span>
+              {/* Subtle Ambient Color Wave */}
+              <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${item.theme.accent} opacity-5 dark:opacity-10 rounded-bl-full pointer-events-none transition-opacity duration-300 group-hover:opacity-15`} />
+
+              <div className="space-y-3 relative z-10">
+                {/* Card Top Row: Illustration Emblem + Codes + Bail */}
+                <div className="flex items-start justify-between gap-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <StatuteIllustration type={item.theme.illustration} />
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-mono text-xs font-black text-slate-900 dark:text-white">
+                          {item.actCode} § {item.section}
+                        </span>
+                        <span className="font-mono text-[10px] font-semibold px-1.5 py-0.2 rounded bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-zinc-700">
+                          {item.bnsSection}
+                        </span>
+                      </div>
+                      <p className="text-[10px] font-medium text-slate-400 mt-0.5">
+                        {item.gravity}
+                      </p>
+                    </div>
                   </div>
 
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1 ${
                     item.bailable 
                       ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/50 dark:border-emerald-800/50' 
                       : 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200/50 dark:border-rose-800/50'
                   }`}>
-                    {item.bailable ? 'Bailable' : 'Non-Bailable'}
+                    {item.bailable ? <Unlock className="w-2.5 h-2.5" /> : <Lock className="w-2.5 h-2.5" />}
+                    <span>{item.bailable ? 'Bailable' : 'Non-Bailable'}</span>
                   </span>
                 </div>
 
                 {/* Offense Title */}
                 <div>
-                  <h2 className="text-[13px] font-bold text-slate-900 dark:text-white tracking-tight leading-snug line-clamp-1">
+                  <h2 className="text-[13px] font-bold text-slate-900 dark:text-white tracking-tight leading-snug line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                     {item.title}
                   </h2>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
-                    {item.actName}
+                  <p className="text-[10.5px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
+                    {item.crimeHead} · {item.crimeSubHead}
                   </p>
                 </div>
 
-                {/* Category & Penalty Summary */}
-                <div className="bg-slate-50/70 dark:bg-zinc-950/50 rounded-lg p-2 space-y-1 border border-slate-100 dark:border-zinc-800/70 text-[11px]">
-                  <p className="truncate">
-                    <span className="font-bold text-slate-400 uppercase text-[9px] mr-1.5">Category:</span>
-                    <span className="font-semibold text-slate-800 dark:text-slate-200">{item.crimeHead} · {item.crimeSubHead}</span>
-                  </p>
-                  <p className="line-clamp-2">
-                    <span className="font-bold text-slate-400 uppercase text-[9px] mr-1.5">Penalty:</span>
-                    <span className="text-slate-600 dark:text-slate-300">{item.maxPunishment}</span>
+                {/* Penalty Matrix Pill */}
+                <div className="bg-slate-50/80 dark:bg-zinc-950/60 rounded-xl p-2.5 space-y-1 border border-slate-100 dark:border-zinc-800/80 text-[11px]">
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="font-bold text-slate-400 uppercase tracking-wider">Statutory Penalty</span>
+                    <span className="font-mono text-slate-500 dark:text-slate-400">{item.triableBy.split('/')[0]}</span>
+                  </div>
+                  <p className="text-slate-700 dark:text-slate-200 font-medium text-[11px] leading-snug line-clamp-2">
+                    {item.maxPunishment}
                   </p>
                 </div>
 
                 {/* Conviction Benchmark & Case Count */}
-                <div className="space-y-1 pt-1">
+                <div className="space-y-1 pt-0.5">
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-slate-500 font-medium">Conviction Rate</span>
-                    <span className="font-bold text-slate-900 dark:text-white">{item.avgConvictionRate}%</span>
+                    <span className="text-slate-500 font-medium text-[10px] uppercase tracking-wider">Empirical Conviction Rate</span>
+                    <span className="font-mono font-bold text-slate-900 dark:text-white">{item.avgConvictionRate}%</span>
                   </div>
                   <div className="h-1.5 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                     <div 
-                      className={`h-full rounded-full ${
+                      className={`h-full rounded-full transition-all duration-500 ${
                         item.avgConvictionRate >= 75 ? 'bg-emerald-500' : item.avgConvictionRate >= 65 ? 'bg-indigo-500' : 'bg-amber-500'
                       }`}
                       style={{ width: `${item.avgConvictionRate}%` }}
                     />
                   </div>
                   <div className="flex items-center justify-between text-[10px] text-slate-400 pt-0.5">
-                    <span className="truncate">{item.triableBy.split('/')[0]}</span>
-                    <span className="font-semibold text-slate-700 dark:text-slate-300 shrink-0">{item.totalCasesActive} Cases</span>
+                    <span>Active Cases Under Investigation</span>
+                    <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{item.totalCasesActive} Cases</span>
                   </div>
                 </div>
               </div>
 
-              {/* Compact Card Action Buttons */}
-              <div className="pt-2.5 mt-2.5 border-t border-slate-100 dark:border-zinc-800 grid grid-cols-2 gap-1.5">
+              {/* Action Buttons */}
+              <div className="pt-3 mt-3 border-t border-slate-100 dark:border-zinc-800 grid grid-cols-2 gap-2 relative z-10">
                 <button
                   onClick={() => handleCopyCitation(item)}
-                  className="py-1.5 px-2 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold flex items-center justify-center gap-1 border border-slate-200/60 dark:border-zinc-700 transition"
+                  className="py-1.5 px-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold flex items-center justify-center gap-1.5 border border-slate-200/60 dark:border-zinc-700 transition active:scale-95"
                 >
                   {copiedKey === item.section ? (
                     <>
                       <Check className="w-3 h-3 text-emerald-500" />
-                      <span className="text-emerald-600 dark:text-emerald-400">Copied</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold">Copied</span>
                     </>
                   ) : (
                     <>
                       <Copy className="w-3 h-3 text-slate-400" />
-                      <span>Copy Citation</span>
+                      <span>Copy Code</span>
                     </>
                   )}
                 </button>
 
                 <button
                   onClick={() => setActiveStatuteModal(item)}
-                  className="py-1.5 px-2 rounded-lg bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-[11px] font-bold flex items-center justify-center gap-1 hover:bg-slate-800 dark:hover:bg-slate-200 transition"
+                  className="py-1.5 px-2.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-[11px] font-bold flex items-center justify-center gap-1.5 hover:bg-indigo-600 dark:hover:bg-indigo-400 dark:hover:text-white transition shadow-2xs active:scale-95"
                 >
                   <span>Legal Guide</span>
-                  <ArrowUpRight className="w-3 h-3" />
+                  <ArrowUpRight className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
@@ -506,7 +650,7 @@ export default function StatutesPage() {
         </div>
       )}
 
-      {/* ─── INVESTIGATION & LEGAL GUIDE MODAL ─── */}
+      {/* ─── WIDE 2-COLUMN LEGAL GUIDE MODAL (NO SCROLLING NEEDED) ─── */}
       <AnimatePresence>
         {activeStatuteModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-xs">
@@ -524,7 +668,7 @@ export default function StatutesPage() {
                 <X className="w-4 h-4" />
               </button>
 
-              {/* Modal Top Header */}
+              {/* Modal Top Header with Illustration */}
               <div className="space-y-1 pr-8 border-b border-slate-100 dark:border-zinc-800 pb-3">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-900 dark:bg-zinc-800 dark:text-slate-100 border border-slate-200 dark:border-zinc-700">
