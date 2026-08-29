@@ -5,12 +5,13 @@ import {
   Scale, BookOpen, Search, Shield, Filter,
   FileCheck, AlertTriangle, ChevronRight, CheckCircle2, Bookmark, Gavel,
   Copy, Check, Sparkles, X, ArrowUpRight, ShieldAlert, Award, FileText,
-  HelpCircle, AlertCircle, Info
+  HelpCircle, AlertCircle, Info, Building2, MapPin, Compass
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const STATUTES_DATA = [
   {
+    id: 'ipc-379',
     actCode: 'IPC',
     actName: 'Indian Penal Code, 1860 / Bharatiya Nyaya Sanhita, 2023',
     section: '379',
@@ -28,20 +29,21 @@ const STATUTES_DATA = [
     totalCasesActive: 1420,
     arrestGuideline: 'Section 41A CrPC / Sec 35 BNSS Notice mandatory unless recorded flight risk or repeat habitual offender.',
     essentialIngredients: [
-      'Dishonest intention to take movable property.',
-      'Property taken out of possession of another without their consent.',
-      'Actual moving of the property in order to accomplish taking.',
+      'Dishonest intention to take movable property out of possession.',
+      'Property taken without the lawful possessor’s consent.',
+      'Actual moving of the property in order to effect such taking.',
       'Ownership or lawful possession established via RC / Invoice.'
     ],
     investigationChecklist: [
-      'Seizure Panchanama (Mahazar) under Section 100 CrPC / 105 BNSS at place of recovery.',
-      'Vehicle Chassis & Engine number verification via VAHAN portal.',
-      'CCTV / ANPR trajectory footage extraction & Section 65B IEA / 63 BSA certificate.',
-      'Statement of complainant & witnesses under Sec 161 CrPC / 180 BNSS.'
+      'Seizure Panchanama (Mahazar) under Sec 100 CrPC / 105 BNSS at recovery locus.',
+      'Vehicle Chassis & Engine number verification via VAHAN database.',
+      'CCTV / ANPR trajectory footage extraction & Sec 65B IEA / 63 BSA certificate.',
+      'Statement of complainant & eyewitnesses under Sec 161 CrPC / 180 BNSS.'
     ],
     landmarkPrecedent: 'State of Maharashtra v. Vishwanath (AIR 1980 SC 697) — Transfer of physical possession constitutes theft even if temporary.'
   },
   {
+    id: 'ipc-392',
     actCode: 'IPC',
     actName: 'Indian Penal Code, 1860 / Bharatiya Nyaya Sanhita, 2023',
     section: '392',
@@ -53,25 +55,26 @@ const STATUTES_DATA = [
     bailable: false,
     cognizable: true,
     compoundable: false,
-    triableBy: 'Court of Session / Magistrate of First Class',
+    triableBy: 'Court of Session / Magistrate First Class',
     maxPunishment: 'Rigorous imprisonment up to 10 years and fine; highway robbery up to 14 years',
     avgConvictionRate: 74,
     totalCasesActive: 890,
-    arrestGuideline: 'Immediate arrest under Sec 41(1) CrPC. Mandatory custodial interrogation for recovery of weapon and looted valuables.',
+    arrestGuideline: 'Immediate arrest under Sec 41(1) CrPC. Mandatory custodial interrogation for recovery of weapon and looted property.',
     essentialIngredients: [
-      'Theft or extortion with wrongful restraint, fear of instant death, or instant hurt.',
-      'Force or threat applied for committing theft or carrying away stolen property.',
+      'Theft or extortion with wrongful restraint or fear of instant death/hurt.',
+      'Force or threat applied for committing theft or carrying away stolen goods.',
       'Active participation of offender with overt aggressive act.'
     ],
     investigationChecklist: [
       'Scene of Crime examination with Forensic Fingerprint Expert.',
       'Test Identification Parade (TIP) of suspects before Judicial Magistrate.',
-      'Recovery of stolen property / weapon under Section 27 Evidence Act / Sec 23 BSA.',
+      'Recovery of stolen property / weapon under Sec 27 Evidence Act / Sec 23 BSA.',
       'Call Detail Records (CDR) & Tower dump analysis for gang movement.'
     ],
     landmarkPrecedent: 'Rajesh Govind Jagesha v. State of Maharashtra (1999) 8 SCC 428 — Identification in TIP is substantive corroborative evidence.'
   },
   {
+    id: 'ipc-302',
     actCode: 'IPC',
     actName: 'Indian Penal Code, 1860 / Bharatiya Nyaya Sanhita, 2023',
     section: '302',
@@ -102,6 +105,7 @@ const STATUTES_DATA = [
     landmarkPrecedent: 'Bachan Singh v. State of Punjab (1980) 2 SCC 684 — "Rarest of Rare" doctrine for capital punishment.'
   },
   {
+    id: 'ipc-307',
     actCode: 'IPC',
     actName: 'Indian Penal Code, 1860 / Bharatiya Nyaya Sanhita, 2023',
     section: '307',
@@ -132,6 +136,7 @@ const STATUTES_DATA = [
     landmarkPrecedent: 'State of Maharashtra v. Balram Bama Patil (1983) 2 SCC 28 — Bodily injury not mandatory; intention and capability suffice.'
   },
   {
+    id: 'it-66d',
     actCode: 'ITACT',
     actName: 'Information Technology Act, 2000 (Amended 2008)',
     section: '66D',
@@ -162,6 +167,7 @@ const STATUTES_DATA = [
     landmarkPrecedent: 'Shreya Singhal v. Union of India (2015) 5 SCC 1 — Strict procedural safeguards for digital evidence admissibility.'
   },
   {
+    id: 'ndps-20b',
     actCode: 'NDPS',
     actName: 'Narcotic Drugs and Psychotropic Substances Act, 1985',
     section: '20B',
@@ -192,6 +198,7 @@ const STATUTES_DATA = [
     landmarkPrecedent: 'State of Punjab v. Baldev Singh (1999) 6 SCC 172 — Strict compliance with Section 50 search mandate is mandatory.'
   },
   {
+    id: 'arms-25',
     actCode: 'ARMS',
     actName: 'The Arms Act, 1959 (Amended 2019)',
     section: '25',
@@ -222,6 +229,7 @@ const STATUTES_DATA = [
     landmarkPrecedent: 'Paras Ram v. State of Haryana (1992) Supp (1) SCC 671 — Possession must be conscious and physical for Section 25.'
   },
   {
+    id: 'pocso-4',
     actCode: 'POCSO',
     actName: 'Protection of Children from Sexual Offences Act, 2012',
     section: '4',
@@ -303,7 +311,7 @@ export default function StatutesPage() {
 
   return (
     <div className="space-y-4 max-w-7xl mx-auto pb-12 font-sans text-slate-900 dark:text-slate-100">
-      {/* ─── SLEEK, COMPACT HERO HEADER ─── */}
+      {/* ─── SLEEK, COMPACT COMMAND HEADER (Matches Hierarchy Layout) ─── */}
       <div className="bg-white dark:bg-zinc-900/90 rounded-2xl p-4 sm:p-5 border border-slate-200/90 dark:border-zinc-800 shadow-2xs space-y-3.5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -326,7 +334,7 @@ export default function StatutesPage() {
           </div>
 
           {/* Quick Metrics Pills */}
-          <div className="flex items-center gap-2 text-xs">
+          <div className="flex items-center gap-2 text-xs flex-wrap">
             <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 font-semibold">
               <span className="font-bold text-indigo-600 dark:text-indigo-400">{STATUTES_DATA.length}</span> Statutes
             </span>
@@ -391,7 +399,7 @@ export default function StatutesPage() {
         </div>
       </div>
 
-      {/* ─── COMPACT STATUTORY CARDS GRID ─── */}
+      {/* ─── 3-COLUMN STATUTE CARDS GRID (Matches KSP Units & HR Layout) ─── */}
       {filteredStatutes.length === 0 ? (
         <div className="bg-white dark:bg-zinc-900 p-8 rounded-2xl text-center space-y-2 border border-slate-200 dark:border-zinc-800">
           <Gavel className="w-8 h-8 text-slate-300 mx-auto" />
@@ -441,7 +449,7 @@ export default function StatutesPage() {
                   </p>
                 </div>
 
-                {/* Category & Penalty Summary */}
+                {/* Category & Penalty Summary Box */}
                 <div className="bg-slate-50/70 dark:bg-zinc-950/50 rounded-lg p-2 space-y-1 border border-slate-100 dark:border-zinc-800/70 text-[11px]">
                   <p className="truncate">
                     <span className="font-bold text-slate-400 uppercase text-[9px] mr-1.5">Category:</span>
@@ -474,7 +482,7 @@ export default function StatutesPage() {
                 </div>
               </div>
 
-              {/* Compact Card Action Buttons */}
+              {/* Action Buttons: Copy Citation & Legal Guide Modal Trigger */}
               <div className="pt-2.5 mt-2.5 border-t border-slate-100 dark:border-zinc-800 grid grid-cols-2 gap-1.5">
                 <button
                   onClick={() => handleCopyCitation(item)}
@@ -488,7 +496,7 @@ export default function StatutesPage() {
                   ) : (
                     <>
                       <Copy className="w-3 h-3 text-slate-400" />
-                      <span>Copy Citation</span>
+                      <span>Copy Code</span>
                     </>
                   )}
                 </button>
@@ -506,7 +514,7 @@ export default function StatutesPage() {
         </div>
       )}
 
-      {/* ─── INVESTIGATION & LEGAL GUIDE MODAL ─── */}
+      {/* ─── WIDE 2-COLUMN LEGAL GUIDE MODAL (NO SCROLLING NEEDED) ─── */}
       <AnimatePresence>
         {activeStatuteModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-xs">
