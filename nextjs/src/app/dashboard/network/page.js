@@ -20,10 +20,21 @@ import InvestigatorWall from '@/components/InvestigatorWall';
 import { DEMO_FIRS } from '@/lib/demo-data';
 import { getFIRFromStore } from '@/lib/fir-store';
 
-// Dynamic import of Leaflet network map for the Map View tab
+// Dynamic import of Leaflet network map (2D fallback)
 const NetworkMapView = dynamic(
   () => import('./NetworkMapView'),
   { ssr: false, loading: () => <div className="h-[580px] flex items-center justify-center text-slate-400 font-mono bg-white dark:bg-[#121215] rounded-2xl border border-slate-200 dark:border-zinc-800">Calibrating Geo-Spatial Intelligence Grid…</div> }
+);
+
+// Dynamic import of 3D MapLibre GL network map (default)
+const NetworkMapView3D = dynamic(
+  () => import('./NetworkMapView3D'),
+  { ssr: false, loading: () => (
+    <div className="h-[580px] flex flex-col items-center justify-center gap-3 text-slate-400 font-mono text-xs bg-[#f8f5f0] rounded-2xl border border-slate-200">
+      <div className="w-8 h-8 rounded-full border-2 border-slate-300 border-t-slate-600 animate-spin" />
+      <span>Initialising 3D Tactical Grid…</span>
+    </div>
+  )}
 );
 
 // Structured Syndicate Knowledge Base with unique identifiers & authentic Indian portraits
@@ -225,6 +236,7 @@ export default function NetworkPage() {
   const [viewMode, setViewMode] = useState('hierarchy');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCaseData, setActiveCaseData] = useState(null);
+  const [isMap3D, setIsMap3D] = useState(true); // default: 3D city view
 
   // Evidence Inspector Lightbox Modal
   const [selectedEvidenceModal, setSelectedEvidenceModal] = useState(null);
@@ -1166,26 +1178,80 @@ export default function NetworkPage() {
             </div>
           </div>
 
+          {/* 3D/2D Map Toggle */}
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Tactical Map</span>
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-zinc-800 rounded-lg p-0.5 border border-slate-200 dark:border-zinc-700">
+              <button
+                id="btn-network-map-3d"
+                onClick={() => setIsMap3D(true)}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                  isMap3D
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
+                }`}
+              >
+                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                3D
+              </button>
+              <button
+                id="btn-network-map-2d"
+                onClick={() => setIsMap3D(false)}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                  !isMap3D
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
+                }`}
+              >
+                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                2D
+              </button>
+            </div>
+          </div>
+
           <div className="h-[580px] rounded-2xl overflow-hidden border border-slate-200 dark:border-zinc-800">
-            <NetworkMapView
-              nodes={SYNDICATES.map(s => ({
-                id: s.kingpin.id,
-                label: `${s.kingpin.name} (${s.kingpin.alias})`,
-                district: s.districts[0],
-                risk_score: s.risk_score,
-                type: 'suspect',
-                color: s.color,
-                route: s.predicted_escape_route,
-                vehicle: s.kingpin.vehicle
-              }))}
-              edges={[]}
-              selectedNodeId={selectedSyndicate.kingpin.id}
-              onNodeClick={(id) => {
-                const syn = SYNDICATES.find(s => s.kingpin.id === id);
-                if (syn) setSelectedSyndicate(syn);
-              }}
-              height={580}
-            />
+            {isMap3D ? (
+              <NetworkMapView3D
+                nodes={SYNDICATES.map(s => ({
+                  id: s.kingpin.id,
+                  label: `${s.kingpin.name} (${s.kingpin.alias})`,
+                  district: s.districts[0],
+                  risk_score: s.risk_score,
+                  type: 'suspect',
+                  color: s.color,
+                  route: s.predicted_escape_route,
+                  vehicle: s.kingpin.vehicle
+                }))}
+                edges={[]}
+                selectedNodeId={selectedSyndicate.kingpin.id}
+                onNodeClick={(id) => {
+                  const syn = SYNDICATES.find(s => s.kingpin.id === id);
+                  if (syn) setSelectedSyndicate(syn);
+                }}
+                height={580}
+                is3D={isMap3D}
+              />
+            ) : (
+              <NetworkMapView
+                nodes={SYNDICATES.map(s => ({
+                  id: s.kingpin.id,
+                  label: `${s.kingpin.name} (${s.kingpin.alias})`,
+                  district: s.districts[0],
+                  risk_score: s.risk_score,
+                  type: 'suspect',
+                  color: s.color,
+                  route: s.predicted_escape_route,
+                  vehicle: s.kingpin.vehicle
+                }))}
+                edges={[]}
+                selectedNodeId={selectedSyndicate.kingpin.id}
+                onNodeClick={(id) => {
+                  const syn = SYNDICATES.find(s => s.kingpin.id === id);
+                  if (syn) setSelectedSyndicate(syn);
+                }}
+                height={580}
+              />
+            )}
           </div>
         </div>
       )}
