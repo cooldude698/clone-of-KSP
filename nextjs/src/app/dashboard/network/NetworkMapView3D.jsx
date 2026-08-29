@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-const MAP_STYLE = 'https://tiles.openfreemap.org/styles/positron';
+const MAP_STYLE = 'https://tiles.openfreemap.org/styles/bright';
 
 function loadMaplibre() {
   return new Promise((resolve) => {
@@ -27,27 +27,42 @@ function loadMaplibre() {
 
 const PREDICTIVE_ROUTES = [
   {
-    id: 'SYN-VT-01-ROUTE', name: 'Bullet Ramesh Escape Corridor (NH-44)', color: '#3B82F6',
+    id: 'SYN-VT-01-ROUTE', name: 'Bullet Ramesh — NH-44 Escape Corridor', color: '#3B82F6',
     waypoints: [
       { lng: 77.6215, lat: 12.9175, label: 'Silk Board TTMC (Last Sighted: 02:15 AM)', type: 'start' },
-      { lng: 77.6602, lat: 12.8452, label: 'Electronic City Toll (FASTag Sweep)', type: 'checkpoint' },
+      { lng: 77.6600, lat: 12.8452, label: 'Electronic City Toll (FASTag Sweep)', type: 'checkpoint' },
       { lng: 77.7200, lat: 12.7800, label: 'Attibele Intercept Checkpost (Active Alert)', type: 'intercept' },
+    ],
+    pathCoords: [
+      [77.6215,12.9175],[77.6250,12.9130],[77.6290,12.9060],[77.6340,12.8980],
+      [77.6400,12.8890],[77.6490,12.8720],[77.6580,12.8540],[77.6600,12.8452],
+      [77.6640,12.8350],[77.6700,12.8220],[77.6760,12.8080],[77.6900,12.7960],
+      [77.7050,12.7870],[77.7200,12.7800],
     ],
   },
   {
-    id: 'SYN-ND-02-ROUTE', name: 'Helmet Imran Narcotics Drop Trajectory', color: '#10B981',
+    id: 'SYN-ND-02-ROUTE', name: 'Helmet Imran — ORR Narcotics Run', color: '#10B981',
     waypoints: [
       { lng: 77.6900, lat: 12.9350, label: 'Bellandur Tech Node (Dead-drop origin)', type: 'start' },
       { lng: 77.6256, lat: 13.0456, label: 'Hebbal Flyover (ANPR Sweep)', type: 'checkpoint' },
       { lng: 77.1000, lat: 13.3400, label: 'Tumakuru Highway Intercept Gate', type: 'intercept' },
     ],
+    pathCoords: [
+      [77.6900,12.9350],[77.6700,12.9530],[77.6500,12.9700],[77.6256,12.9980],
+      [77.6256,13.0200],[77.6100,13.0450],[77.5900,13.1100],[77.4200,13.2500],
+      [77.2500,13.3000],[77.1000,13.3400],
+    ],
   },
   {
-    id: 'SYN-RB-03-ROUTE', name: 'Snake Naidu Highway Heist Escape Vector', color: '#EF4444',
+    id: 'SYN-RB-03-ROUTE', name: 'Snake Naidu — MG Road Heist Vector', color: '#EF4444',
     waypoints: [
       { lng: 77.6408, lat: 12.9784, label: 'Indiranagar 100ft Rd (Target Ambush)', type: 'start' },
       { lng: 77.5946, lat: 12.9716, label: 'Cubbon Park Fringe (Getaway Transition)', type: 'checkpoint' },
       { lng: 77.5963, lat: 13.1007, label: 'Yelahanka Toll Intercept Barrier', type: 'intercept' },
+    ],
+    pathCoords: [
+      [77.6408,12.9784],[77.6290,12.9730],[77.6120,12.9716],[77.5946,12.9716],
+      [77.5800,12.9800],[77.5750,13.0100],[77.5850,13.0700],[77.5963,13.1007],
     ],
   },
 ];
@@ -66,7 +81,8 @@ function routesGeoJSON() {
     features: PREDICTIVE_ROUTES.map(r => ({
       type: 'Feature',
       properties: { id: r.id, name: r.name, color: r.color },
-      geometry: { type: 'LineString', coordinates: r.waypoints.map(w => [w.lng, w.lat]) },
+      // Use pathCoords (road-following) if available, else fall back to waypoint line
+      geometry: { type: 'LineString', coordinates: r.pathCoords || r.waypoints.map(w => [w.lng, w.lat]) },
     })),
   };
 }
@@ -107,14 +123,19 @@ export default function NetworkMapView3D({ nodes = [], selectedNodeId, onNodeCli
       map = new ml.Map({
         container: containerRef.current,
         style:     MAP_STYLE,
-        center:    [77.6000, 12.9716],
+        center:    [77.6200, 12.9400],
         zoom:      11,
-        pitch:     is3D ? 50 : 0,
-        bearing:   is3D ? -15 : 0,
+        pitch:     58,
+        bearing:   -20,
         antialias: true,
+        dragRotate:      true,
+        pitchWithRotate: true,
+        touchPitch:      true,
+        touchZoomRotate: true,
       });
 
       mapRef.current = map;
+      map.addControl(new ml.NavigationControl({ visualizePitch: true }), 'top-right');
 
       map.on('error', (e) => {
         console.warn('[NetworkMapView3D]', e?.error?.message ?? e);
