@@ -402,10 +402,10 @@ export default function NetworkPage() {
           </div>
 
           {/* ── CINEMATIC DETECTIVE PINBOARD CANVAS (PACKED COMPACT BOARD WITH REALISTIC TEXTURE) ── */}
-          <div className="relative w-full max-w-6xl mx-auto rounded-2xl bg-[#32363e] border-[10px] border-[#181a1f] shadow-2xl p-4 sm:p-6 overflow-hidden select-none">
+          <div className="relative w-full max-w-6xl mx-auto rounded-3xl bg-[#2b2f38] border-[12px] border-[#1e1c18] shadow-[0_20px_50px_rgba(0,0,0,0.8),inset_0_0_80px_rgba(0,0,0,0.7)] p-4 sm:p-6 overflow-hidden select-none">
             
             {/* Ambient Cork/Felt Texture */}
-            <div className="absolute inset-0 bg-[radial-gradient(#4a505c_1.5px,transparent_1.5px)] [background-size:16px_16px] pointer-events-none z-0 opacity-80" />
+            <div className="absolute inset-0 bg-[radial-gradient(#404652_1.5px,transparent_1.5px)] [background-size:16px_16px] pointer-events-none z-0 opacity-80" />
             <div className="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.85)] pointer-events-none z-0" />
 
             {/* ── DENSE SVG RED YARN WEB (CRISS-CROSSING TIGHTLY ACROSS NODES) ── */}
