@@ -1251,54 +1251,53 @@ export default function NetworkPage() {
         )}
       </AnimatePresence>
 
-      {/* ── PREMIUM POLICE EVIDENCE NOTE & PIN MODAL ── */}
+      {/* ── AUTHENTIC NEWSPAPER BROADSHEET EVIDENCE LOG MEMORANDUM MODAL ── */}
       <AnimatePresence>
         {isAddPinModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/75 backdrop-blur-xs">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              initial={{ opacity: 0, scale: 0.96, y: 8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-[#1e2229] border-2 border-stone-600 text-stone-100 rounded-3xl max-w-lg w-full shadow-[0_25px_60px_rgba(0,0,0,0.85)] p-6 space-y-5 relative font-mono overflow-hidden"
+              exit={{ opacity: 0, scale: 0.96, y: 8 }}
+              className="bg-[#f7f3e8] dark:bg-[#1f2126] border-4 border-stone-800 dark:border-stone-500 text-stone-950 dark:text-stone-100 rounded-2xl max-w-lg w-full shadow-[0_25px_60px_rgba(0,0,0,0.6)] p-6 sm:p-7 space-y-6 relative font-serif overflow-hidden"
             >
               {/* Pushpin at Top Center */}
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-gradient-to-tr from-red-800 to-red-400 border-2 border-white shadow-lg z-30 flex items-center justify-center">
-                <div className="w-1.5 h-1.5 rounded-full bg-white/80" />
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-gradient-to-tr from-red-800 to-red-500 border-2 border-white shadow-md z-30 flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-white" />
               </div>
+
+              {/* Scotch Tape at Top Left Corner */}
+              <div className="absolute -top-2 left-6 w-16 h-4 bg-amber-200/60 backdrop-blur-xs border border-amber-300/40 rounded-xs shadow-xs transform rotate-[-3deg]" />
 
               {/* Close Button */}
               <button
                 onClick={() => setIsAddPinModalOpen(false)}
-                className="absolute top-4 right-4 p-2 rounded-xl bg-stone-800/80 hover:bg-stone-700 text-stone-400 hover:text-white transition cursor-pointer"
+                className="absolute top-4 right-4 p-1.5 rounded-lg bg-stone-300 dark:bg-stone-800 hover:bg-stone-400 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 transition cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
 
-              {/* Header */}
-              <div className="space-y-1 pt-2 pb-3 border-b border-stone-700/80">
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-400 text-[10px] font-bold uppercase tracking-wider">
-                    CCTNS FIELD MEMO
-                  </span>
-                  <span className="text-[10px] text-stone-400 font-mono">
-                    REF: #{selectedSyndicate.id}
-                  </span>
+              {/* Newspaper Header Strip */}
+              <div className="space-y-1.5 pt-1 pb-3 border-b-2 border-black dark:border-stone-400 text-center">
+                <div className="flex items-center justify-between text-[9px] font-mono text-stone-600 dark:text-stone-400 border-b border-stone-400 pb-1 uppercase tracking-wider">
+                  <span>KSP INTELLIGENCE DESK</span>
+                  <span className="font-bold text-red-700 dark:text-red-400">★ FIELD DISPATCH MEMO ★</span>
+                  <span>REF: #{selectedSyndicate.id}</span>
                 </div>
-                <h3 className="text-base font-bold text-white uppercase tracking-tight flex items-center gap-2">
-                  <StickyNote className="w-4 h-4 text-amber-400" />
-                  <span>Log Field Clue & Evidence Note</span>
+                <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-stone-950 dark:text-white font-serif pt-1">
+                  LOG FIELD CLUE & EVIDENCE NOTE
                 </h3>
-                <p className="text-xs text-stone-400">
-                  Target Syndicate: <strong className="text-stone-200">{selectedSyndicate.name}</strong>
+                <p className="text-xs italic text-stone-700 dark:text-stone-300">
+                  Target Syndicate: <strong className="not-italic font-bold text-stone-950 dark:text-white">{selectedSyndicate.name}</strong>
                 </p>
               </div>
 
-              <form onSubmit={handleAddCustomPin} className="space-y-4 text-xs">
-                {/* Observation Textarea */}
-                <div className="space-y-1.5">
-                  <label className="text-stone-300 font-bold flex items-center justify-between text-xs">
+              <form onSubmit={handleAddCustomPin} className="space-y-5 text-xs font-mono">
+                {/* Observation Lined Textarea */}
+                <div className="space-y-2">
+                  <label className="text-stone-900 dark:text-stone-100 font-bold flex items-center justify-between text-xs uppercase tracking-wide">
                     <span>Field Observation / Evidence Lead *</span>
-                    <span className="text-[10px] text-stone-500 font-normal">Marked for Pinboard</span>
+                    <span className="text-[10px] text-red-700 dark:text-red-400 font-bold">REQUIRED</span>
                   </label>
                   <textarea
                     required
@@ -1306,22 +1305,22 @@ export default function NetworkPage() {
                     placeholder="e.g. Sighted suspect switching to Bajaj Pulsar (KA-01-MJ-8821) near Balay Circle at 23:40 hrs..."
                     value={newPinNote.text}
                     onChange={(e) => setNewPinNote({ ...newPinNote, text: e.target.value })}
-                    className="w-full p-3 rounded-2xl bg-[#14161a] border border-stone-700 text-stone-100 placeholder:text-stone-600 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/50 text-xs leading-relaxed font-sans"
+                    className="w-full p-3.5 rounded-xl bg-white dark:bg-stone-900 border-2 border-stone-400 dark:border-stone-600 text-stone-950 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black text-xs leading-relaxed font-sans shadow-inner"
                   />
                 </div>
 
-                {/* Category Chips Selector */}
-                <div className="space-y-1.5">
-                  <label className="text-stone-300 font-bold block text-xs">
+                {/* Classification Chips (Spacious & Generous) */}
+                <div className="space-y-2">
+                  <label className="text-stone-900 dark:text-stone-100 font-bold block text-xs uppercase tracking-wide">
                     Intel Classification Tag
                   </label>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-2.5">
                     {[
-                      { id: 'ANPR HIT', label: 'ANPR Hit', color: 'border-rose-500/50 text-rose-400 bg-rose-950/30' },
-                      { id: 'FIELD SIGHTING', label: 'Field Sighting', color: 'border-amber-500/50 text-amber-400 bg-amber-950/30' },
-                      { id: 'WEAPON CLUE', label: 'Weapon / Tool', color: 'border-red-500/50 text-red-400 bg-red-950/30' },
-                      { id: 'MULE ACCOUNT', label: 'Mule Bank / Crypto', color: 'border-cyan-500/50 text-cyan-400 bg-cyan-950/30' },
-                      { id: 'INFORMER INTEL', label: 'Informer Intel', color: 'border-emerald-500/50 text-emerald-400 bg-emerald-950/30' },
+                      { id: 'ANPR HIT', label: 'ANPR Hit' },
+                      { id: 'FIELD SIGHTING', label: 'Field Sighting' },
+                      { id: 'WEAPON CLUE', label: 'Weapon / Tool' },
+                      { id: 'MULE ACCOUNT', label: 'Mule Bank / Crypto' },
+                      { id: 'INFORMER INTEL', label: 'Informer Intel' },
                     ].map(tagItem => {
                       const isSelected = newPinNote.tag === tagItem.id;
                       return (
@@ -1329,10 +1328,10 @@ export default function NetworkPage() {
                           key={tagItem.id}
                           type="button"
                           onClick={() => setNewPinNote({ ...newPinNote, tag: tagItem.id })}
-                          className={`px-3 py-1.5 rounded-xl border text-[11px] font-bold transition-all cursor-pointer ${
+                          className={`px-3.5 py-2 rounded-xl border-2 text-xs font-bold transition-all cursor-pointer shadow-xs ${
                             isSelected
-                              ? 'bg-amber-500 text-stone-950 border-amber-400 shadow-md font-extrabold scale-102'
-                              : 'bg-stone-900/60 border-stone-700 text-stone-400 hover:border-stone-500 hover:text-stone-200'
+                              ? 'bg-stone-900 text-white dark:bg-white dark:text-stone-900 border-black dark:border-white font-extrabold scale-102'
+                              : 'bg-[#eee8dc] dark:bg-stone-800 border-stone-400 dark:border-stone-600 text-stone-800 dark:text-stone-300 hover:border-black dark:hover:border-white'
                           }`}
                         >
                           {tagItem.label}
@@ -1343,41 +1342,41 @@ export default function NetworkPage() {
                 </div>
 
                 {/* Officer Sign-off Input */}
-                <div className="space-y-1.5">
-                  <label className="text-stone-300 font-bold block text-xs">
-                    Investigating Officer / Unit
+                <div className="space-y-2">
+                  <label className="text-stone-900 dark:text-stone-100 font-bold block text-xs uppercase tracking-wide">
+                    Investigating Officer / Division
                   </label>
-                  <div className="flex items-center gap-2 p-2.5 rounded-2xl bg-[#14161a] border border-stone-700">
-                    <Shield className="w-4 h-4 text-stone-400 shrink-0" />
+                  <div className="flex items-center gap-2.5 p-3 rounded-xl bg-white dark:bg-stone-900 border-2 border-stone-400 dark:border-stone-600 shadow-inner">
+                    <Shield className="w-4 h-4 text-stone-700 dark:text-stone-300 shrink-0" />
                     <input
                       type="text"
                       value={newPinNote.author}
                       onChange={(e) => setNewPinNote({ ...newPinNote, author: e.target.value })}
                       placeholder="e.g. Insp. V. Sharma (KSP CCB)"
-                      className="w-full bg-transparent text-stone-100 text-xs focus:outline-none placeholder:text-stone-600 font-mono"
+                      className="w-full bg-transparent text-stone-950 dark:text-stone-100 text-xs focus:outline-none placeholder:text-stone-400 font-mono"
                     />
                   </div>
                 </div>
 
-                {/* Actions */}
-                <div className="pt-3 border-t border-stone-700/80 flex items-center justify-between">
-                  <span className="text-[10px] text-stone-500 font-mono">
-                    * Clue will pin organically to wall
+                {/* Actions (Spacious & Clean) */}
+                <div className="pt-4 border-t-2 border-stone-400 dark:border-stone-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <span className="text-[10px] text-stone-600 dark:text-stone-400 font-serif italic">
+                    * Clue will pin organically with pushpins on the evidence wall
                   </span>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3 self-end sm:self-auto">
                     <button
                       type="button"
                       onClick={() => setIsAddPinModalOpen(false)}
-                      className="px-4 py-2 rounded-xl bg-stone-800/80 hover:bg-stone-700 text-stone-400 hover:text-white font-bold text-xs transition cursor-pointer"
+                      className="px-4 py-2.5 rounded-xl border-2 border-stone-400 bg-stone-200 dark:bg-stone-800 text-stone-800 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700 font-bold text-xs transition cursor-pointer"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-black text-xs transition shadow-lg flex items-center gap-1.5 cursor-pointer active:scale-98"
+                      className="px-6 py-2.5 rounded-xl bg-stone-900 hover:bg-black text-white dark:bg-white dark:text-stone-900 dark:hover:bg-stone-200 font-black text-xs uppercase tracking-wider transition shadow-md flex items-center gap-2 cursor-pointer active:scale-98"
                     >
                       <Pin className="w-3.5 h-3.5 fill-current" />
-                      <span>Pin to Investigation Wall</span>
+                      <span>Pin to Gazette Wall</span>
                     </button>
                   </div>
                 </div>
