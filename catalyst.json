@@ -47,7 +47,7 @@
   "slate": [
     {
       "name": "nextjs",
-      "source": "nextjs",
+      "source": "dist-slate",
       "ignore": [
         "**/node_modules/**",
         "**/.next/cache/**",

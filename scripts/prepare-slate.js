@@ -197,7 +197,27 @@ function patchFilePaths(filePath) {
   }
 }
 
-patchFilePaths(path.join(standalonePkgDir, 'server.js'));
-patchFilePaths(path.join(standalonePkgDir, '.next', 'required-server-files.json'));
+// 10. Prepare dist-slate/nextjs packaging bundle for Catalyst Slate CLI
+const distSlateDir = path.join(rootDir, 'dist-slate');
+const distSlateNext = path.join(distSlateDir, 'nextjs');
+if (!fs.existsSync(distSlateNext)) fs.mkdirSync(distSlateNext, { recursive: true });
 
-console.log('--- All done! AppSail-ready standalone build complete ---');
+const filesToCopy = ['package.json', 'next.config.mjs', 'tailwind.config.js', 'postcss.config.mjs', 'jsconfig.json'];
+for (const f of filesToCopy) {
+  const src = path.join(nextDir, f);
+  if (fs.existsSync(src)) fs.copyFileSync(src, path.join(distSlateNext, f));
+}
+for (const d of ['src', 'public', 'scripts']) {
+  const src = path.join(nextDir, d);
+  if (fs.existsSync(src)) fs.cpSync(src, path.join(distSlateNext, d), { recursive: true });
+}
+if (fs.existsSync(path.join(nextDir, '.next'))) {
+  fs.cpSync(path.join(nextDir, '.next'), path.join(distSlateNext, '.next'), { recursive: true });
+  fs.rmSync(path.join(distSlateNext, '.next', 'cache'), { recursive: true, force: true });
+  fs.rmSync(path.join(distSlateNext, '.next', 'standalone'), { recursive: true, force: true });
+  fs.rmSync(path.join(distSlateNext, '.next', 'trace'), { recursive: true, force: true });
+}
+console.log('  ✔ dist-slate/nextjs bundle synchronized for Catalyst Slate');
+
+console.log('--- All done! Slate and AppSail ready ---');
+
