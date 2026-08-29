@@ -1,5 +1,5 @@
 {
-  "command": "node server.js",
+  "command": "node catalyst-start.js",
   "stack": "node20",
   "build_path": "nextjs/.next/standalone/nextjs",
   "env_variables": {
