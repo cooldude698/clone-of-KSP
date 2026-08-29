@@ -26,3 +26,5 @@ Thumbs.db
 # Misc
 *.zip
 crime-database/raw-data/
+dist-slate/
+.open-next/
