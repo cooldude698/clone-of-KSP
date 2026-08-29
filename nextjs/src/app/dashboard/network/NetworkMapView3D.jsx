@@ -1,9 +1,18 @@
 'use client';
 
-// Static imports are safe — loaded only client-side via ssr:false dynamic()
+// maplibre-gl is pure ESM (v6) — loaded client-side only via ssr:false dynamic()
 import * as maplibregl from 'maplibre-gl';
-import 'maplibre-gl/dist/maplibre-gl.css';
 import { useEffect, useRef, useState } from 'react';
+
+function ensureMaplibreCSS() {
+  if (typeof document === 'undefined') return;
+  if (document.getElementById('maplibre-gl-css')) return;
+  const link = document.createElement('link');
+  link.id = 'maplibre-gl-css';
+  link.rel = 'stylesheet';
+  link.href = 'https://unpkg.com/maplibre-gl@6/dist/maplibre-gl.css';
+  document.head.appendChild(link);
+}
 
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/positron';
 
@@ -100,7 +109,7 @@ export default function NetworkMapView3D({
   // ── Initialize map ────────────────────────────────────────────────────────
   useEffect(() => {
     if (mapRef.current || !containerRef.current) return;
-
+    ensureMaplibreCSS();
     let map;
     try {
       map = new maplibregl.Map({

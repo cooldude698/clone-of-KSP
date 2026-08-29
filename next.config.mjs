@@ -23,6 +23,7 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  transpilePackages: ['maplibre-gl'],
   experimental: {
     optimizeCss: false,
     optimizePackageImports: ['lucide-react', 'framer-motion', 'recharts', 'date-fns'],
