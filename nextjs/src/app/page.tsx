@@ -374,7 +374,7 @@ export default function LandingPage() {
                     key="cta-button"
                     layoutId="authPanel"
                     onClick={() => setIsSigningIn(true)}
-                    className="group relative px-8 py-4 rounded-lg bg-[var(--accent)] text-white font-mono text-xs font-bold uppercase tracking-[0.2em] transition-all border border-white/10 shadow-lg shadow-[var(--accent-glow)] hover:opacity-95 active:scale-[0.98] flex items-center gap-3"
+                    className="group relative px-8 py-4 rounded-lg bg-[#1d6fbf] hover:bg-[#155a9e] text-white font-mono text-xs font-bold uppercase tracking-[0.2em] transition-all border border-blue-400/30 shadow-lg shadow-blue-500/20 hover:opacity-95 active:scale-[0.98] flex items-center gap-3"
                   >
                     <span>ENTER CONTROL ROOM</span>
                     <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
