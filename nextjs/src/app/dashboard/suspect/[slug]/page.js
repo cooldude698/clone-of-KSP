@@ -310,7 +310,7 @@ export default function SuspectProfilePage() {
               <img
                 src={media.mugshot}
                 alt={suspect.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-top"
               />
               <span className={`absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-zinc-900 ${
                 isAbsconding ? 'bg-rose-500 animate-pulse' : isCustody ? 'bg-emerald-500' : 'bg-amber-500'
