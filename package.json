@@ -9,9 +9,9 @@
     "nextjs"
   ],
   "scripts": {
-    "build": "node scripts/prepare-slate.js",
-    "start": "cd nextjs && npm run start",
-    "dev": "cd nextjs && npm run dev"
+    "build": "next build",
+    "start": "next start",
+    "dev": "next dev"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
