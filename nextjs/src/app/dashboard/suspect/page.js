@@ -444,7 +444,7 @@ export default function SuspectWatchlistPage() {
                               <img
                                 src={media.mugshot}
                                 alt={s.name || 'Suspect'}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover object-top"
                                 loading="lazy"
                               />
                             </div>
@@ -540,7 +540,7 @@ export default function SuspectWatchlistPage() {
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-11 h-11 rounded-full overflow-hidden bg-slate-100 dark:bg-zinc-800 border border-slate-200 shrink-0">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={media.mugshot} alt={s.name} className="w-full h-full object-cover" />
+                        <img src={media.mugshot} alt={s.name} className="w-full h-full object-cover object-top" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
