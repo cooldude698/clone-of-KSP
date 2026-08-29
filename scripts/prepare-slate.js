@@ -98,15 +98,30 @@ for (const target of [rootNext, standaloneNext]) {
   if (!fs.existsSync(rsPath)) fs.writeFileSync(rsPath, reqServerFiles, 'utf-8');
 }
 
-// 5. Sync public directory
+// 5. Sync public directory into standalone/nextjs/public (Next.js standalone requirement)
 const rootPublic = path.join(rootDir, 'public');
-const standalonePublic = path.join(rootNext, 'standalone', 'public');
 const nextPublic = path.join(nextDir, 'public');
+// The ACTUAL standalone server.js lives at nextjs/.next/standalone/nextjs/
+const standalonePkg = path.join(nextDir, '.next', 'standalone', 'nextjs');
+const standalonePublic = path.join(standalonePkg, 'public');
+const standaloneStatic = path.join(standalonePkg, '.next', 'static');
+const nextStatic = path.join(nextDir, '.next', 'static');
+
+// Copy public → standalone/nextjs/public
 if (fs.existsSync(nextPublic)) {
   if (!fs.existsSync(rootPublic)) fs.mkdirSync(rootPublic, { recursive: true });
-  if (!fs.existsSync(standalonePublic)) fs.mkdirSync(standalonePublic, { recursive: true });
   fs.cpSync(nextPublic, rootPublic, { recursive: true });
   fs.cpSync(nextPublic, standalonePublic, { recursive: true });
+  console.log('  ✔ public copied to standalone/nextjs/public');
+}
+
+// Copy .next/static → standalone/nextjs/.next/static (required for CSS/JS assets)
+if (fs.existsSync(nextStatic)) {
+  if (fs.existsSync(standaloneStatic)) {
+    fs.rmSync(standaloneStatic, { recursive: true, force: true });
+  }
+  fs.cpSync(nextStatic, standaloneStatic, { recursive: true });
+  console.log('  ✔ .next/static copied to standalone/nextjs/.next/static');
 }
 
 // 6. Sync root config files for Catalyst tools
