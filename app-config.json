@@ -1,9 +1,15 @@
 {
-  "command": "cd nextjs && npm start",
-  "stack": "node",
+  "command": "node server.js",
+  "stack": "node20",
+  "build_path": ".",
   "env_variables": {
     "NODE_ENV": "production",
-    "PORT": "3000"
+    "CATALYST_PROJECT_ID": "49149000000019001",
+    "CATALYST_ORG_ID": "60073715607",
+    "CATALYST_FUNCTIONS_URL": "https://drishti-ksp-60073715607.development.catalystserverless.in/server",
+    "NEXT_PUBLIC_CATALYST_FUNCTIONS_URL": "https://drishti-ksp-60073715607.development.catalystserverless.in/server",
+    "NEXT_PUBLIC_API_BASE_URL": "/api",
+    "ANALYTICS_API_URL": "/api"
   },
-  "memory": 1024
+  "memory": 2048
 }
