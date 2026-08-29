@@ -2,7 +2,7 @@
 
 // Static imports are safe here — this file is ONLY loaded client-side
 // via dynamic(() => import('./MapView3D'), { ssr: false }) in page.js
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useEffect, useRef, useState } from 'react';
 
