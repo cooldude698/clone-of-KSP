@@ -23,7 +23,7 @@ import { getFIRFromStore } from '@/lib/fir-store';
 // Dynamic import of Leaflet network map for the Map View tab
 const NetworkMapView = dynamic(
   () => import('./NetworkMapView'),
-  { ssr: false, loading: () => <div className="h-[580px] flex items-center justify-center text-slate-400 font-mono bg-white dark:bg-[#121215] rounded-3xl border border-slate-200 dark:border-zinc-800">Calibrating Geo-Spatial Intelligence Grid…</div> }
+  { ssr: false, loading: () => <div className="h-[580px] flex items-center justify-center text-slate-400 font-mono bg-white dark:bg-[#121215] rounded-2xl border border-slate-200 dark:border-zinc-800">Calibrating Geo-Spatial Intelligence Grid…</div> }
 );
 
 // Structured Syndicate Knowledge Base with unique identifiers & authentic Indian portraits
@@ -222,7 +222,7 @@ const SYNDICATES = [
 export default function NetworkPage() {
   const [selectedSyndicate, setSelectedSyndicate] = useState(SYNDICATES[0]);
   const [activeCategory, setActiveCategory] = useState('all');
-  const [viewMode, setViewMode] = useState('hierarchy'); // Default to Investigation Pinboard
+  const [viewMode, setViewMode] = useState('hierarchy');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCaseData, setActiveCaseData] = useState(null);
 
@@ -233,7 +233,6 @@ export default function NetworkPage() {
   const [isAddPinModalOpen, setIsAddPinModalOpen] = useState(false);
   const [newPinNote, setNewPinNote] = useState({ text: '', author: 'Insp. V. Sharma', tag: 'ANPR HIT' });
 
-  // Load custom pins from localStorage
   useEffect(() => {
     try {
       const stored = localStorage.getItem('ksp_custom_evidence_pins');
@@ -249,9 +248,7 @@ export default function NetworkPage() {
       text: newPinNote.text,
       author: newPinNote.author || 'Investigating Officer',
       tag: newPinNote.tag || 'FIELD CLUE',
-      date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
-      color: 'bg-[#fff9db] border-amber-300 text-stone-900',
-      rotation: 'rotate-[-2deg]'
+      date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })
     };
     const updated = [newPin, ...customPins];
     setCustomPins(updated);
@@ -262,7 +259,6 @@ export default function NetworkPage() {
     setNewPinNote({ text: '', author: 'Insp. V. Sharma', tag: 'ANPR HIT' });
   };
 
-  // Filtered syndicates list based on category and search
   const filteredSyndicates = useMemo(() => {
     return SYNDICATES.filter(s => {
       const matchesCat = activeCategory === 'all' || s.category === activeCategory;
@@ -310,33 +306,33 @@ export default function NetworkPage() {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-5 pb-20 font-sans text-slate-900 dark:text-slate-100">
+    <div className="w-full max-w-7xl mx-auto space-y-4 pb-20 font-sans text-slate-900 dark:text-slate-100">
       
-      {/* ── 1. TOP HEADER & TELEMETRY HUB ── */}
-      <div className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-slate-200/90 dark:border-zinc-800 shadow-xs">
+      {/* ── TOP HEADER & TELEMETRY HUB ── */}
+      <div className="bg-white dark:bg-zinc-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 flex items-center justify-center font-bold shrink-0 shadow-md">
+            <div className="w-10 h-10 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 flex items-center justify-center font-bold shrink-0 shadow-md">
               <NetworkIcon className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2.5 flex-wrap">
-                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white">
                   Criminal Syndicate & Gang Nexus
                 </h1>
-                <span className="inline-flex items-center gap-1.5 bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200/60 text-xs font-mono px-3 py-0.5 rounded-full font-bold">
+                <span className="inline-flex items-center gap-1.5 bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200/60 text-xs font-mono px-2.5 py-0.5 rounded-full font-bold">
                   <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
                   5 ACTIVE GANG RINGS
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Karnataka State Police CCTNS · Authentic Detective War Room & Evidence Pinboard
               </p>
             </div>
           </div>
 
           {/* View Mode Switcher */}
-          <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-zinc-800 p-1.5 rounded-2xl border border-slate-200 dark:border-zinc-700 text-xs font-semibold self-start md:self-auto overflow-x-auto max-w-full">
+          <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-zinc-800 p-1 rounded-xl border border-slate-200 dark:border-zinc-700 text-xs font-semibold self-start md:self-auto">
             {[
               { id: 'hierarchy', label: 'Investigation Board', icon: Share2 },
               { id: 'cards', label: 'Syndicate Cards', icon: Layers },
@@ -349,10 +345,10 @@ export default function NetworkPage() {
                 <button
                   key={tab.id}
                   onClick={() => setViewMode(tab.id)}
-                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
                     isActive 
-                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm font-bold' 
-                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-zinc-700/60'
+                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs font-bold' 
+                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-zinc-700/60'
                   }`}
                 >
                   <IconComp className="w-3.5 h-3.5" />
@@ -364,423 +360,399 @@ export default function NetworkPage() {
         </div>
       </div>
 
-      {/* ── 2. VIEW 1: MOVIE-STYLE AUTHENTIC POLICE PINBOARD WITH DENSE COLLAGE & RED STRINGS ── */}
+      {/* ── VIEW 1: DENSE AUTHENTIC DETECTIVE PINBOARD (NO EMPTY GAPS, 100% PACKED) ── */}
       {viewMode === 'hierarchy' && (
         <div className="space-y-4">
           {/* Top Control Bar for Detective Board */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#1c1e23] text-stone-200 p-3.5 sm:p-4 rounded-2xl border border-stone-700 shadow-lg">
-            <div className="flex items-center gap-3">
-              <div className="w-3.5 h-3.5 rounded-full bg-red-600 shadow-red-600/70 shadow-md animate-pulse" />
-              <div>
-                <span className="text-[10px] font-bold font-mono uppercase tracking-widest text-amber-400 block">
-                  Active Criminal Intelligence Pinboard
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#1e2025] text-stone-200 px-4 py-2.5 rounded-xl border border-stone-700 shadow-md">
+            <div className="flex items-center gap-2.5">
+              <div className="w-3 h-3 rounded-full bg-red-600 shadow-red-600/70 shadow-sm animate-pulse" />
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-bold font-mono uppercase tracking-widest text-amber-400">
+                  CRIMINAL INTELLIGENCE EVIDENCE WALL:
                 </span>
-                <span className="text-sm sm:text-base font-bold text-white font-mono">
+                <span className="text-xs sm:text-sm font-bold text-white font-mono">
                   {selectedSyndicate.name}
                 </span>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5">
-              {/* Target Syndicate Selector */}
-              <div className="relative">
-                <select
-                  value={selectedSyndicate.id}
-                  onChange={(e) => {
-                    const s = SYNDICATES.find(syn => syn.id === e.target.value);
-                    if (s) setSelectedSyndicate(s);
-                  }}
-                  className="pl-3 pr-8 py-1.5 rounded-xl bg-stone-900 border border-stone-600 text-xs font-bold text-stone-100 font-mono focus:outline-none cursor-pointer appearance-none shadow-sm"
-                >
-                  {SYNDICATES.map(s => (
-                    <option key={s.id} value={s.id}>{s.name}</option>
-                  ))}
-                </select>
-                <ChevronDown className="w-3 h-3 text-stone-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
+            <div className="flex items-center gap-2">
+              <select
+                value={selectedSyndicate.id}
+                onChange={(e) => {
+                  const s = SYNDICATES.find(syn => syn.id === e.target.value);
+                  if (s) setSelectedSyndicate(s);
+                }}
+                className="px-2.5 py-1 rounded-lg bg-stone-900 border border-stone-600 text-xs font-bold text-stone-100 font-mono focus:outline-none cursor-pointer"
+              >
+                {SYNDICATES.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
 
-              {/* + Pin Clue Button */}
               <button
                 onClick={() => setIsAddPinModalOpen(true)}
-                className="py-1.5 px-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-1.5 shadow-md cursor-pointer transition"
+                className="py-1 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-1 cursor-pointer transition shadow-sm"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Pin Clue to Wall</span>
+                <span>+ Pin Clue</span>
               </button>
             </div>
           </div>
 
-          {/* ── CINEMATIC DETECTIVE PINBOARD CANVAS (AUTHENTIC CORK/FELT TEXTURE & CLUSTERED LAYOUT) ── */}
-          <div className="relative w-full min-h-[960px] p-4 sm:p-8 rounded-2xl bg-[#2a2e36] border-[12px] border-[#181a1f] shadow-[0_25px_60px_rgba(0,0,0,0.85)] overflow-hidden select-none">
+          {/* ── CINEMATIC DETECTIVE PINBOARD CANVAS (PACKED COMPACT BOARD WITH REALISTIC TEXTURE) ── */}
+          <div className="relative w-full max-w-6xl mx-auto rounded-2xl bg-[#32363e] border-[10px] border-[#181a1f] shadow-2xl p-4 sm:p-6 overflow-hidden select-none">
             
-            {/* Ambient Felt Pinboard Texture */}
-            <div className="absolute inset-0 bg-[radial-gradient(#434955_1.5px,transparent_1.5px)] [background-size:18px_18px] pointer-events-none z-0 opacity-70" />
-            <div className="absolute inset-0 shadow-[inset_0_0_140px_rgba(0,0,0,0.9)] pointer-events-none z-0" />
+            {/* Ambient Cork/Felt Texture */}
+            <div className="absolute inset-0 bg-[radial-gradient(#4a505c_1.5px,transparent_1.5px)] [background-size:16px_16px] pointer-events-none z-0 opacity-80" />
+            <div className="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.85)] pointer-events-none z-0" />
 
-            {/* ── DENSE RED YARN STRINGS SVG OVERLAY (CRISS-CROSSING FROM PIN TO PIN LIKE REFERENCE) ── */}
+            {/* ── DENSE SVG RED YARN WEB (CRISS-CROSSING TIGHTLY ACROSS NODES) ── */}
             <svg 
               className="absolute inset-0 w-full h-full pointer-events-none z-20" 
-              viewBox="0 0 1200 900" 
+              viewBox="0 0 1000 680" 
               preserveAspectRatio="none"
               xmlns="http://www.w3.org/2000/svg"
             >
               <defs>
-                <filter id="yarnGlow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#ef4444" floodOpacity="1" />
-                </filter>
-                <filter id="yarnShadow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="3" dy="5" stdDeviation="3" floodColor="#000000" floodOpacity="0.85" />
+                <filter id="pinShadow" x="-30%" y="-30%" width="160%" height="160%">
+                  <feDropShadow dx="1.5" dy="3" stdDeviation="2" floodColor="#000000" floodOpacity="0.85" />
                 </filter>
               </defs>
 
-              {/* Group of All Red Yarn Strings */}
-              <g fill="none" strokeLinecap="round" filter="url(#yarnShadow)">
-                {/* 1. Top-Left CID Dossier (180, 95) -> Wanted Poster (600, 75) */}
-                <path d="M 180 95 Q 380 40, 600 75" stroke="#ef4444" strokeWidth="3" strokeDasharray="8,2" />
+              <g fill="none" strokeLinecap="round" filter="url(#pinShadow)">
+                {/* 1. Top-Left Dossier (180, 70) -> Center Wanted Poster (500, 60) */}
+                <path d="M 180 70 Q 340 30, 500 60" stroke="#ef4444" strokeWidth="2.5" strokeDasharray="6,2" />
 
-                {/* 2. Top-Left CID Dossier (180, 95) -> Top Newspaper (260, 45) */}
-                <path d="M 180 95 Q 220 125, 260 45" stroke="#dc2626" strokeWidth="2.5" strokeDasharray="5,2" />
+                {/* 2. Top-Left Newspaper (160, 220) -> Center Wanted Poster (500, 60) */}
+                <path d="M 160 220 Q 320 140, 500 60" stroke="#dc2626" strokeWidth="2" strokeDasharray="5,2" />
 
-                {/* 3. Top Newspaper (260, 45) -> Wanted Poster (600, 75) */}
-                <path d="M 260 45 Q 430 110, 600 75" stroke="#ef4444" strokeWidth="2.5" strokeDasharray="7,2" />
+                {/* 3. Center Wanted Poster (500, 60) -> Top-Right FASTag & Keys (720, 50) */}
+                <path d="M 500 60 Q 610 25, 720 50" stroke="#ef4444" strokeWidth="2.5" strokeDasharray="6,2" />
 
-                {/* 4. Wanted Poster (600, 75) -> Top-Center FASTag (720, 50) */}
-                <path d="M 600 75 Q 660 30, 720 50" stroke="#dc2626" strokeWidth="2.5" strokeDasharray="6,2" />
+                {/* 4. Top-Right FASTag & Keys (720, 50) -> Top-Right Toll Slip (880, 60) */}
+                <path d="M 720 50 Q 800 30, 880 60" stroke="#dc2626" strokeWidth="2" strokeDasharray="5,2" />
 
-                {/* 5. Top-Center FASTag (720, 50) -> Yellow Keys Pin (880, 60) */}
-                <path d="M 720 50 Q 800 20, 880 60" stroke="#dc2626" strokeWidth="2.5" strokeDasharray="6,2" />
+                {/* 5. Top-Right Toll Slip (880, 60) -> Mid-Right Lieutenants (840, 220) */}
+                <path d="M 880 60 Q 890 140, 840 220" stroke="#ef4444" strokeWidth="2.5" strokeDasharray="6,2" />
 
-                {/* 6. Yellow Keys Pin (880, 60) -> Top-Right Toll Slip (1060, 45) */}
-                <path d="M 880 60 Q 970 30, 1060 45" stroke="#ef4444" strokeWidth="2.5" strokeDasharray="6,2" />
+                {/* 6. Center Wanted Poster (500, 60) -> Mid-Right Lieutenants (840, 220) */}
+                <path d="M 500 60 Q 680 120, 840 220" stroke="#ef4444" strokeWidth="3" strokeDasharray="7,2" />
 
-                {/* 7. Top-Right Toll Slip (1060, 45) -> Mid-Right Polaroid Cluster (1030, 310) */}
-                <path d="M 1060 45 Q 1090 180, 1030 310" stroke="#dc2626" strokeWidth="3" strokeDasharray="8,2" />
+                {/* 7. Center Wanted Poster (500, 60) -> Center Forensic Hardware (500, 360) */}
+                <path d="M 500 60 Q 480 200, 500 360" stroke="#ef4444" strokeWidth="3" strokeDasharray="7,2" />
 
-                {/* 8. Wanted Poster (600, 75) -> Mid-Right Polaroid Cluster (1030, 310) */}
-                <path d="M 600 75 Q 820 160, 1030 310" stroke="#ef4444" strokeWidth="3.5" strokeDasharray="8,2" />
+                {/* 8. Center Forensic Hardware (500, 360) -> Mid-Left Radar Map (220, 380) */}
+                <path d="M 500 360 Q 360 360, 220 380" stroke="#dc2626" strokeWidth="2.5" strokeDasharray="6,2" />
 
-                {/* 9. Mid-Right Polaroid Cluster (1030, 310) -> "Personal Facial Profile" (890, 275) */}
-                <path d="M 1030 310 Q 960 270, 890 275" stroke="#dc2626" strokeWidth="2.5" strokeDasharray="5,2" />
+                {/* 9. Center Forensic Hardware (500, 360) -> Mid-Right Police Gazette (820, 380) */}
+                <path d="M 500 360 Q 660 360, 820 380" stroke="#dc2626" strokeWidth="2.5" strokeDasharray="6,2" />
 
-                {/* 10. "Personal Facial Profile" (890, 275) -> Police Gazette Newspaper (960, 430) */}
-                <path d="M 890 275 Q 940 360, 960 430" stroke="#b91c1c" strokeWidth="2.5" strokeDasharray="5,2" />
+                {/* 10. Center Forensic Hardware (500, 360) -> Bottom-Left Operatives (220, 560) */}
+                <path d="M 500 360 Q 360 480, 220 560" stroke="#ef4444" strokeWidth="2.5" strokeDasharray="6,2" />
 
-                {/* 11. Police Gazette Newspaper (960, 430) -> Bottom-Right Dossier 2 (1040, 740) */}
-                <path d="M 960 430 Q 1020 590, 1040 740" stroke="#ef4444" strokeWidth="3" strokeDasharray="7,2" />
+                {/* 11. Center Forensic Hardware (500, 360) -> Bottom-Center CCTNS Leads (500, 540) */}
+                <path d="M 500 360 Q 500 450, 500 540" stroke="#ef4444" strokeWidth="3" strokeDasharray="7,2" />
 
-                {/* 12. Wanted Poster (600, 75) -> Center Evidence Seizure (600, 770) */}
-                <path d="M 600 75 Q 560 420, 600 770" stroke="#ef4444" strokeWidth="3.5" strokeDasharray="8,2" />
+                {/* 12. Center Forensic Hardware (500, 360) -> Bottom-Right Dossier (820, 560) */}
+                <path d="M 500 360 Q 670 480, 820 560" stroke="#ef4444" strokeWidth="2.5" strokeDasharray="6,2" />
 
-                {/* 13. Center Evidence Seizure (600, 770) -> Bottom-Right Dossier 2 (1040, 740) */}
-                <path d="M 600 770 Q 820 800, 1040 740" stroke="#dc2626" strokeWidth="2.5" strokeDasharray="6,2" />
+                {/* 13. Bottom-Left Operatives (220, 560) -> Bottom-Center CCTNS Leads (500, 540) */}
+                <path d="M 220 560 Q 360 570, 500 540" stroke="#dc2626" strokeWidth="2" strokeDasharray="5,2" />
 
-                {/* 14. Center Evidence Seizure (600, 770) -> Bottom-Left Operatives (280, 810) */}
-                <path d="M 600 770 Q 440 820, 280 810" stroke="#ef4444" strokeWidth="3" strokeDasharray="7,2" />
-
-                {/* 15. Bottom-Left Operatives (280, 810) -> "Unknown Info" Note (240, 760) */}
-                <path d="M 280 810 Q 250 820, 240 760" stroke="#b91c1c" strokeWidth="2" strokeDasharray="4,2" />
-
-                {/* 16. Bottom-Left Operatives (280, 810) -> Mid-Left Radar Map (290, 310) */}
-                <path d="M 280 810 Q 220 560, 290 310" stroke="#dc2626" strokeWidth="2.5" strokeDasharray="6,2" />
-
-                {/* 17. Mid-Left Radar Map (290, 310) -> Wanted Poster (600, 75) */}
-                <path d="M 290 310 Q 440 220, 600 75" stroke="#ef4444" strokeWidth="3" strokeDasharray="8,2" />
+                {/* 14. Bottom-Center CCTNS Leads (500, 540) -> Bottom-Right Dossier (820, 560) */}
+                <path d="M 500 540 Q 660 570, 820 560" stroke="#dc2626" strokeWidth="2" strokeDasharray="5,2" />
               </g>
 
-              {/* 3D Red Pushpin Head Knots on SVG */}
+              {/* 3D Pushpins with Shiny Highlights */}
               {[
-                { x: 180, y: 95 },
-                { x: 260, y: 45 },
-                { x: 600, y: 75 },
+                { x: 180, y: 70 },
+                { x: 160, y: 220 },
+                { x: 500, y: 60 },
                 { x: 720, y: 50 },
                 { x: 880, y: 60 },
-                { x: 1060, y: 45 },
-                { x: 1030, y: 310 },
-                { x: 890, y: 275 },
-                { x: 960, y: 430 },
-                { x: 1040, y: 740 },
-                { x: 600, y: 770 },
-                { x: 280, y: 810 },
-                { x: 240, y: 760 },
-                { x: 290, y: 310 },
+                { x: 840, y: 220 },
+                { x: 500, y: 360 },
+                { x: 220, y: 380 },
+                { x: 820, y: 380 },
+                { x: 220, y: 560 },
+                { x: 500, y: 540 },
+                { x: 820, y: 560 }
               ].map((pin, i) => (
-                <g key={i} filter="url(#yarnShadow)">
-                  <circle cx={pin.x} cy={pin.y} r="8" fill="#b91c1c" />
-                  <circle cx={pin.x} cy={pin.y} r="6" fill="#ef4444" />
-                  <circle cx={pin.x - 2} cy={pin.y - 2} r="2" fill="#ffffff" opacity="0.85" />
+                <g key={i} filter="url(#pinShadow)">
+                  <circle cx={pin.x} cy={pin.y} r="6.5" fill="#991b1b" />
+                  <circle cx={pin.x} cy={pin.y} r="4.5" fill="#ef4444" />
+                  <circle cx={pin.x - 1.5} cy={pin.y - 1.5} r="1.5" fill="#ffffff" opacity="0.9" />
                 </g>
               ))}
             </svg>
 
-            {/* ── ARTIFACT LAYER: DENSE ORGANIC DETECTIVE COLLAGE (LIKE REFERENCE) ── */}
-            <div className="relative z-10 w-full min-h-[900px]">
-
-              {/* ── 1. TOP-LEFT NEWSPAPER SHEET (DECCAN CHRONICLE / "GOOD START HALF THE BATTLE") ── */}
-              <div
-                onClick={() => setSelectedEvidenceModal({
-                  title: 'THE DECCAN CHRONICLE — CRIME SPECIAL EDITION',
-                  type: 'NEWSPAPER ARCHIVE PRESS CLIPPING',
-                  content: `Special Squad cracks inter-district vehicle theft racket in midnight sweep. 42 vehicles recovered across Bengaluru, Raichur, and Bidar corridors. Master electronic bypass devices seized from Yelahanka chopshop.`,
-                  date: '02 Jun 2024',
-                  stamp: 'PRESS ARCHIVE'
-                })}
-                className="absolute left-2 sm:left-6 top-6 w-72 sm:w-84 bg-[#e8e2d5] text-stone-950 p-3.5 shadow-2xl border border-stone-400 font-mono text-[10px] transform rotate-[-2deg] cursor-pointer hover:rotate-0 hover:scale-102 transition-all z-1"
-              >
-                {/* Red Pin */}
-                <div className="absolute -top-2 left-6 w-4 h-4 rounded-full bg-gradient-to-tr from-red-800 via-red-600 to-red-300 border border-white shadow-md z-30" />
-                
-                <div className="border-b-2 border-black pb-1 mb-1.5 flex items-center justify-between font-serif">
-                  <span className="font-black text-xs uppercase tracking-tight">THE DECCAN CHRONICLE</span>
-                  <span className="text-[8px] font-mono text-stone-600">PAGE 4 · CRIME DESK</span>
-                </div>
-
-                <div className="bg-stone-900 text-white font-serif font-black text-[12px] p-1 uppercase leading-tight mb-1 text-center">
-                  GOOD START HALF THE BATTLE.
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 text-[8px] text-stone-700 font-serif leading-tight">
-                  <div className="space-y-1">
-                    <p className="font-bold text-stone-900 uppercase">SPECIAL SQUAD BUSTS GANG</p>
-                    <p>Over 42 vehicles traced along NH-44. Police recover master frequency jammers.</p>
+            {/* ── ARTIFACT GRID: DENSE 3-COLUMN STRUCTURE THAT FILLS 100% OF THE CANVAS ── */}
+            <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-3.5">
+              
+              {/* ── LEFT COLUMN (4 Cols): Top Dossier + Deccan Chronicle Newspaper + Radar Grid ── */}
+              <div className="md:col-span-4 space-y-3">
+                {/* 1. Official CID Suspect Profile Sheet */}
+                <div
+                  onClick={() => setSelectedEvidenceModal({
+                    title: 'KSP CID REVIEW PROGRAM — AGENT PROFILE',
+                    type: 'OFFICIAL POLICE DOSSIER',
+                    mugshot: selectedSyndicate.kingpin.mugshot,
+                    content: `Subject ${selectedSyndicate.kingpin.name} (Alias: "${selectedSyndicate.kingpin.alias}") classified under CCTNS Organized Crime Index. Operating Corridor: ${selectedSyndicate.primary_corridor}. Threat Level: ${selectedSyndicate.threat_level} (${selectedSyndicate.risk_score}%). Multiple non-bailable warrants pending execution across 3 districts.`,
+                    date: '24 Nov 2024',
+                    stamp: 'VERIFIED CCTNS'
+                  })}
+                  className="bg-[#faf7f0] text-stone-950 p-3 rounded shadow-xl border border-stone-300 font-mono text-xs transform rotate-[-2deg] cursor-pointer hover:rotate-0 hover:scale-102 transition-all relative"
+                >
+                  <div className="flex items-center justify-between border-b border-stone-300 pb-1 text-[9px] font-bold text-stone-800">
+                    <span className="flex items-center gap-1"><Shield className="w-3 h-3 text-stone-700" /> KSP CID REVIEW PROGRAM</span>
+                    <span className="text-[8px] bg-red-700 text-white px-1 font-bold rounded">CONFIDENTIAL</span>
                   </div>
-                  <div className="space-y-1 border-l border-stone-400 pl-1.5">
-                    <p className="font-bold text-stone-900 uppercase">FSL CONFIRMS VIN TAMPER</p>
-                    <p>Chopshop in Yelahanka raided at midnight. 3 enforcers taken into custody.</p>
+
+                  <div className="flex gap-2.5 pt-2">
+                    <div className="w-14 h-16 bg-stone-200 rounded border border-stone-400 overflow-hidden shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={selectedSyndicate.kingpin.mugshot} alt="Kingpin" className="w-full h-full object-cover object-top" />
+                    </div>
+                    <div className="text-[9px] space-y-0.5 min-w-0">
+                      <p><strong className="text-stone-900">NAME:</strong> {selectedSyndicate.kingpin.name}</p>
+                      <p><strong className="text-stone-900">ALIAS:</strong> “{selectedSyndicate.kingpin.alias}”</p>
+                      <p><strong className="text-stone-900">ID:</strong> {selectedSyndicate.kingpin.id}</p>
+                      <p><strong className="text-stone-900">THREAT:</strong> <span className="text-red-700 font-bold">{selectedSyndicate.threat_level}</span></p>
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              {/* ── 2. TOP-LEFT OFFICIAL CID DOSSIER SHEET (TOM CRUISE STYLE PROFILE) ── */}
-              <div
-                onMouseEnter={() => setHoveredNode('dossier')}
-                onMouseLeave={() => setHoveredNode(null)}
-                onClick={() => setSelectedEvidenceModal({
-                  title: 'KSP CID REVIEW PROGRAM — AGENT PROFILE',
-                  type: 'OFFICIAL POLICE DOSSIER',
-                  mugshot: selectedSyndicate.kingpin.mugshot,
-                  content: `Subject ${selectedSyndicate.kingpin.name} (Alias: "${selectedSyndicate.kingpin.alias}") classified under CCTNS Organized Crime Index. Operating Corridor: ${selectedSyndicate.primary_corridor}. Threat Level: ${selectedSyndicate.threat_level} (${selectedSyndicate.risk_score}%). Multiple non-bailable warrants pending execution across 3 districts.`,
-                  date: '24 Nov 2024',
-                  stamp: 'VERIFIED CCTNS'
-                })}
-                className="absolute left-4 sm:left-10 top-16 w-56 sm:w-64 bg-[#faf7f0] text-stone-950 p-3.5 shadow-2xl border border-stone-300 font-mono text-xs transform rotate-[-4deg] cursor-pointer hover:rotate-0 hover:scale-103 transition-all z-2"
-              >
-                {/* Red Pin */}
-                <div className="absolute -top-2 left-4 w-4 h-4 rounded-full bg-gradient-to-tr from-red-800 via-red-600 to-red-300 border border-white shadow-md z-30" />
-                
-                {/* Paperclip top right */}
-                <div className="absolute -top-2.5 right-4 w-3 h-7 border-2 border-stone-400 rounded-full z-30 opacity-75" />
-
-                <div className="flex items-center gap-1.5 border-b border-stone-300 pb-1 text-[9px] font-bold uppercase text-stone-800">
-                  <Shield className="w-3.5 h-3.5 text-stone-700" />
-                  <span>KSP CID REVIEW PROGRAM</span>
-                </div>
-
-                <div className="flex gap-2.5 pt-2">
-                  <div className="w-14 h-16 bg-stone-200 rounded border border-stone-300 overflow-hidden shrink-0">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={selectedSyndicate.kingpin.mugshot} alt="Kingpin" className="w-full h-full object-cover object-top" />
-                  </div>
-                  <div className="text-[9px] space-y-0.5 min-w-0">
-                    <p><strong className="text-stone-900">NAME:</strong> {selectedSyndicate.kingpin.name.split(' ')[0]}</p>
-                    <p><strong className="text-stone-900">ALIAS:</strong> “{selectedSyndicate.kingpin.alias}”</p>
-                    <p><strong className="text-stone-900">ID:</strong> {selectedSyndicate.kingpin.id}</p>
-                    <p><strong className="text-stone-900">THREAT:</strong> <span className="text-red-700 font-bold">{selectedSyndicate.threat_level}</span></p>
+                  <div className="mt-2 pt-1 border-t border-stone-200 text-[8px] text-stone-600 flex items-center justify-between">
+                    <span>Insp. V. Sharma</span>
+                    <span className="font-bold text-red-700 border border-red-700 px-1">CCTNS VERIFIED</span>
                   </div>
                 </div>
 
-                <div className="mt-2 pt-1.5 border-t border-stone-200 text-[8.5px] text-stone-600 space-y-0.5">
-                  <p>• Vehicle: {selectedSyndicate.kingpin.vehicle.split('(')[0]}</p>
-                  <p>• Corridor: {selectedSyndicate.districts.join(', ')}</p>
-                </div>
-
-                <div className="mt-1.5 pt-1 border-t border-stone-300 flex items-center justify-between text-[8px] text-stone-500">
-                  <span>Insp. V. Sharma</span>
-                  <span className="font-bold text-red-700 border border-red-700 px-1 py-0.2">CCTNS VERIFIED</span>
-                </div>
-              </div>
-
-              {/* ── 3. MID-LEFT SATELLITE RADAR MAP & NIGHT SURVEILLANCE STILL ("IS FLIGHT 603" STYLE) ── */}
-              <div
-                onClick={() => setSelectedEvidenceModal({
-                  title: 'RECONNAISSANCE GRID & HIGHWAY RADAR MAP',
-                  type: 'SATELLITE ESCAPE TRAIL',
-                  content: `Satellite ANPR radar grid tracking getaway movement along Hosur Road toward Attibele Toll Plaza. Predicted intercept waypoint flagged at Balay Circle.`,
-                  date: '18 Jul 2026',
-                  stamp: 'SATELLITE RADAR'
-                })}
-                className="absolute left-6 sm:left-12 top-80 sm:top-88 w-56 sm:w-64 bg-[#141923] text-stone-100 p-3 shadow-2xl border-2 border-stone-700 font-mono text-[9px] transform rotate-[3deg] cursor-pointer hover:rotate-0 hover:scale-103 transition-all z-2"
-              >
-                {/* Red Pin */}
-                <div className="absolute -top-2 left-6 w-4 h-4 rounded-full bg-gradient-to-tr from-red-800 via-red-600 to-red-300 border border-white shadow-md z-30" />
-                
-                <div className="flex items-center justify-between pb-1 border-b border-stone-700 text-sky-400 font-bold">
-                  <span>TRANSIT RADAR GRID</span>
-                  <Crosshair className="w-3 h-3 text-red-500 animate-pulse" />
-                </div>
-
-                <div className="mt-1.5 h-20 bg-[#0a0d14] rounded border border-stone-800 p-2 relative overflow-hidden flex flex-col justify-between">
-                  <div className="absolute inset-0 opacity-30 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:6px_6px]" />
-                  <div className="relative z-10 text-[8px] text-sky-300 font-bold">
-                    ROUTE: SILK BOARD → ATTIBELE TOLL
+                {/* 2. Deccan Chronicle Vintage Newspaper Clipping */}
+                <div
+                  onClick={() => setSelectedEvidenceModal({
+                    title: 'THE DECCAN CHRONICLE — CRIME SPECIAL EDITION',
+                    type: 'NEWSPAPER ARCHIVE PRESS CLIPPING',
+                    content: `Special Squad cracks inter-district vehicle theft racket in midnight sweep. 42 vehicles recovered across Bengaluru, Raichur, and Bidar corridors. Master electronic bypass devices seized from Yelahanka chopshop.`,
+                    date: '02 Jun 2024',
+                    stamp: 'PRESS ARCHIVE'
+                  })}
+                  className="bg-[#e8e2d5] text-stone-950 p-3 rounded shadow-lg border border-stone-400 font-mono text-[9.5px] transform rotate-[1.5deg] cursor-pointer hover:rotate-0 hover:scale-102 transition-all"
+                >
+                  <div className="border-b-2 border-black pb-0.5 mb-1 flex items-center justify-between font-serif">
+                    <span className="font-black text-xs uppercase tracking-tight">THE DECCAN CHRONICLE</span>
+                    <span className="text-[8px] font-mono text-stone-600">PAGE 4 · CRIME</span>
                   </div>
-                  <div className="relative z-10 text-[7.5px] text-stone-400">
-                    ANPR CAM-0045 & CAM-0012 HIT
+                  <div className="bg-stone-900 text-white font-serif font-black text-[11px] p-0.5 uppercase leading-tight mb-1 text-center">
+                    SPECIAL SQUAD BUSTS HIGHWAY GANG
                   </div>
-                </div>
-
-                <div className="mt-1 pt-1 border-t border-stone-800 text-[8px] text-amber-400 flex items-center justify-between font-bold">
-                  <span>INTERCEPTOR: ACTIVE</span>
-                  <span className="text-red-400">SPEED: 92 KM/H</span>
-                </div>
-              </div>
-
-              {/* ── 4. CENTER: THE ICONIC "WANTED BY THE FBI / POLICE" CENTRAL BULLETIN ── */}
-              <div
-                onMouseEnter={() => setHoveredNode('kingpin')}
-                onMouseLeave={() => setHoveredNode(null)}
-                onClick={() => setSelectedEvidenceModal({
-                  title: `WANTED NOTICE: ${selectedSyndicate.kingpin.name}`,
-                  type: 'WANTED BULLETIN',
-                  mugshot: selectedSyndicate.kingpin.mugshot,
-                  content: `Wanted for organized gang offenses, vehicle theft, and conspiracy under IPC § 379, 392, 120B. Physical specs: Height 5'9", Age 34, Medium build. Last seen near ${selectedSyndicate.kingpin.last_location}. Reward declared: ${selectedSyndicate.kingpin.reward}.`,
-                  date: 'CURRENT BULLETIN',
-                  stamp: 'ACTIVE NBW WARRANT'
-                })}
-                className="absolute left-1/2 -translate-x-1/2 top-10 sm:top-14 w-68 sm:w-76 bg-[#fffefb] text-stone-950 p-4 shadow-2xl border-2 border-stone-400 text-center font-mono transform rotate-[-1deg] cursor-pointer hover:rotate-0 hover:scale-102 transition-all z-4"
-              >
-                {/* Central Red Heavy Pushpin */}
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-gradient-to-tr from-red-900 via-red-600 to-red-300 border-2 border-white shadow-xl z-30" />
-
-                {/* Poster Header */}
-                <div className="border-b-2 border-black pb-1 mb-2">
-                  <h3 className="font-black text-lg sm:text-xl uppercase tracking-tight text-black">
-                    ★ WANTED BY POLICE ★
-                  </h3>
-                  <p className="text-[8.5px] font-bold text-red-700 tracking-wider uppercase">
-                    KARNATAKA STATE POLICE · CCTNS WATCHLIST
+                  <p className="text-[8px] text-stone-700 font-serif leading-snug">
+                    Over 42 vehicles traced along NH-44 corridor. Police recover master 433MHz frequency jammers from Yelahanka chopshop.
                   </p>
                 </div>
 
-                {/* Dual Mugshot Grid (Like Reference Wanted Poster) */}
-                <div className="grid grid-cols-2 gap-2 max-w-[210px] mx-auto">
-                  <div className="relative aspect-square rounded overflow-hidden bg-stone-200 border border-black">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={selectedSyndicate.kingpin.mugshot} alt={selectedSyndicate.kingpin.name} className="w-full h-full object-cover object-top" />
-                    <span className="absolute bottom-0 inset-x-0 bg-black/85 text-white text-[7.5px] font-bold py-0.5">
-                      {selectedSyndicate.kingpin.name.split(' ')[0]}
-                    </span>
+                {/* 3. Satellite Reconnaissance Radar Grid */}
+                <div
+                  onClick={() => setSelectedEvidenceModal({
+                    title: 'RECONNAISSANCE GRID & HIGHWAY RADAR MAP',
+                    type: 'SATELLITE ESCAPE TRAIL',
+                    content: `Satellite ANPR radar grid tracking getaway movement along Hosur Road toward Attibele Toll Plaza. Predicted intercept waypoint flagged at Balay Circle.`,
+                    date: '18 Jul 2026',
+                    stamp: 'SATELLITE RADAR'
+                  })}
+                  className="bg-[#141923] text-stone-100 p-2.5 rounded shadow-xl border border-stone-700 font-mono text-[9px] transform rotate-[-1deg] cursor-pointer hover:rotate-0 hover:scale-102 transition-all"
+                >
+                  <div className="flex items-center justify-between pb-1 border-b border-stone-700 text-sky-400 font-bold">
+                    <span>TRANSIT RADAR GRID</span>
+                    <Crosshair className="w-3 h-3 text-red-500 animate-pulse" />
                   </div>
-                  <div className="relative aspect-square rounded overflow-hidden bg-stone-200 border border-black">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={selectedSyndicate.lieutenants[0].mugshot} alt={selectedSyndicate.lieutenants[0].name} className="w-full h-full object-cover object-top" />
-                    <span className="absolute bottom-0 inset-x-0 bg-black/85 text-white text-[7.5px] font-bold py-0.5">
-                      {selectedSyndicate.lieutenants[0].name.split(' ')[0]}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Notice & Reward Box */}
-                <div className="mt-2 space-y-0.5">
-                  <p className="text-[11px] font-black uppercase text-stone-900">
-                    {selectedSyndicate.kingpin.name} & {selectedSyndicate.lieutenants[0].name}
-                  </p>
-                  <p className="text-[8.5px] text-red-700 font-bold">
-                    THOUGHT TO BE ARMED AND DANGEROUS
-                  </p>
-                  <div className="bg-stone-100 p-1.5 rounded border border-stone-300 text-[8.5px] text-stone-700">
-                    <strong className="text-stone-900">REWARD:</strong> <strong className="text-emerald-800">{selectedSyndicate.kingpin.reward}</strong>. Sighted near {selectedSyndicate.kingpin.last_location.split('—')[0]}.
+                  <div className="mt-1 h-14 bg-[#0a0d14] rounded border border-stone-800 p-1.5 relative overflow-hidden flex flex-col justify-between">
+                    <div className="absolute inset-0 opacity-30 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:6px_6px]" />
+                    <div className="relative z-10 text-[8px] text-sky-300 font-bold">
+                      ROUTE: SILK BOARD → ATTIBELE TOLL
+                    </div>
+                    <div className="relative z-10 text-[7.5px] text-stone-400">
+                      ANPR CAM-0045 & CAM-0012 HIT
+                    </div>
                   </div>
                 </div>
 
-                {/* Yellow "DANGEROUS!!!" Note Taped to Wanted Poster (Like Reference) */}
-                <div className="absolute -bottom-3 -right-3 bg-[#fef08a] text-stone-950 px-2 py-1 rounded shadow-md border border-amber-300 text-[9px] font-black uppercase transform rotate-[6deg] z-20">
-                  ⚡ DANGEROUS!!!
+                {/* 4. Bottom-Left Handwritten Operatives Cluster */}
+                <div className="bg-[#fffbeb] text-amber-950 p-2 rounded shadow border border-amber-300 font-mono text-[9px] transform rotate-[-2deg] space-y-1.5">
+                  <p className="font-bold text-[8.5px]">❓ UNKNOWN INFORMATION — OPERATIVES:</p>
+                  <div className="flex items-center gap-1.5 overflow-hidden">
+                    <div className="w-12 h-14 bg-stone-200 rounded border border-stone-400 overflow-hidden shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src="/mugshots/ravi-shankar.jpg" alt="Manoj" className="w-full h-full object-cover object-top" />
+                    </div>
+                    <div className="w-12 h-14 bg-stone-200 rounded border border-stone-400 overflow-hidden shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src="/mugshots/deepak-shetty.jpg" alt="Deepak" className="w-full h-full object-cover object-top" />
+                    </div>
+                    <div className="text-[8px] text-stone-800 font-bold min-w-0">
+                      <p>Manoj Reddy</p>
+                      <p>Deepak Shetty</p>
+                      <p className="text-amber-800">IMEI Tracking Active</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* ── 5. TOP-CENTER-RIGHT CLIPPED IDENTITY & TOLL CARDS ── */}
-              <div
-                onClick={() => setSelectedEvidenceModal({
-                  title: 'FASTAG & HIGHWAY TRANSIT PASSES',
-                  type: 'ELECTRONIC EVIDENCE ARTIFACT',
-                  content: `Seized electronic RFID toll tags, FASTag toll passes, and parking cards associated with syndicate getaway vehicles.`,
-                  date: '18 Jul 2026',
-                  stamp: 'FASTAG SWEEP'
-                })}
-                className="absolute right-[32%] sm:right-[35%] top-4 w-36 sm:w-44 bg-[#1f2937] text-white p-2 rounded shadow-2xl border border-stone-500 font-mono text-[8.5px] transform rotate-[-3deg] cursor-pointer hover:rotate-0 hover:scale-105 transition-all z-3"
-              >
-                {/* White Clip */}
-                <div className="absolute -top-2 left-4 w-3 h-5 bg-stone-300 rounded border border-stone-500 z-30" />
-                <div className="flex items-center justify-between pb-1 border-b border-stone-600 text-amber-400 font-bold">
-                  <span>FASTAG TOLL TAG</span>
-                  <Radio className="w-3 h-3 text-emerald-400" />
+              {/* ── CENTER COLUMN (4 Cols): WANTED Poster + Seized Hardware + CCTNS Linked Cases ── */}
+              <div className="md:col-span-4 space-y-3">
+                {/* Centerpiece "WANTED BY POLICE" Poster */}
+                <div
+                  onMouseEnter={() => setHoveredNode('kingpin')}
+                  onMouseLeave={() => setHoveredNode(null)}
+                  onClick={() => setSelectedEvidenceModal({
+                    title: `WANTED NOTICE: ${selectedSyndicate.kingpin.name}`,
+                    type: 'WANTED BULLETIN',
+                    mugshot: selectedSyndicate.kingpin.mugshot,
+                    content: `Wanted for organized gang offenses, vehicle theft, and conspiracy under IPC § 379, 392, 120B. Physical specs: Height 5'9", Age 34, Medium build. Last seen near ${selectedSyndicate.kingpin.last_location}. Reward declared: ${selectedSyndicate.kingpin.reward}.`,
+                    date: 'CURRENT BULLETIN',
+                    stamp: 'ACTIVE NBW WARRANT'
+                  })}
+                  className="bg-[#fffefb] text-stone-950 p-3.5 rounded shadow-2xl border-2 border-stone-400 text-center font-mono transform rotate-[-0.5deg] cursor-pointer hover:rotate-0 hover:scale-102 transition-all relative"
+                >
+                  <div className="border-b-2 border-black pb-1 mb-1.5">
+                    <h3 className="font-black text-base uppercase tracking-tight text-black">
+                      ★ WANTED BY POLICE ★
+                    </h3>
+                    <p className="text-[8px] font-bold text-red-700 tracking-wider uppercase">
+                      KARNATAKA STATE POLICE · CCTNS WATCHLIST
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-1.5 max-w-[190px] mx-auto">
+                    <div className="relative aspect-square rounded overflow-hidden bg-stone-200 border border-black">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={selectedSyndicate.kingpin.mugshot} alt={selectedSyndicate.kingpin.name} className="w-full h-full object-cover object-top" />
+                      <span className="absolute bottom-0 inset-x-0 bg-black/85 text-white text-[7.5px] font-bold py-0.5">
+                        {selectedSyndicate.kingpin.name.split(' ')[0]}
+                      </span>
+                    </div>
+                    <div className="relative aspect-square rounded overflow-hidden bg-stone-200 border border-black">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={selectedSyndicate.lieutenants[0].mugshot} alt={selectedSyndicate.lieutenants[0].name} className="w-full h-full object-cover object-top" />
+                      <span className="absolute bottom-0 inset-x-0 bg-black/85 text-white text-[7.5px] font-bold py-0.5">
+                        {selectedSyndicate.lieutenants[0].name.split(' ')[0]}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-1.5 space-y-0.5">
+                    <p className="text-[10px] font-black uppercase text-stone-900">
+                      {selectedSyndicate.kingpin.name} & {selectedSyndicate.lieutenants[0].name}
+                    </p>
+                    <p className="text-[7.5px] text-red-700 font-bold">
+                      THOUGHT TO BE ARMED AND DANGEROUS
+                    </p>
+                    <div className="bg-stone-100 p-1 rounded border border-stone-300 text-[8px] text-stone-700">
+                      <strong className="text-stone-900">REWARD:</strong> <strong className="text-emerald-800">{selectedSyndicate.kingpin.reward}</strong>. Sighted near {selectedSyndicate.kingpin.last_location.split('—')[0]}.
+                    </div>
+                  </div>
+
+                  <div className="absolute -bottom-2 -right-2 bg-[#fef08a] text-stone-950 px-2 py-0.5 rounded shadow border border-amber-300 text-[8px] font-black uppercase transform rotate-[6deg] z-20">
+                    ⚡ DANGEROUS!!!
+                  </div>
                 </div>
-                <div className="pt-1 text-[8px] text-stone-300 space-y-0.5">
-                  <p>TAG: 34161FA8829104</p>
-                  <p className="text-emerald-400">VEH: KA-01-MJ-8821</p>
-                  <p className="text-stone-400">PLAZA: Attibele Checkpost</p>
+
+                {/* Center Forensic Hardware Seizure Docket */}
+                <div
+                  onMouseEnter={() => setHoveredNode('evidence')}
+                  onMouseLeave={() => setHoveredNode(null)}
+                  onClick={() => setSelectedEvidenceModal({
+                    title: 'EVIDENCE SEIZURE: RECOVERED JAMMERS & TOOLS',
+                    type: 'SEIZED HARDWARE DOCKET',
+                    content: `Recovered master 433MHz frequency jammer unit, OBD-II keyway code duplicator, and 14 blank smart keys from Yelahanka chopshop. Tampered chassis numbers confirmed by FSL forensics.`,
+                    date: '01 Jun 2024',
+                    stamp: 'SEIZED EVIDENCE #EV-4910'
+                  })}
+                  className="bg-[#eef2f6] text-stone-900 p-3 rounded shadow-xl border border-stone-300 font-mono text-[9px] transform rotate-[1deg] cursor-pointer hover:rotate-0 hover:scale-102 transition-all"
+                >
+                  <div className="flex items-center justify-between border-b border-stone-300 pb-1 text-[8.5px] font-bold">
+                    <span className="text-emerald-800">EVIDENCE SEIZURE</span>
+                    <span className="text-red-700">#EV-4910-KSP</span>
+                  </div>
+
+                  <div className="pt-1.5 space-y-0.5 text-stone-800">
+                    <p className="font-black text-stone-950">⚡ RECOVERED HARDWARE:</p>
+                    <p>• 433MHz Master RF Jammer</p>
+                    <p>• OBD-II smart-key duplicator & 14 blanks</p>
+                    <p className="text-emerald-800 font-bold text-[8px]">FSL Forensics Confirmed</p>
+                  </div>
+                </div>
+
+                {/* Center-Bottom FIR Quick-List on Board */}
+                <div className="bg-[#f8fafc] text-stone-900 p-2.5 rounded shadow border border-slate-300 font-mono text-[8.5px] space-y-1">
+                  <div className="font-bold text-slate-800 flex items-center justify-between border-b pb-0.5">
+                    <span>LINKED CCTNS CASE FILES</span>
+                    <span className="text-indigo-600 font-bold">{selectedSyndicate.connected_firs.length} Dockets</span>
+                  </div>
+                  {selectedSyndicate.connected_firs.slice(0, 2).map(fir => (
+                    <div
+                      key={fir.case_number}
+                      onClick={() => handleCaseClick(fir.case_number)}
+                      className="flex items-center justify-between hover:bg-slate-100 p-0.5 rounded cursor-pointer"
+                    >
+                      <span className="font-bold text-indigo-700">{fir.case_number}</span>
+                      <span className="text-stone-500">{fir.crime}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* ── 6. TOP-RIGHT YELLOW KEYS & VINYL RECORD ARTIFACTS (LIKE IN REFERENCE) ── */}
-              <div
-                onClick={() => setSelectedEvidenceModal({
-                  title: 'MASTER KEYWAY LOCKPICKS & HARDWARE DYES',
-                  type: 'PHYSICAL EVIDENCE ARTIFACT',
-                  content: `Seized master keyway lockpicks, OBD-II programmers, and stamped VIN number dyes used by Farid Mirza to duplicate vehicle keys.`,
-                  date: '01 Jun 2024',
-                  stamp: 'SEIZED ARTIFACT'
-                })}
-                className="absolute right-[18%] sm:right-[20%] top-6 flex items-center gap-2 cursor-pointer hover:scale-110 transition-transform z-3"
-              >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-600 to-yellow-300 p-1.5 shadow-lg border-2 border-white flex items-center justify-center text-stone-950 font-bold">
-                  <Key className="w-4 h-4" />
-                </div>
-                <div className="w-9 h-9 rounded-full bg-[#111] p-1.5 shadow-xl border-2 border-amber-600 flex items-center justify-center text-amber-500">
-                  <Disc className="w-5 h-5 animate-spin" />
-                </div>
-              </div>
+              {/* ── RIGHT COLUMN (4 Cols): FASTag Toll + Polaroid Lieutenants Cluster + Police Gazette + Dossier 2 ── */}
+              <div className="md:col-span-4 space-y-3">
+                {/* 1. FASTag Toll Tag & Keyway Tools */}
+                <div className="flex items-center gap-2">
+                  <div
+                    onClick={() => setSelectedEvidenceModal({
+                      title: 'FASTAG & HIGHWAY TRANSIT PASSES',
+                      type: 'ELECTRONIC EVIDENCE ARTIFACT',
+                      content: `Seized electronic RFID toll tags, FASTag toll passes, and parking cards associated with syndicate getaway vehicles.`,
+                      date: '18 Jul 2026',
+                      stamp: 'FASTAG SWEEP'
+                    })}
+                    className="flex-1 bg-[#1f2937] text-white p-2 rounded shadow-lg border border-stone-500 font-mono text-[8px] transform rotate-[-2deg] cursor-pointer hover:rotate-0 hover:scale-102 transition-all"
+                  >
+                    <div className="flex items-center justify-between pb-0.5 border-b border-stone-600 text-amber-400 font-bold">
+                      <span>FASTAG TOLL</span>
+                      <Radio className="w-2.5 h-2.5 text-emerald-400" />
+                    </div>
+                    <p className="pt-0.5 text-[7.5px] text-stone-300">TAG: 34161FA8829104</p>
+                    <p className="text-emerald-400 text-[7.5px]">VEH: KA-01-MJ-8821</p>
+                  </div>
 
-              {/* ── 7. TOP-RIGHT HIGHWAY TOLL SLIP ── */}
-              <div
-                onClick={() => setSelectedEvidenceModal({
-                  title: 'ATTIBELE TOLL BARRIER RECEIPT',
-                  type: 'HIGHWAY TOLL EVIDENCE',
-                  content: `Attibele Toll Plaza lane 4 recorded vehicle ${selectedSyndicate.kingpin.vehicle} passing at 23:42 hrs without stopping. Automatic barrier breach recorded.`,
-                  date: '18 Jul 2026 23:42 hrs',
-                  stamp: 'ANPR HIT'
-                })}
-                className="absolute right-3 sm:right-8 top-4 w-36 sm:w-44 bg-[#f8f5ee] text-stone-950 p-2.5 shadow-xl border border-stone-300 font-mono text-[8.5px] transform rotate-[3deg] cursor-pointer hover:rotate-0 hover:scale-105 transition-all z-2"
-              >
-                {/* Red Pin */}
-                <div className="absolute -top-2 right-4 w-4 h-4 rounded-full bg-gradient-to-tr from-red-800 via-red-600 to-red-300 border border-white shadow-md z-30" />
-                
-                <div className="border-b border-stone-300 pb-0.5 mb-1 font-bold flex justify-between">
-                  <span>HIGHWAY TOLL</span>
-                  <span className="text-red-700">#TL-8821</span>
-                </div>
-                <p>PLAZA: Attibele Checkpost</p>
-                <p>TIME: 23:42:15 HRS</p>
-                <p className="text-red-700 font-bold mt-0.5">ANPR HIT CONFIRMED</p>
-              </div>
-
-              {/* ── 8. MID-RIGHT "PERSONAL FACIAL PROFILE" & POLAROIDS CLUSTER (TOM CRUISE TRIO STYLE) ── */}
-              <div
-                onMouseEnter={() => setHoveredNode('lt-0')}
-                onMouseLeave={() => setHoveredNode(null)}
-                className="absolute right-2 sm:right-6 top-48 sm:top-52 w-64 sm:w-72 space-y-2 z-3"
-              >
-                {/* Handwritten Sky Blue Index Note (Like Reference) */}
-                <div className="bg-[#e0f2fe] text-sky-950 p-1.5 rounded shadow border border-sky-300 font-mono text-[9.5px] font-black flex items-center justify-between transform rotate-[-2deg]">
-                  <span>PERSONAL FACIAL PROFILE</span>
-                  <span className="text-sky-700">ANPR MATCH 98.4%</span>
+                  <div
+                    onClick={() => setSelectedEvidenceModal({
+                      title: 'ATTIBELE TOLL BARRIER RECEIPT',
+                      type: 'HIGHWAY TOLL EVIDENCE',
+                      content: `Attibele Toll Plaza lane 4 recorded vehicle ${selectedSyndicate.kingpin.vehicle} passing at 23:42 hrs without stopping. Automatic barrier breach recorded.`,
+                      date: '18 Jul 2026 23:42 hrs',
+                      stamp: 'ANPR HIT'
+                    })}
+                    className="bg-[#f8f5ee] text-stone-950 p-2 rounded shadow border border-stone-300 font-mono text-[8px] transform rotate-[2deg] cursor-pointer hover:rotate-0 hover:scale-102 transition-all"
+                  >
+                    <p className="font-bold text-red-700">#TL-8821</p>
+                    <p className="text-[7.5px] text-stone-600">Attibele Toll</p>
+                  </div>
                 </div>
 
-                {/* Overlapping Trio of Polaroids (Lieutenants: Deepak Shetty, Manoj Reddy, Farid Mirza) */}
-                <div className="flex -space-x-4 items-center">
-                  {selectedSyndicate.lieutenants.map((lt, idx) => {
-                    const rot = idx === 0 ? 'rotate-[-3deg]' : idx === 1 ? 'rotate-[2deg]' : 'rotate-[4deg]';
-                    return (
+                {/* 2. Personal Facial Profile with Clustered Polaroids */}
+                <div
+                  onMouseEnter={() => setHoveredNode('lt-0')}
+                  onMouseLeave={() => setHoveredNode(null)}
+                  className="bg-[#faf8f4] text-stone-900 p-2.5 rounded shadow-xl border border-stone-300 font-mono text-xs transform rotate-[1deg] space-y-1.5"
+                >
+                  <div className="bg-[#e0f2fe] text-sky-950 p-1 rounded border border-sky-300 text-[8.5px] font-black flex items-center justify-between">
+                    <span>PERSONAL FACIAL PROFILE</span>
+                    <span className="text-sky-700">ANPR MATCH 98.4%</span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-1.5 pt-1">
+                    {selectedSyndicate.lieutenants.map((lt) => (
                       <div
                         key={lt.id}
                         onClick={() => setSelectedEvidenceModal({
@@ -791,150 +763,68 @@ export default function NetworkPage() {
                           date: 'ACTIVE FILE',
                           stamp: 'KEY ENFORCER'
                         })}
-                        className={`bg-[#faf8f4] text-stone-900 p-2 pb-2.5 rounded shadow-2xl border border-stone-300 font-mono cursor-pointer hover:scale-115 hover:z-30 transition-all transform ${rot} w-24 sm:w-28 shrink-0 relative`}
+                        className="bg-white p-1 rounded border border-stone-300 text-center cursor-pointer hover:scale-105 transition-transform"
                       >
-                        {/* Red Pushpin */}
-                        <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-gradient-to-tr from-red-800 via-red-600 to-red-300 border border-white shadow z-30" />
-                        
-                        <div className="aspect-square rounded overflow-hidden bg-stone-200 border border-stone-300 mb-1">
+                        <div className="aspect-square rounded overflow-hidden bg-stone-200 border border-stone-300 mb-0.5">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={lt.mugshot} alt={lt.name} className="w-full h-full object-cover object-top" />
                         </div>
-                        <p className="font-extrabold text-[8.5px] uppercase truncate text-stone-900">{lt.name.split(' ')[0]}</p>
-                        <p className="text-[7.5px] text-blue-700 font-bold truncate">{lt.role.split('&')[0]}</p>
+                        <p className="font-extrabold text-[7.5px] uppercase truncate text-stone-900">{lt.name.split(' ')[0]}</p>
+                        <p className="text-[6.5px] text-blue-700 font-bold truncate">{lt.district}</p>
                       </div>
-                    );
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. The Police Gazette Article */}
+                <div
+                  onClick={() => setSelectedEvidenceModal({
+                    title: 'THE POLICE GAZETTE / INVESTIGATION BULLETIN',
+                    type: 'NEWSPAPER ARCHIVE SNIPPET',
+                    content: `Press report covering the ongoing surveillance of inter-district supply chains along the Bengaluru-Raichur highway.`,
+                    date: '28 May 2024',
+                    stamp: 'INTELLIGENCE RECORD'
                   })}
-                </div>
-              </div>
-
-              {/* ── 9. MID-RIGHT NEWSPAPER CLIPPING ("THE SECRET GARDEN / WHATEVER YOU DO...") ── */}
-              <div
-                onClick={() => setSelectedEvidenceModal({
-                  title: 'THE SECRET GARDEN / INVESTIGATION BULLETIN',
-                  type: 'NEWSPAPER ARCHIVE SNIPPET',
-                  content: `Press report covering the ongoing surveillance of inter-district supply chains along the Bengaluru-Raichur highway.`,
-                  date: '28 May 2024',
-                  stamp: 'INTELLIGENCE RECORD'
-                })}
-                className="absolute right-4 sm:right-10 top-96 sm:top-[420px] w-48 sm:w-56 bg-[#f5ede0] text-stone-900 p-2.5 shadow-xl border border-stone-400 font-serif text-[8.5px] transform rotate-[2deg] cursor-pointer hover:rotate-0 hover:scale-105 transition-all z-1"
-              >
-                {/* Red Pin */}
-                <div className="absolute -top-2 left-6 w-3.5 h-3.5 rounded-full bg-gradient-to-tr from-red-800 via-red-600 to-red-300 border border-white shadow-md z-30" />
-                
-                <div className="border-b border-black pb-0.5 mb-1 text-center font-bold">
-                  The Police Gazette
-                </div>
-                <p className="font-bold text-[9px] uppercase leading-tight">
-                  WHATEVER YOU DO, DO IT A HUNDRED PERCENT.
-                </p>
-                <p className="text-stone-700 text-[8px] mt-1 leading-snug">
-                  Everything possible for a willing heart. Highway surveillance intensified at border checkposts.
-                </p>
-              </div>
-
-              {/* ── 10. BOTTOM-RIGHT OFFICIAL DOSSIER 2 (SIMON PEGG PROFILE STYLE) ── */}
-              <div
-                onClick={() => setSelectedEvidenceModal({
-                  title: `KSP CID REVIEW PROGRAM — ${selectedSyndicate.lieutenants[2]?.name || 'FARID MIRZA'}`,
-                  type: 'OFFICIAL POLICE DOSSIER',
-                  mugshot: selectedSyndicate.lieutenants[2]?.mugshot || selectedSyndicate.lieutenants[0].mugshot,
-                  content: `Subject ${selectedSyndicate.lieutenants[2]?.name || 'Farid Mirza'} identified as primary technical specialist and arms procurement lead for the syndicate.`,
-                  date: '20 Jul 2024',
-                  stamp: 'CID VERIFIED'
-                })}
-                className="absolute right-2 sm:right-6 bottom-4 sm:bottom-8 w-56 sm:w-64 bg-[#fbf9f4] text-stone-950 p-3.5 shadow-2xl border border-stone-300 font-mono text-xs transform rotate-[1.5deg] cursor-pointer hover:rotate-0 hover:scale-103 transition-all z-3"
-              >
-                {/* Red Pin */}
-                <div className="absolute -top-2 right-6 w-4 h-4 rounded-full bg-gradient-to-tr from-red-800 via-red-600 to-red-300 border border-white shadow-md z-30" />
-                
-                <div className="flex items-center gap-1.5 border-b border-stone-300 pb-1 text-[9px] font-bold uppercase text-stone-800">
-                  <Shield className="w-3.5 h-3.5 text-stone-700" />
-                  <span>KSP CID REVIEW PROGRAM</span>
-                </div>
-
-                <div className="flex gap-2.5 pt-2">
-                  <div className="w-14 h-16 bg-stone-200 rounded border border-stone-300 overflow-hidden shrink-0">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={selectedSyndicate.lieutenants[2]?.mugshot || selectedSyndicate.lieutenants[0].mugshot} alt="Operative" className="w-full h-full object-cover object-top" />
+                  className="bg-[#f5ede0] text-stone-900 p-2 rounded shadow border border-stone-400 font-serif text-[8px] transform rotate-[-1deg] cursor-pointer hover:rotate-0 hover:scale-102 transition-all"
+                >
+                  <div className="border-b border-black pb-0.5 mb-0.5 text-center font-bold">
+                    The Police Gazette · Intelligence Bulletin
                   </div>
-                  <div className="text-[9px] space-y-0.5 min-w-0">
-                    <p><strong className="text-stone-900">NAME:</strong> {(selectedSyndicate.lieutenants[2]?.name || 'Farid Mirza').split(' ')[0]}</p>
-                    <p><strong className="text-stone-900">ROLE:</strong> Key Specialist</p>
-                    <p><strong className="text-stone-900">RISK:</strong> <span className="text-red-700 font-bold">{selectedSyndicate.lieutenants[2]?.risk_score || 82}%</span></p>
+                  <p className="font-bold text-[8.5px] uppercase leading-tight">
+                    WHATEVER YOU DO, DO IT A HUNDRED PERCENT.
+                  </p>
+                  <p className="text-stone-700 text-[7.5px] mt-0.5 leading-snug">
+                    Highway surveillance intensified at border checkposts across Raichur and Bidar.
+                  </p>
+                </div>
+
+                {/* 4. Second CID Agent Profile Sheet */}
+                <div
+                  onClick={() => setSelectedEvidenceModal({
+                    title: `KSP CID REVIEW PROGRAM — ${selectedSyndicate.lieutenants[2]?.name || 'FARID MIRZA'}`,
+                    type: 'OFFICIAL POLICE DOSSIER',
+                    mugshot: selectedSyndicate.lieutenants[2]?.mugshot || selectedSyndicate.lieutenants[0].mugshot,
+                    content: `Subject ${selectedSyndicate.lieutenants[2]?.name || 'Farid Mirza'} identified as primary technical specialist and arms procurement lead for the syndicate.`,
+                    date: '20 Jul 2024',
+                    stamp: 'CID VERIFIED'
+                  })}
+                  className="bg-[#fbf9f4] text-stone-950 p-2.5 rounded shadow-xl border border-stone-300 font-mono text-xs transform rotate-[1.5deg] cursor-pointer hover:rotate-0 hover:scale-102 transition-all"
+                >
+                  <div className="flex items-center gap-1 border-b border-stone-300 pb-0.5 text-[8.5px] font-bold uppercase text-stone-800">
+                    <Shield className="w-3 h-3 text-stone-700" />
+                    <span>KSP CID REVIEW PROGRAM</span>
                   </div>
-                </div>
 
-                <div className="mt-2 pt-1 border-t border-stone-200 text-[8px] text-stone-600">
-                  <p>• Assignment: Master keyways & OBD-II</p>
-                </div>
-
-                <div className="mt-1.5 pt-1 border-t border-stone-300 flex items-center justify-between text-[8px] text-stone-500">
-                  <span>Sign: IO Verified</span>
-                  <span className="font-bold text-red-700 border border-red-700 px-1">CHARGESHEETED</span>
-                </div>
-              </div>
-
-              {/* ── 11. CENTER-BOTTOM EVIDENCE SEIZURE CARD & 35MM FILM STRIP ── */}
-              <div
-                onMouseEnter={() => setHoveredNode('evidence')}
-                onMouseLeave={() => setHoveredNode(null)}
-                onClick={() => setSelectedEvidenceModal({
-                  title: 'EVIDENCE SEIZURE: RECOVERED JAMMERS & TOOLS',
-                  type: 'SEIZED HARDWARE DOCKET',
-                  content: `Recovered master 433MHz frequency jammer unit, OBD-II keyway code duplicator, and 14 blank smart keys from Yelahanka chopshop. Tampered chassis numbers confirmed by FSL forensics.`,
-                  date: '01 Jun 2024',
-                  stamp: 'SEIZED EVIDENCE #EV-4910'
-                })}
-                className="absolute left-1/2 -translate-x-1/2 bottom-8 sm:bottom-12 w-64 sm:w-72 bg-[#eef2f6] text-stone-900 p-3.5 shadow-2xl border-2 border-stone-300 font-mono text-[9.5px] transform rotate-[-1deg] cursor-pointer hover:rotate-0 hover:scale-103 transition-all z-4"
-              >
-                {/* Red Pin */}
-                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-gradient-to-tr from-red-800 via-red-600 to-red-300 border border-white shadow-md z-30" />
-                
-                <div className="flex items-center justify-between border-b border-stone-300 pb-1 text-[9px] font-bold">
-                  <span className="text-emerald-800">EVIDENCE SEIZURE</span>
-                  <span className="text-red-700">#EV-4910-KSP</span>
-                </div>
-
-                <div className="pt-1.5 space-y-0.5 text-stone-800">
-                  <p className="font-black text-stone-950">⚡ RECOVERED HARDWARE:</p>
-                  <p>• 433MHz Master RF Jammer</p>
-                  <p>• OBD-II smart-key duplicator & 14 blanks</p>
-                  <p className="text-emerald-800 font-bold text-[8.5px]">FSL Forensics Confirmed</p>
-                </div>
-              </div>
-
-              {/* ── 12. BOTTOM-LEFT "UNKNOWN INFORMATION" CARD & OPERATIVES CLUSTER (LIKE IN REFERENCE) ── */}
-              <div className="absolute left-2 sm:left-6 bottom-4 sm:bottom-8 w-64 sm:w-72 space-y-2 z-3">
-                {/* Handwritten Note (Like in Reference) */}
-                <div className="bg-[#fffbeb] text-amber-950 p-2 rounded shadow border border-amber-300 font-mono text-[9px] font-black transform rotate-[-3deg]">
-                  ❓ UNKNOWN INFORMATION... FURTHER VERIFICATION IS REQUIRED
-                </div>
-
-                {/* Overlapping Cluster of Operatives */}
-                <div className="flex -space-x-3 items-center">
-                  <div className="bg-[#faf8f4] text-stone-900 p-1.5 rounded shadow-lg border border-stone-300 font-mono transform rotate-[-4deg] w-20 shrink-0">
-                    <div className="aspect-square rounded overflow-hidden bg-stone-200 border border-stone-300 mb-0.5">
+                  <div className="flex gap-2 pt-1.5">
+                    <div className="w-12 h-14 bg-stone-200 rounded border border-stone-300 overflow-hidden shrink-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/mugshots/ravi-shankar.jpg" alt="Manoj" className="w-full h-full object-cover object-top" />
+                      <img src={selectedSyndicate.lieutenants[2]?.mugshot || selectedSyndicate.lieutenants[0].mugshot} alt="Operative" className="w-full h-full object-cover object-top" />
                     </div>
-                    <p className="font-bold text-[7.5px] truncate">Manoj Reddy</p>
-                  </div>
-
-                  <div className="bg-[#faf8f4] text-stone-900 p-1.5 rounded shadow-lg border border-stone-300 font-mono transform rotate-[3deg] w-20 shrink-0 z-10">
-                    <div className="aspect-square rounded overflow-hidden bg-stone-200 border border-stone-300 mb-0.5">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/mugshots/deepak-shetty.jpg" alt="Deepak" className="w-full h-full object-cover object-top" />
+                    <div className="text-[8px] space-y-0.5 min-w-0">
+                      <p><strong className="text-stone-900">NAME:</strong> {(selectedSyndicate.lieutenants[2]?.name || 'Farid Mirza').split(' ')[0]}</p>
+                      <p><strong className="text-stone-900">ROLE:</strong> Key Specialist</p>
+                      <p><strong className="text-stone-900">RISK:</strong> <span className="text-red-700 font-bold">{selectedSyndicate.lieutenants[2]?.risk_score || 82}%</span></p>
                     </div>
-                    <p className="font-bold text-[7.5px] truncate">Deepak Shetty</p>
-                  </div>
-
-                  <div className="bg-[#faf8f4] text-stone-900 p-1.5 rounded shadow-lg border border-stone-300 font-mono transform rotate-[-2deg] w-20 shrink-0">
-                    <div className="aspect-square rounded overflow-hidden bg-stone-200 border border-stone-300 mb-0.5">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/mugshots/farid-mirza.jpg" alt="Farid" className="w-full h-full object-cover object-top" />
-                    </div>
-                    <p className="font-bold text-[7.5px] truncate">Farid Mirza</p>
                   </div>
                 </div>
               </div>
@@ -980,10 +870,9 @@ export default function NetworkPage() {
         </div>
       )}
 
-      {/* ── 3. VIEW 2: SYNDICATE CARDS WORKBENCH ── */}
+      {/* ── VIEW 2: SYNDICATE CARDS WORKBENCH ── */}
       {viewMode === 'cards' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          {/* Left: Syndicate Cards Grid (7 Cols) */}
           <div className="lg:col-span-7 space-y-3.5">
             {filteredSyndicates.map(syn => {
               const isSelected = selectedSyndicate.id === syn.id;
@@ -1082,7 +971,6 @@ export default function NetworkPage() {
             })}
           </div>
 
-          {/* Right: Selected Syndicate Focus Panel (5 Cols) */}
           <div className="lg:col-span-5 space-y-4">
             <div className="sticky top-4 p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 shadow-xs space-y-4">
               <div className="pb-3 border-b border-slate-100 dark:border-zinc-800">
@@ -1175,7 +1063,7 @@ export default function NetworkPage() {
         </div>
       )}
 
-      {/* ── 4. VIEW 3: STRATEGIC NEXUS MATRIX ── */}
+      {/* ── VIEW 3: STRATEGIC NEXUS MATRIX ── */}
       {viewMode === 'matrix' && (
         <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 shadow-xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-zinc-800">
@@ -1269,7 +1157,7 @@ export default function NetworkPage() {
         </div>
       )}
 
-      {/* ── 5. VIEW 4: PREDICTIVE INTERCEPTION MAP ── */}
+      {/* ── VIEW 4: PREDICTIVE INTERCEPTION MAP ── */}
       {viewMode === 'map' && (
         <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 shadow-xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-zinc-800">
@@ -1331,7 +1219,7 @@ export default function NetworkPage() {
         </div>
       )}
 
-      {/* ── 6. EVIDENCE INSPECTOR LIGHTBOX MODAL ── */}
+      {/* ── EVIDENCE INSPECTOR LIGHTBOX MODAL ── */}
       <AnimatePresence>
         {selectedEvidenceModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/75 backdrop-blur-xs">
@@ -1392,7 +1280,7 @@ export default function NetworkPage() {
         )}
       </AnimatePresence>
 
-      {/* ── 7. ADD CLUE / PIN MODAL ── */}
+      {/* ── ADD CLUE / PIN MODAL ── */}
       <AnimatePresence>
         {isAddPinModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs">
@@ -1479,7 +1367,7 @@ export default function NetworkPage() {
         )}
       </AnimatePresence>
 
-      {/* ── 8. INVESTIGATOR WALL SLIDE-OVER ── */}
+      {/* ── INVESTIGATOR WALL SLIDE-OVER ── */}
       {activeCaseData && (
         <InvestigatorWall
           caseData={activeCaseData}
