@@ -12,7 +12,7 @@ import {
   Terminal, Flame, Crosshair, Briefcase, FlaskConical, Navigation,
   Radar, ShieldCheck, UserCheck, ArrowUpRight, Compass, Sparkles,
   Pin, Bookmark, Camera, FileCheck, Plus, X, Tag, FileSpreadsheet,
-  HelpCircle, AlertCircle, Maximize2, Minimize2, Fingerprint
+  HelpCircle, AlertCircle, Maximize2, Minimize2, Fingerprint, Paperclip
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import InvestigatorWall from '@/components/InvestigatorWall';
@@ -221,7 +221,7 @@ const SYNDICATES = [
 export default function NetworkPage() {
   const [selectedSyndicate, setSelectedSyndicate] = useState(SYNDICATES[0]);
   const [activeCategory, setActiveCategory] = useState('all');
-  const [viewMode, setViewMode] = useState('hierarchy'); // Default to Investigation Wall
+  const [viewMode, setViewMode] = useState('hierarchy'); // Default to Investigation Pinboard
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCaseData, setActiveCaseData] = useState(null);
 
@@ -249,7 +249,8 @@ export default function NetworkPage() {
       author: newPinNote.author || 'Investigating Officer',
       tag: newPinNote.tag || 'FIELD CLUE',
       date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
-      color: 'bg-amber-100 dark:bg-amber-950/80 border-amber-300 dark:border-amber-800'
+      color: 'bg-[#fff9db] border-amber-300 text-stone-900',
+      rotation: 'rotate-[-1.5deg]'
     };
     const updated = [newPin, ...customPins];
     setCustomPins(updated);
@@ -308,14 +309,14 @@ export default function NetworkPage() {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6 pb-20 font-sans text-slate-900 dark:text-slate-100">
+    <div className="w-full max-w-7xl mx-auto space-y-5 pb-20 font-sans text-slate-900 dark:text-slate-100">
       
       {/* ── 1. TOP HEADER & TELEMETRY HUB ── */}
-      <div className="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-slate-200/90 dark:border-zinc-800 shadow-sm">
+      <div className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-slate-200/90 dark:border-zinc-800 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 flex items-center justify-center font-bold shrink-0 shadow-md">
-              <NetworkIcon className="w-6 h-6" />
+            <div className="w-11 h-11 rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 flex items-center justify-center font-bold shrink-0 shadow-md">
+              <NetworkIcon className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2.5 flex-wrap">
@@ -327,8 +328,8 @@ export default function NetworkPage() {
                   5 ACTIVE GANG RINGS
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Karnataka State Police CCTNS · Multi-Hop Organized Crime Network & Detective Wall
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Karnataka State Police CCTNS · Multi-Hop Criminal Evidence Pinboard & Detective War Room
               </p>
             </div>
           </div>
@@ -336,7 +337,7 @@ export default function NetworkPage() {
           {/* View Mode Switcher */}
           <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-zinc-800 p-1.5 rounded-2xl border border-slate-200 dark:border-zinc-700 text-xs font-semibold self-start md:self-auto overflow-x-auto max-w-full">
             {[
-              { id: 'hierarchy', label: 'Investigation Wall', icon: Share2 },
+              { id: 'hierarchy', label: 'Investigation Pinboard', icon: Share2 },
               { id: 'cards', label: 'Syndicate Cards', icon: Layers },
               { id: 'matrix', label: 'Nexus Matrix', icon: Database },
               { id: 'map', label: 'Predictive Routes', icon: Navigation },
@@ -362,105 +363,18 @@ export default function NetworkPage() {
         </div>
       </div>
 
-      {/* ── 2. UNIFIED STATS TILES ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 shadow-sm">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
-            <span className="font-bold uppercase tracking-wider text-[10px] font-mono">Kingpins Tracked</span>
-            <UserCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-          </div>
-          <p className="text-2xl font-bold font-mono text-slate-900 dark:text-white">5 High-Value</p>
-          <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-zinc-800 text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
-            <span>100% Active ANPR Sweeps</span>
-          </div>
-        </div>
-
-        <div className="p-5 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 shadow-sm">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
-            <span className="font-bold uppercase tracking-wider text-[10px] font-mono">Key Lieutenants</span>
-            <Users className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-          </div>
-          <p className="text-2xl font-bold font-mono text-slate-900 dark:text-white">11 Operatives</p>
-          <p className="mt-2.5 pt-2 border-t border-slate-100 dark:border-zinc-800 text-[11px] text-slate-500">
-            Chopshops, Mules & Couriers
-          </p>
-        </div>
-
-        <div className="p-5 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 shadow-sm">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
-            <span className="font-bold uppercase tracking-wider text-[10px] font-mono">Correlated FIRs</span>
-            <FileText className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-          </div>
-          <p className="text-2xl font-bold font-mono text-slate-900 dark:text-white">51 Indexed</p>
-          <p className="mt-2.5 pt-2 border-t border-slate-100 dark:border-zinc-800 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
-            Cross-District Verified
-          </p>
-        </div>
-
-        <div className="p-5 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 shadow-sm">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
-            <span className="font-bold uppercase tracking-wider text-[10px] font-mono">Surveillance Nodes</span>
-            <Camera className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-          </div>
-          <p className="text-2xl font-bold font-mono text-slate-900 dark:text-white">18 Chokepoints</p>
-          <p className="mt-2.5 pt-2 border-t border-slate-100 dark:border-zinc-800 text-[11px] text-slate-500">
-            Statewide Interceptor Grid
-          </p>
-        </div>
-      </div>
-
-      {/* ── 3. FILTER BAR (CARDS & MATRIX VIEW) ── */}
-      {viewMode !== 'hierarchy' && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1">
-            {[
-              { id: 'all', label: 'All Syndicates' },
-              { id: 'vehicle_theft', label: 'Vehicle Theft' },
-              { id: 'narcotics', label: 'Narcotics NDPS' },
-              { id: 'robbery', label: 'Armed Robbery' },
-              { id: 'cybercrime', label: 'Cyber Fraud' },
-              { id: 'assault', label: 'Extortion' },
-            ].map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`px-3.5 py-1.5 rounded-2xl text-xs font-semibold transition cursor-pointer whitespace-nowrap ${
-                  activeCategory === cat.id
-                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm'
-                    : 'bg-white dark:bg-zinc-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 border border-slate-200 dark:border-zinc-800'
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="relative w-full sm:w-64">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search syndicate, kingpin, or corridor..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3.5 py-2 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-xs text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 shadow-sm"
-            />
-          </div>
-        </div>
-      )}
-
-      {/* ── 4. VIEW 1: MOVIE-STYLE DETECTIVE INVESTIGATION WALL (ROUNDED CARDS + DYNAMIC RED STRINGS) ── */}
+      {/* ── 2. VIEW 1: MOVIE-STYLE AUTHENTIC POLICE PINBOARD WITH DENSE COLLAGE & RED STRINGS ── */}
       {viewMode === 'hierarchy' && (
         <div className="space-y-4">
           {/* Top Control Bar for Detective Board */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-zinc-900 p-4 rounded-3xl border border-slate-200 dark:border-zinc-800 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#1e2025] text-stone-200 p-4 rounded-2xl border border-stone-700 shadow-lg">
             <div className="flex items-center gap-3">
-              <div className="w-3.5 h-3.5 rounded-full bg-red-600 shadow-red-600/50 shadow-md animate-pulse" />
+              <div className="w-3.5 h-3.5 rounded-full bg-red-600 shadow-red-600/70 shadow-md animate-pulse" />
               <div>
-                <span className="text-[10px] font-bold font-mono uppercase tracking-widest text-slate-400 block">
-                  Active Criminal Syndicate Target
+                <span className="text-[10px] font-bold font-mono uppercase tracking-widest text-amber-400 block">
+                  Active Criminal Intelligence War Room
                 </span>
-                <span className="text-base font-bold text-slate-900 dark:text-white">
+                <span className="text-base font-bold text-white font-mono">
                   {selectedSyndicate.name}
                 </span>
               </div>
@@ -475,455 +389,613 @@ export default function NetworkPage() {
                     const s = SYNDICATES.find(syn => syn.id === e.target.value);
                     if (s) setSelectedSyndicate(s);
                   }}
-                  className="pl-3.5 pr-8 py-2 rounded-2xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer appearance-none shadow-xs"
+                  className="pl-3.5 pr-8 py-2 rounded-xl bg-stone-900 border border-stone-600 text-xs font-bold text-stone-100 font-mono focus:outline-none cursor-pointer appearance-none shadow-sm"
                 >
                   {SYNDICATES.map(s => (
                     <option key={s.id} value={s.id}>{s.name}</option>
                   ))}
                 </select>
-                <ChevronDown className="w-3 h-3 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <ChevronDown className="w-3 h-3 text-stone-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
 
               {/* + Pin Clue Button */}
               <button
                 onClick={() => setIsAddPinModalOpen(true)}
-                className="py-2 px-4 rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-indigo-600 dark:hover:bg-indigo-400 dark:hover:text-white text-xs font-bold flex items-center gap-1.5 shadow-sm cursor-pointer transition"
+                className="py-2 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-1.5 shadow-md cursor-pointer transition"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Pin Field Clue</span>
+                <span>Pin Clue to Wall</span>
               </button>
             </div>
           </div>
 
-          {/* ── CINEMATIC BULLETIN WALL CANVAS ── */}
-          <div className="relative w-full p-6 sm:p-10 rounded-3xl bg-[#1a1d24] border border-slate-800 shadow-2xl overflow-hidden select-none">
+          {/* ── CINEMATIC DETECTIVE PINBOARD CANVAS (AUTHENTIC CORK/FELT TEXTURE & CLUSTERED LAYOUT) ── */}
+          <div className="relative w-full min-h-[900px] p-6 sm:p-10 rounded-2xl bg-[#23272e] border-[10px] border-[#15171c] shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden select-none">
             
-            {/* Ambient Background Grid */}
-            <div className="absolute inset-0 bg-[radial-gradient(#2e323b_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none z-0" />
-            <div className="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.6)] pointer-events-none z-0" />
+            {/* Ambient Wall Vignette & Pinboard Texture */}
+            <div className="absolute inset-0 bg-[radial-gradient(#3a404d_1.5px,transparent_1.5px)] [background-size:22px_22px] pointer-events-none z-0 opacity-60" />
+            <div className="absolute inset-0 shadow-[inset_0_0_120px_rgba(0,0,0,0.85)] pointer-events-none z-0" />
 
-            {/* ── DYNAMIC SVG RED YARN STRINGS LAYER ── */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none z-10" xmlns="http://www.w3.org/2000/svg">
+            {/* ── DENSE RED YARN STRINGS SVG OVERLAY (LIKE MOVIE PINBOARD) ── */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none z-20" xmlns="http://www.w3.org/2000/svg">
               <defs>
-                <filter id="yarnShadow" x="-30%" y="-30%" width="160%" height="160%">
-                  <feDropShadow dx="2" dy="5" stdDeviation="4" floodColor="#000000" floodOpacity="0.8" />
+                <filter id="stringShadow" x="-20%" y="-20%" width="150%" height="150%">
+                  <feDropShadow dx="3" dy="5" stdDeviation="3" floodColor="#000000" floodOpacity="0.9" />
                 </filter>
-                <filter id="yarnGlow" x="-30%" y="-30%" width="160%" height="160%">
-                  <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#ef4444" floodOpacity="0.9" />
+                <filter id="stringGlow" x="-20%" y="-20%" width="150%" height="150%">
+                  <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#ef4444" floodOpacity="1" />
                 </filter>
               </defs>
 
-              {/* String 1: Kingpin -> Left Dossier */}
+              {/* String: Kingpin Wanted Pin (Center) -> Top Left CID Dossier */}
               <path
-                d="M 50% 190 Q 30% 140, 16% 160"
+                d="M 50% 120 Q 32% 90, 15% 100"
                 stroke={hoveredNode === 'kingpin' || hoveredNode === 'dossier' ? '#ff3333' : '#dc2626'}
-                strokeWidth={hoveredNode === 'kingpin' || hoveredNode === 'dossier' ? '3.5' : '2.5'}
+                strokeWidth={hoveredNode === 'kingpin' || hoveredNode === 'dossier' ? '4' : '2.5'}
+                strokeDasharray="6,2"
+                filter={hoveredNode === 'kingpin' ? 'url(#stringGlow)' : 'url(#stringShadow)'}
+                className="transition-all duration-200"
+              />
+
+              {/* String: Top Left Dossier -> Top Newspaper Headline */}
+              <path
+                d="M 15% 100 Q 24% 120, 32% 115"
+                stroke="#b91c1c"
+                strokeWidth="2.5"
+                strokeDasharray="5,2"
+                filter="url(#stringShadow)"
+              />
+
+              {/* String: Kingpin Wanted Pin -> Top Right Transit Passes / FASTag */}
+              <path
+                d="M 50% 120 Q 64% 85, 78% 95"
+                stroke={hoveredNode === 'kingpin' || hoveredNode === 'toll' ? '#ff3333' : '#dc2626'}
+                strokeWidth="2.5"
+                strokeDasharray="6,2"
+                filter="url(#stringShadow)"
+              />
+
+              {/* String: Transit Passes -> Top Right Escape Satellite Map */}
+              <path
+                d="M 78% 95 Q 86% 90, 92% 105"
+                stroke="#dc2626"
+                strokeWidth="2.5"
+                strokeDasharray="5,2"
+                filter="url(#stringShadow)"
+              />
+
+              {/* String: Kingpin Pin -> Center Left CCTV Night Photo */}
+              <path
+                d="M 50% 120 Q 35% 240, 22% 340"
+                stroke={hoveredNode === 'kingpin' || hoveredNode === 'cctv' ? '#ff3333' : '#dc2626'}
+                strokeWidth="2.5"
+                strokeDasharray="6,2"
+                filter="url(#stringShadow)"
+              />
+
+              {/* String: Kingpin Pin -> Center Right Lieutenant Cluster (Deepak Shetty) */}
+              <path
+                d="M 50% 120 Q 66% 230, 80% 330"
+                stroke={hoveredNode === 'kingpin' || hoveredNode === 'lt-0' ? '#ff2222' : '#dc2626'}
+                strokeWidth="3"
                 strokeDasharray="8,2"
-                filter={hoveredNode === 'kingpin' ? 'url(#yarnGlow)' : 'url(#yarnShadow)'}
-                className="transition-all duration-300"
+                filter={hoveredNode === 'lt-0' ? 'url(#stringGlow)' : 'url(#stringShadow)'}
               />
 
-              {/* String 2: Kingpin -> Right Escape Corridor Map */}
+              {/* String: Mid Right Lieutenants -> Mid Right Personal Facial Profile Note */}
               <path
-                d="M 50% 190 Q 70% 130, 84% 160"
-                stroke={hoveredNode === 'kingpin' || hoveredNode === 'map' ? '#ff3333' : '#dc2626'}
-                strokeWidth={hoveredNode === 'kingpin' || hoveredNode === 'map' ? '3.5' : '2.5'}
-                strokeDasharray="8,2"
-                filter={hoveredNode === 'kingpin' ? 'url(#yarnGlow)' : 'url(#yarnShadow)'}
-                className="transition-all duration-300"
+                d="M 80% 330 Q 72% 300, 66% 280"
+                stroke="#b91c1c"
+                strokeWidth="2"
+                strokeDasharray="4,2"
+                filter="url(#stringShadow)"
               />
 
-              {/* String 3: Kingpin -> Left Lt (Deepak Shetty) */}
+              {/* String: Kingpin Pin -> Bottom Center Evidence Note & Jammer */}
               <path
-                d="M 50% 190 Q 32% 380, 18% 540"
-                stroke={hoveredNode === 'lt-0' || hoveredNode === 'kingpin' ? '#ff2222' : '#dc2626'}
-                strokeWidth={hoveredNode === 'lt-0' ? '4' : '2.5'}
-                strokeDasharray="10,2"
-                filter={hoveredNode === 'lt-0' ? 'url(#yarnGlow)' : 'url(#yarnShadow)'}
+                d="M 50% 120 Q 50% 380, 50% 640"
+                stroke={hoveredNode === 'kingpin' || hoveredNode === 'evidence' ? '#ff3333' : '#dc2626'}
+                strokeWidth="3"
+                strokeDasharray="6,2"
+                filter="url(#stringShadow)"
               />
 
-              {/* String 4: Kingpin -> Mid Lt (Manoj Reddy) */}
+              {/* String: Bottom Center Evidence -> Bottom Left Operatives Cluster */}
               <path
-                d="M 50% 190 Q 50% 380, 50% 540"
-                stroke={hoveredNode === 'lt-1' || hoveredNode === 'kingpin' ? '#ff2222' : '#dc2626'}
-                strokeWidth={hoveredNode === 'lt-1' ? '4' : '2.5'}
-                strokeDasharray="10,2"
-                filter={hoveredNode === 'lt-1' ? 'url(#yarnGlow)' : 'url(#yarnShadow)'}
+                d="M 50% 640 Q 32% 660, 16% 670"
+                stroke="#dc2626"
+                strokeWidth="2.5"
+                strokeDasharray="6,2"
+                filter="url(#stringShadow)"
               />
 
-              {/* String 5: Kingpin -> Right Lt (Farid Mirza) */}
+              {/* String: Bottom Center Evidence -> Bottom Right FIR Docket Sheet */}
               <path
-                d="M 50% 190 Q 68% 380, 82% 540"
-                stroke={hoveredNode === 'lt-2' || hoveredNode === 'kingpin' ? '#ff2222' : '#dc2626'}
-                strokeWidth={hoveredNode === 'lt-2' ? '4' : '2.5'}
-                strokeDasharray="10,2"
-                filter={hoveredNode === 'lt-2' ? 'url(#yarnGlow)' : 'url(#yarnShadow)'}
+                d="M 50% 640 Q 68% 660, 84% 670"
+                stroke="#dc2626"
+                strokeWidth="2.5"
+                strokeDasharray="6,2"
+                filter="url(#stringShadow)"
               />
 
-              {/* Strings from Lieutenants down to FIRs */}
-              <path d="M 18% 660 Q 15% 730, 14% 790" stroke="#b91c1c" strokeWidth="2" strokeDasharray="5,2" filter="url(#yarnShadow)" />
-              <path d="M 50% 660 Q 42% 730, 38% 790" stroke="#b91c1c" strokeWidth="2" strokeDasharray="5,2" filter="url(#yarnShadow)" />
-              <path d="M 50% 660 Q 58% 730, 62% 790" stroke="#b91c1c" strokeWidth="2" strokeDasharray="5,2" filter="url(#yarnShadow)" />
-              <path d="M 82% 660 Q 84% 730, 86% 790" stroke="#b91c1c" strokeWidth="2" strokeDasharray="5,2" filter="url(#yarnShadow)" />
+              {/* String: Bottom Left Operatives Cluster -> Center Left CCTV Night Photo */}
+              <path
+                d="M 16% 670 Q 14% 500, 22% 340"
+                stroke="#991b1b"
+                strokeWidth="2"
+                strokeDasharray="5,2"
+                filter="url(#stringShadow)"
+              />
+
+              {/* String: Mid Right Lieutenants -> Bottom Right FIR Docket */}
+              <path
+                d="M 80% 330 Q 86% 500, 84% 670"
+                stroke="#991b1b"
+                strokeWidth="2.5"
+                strokeDasharray="5,2"
+                filter="url(#stringShadow)"
+              />
             </svg>
 
-            {/* ── TIER 1 (TOP SECTION): DOSSIER, MAIN WANTED POSTER & CORRIDOR MAP ── */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 relative z-20 items-start pb-8">
+            {/* ── ARTIFACT LAYER: DETECTIVE PINBOARD COLLAGE ── */}
+            <div className="relative z-10 space-y-8">
               
-              {/* Top Left: Rounded Police Intel Sheet */}
-              <div
-                onMouseEnter={() => setHoveredNode('dossier')}
-                onMouseLeave={() => setHoveredNode(null)}
-                onClick={() => setSelectedEvidenceModal({
-                  title: 'KSP CID OFFICIAL DOSSIER RECORD',
-                  type: 'OFFICIAL DOCUMENT',
-                  content: `Subject ${selectedSyndicate.kingpin.name} (Alias: "${selectedSyndicate.kingpin.alias}") classified under High-Recidivism Organized Gang Index. Operating corridor: ${selectedSyndicate.primary_corridor}. Verified CCTNS ID: ${selectedSyndicate.kingpin.id}.`,
-                  date: '24 Nov 2024',
-                  stamp: 'CONFIDENTIAL CCTNS'
-                })}
-                className="md:col-span-3 bg-white text-slate-900 p-5 rounded-3xl shadow-xl border border-slate-200/80 hover:shadow-2xl hover:-translate-y-1 transition-all duration-200 cursor-pointer relative space-y-3"
-              >
-                {/* Silver Metal Pushpin */}
-                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-gradient-to-tr from-slate-600 to-slate-200 border-2 border-slate-400 shadow-md" />
+              {/* ── TOP SECTION (WANTED POSTER, CID DOSSIER, NEWSPAPER, TOLL SLIPS, SATELLITE MAP) ── */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
                 
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full font-mono">
-                    CONFIDENTIAL CCTNS
-                  </span>
-                  <FileText className="w-3.5 h-3.5 text-slate-400" />
-                </div>
-
-                <div>
-                  <h4 className="font-bold text-sm text-slate-900 tracking-tight">
-                    POLICE INTEL DOSSIER
-                  </h4>
-                  <p className="text-xs text-slate-500 font-mono mt-0.5">
-                    {selectedSyndicate.kingpin.id}
-                  </p>
-                </div>
-                
-                <div className="space-y-1.5 pt-1 text-xs text-slate-600">
-                  <p><strong className="text-slate-900">Name:</strong> {selectedSyndicate.kingpin.name}</p>
-                  <p><strong className="text-slate-900">Threat:</strong> <span className="text-rose-600 font-bold">{selectedSyndicate.threat_level} ({selectedSyndicate.risk_score}%)</span></p>
-                  <p><strong className="text-slate-900">Territory:</strong> {selectedSyndicate.districts.join(', ')}</p>
-                </div>
-
-                <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-                  <span>Sign: Insp. V. Sharma</span>
-                  <span className="text-indigo-600 font-semibold font-mono">VERIFIED</span>
-                </div>
-              </div>
-
-              {/* Center: Large Rounded "WANTED BY POLICE" Poster (Main Kingpin) */}
-              <div
-                onMouseEnter={() => setHoveredNode('kingpin')}
-                onMouseLeave={() => setHoveredNode(null)}
-                onClick={() => setSelectedEvidenceModal({
-                  title: `WANTED NOTICE: ${selectedSyndicate.kingpin.name}`,
-                  type: 'WANTED BULLETIN',
-                  mugshot: selectedSyndicate.kingpin.mugshot,
-                  content: `Wanted in connection with multi-district organized offenses. Associated vehicle: ${selectedSyndicate.kingpin.vehicle}. Last verified sighting: ${selectedSyndicate.kingpin.last_location}. Reward declared: ${selectedSyndicate.kingpin.reward}.`,
-                  date: 'CURRENT BULLETIN',
-                  stamp: 'ACTIVE NBW WARRANT'
-                })}
-                className="md:col-span-6 bg-white text-slate-900 p-6 rounded-3xl shadow-2xl border-2 border-slate-200 hover:shadow-2xl hover:scale-101 transition-all duration-200 cursor-pointer relative max-w-md mx-auto w-full text-center space-y-4"
-              >
-                {/* Big Red Shiny Pushpin */}
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-gradient-to-tr from-red-900 via-red-600 to-red-400 border-2 border-red-300 shadow-xl z-30" />
-
-                {/* Poster Header */}
-                <div className="border-b border-slate-200 pb-2">
-                  <h3 className="font-extrabold text-lg sm:text-xl uppercase tracking-wider text-slate-900 font-mono">
-                    ★ WANTED BY POLICE ★
-                  </h3>
-                  <p className="text-[10.5px] font-bold text-rose-600 tracking-wider uppercase font-mono mt-0.5">
-                    KARNATAKA STATE POLICE · CCTNS WATCHLIST
-                  </p>
-                </div>
-
-                {/* Mugshot Frame with Rounded Borders */}
-                <div className="relative w-44 h-44 sm:w-48 sm:h-48 mx-auto rounded-2xl overflow-hidden bg-slate-100 border-2 border-slate-300 shadow-md">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={selectedSyndicate.kingpin.mugshot}
-                    alt={selectedSyndicate.kingpin.name}
-                    className="w-full h-full object-cover object-top"
-                  />
-                  <span className="absolute bottom-2 right-2 bg-rose-600 text-white font-mono text-[9px] font-bold px-2 py-0.5 rounded-md uppercase shadow">
-                    PRIME KINGPIN
-                  </span>
-                </div>
-
-                {/* Kingpin Identity */}
-                <div className="space-y-1">
-                  <h4 className="font-bold text-base text-slate-900">
-                    {selectedSyndicate.kingpin.name}
-                  </h4>
-                  <p className="text-xs text-rose-600 font-bold font-mono">
-                    KNOWN ALIAS: &quot;{selectedSyndicate.kingpin.alias}&quot;
-                  </p>
+                {/* 1. TOP LEFT: OFFICIAL CID REVIEW / SUSPECT DOSSIER PAGE */}
+                <div
+                  onMouseEnter={() => setHoveredNode('dossier')}
+                  onMouseLeave={() => setHoveredNode(null)}
+                  onClick={() => setSelectedEvidenceModal({
+                    title: 'CID REVIEW PROGRAM — AGENT PROFILE',
+                    type: 'OFFICIAL POLICE DOSSIER',
+                    mugshot: selectedSyndicate.kingpin.mugshot,
+                    content: `Subject ${selectedSyndicate.kingpin.name} (Alias: "${selectedSyndicate.kingpin.alias}") classified under CCTNS Organized Crime Index. Operating Corridor: ${selectedSyndicate.primary_corridor}. Threat Level: ${selectedSyndicate.threat_level} (${selectedSyndicate.risk_score}%). Multiple non-bailable warrants pending execution across 3 districts.`,
+                    date: '24 Nov 2024',
+                    stamp: 'VERIFIED CCTNS'
+                  })}
+                  className="md:col-span-4 bg-[#fbf9f4] text-stone-900 p-4 rounded shadow-2xl border border-stone-300 font-mono text-xs relative cursor-pointer group hover:scale-102 transition-transform"
+                >
+                  {/* Red Metal Pushpin */}
+                  <div className="absolute -top-2.5 left-4 w-5 h-5 rounded-full bg-gradient-to-tr from-red-800 via-red-600 to-red-400 border border-red-200 shadow-md z-30 group-hover:scale-120 transition-transform" />
                   
-                  <div className="mt-3 pt-2.5 border-t border-slate-100 grid grid-cols-2 gap-2 text-left text-xs text-slate-600">
-                    <p><strong className="text-slate-900">Reward:</strong> <span className="font-bold text-emerald-600 font-mono">{selectedSyndicate.kingpin.reward}</span></p>
-                    <p className="truncate"><strong className="text-slate-900">Vehicle:</strong> {selectedSyndicate.kingpin.vehicle.split('(')[0]}</p>
+                  {/* Paperclip top right */}
+                  <div className="absolute -top-3 right-4 w-4 h-8 border-2 border-stone-400 rounded-full z-30 opacity-70" />
+
+                  {/* Header with Police Seal */}
+                  <div className="flex items-center gap-2 border-b border-stone-300 pb-2">
+                    <Shield className="w-4 h-4 text-stone-700 shrink-0" />
+                    <div>
+                      <h4 className="font-extrabold text-[11px] uppercase tracking-wider text-stone-900">
+                        KSP CID REVIEW PROGRAM
+                      </h4>
+                      <p className="text-[9px] text-stone-500 uppercase">SUBJECT AGENT PROFILE</p>
+                    </div>
+                  </div>
+
+                  {/* Profile Layout */}
+                  <div className="flex gap-3 pt-2.5">
+                    <div className="w-16 h-20 bg-stone-200 rounded border border-stone-300 overflow-hidden shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={selectedSyndicate.kingpin.mugshot} alt="Kingpin" className="w-full h-full object-cover object-top" />
+                    </div>
+                    <div className="text-[10px] space-y-0.5 min-w-0">
+                      <p><strong className="text-stone-900">NAME:</strong> {selectedSyndicate.kingpin.name}</p>
+                      <p><strong className="text-stone-900">ALIAS:</strong> “{selectedSyndicate.kingpin.alias}”</p>
+                      <p><strong className="text-stone-900">ID:</strong> {selectedSyndicate.kingpin.id}</p>
+                      <p><strong className="text-stone-900">STATUS:</strong> <span className="text-red-700 font-bold">{selectedSyndicate.kingpin.status.split('/')[0]}</span></p>
+                    </div>
+                  </div>
+
+                  {/* Typewriter Dossier Text */}
+                  <div className="mt-2 pt-2 border-t border-stone-200 text-[9.5px] text-stone-600 space-y-1 leading-snug">
+                    <p>• Verified leader of {selectedSyndicate.name}.</p>
+                    <p>• Primary transit route: {selectedSyndicate.primary_corridor}.</p>
+                  </div>
+
+                  <div className="mt-2 pt-1.5 border-t border-stone-300 flex items-center justify-between text-[9px] text-stone-500">
+                    <span>Officer: Insp. V. Sharma</span>
+                    <span className="font-bold text-red-700 uppercase border border-red-700 px-1 py-0.2">CCTNS VERIFIED</span>
                   </div>
                 </div>
 
-                {/* Pinned Sighting Pill */}
-                <div className="bg-amber-50 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 px-3.5 py-2 rounded-2xl border border-amber-200 dark:border-amber-800 text-xs font-semibold text-left flex items-center gap-2">
-                  <MapPin className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                  <span className="truncate">Last Sighted: {selectedSyndicate.kingpin.last_location.split('—')[0]}</span>
-                </div>
-              </div>
+                {/* 2. CENTER: LARGE "WANTED BY POLICE" CENTRAL BULLETIN */}
+                <div
+                  onMouseEnter={() => setHoveredNode('kingpin')}
+                  onMouseLeave={() => setHoveredNode(null)}
+                  onClick={() => setSelectedEvidenceModal({
+                    title: `WANTED NOTICE: ${selectedSyndicate.kingpin.name}`,
+                    type: 'WANTED BULLETIN',
+                    mugshot: selectedSyndicate.kingpin.mugshot,
+                    content: `Wanted for organized gang offenses, vehicle theft, and conspiracy under IPC § 379, 392, 120B. Physical specs: Height 5'9", Age 34, Medium build. Last seen near ${selectedSyndicate.kingpin.last_location}. Reward declared: ${selectedSyndicate.kingpin.reward}.`,
+                    date: 'CURRENT BULLETIN',
+                    stamp: 'ACTIVE NBW WARRANT'
+                  })}
+                  className="md:col-span-4 bg-[#fffefc] text-stone-950 p-5 rounded shadow-2xl border-2 border-stone-400 text-center font-mono relative cursor-pointer group hover:scale-102 transition-transform"
+                >
+                  {/* Central Red Heavy Pushpin */}
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-gradient-to-tr from-red-900 via-red-600 to-red-300 border-2 border-white shadow-xl z-30 group-hover:scale-120 transition-transform" />
 
-              {/* Top Right: Rounded Escape Corridor Telemetry Map */}
-              <div
-                onMouseEnter={() => setHoveredNode('map')}
-                onMouseLeave={() => setHoveredNode(null)}
-                onClick={() => setSelectedEvidenceModal({
-                  title: 'PREDICTED ESCAPE CORRIDOR & CHOKEPOINT GRID',
-                  type: 'CORRIDOR MAPPING',
-                  content: `Primary Transit: ${selectedSyndicate.primary_corridor}. Predicted Path: ${selectedSyndicate.predicted_escape_route}. Active ANPR Intercept Nodes: ${selectedSyndicate.anpr_chokepoints.join(', ')}.`,
-                  date: 'LIVE CALIBRATION',
-                  stamp: 'FASTAG / ANPR GRID'
-                })}
-                className="md:col-span-3 bg-white dark:bg-zinc-900 text-slate-900 dark:text-white p-5 rounded-3xl shadow-xl border border-slate-200/80 dark:border-zinc-800 hover:shadow-2xl hover:-translate-y-1 transition-all duration-200 cursor-pointer relative space-y-3"
-              >
-                {/* Yellow Pushpin */}
-                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-gradient-to-tr from-amber-600 to-yellow-300 border-2 border-amber-500 shadow-md" />
-                
-                <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-zinc-800 text-xs font-bold">
-                  <span className="text-slate-900 dark:text-white font-mono uppercase text-[11px]">TRANSIT CORRIDOR</span>
-                  <Navigation className="w-3.5 h-3.5 text-rose-500 animate-pulse" />
+                  {/* Poster Banner */}
+                  <div className="border-b-2 border-black pb-1.5 mb-2.5">
+                    <h3 className="font-black text-xl sm:text-2xl uppercase tracking-tight text-black">
+                      ★ WANTED BY POLICE ★
+                    </h3>
+                    <p className="text-[10px] font-bold text-red-700 tracking-wider uppercase">
+                      KARNATAKA STATE POLICE · CCTNS WATCHLIST
+                    </p>
+                  </div>
+
+                  {/* Dual Mugshot Grid (Like Reference Wanted Poster) */}
+                  <div className="grid grid-cols-2 gap-2 max-w-[260px] mx-auto">
+                    <div className="relative aspect-square rounded overflow-hidden bg-stone-200 border-2 border-black">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={selectedSyndicate.kingpin.mugshot} alt={selectedSyndicate.kingpin.name} className="w-full h-full object-cover object-top" />
+                      <span className="absolute bottom-0 inset-x-0 bg-black/80 text-white text-[8px] font-bold py-0.5">
+                        {selectedSyndicate.kingpin.name.split(' ')[0]}
+                      </span>
+                    </div>
+                    <div className="relative aspect-square rounded overflow-hidden bg-stone-200 border-2 border-black">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={selectedSyndicate.lieutenants[0].mugshot} alt={selectedSyndicate.lieutenants[0].name} className="w-full h-full object-cover object-top" />
+                      <span className="absolute bottom-0 inset-x-0 bg-black/80 text-white text-[8px] font-bold py-0.5">
+                        {selectedSyndicate.lieutenants[0].name.split(' ')[0]}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Notice & Reward Box */}
+                  <div className="mt-2.5 space-y-1">
+                    <p className="text-xs font-black uppercase text-stone-900">
+                      {selectedSyndicate.kingpin.name} & {selectedSyndicate.lieutenants[0].name}
+                    </p>
+                    <p className="text-[10px] text-red-700 font-bold">
+                      THOUGHT TO BE ARMED AND DANGEROUS
+                    </p>
+                    <div className="bg-stone-100 p-1.5 rounded border border-stone-300 text-[9.5px] text-stone-700">
+                      <strong className="text-stone-900">NOTICE:</strong> If sighted, contact State Control Room 112 immediately. Reward: <strong className="text-emerald-800">{selectedSyndicate.kingpin.reward}</strong>.
+                    </div>
+                  </div>
+
+                  {/* Yellow Sighting Sticky Note Taped on Corner */}
+                  <div className="mt-2.5 bg-[#fef08a] text-stone-950 p-2 rounded shadow-md border border-amber-300 text-left text-[10px] font-bold">
+                    📍 LAST SIGHTED: {selectedSyndicate.kingpin.last_location.split('—')[0]}
+                  </div>
                 </div>
 
-                {/* Map Vector Graphic */}
-                <div className="h-28 bg-slate-900 text-white rounded-2xl p-3 relative overflow-hidden flex flex-col justify-between">
-                  <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#ef4444_1px,transparent_1px)] [background-size:8px_8px]" />
+                {/* 3. TOP RIGHT: ESCAPE CORRIDOR SATELLITE MAP & TOLL PASS CLIPPINGS */}
+                <div className="md:col-span-4 space-y-3">
                   
-                  {/* Route Polyline */}
-                  <div className="relative z-10 flex items-center justify-between text-[10px] font-mono font-bold">
-                    <span className="bg-rose-900 text-rose-200 px-2 py-0.5 rounded-lg">NODE A</span>
-                    <span className="text-amber-400">──▶</span>
-                    <span className="bg-amber-900 text-amber-200 px-2 py-0.5 rounded-lg">TOLL</span>
-                    <span className="text-amber-400">──▶</span>
-                    <span className="bg-emerald-900 text-emerald-200 px-2 py-0.5 rounded-lg">YARD</span>
-                  </div>
-
-                  <p className="relative z-10 text-[10px] text-slate-300 line-clamp-2">
-                    Route: <span className="text-white font-bold">{selectedSyndicate.predicted_escape_route}</span>
-                  </p>
-                </div>
-
-                <div className="pt-1 flex items-center justify-between text-xs text-slate-500 font-mono">
-                  <span>ANPR Hits: 2 Verified</span>
-                  <span className="text-indigo-600 dark:text-indigo-400 font-bold">GRID SYNC</span>
-                </div>
-              </div>
-
-            </div>
-
-            {/* ── TIER 2: FORENSIC EVIDENCE & ANPR TILES ── */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 relative z-20 pb-8 max-w-3xl mx-auto">
-              
-              {/* Forensic Fingerprint AFIS Card */}
-              <div
-                onClick={() => setSelectedEvidenceModal({
-                  title: 'LATENT BIOMETRIC FINGERPRINT MATCH',
-                  type: 'FORENSIC SCIENCE LAB EVIDENCE',
-                  content: `Latent fingerprints lifted from ignition lock and frequency jammer casing matched subject ${selectedSyndicate.kingpin.name} with 98.4% AFIS algorithm confidence.`,
-                  date: '18 Jul 2026',
-                  stamp: 'FSL CONFIRMED MATCH'
-                })}
-                className="bg-white dark:bg-zinc-900 p-4 rounded-3xl shadow-lg border border-slate-200/80 dark:border-zinc-800 hover:shadow-xl transition-all cursor-pointer relative space-y-2"
-              >
-                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-gradient-to-tr from-emerald-700 to-emerald-400 border border-emerald-300 shadow-md" />
-                
-                <div className="flex items-center justify-between text-xs font-bold text-slate-500 pb-1 border-b border-slate-100 dark:border-zinc-800">
-                  <span className="font-mono text-[10px] uppercase">FORENSIC LAB REPORT</span>
-                  <span className="text-rose-600 font-mono text-[10px]">#EV-9021-FSL</span>
-                </div>
-
-                <div className="flex items-center gap-3 pt-1">
-                  <div className="w-12 h-12 bg-slate-100 dark:bg-zinc-800 rounded-2xl flex items-center justify-center text-slate-800 dark:text-slate-200 shrink-0">
-                    <Fingerprint className="w-7 h-7" />
-                  </div>
-                  <div className="min-w-0 text-xs">
-                    <p className="font-bold text-slate-900 dark:text-white">AFIS Latent Match: 98.4%</p>
-                    <p className="text-slate-500 text-[11px] truncate">Stolen vehicle steering & jammer casing</p>
-                    <p className="text-emerald-600 font-semibold text-[11px] mt-0.5">Matched: {selectedSyndicate.kingpin.name}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* CCTV Camera Snapshot Still */}
-              <div
-                onClick={() => setSelectedEvidenceModal({
-                  title: 'ANPR SURVEILLANCE CAMERA INTERCEPT',
-                  type: 'CCTV SURVEILLANCE STILL',
-                  content: `Camera CAM-BLR-0045 recorded vehicle ${selectedSyndicate.kingpin.vehicle} passing Silk Board TTMC at high speed. Facial match algorithm flagged subject with 98.4% confidence score.`,
-                  date: '18 Jul 2026 14:22 hrs',
-                  stamp: 'ANPR TIME-STAMPED'
-                })}
-                className="bg-white dark:bg-zinc-900 p-4 rounded-3xl shadow-lg border border-slate-200/80 dark:border-zinc-800 hover:shadow-xl transition-all cursor-pointer relative space-y-2"
-              >
-                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-gradient-to-tr from-cyan-600 to-cyan-300 border border-cyan-400 shadow-md" />
-                
-                <div className="flex items-center justify-between text-xs font-bold text-slate-500 pb-1 border-b border-slate-100 dark:border-zinc-800">
-                  <span className="font-mono text-[10px] uppercase">ANPR CAMERA FEED</span>
-                  <span className="text-rose-600 font-mono text-[10px]">REC ● 14:22:10</span>
-                </div>
-
-                <div className="flex items-center gap-3 pt-1">
-                  <div className="w-12 h-12 bg-cyan-50 dark:bg-cyan-950/60 rounded-2xl flex items-center justify-center text-cyan-600 shrink-0">
-                    <Camera className="w-7 h-7" />
-                  </div>
-                  <div className="min-w-0 text-xs">
-                    <p className="font-bold text-slate-900 dark:text-white">CAM-BLR-0045 @ Silk Board</p>
-                    <p className="text-slate-500 text-[11px] truncate">Plate: KA-01-MJ-8821</p>
-                    <p className="text-indigo-600 dark:text-indigo-400 font-semibold text-[11px] mt-0.5">Biometric Match: 98.4%</p>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            {/* ── TIER 3: KEY LIEUTENANTS ROUNDED CARDS ── */}
-            <div className="relative z-20 pb-8">
-              <div className="flex items-center justify-center gap-2 mb-5">
-                <span className="h-px w-16 bg-slate-700" />
-                <span className="text-xs font-bold font-mono uppercase tracking-widest text-amber-400 bg-slate-900 px-4 py-1.5 rounded-full border border-slate-700 shadow-md">
-                  OPERATIONAL LIEUTENANTS ({selectedSyndicate.lieutenants.length})
-                </span>
-                <span className="h-px w-16 bg-slate-700" />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                {selectedSyndicate.lieutenants.map((lt, idx) => (
+                  {/* Pinned Toll & FASTag Ticket Slips (Top) */}
                   <div
-                    key={lt.id}
-                    onMouseEnter={() => setHoveredNode(`lt-${idx}`)}
+                    onMouseEnter={() => setHoveredNode('toll')}
                     onMouseLeave={() => setHoveredNode(null)}
                     onClick={() => setSelectedEvidenceModal({
-                      title: `LIEUTENANT DOSSIER: ${lt.name}`,
-                      type: 'SYNDICATE OPERATIVE PROFILE',
-                      mugshot: lt.mugshot,
-                      content: `Role: ${lt.role}. Operational Area: ${lt.district}. Assignment: ${lt.task}. Risk Score: ${lt.risk_score}%.`,
-                      date: 'ACTIVE FILE',
-                      stamp: 'KEY ENFORCER'
+                      title: 'FASTAG & ANPR TOLL CHECKPOST SEIZURE',
+                      type: 'ELECTRONIC TOLL SLIP',
+                      content: `Attibele Toll Plaza lane 4 recorded vehicle ${selectedSyndicate.kingpin.vehicle} passing at 23:42 hrs without stopping. Automatic barrier breach recorded.`,
+                      date: '18 Jul 2026 23:42 hrs',
+                      stamp: 'FASTAG TOLL SWEEP'
                     })}
-                    className="flex flex-col items-center cursor-pointer group"
+                    className="bg-[#f2ece1] text-stone-900 p-3 rounded shadow-lg border border-stone-300 font-mono text-[10px] relative cursor-pointer hover:scale-102 transition-transform"
                   >
-                    {/* Pushpin */}
-                    <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-amber-600 to-yellow-300 shadow-lg border border-amber-200 z-30 -mb-2.5 group-hover:scale-110 transition-transform" />
+                    <div className="absolute -top-2.5 left-6 w-4 h-4 rounded-full bg-gradient-to-tr from-cyan-600 to-cyan-300 border border-cyan-400 shadow-md z-30" />
                     
-                    {/* Rounded Card */}
-                    <div className="bg-white dark:bg-zinc-900 text-slate-900 dark:text-white p-4 rounded-3xl shadow-xl border border-slate-200/80 dark:border-zinc-800 w-full group-hover:shadow-2xl group-hover:-translate-y-1.5 transition-all duration-200 space-y-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 shrink-0">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={lt.mugshot}
-                            alt={lt.name}
-                            className="w-full h-full object-cover object-top"
-                          />
-                        </div>
-                        <div className="min-w-0 text-left">
-                          <h5 className="font-bold text-sm text-slate-900 dark:text-white truncate">{lt.name}</h5>
-                          <p className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold truncate">{lt.role}</p>
-                          <span className="inline-block mt-1 text-[10px] bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 font-bold px-2 py-0.2 rounded-full font-mono border border-rose-200/60">
-                            Risk {lt.risk_score}%
-                          </span>
-                        </div>
+                    <div className="flex items-center justify-between border-b border-stone-300 pb-1 font-bold">
+                      <span>HIGHWAY TOLL RECEIPT</span>
+                      <span className="text-red-700">#TL-8821-B</span>
+                    </div>
+                    <div className="pt-1 text-[9.5px] text-stone-600 space-y-0.5">
+                      <p><strong className="text-stone-900">PLAZA:</strong> Attibele Toll Plaza (NH-44)</p>
+                      <p><strong className="text-stone-900">TAG ID:</strong> 34161FA8829104 (KA-01-MJ-8821)</p>
+                      <p className="text-red-700 font-bold">TIME: 23:42:15 HRS · ANPR HIT</p>
+                    </div>
+                  </div>
+
+                  {/* Satellite Corridor Route Map Sheet (Bottom) */}
+                  <div
+                    onMouseEnter={() => setHoveredNode('map')}
+                    onMouseLeave={() => setHoveredNode(null)}
+                    onClick={() => setSelectedEvidenceModal({
+                      title: 'PREDICTED ESCAPE CORRIDOR & CHOKEPOINT GRID',
+                      type: 'CORRIDOR MAPPING',
+                      content: `Primary Transit: ${selectedSyndicate.primary_corridor}. Predicted Path: ${selectedSyndicate.predicted_escape_route}. Active ANPR Intercept Nodes: ${selectedSyndicate.anpr_chokepoints.join(', ')}.`,
+                      date: 'LIVE CALIBRATION',
+                      stamp: 'FASTAG / ANPR GRID'
+                    })}
+                    className="bg-[#181a1f] text-stone-100 p-3.5 rounded shadow-2xl border-2 border-stone-600 font-mono text-xs relative cursor-pointer hover:scale-102 transition-transform"
+                  >
+                    {/* Yellow Pushpin */}
+                    <div className="absolute -top-2.5 right-6 w-5 h-5 rounded-full bg-gradient-to-tr from-amber-600 to-yellow-300 border border-amber-500 shadow-md z-30" />
+                    
+                    <div className="flex items-center justify-between pb-1 border-b border-stone-700 text-[10px] text-amber-400 font-bold uppercase">
+                      <span>ESCAPE CORRIDOR MAP</span>
+                      <Navigation className="w-3.5 h-3.5 text-red-500 animate-pulse" />
+                    </div>
+
+                    <div className="mt-2 h-28 bg-[#0e1013] rounded border border-stone-700 p-2 relative overflow-hidden flex flex-col justify-between">
+                      <div className="absolute inset-0 opacity-25 bg-[radial-gradient(#ef4444_1px,transparent_1px)] [background-size:8px_8px]" />
+                      
+                      <div className="relative z-10 flex items-center justify-between text-[9px]">
+                        <span className="bg-red-900 text-red-200 px-1.5 py-0.2 rounded font-bold">SILK BOARD</span>
+                        <span className="text-amber-400 font-black">──▶</span>
+                        <span className="bg-amber-900 text-amber-200 px-1.5 py-0.2 rounded font-bold">ATTIBELE</span>
+                        <span className="text-amber-400 font-black">──▶</span>
+                        <span className="bg-emerald-900 text-emerald-200 px-1.5 py-0.2 rounded font-bold">RAICHUR</span>
                       </div>
 
-                      <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                        {lt.task}
+                      <p className="relative z-10 text-[9.5px] text-stone-300 leading-tight">
+                        Route: <span className="text-white font-bold">{selectedSyndicate.predicted_escape_route}</span>
                       </p>
+                    </div>
 
-                      <div className="pt-2 border-t border-slate-100 dark:border-zinc-800 text-[11px] text-slate-400 flex items-center justify-between font-mono">
-                        <span>Sector: {lt.district}</span>
-                        <span className="text-indigo-600 dark:text-indigo-400 font-bold">LINKED</span>
+                    <div className="mt-2 pt-1 border-t border-stone-700 text-[9.5px] text-amber-400 font-bold flex items-center justify-between">
+                      <span>ANPR NODES: 2 HIT</span>
+                      <span className="text-red-400">CHOKEPOINTS ACTIVE</span>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+
+              {/* ── MIDDLE SECTION (POLAROID CLUSTERS, NEWSPAPER COLUMNS, EVIDENCE STICKY NOTES, CCTV STILLS) ── */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-start pt-2">
+                
+                {/* 4. MID-LEFT: NIGHT CCTV STILL & NEWSPAPER PRESS RELEASE */}
+                <div className="md:col-span-4 space-y-3">
+                  
+                  {/* Newspaper Press Clipping ("DECCAN CHRONICLE") */}
+                  <div
+                    onClick={() => setSelectedEvidenceModal({
+                      title: 'NEWSPAPER BULLETIN: INTER-DISTRICT GANG BUSTED',
+                      type: 'PRESS RELEASE CLIPPING',
+                      content: `Bengaluru City Police Crime Squad carried out coordinated midnight raids across 5 locations, seizing master electronic frequency bypass units and recovering 42 stolen two-wheelers.`,
+                      date: '02 Jun 2024',
+                      stamp: 'PRESS ARCHIVE'
+                    })}
+                    className="bg-[#f4efe4] text-stone-900 p-3.5 rounded shadow-lg border border-stone-300 font-mono relative cursor-pointer hover:scale-102 transition-transform"
+                  >
+                    <div className="absolute -top-2.5 left-8 w-4 h-4 rounded-full bg-gradient-to-tr from-slate-600 to-slate-300 border border-slate-400 shadow-md z-30" />
+                    
+                    <div className="border-b border-black pb-1 mb-1.5 text-center">
+                      <h5 className="font-black text-xs uppercase tracking-tight text-black">
+                        THE DECCAN CHRONICLE
+                      </h5>
+                      <p className="text-[8.5px] text-stone-500">STATE POLICE INTELLIGENCE DESK</p>
+                    </div>
+
+                    <h6 className="font-extrabold text-[11px] uppercase leading-tight text-stone-950">
+                      SPECIAL SQUAD BUSTS HIGHWAY AUTO GANG IN MIDNIGHT SWEEP
+                    </h6>
+                    <p className="text-[9.5px] text-stone-700 mt-1 leading-snug">
+                      Over 42 vehicles recovered. Master frequency immobilizer bypass devices seized from Yelahanka scrap yard.
+                    </p>
+                  </div>
+
+                  {/* CCTV Camera Night Snapshot Still */}
+                  <div
+                    onMouseEnter={() => setHoveredNode('cctv')}
+                    onMouseLeave={() => setHoveredNode(null)}
+                    onClick={() => setSelectedEvidenceModal({
+                      title: 'ANPR NIGHT SURVEILLANCE INTERCEPT',
+                      type: 'CCTV SURVEILLANCE STILL',
+                      content: `Camera CAM-BLR-0045 captured vehicle ${selectedSyndicate.kingpin.vehicle} heading toward Hosur Road exit at high velocity. Facial recognition flagged subject with 98.4% match confidence.`,
+                      date: '18 Jul 2026 14:22 hrs',
+                      stamp: 'ANPR TIME-STAMPED'
+                    })}
+                    className="bg-[#111317] text-stone-100 p-3 rounded shadow-xl border border-stone-700 font-mono relative cursor-pointer hover:scale-102 transition-transform"
+                  >
+                    <div className="absolute -top-2.5 right-8 w-4 h-4 rounded-full bg-gradient-to-tr from-cyan-600 to-cyan-300 border border-cyan-400 shadow-md z-30" />
+                    
+                    <div className="flex items-center justify-between border-b border-stone-700 pb-1 text-[9.5px] text-cyan-400 font-bold">
+                      <span>ANPR CAM-BLR-0045</span>
+                      <span className="text-red-400">REC ● 14:22:10</span>
+                    </div>
+
+                    <div className="mt-2 bg-[#090a0c] p-2 rounded border border-stone-800 flex items-center justify-between">
+                      <div className="text-[10px] space-y-0.5">
+                        <p className="text-cyan-300 font-bold">Silk Board TTMC Approach</p>
+                        <p className="text-amber-400 font-bold">PLATE: KA-01-MJ-8821</p>
+                        <p className="text-emerald-400 text-[9px]">AFIS Match: 98.4%</p>
+                      </div>
+                      <div className="w-10 h-10 rounded bg-cyan-950/60 border border-cyan-700 flex items-center justify-center text-cyan-400">
+                        <Camera className="w-5 h-5" />
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
 
-            {/* ── TIER 4: CCTNS FIR CASE DOCKETS ── */}
-            <div className="relative z-20 pt-2">
-              <div className="flex items-center justify-center gap-2 mb-5">
-                <span className="h-px w-16 bg-slate-700" />
-                <span className="text-xs font-bold font-mono uppercase tracking-widest text-emerald-400 bg-slate-900 px-4 py-1.5 rounded-full border border-slate-700 shadow-md">
-                  SEIZED EVIDENCE & CCTNS CASE DOCKETS ({selectedSyndicate.connected_firs.length})
-                </span>
-                <span className="h-px w-16 bg-slate-700" />
-              </div>
+                </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
-                {selectedSyndicate.connected_firs.map((fir, idx) => (
+                {/* 5. MID-CENTER: SEIZED EVIDENCE NOTE & FILM STRIPS */}
+                <div
+                  onMouseEnter={() => setHoveredNode('evidence')}
+                  onMouseLeave={() => setHoveredNode(null)}
+                  className="md:col-span-4 space-y-3"
+                >
+                  {/* Handwritten Blue/White Evidence Index Card (Like in reference) */}
                   <div
-                    key={fir.case_number}
-                    onClick={() => handleCaseClick(fir.case_number)}
-                    className="group flex flex-col items-center cursor-pointer"
+                    onClick={() => setSelectedEvidenceModal({
+                      title: 'FORENSIC EVIDENCE: RECOVERED JAMMERS & KEYS',
+                      type: 'EVIDENCE SEIZURE DOCKET',
+                      content: `Recovered master 433MHz frequency jammer unit, OBD-II keyway code duplicator, and 14 blank smart keys from Yelahanka chopshop. Tampered chassis numbers confirmed by FSL forensics.`,
+                      date: '01 Jun 2024',
+                      stamp: 'SEIZED EVIDENCE #EV-4910'
+                    })}
+                    className="bg-[#edf2f7] text-stone-900 p-4 rounded shadow-xl border-2 border-stone-300 font-mono relative cursor-pointer hover:scale-102 transition-transform"
                   >
-                    {/* Green Pushpin */}
-                    <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-emerald-700 to-emerald-400 shadow-md border border-emerald-200 z-30 -mb-2 group-hover:scale-115 transition-transform" />
+                    <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-gradient-to-tr from-emerald-700 to-emerald-400 border border-emerald-300 shadow-md z-30" />
                     
-                    {/* Rounded Manila Docket */}
-                    <div className="bg-white dark:bg-zinc-900 text-slate-900 dark:text-white p-4 rounded-3xl shadow-lg border border-slate-200/80 dark:border-zinc-800 w-full hover:bg-slate-50 dark:hover:bg-zinc-800/80 space-y-2 text-left transform group-hover:-translate-y-1.5 transition-all">
-                      <div className="flex items-center justify-between text-xs font-mono">
-                        <span className="font-bold text-indigo-600 dark:text-indigo-400">{fir.case_number}</span>
-                        <span className="px-2 py-0.5 bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 font-bold rounded-full text-[10px]">
+                    <div className="flex items-center justify-between border-b border-stone-300 pb-1 text-[10px] font-bold text-stone-700">
+                      <span className="text-emerald-800">EVIDENCE SEIZURE</span>
+                      <span className="text-red-700">#EV-4910-KSP</span>
+                    </div>
+
+                    <div className="pt-2 text-[10.5px] space-y-1">
+                      <p className="font-extrabold text-stone-950">
+                        ⚡ RECOVERED HARDWARE & ARMS:
+                      </p>
+                      <p className="text-stone-700 text-[10px] leading-snug">
+                        • 433MHz Master RF Frequency Jammer.<br />
+                        • OBD-II smart-key duplicator & 14 blanks.<br />
+                        • Stamped VIN plate dyes from Raichur yard.
+                      </p>
+                    </div>
+
+                    <div className="mt-2.5 pt-1.5 border-t border-stone-300 flex items-center justify-between text-[9px] text-stone-500">
+                      <span>FSL Forensics Confirmed</span>
+                      <span className="text-emerald-800 font-bold uppercase">PHYSICAL CUSTODY</span>
+                    </div>
+                  </div>
+
+                  {/* Warning Sticky Note (Yellow) */}
+                  <div className="bg-[#fef08a] text-stone-950 p-2.5 rounded shadow-md border border-amber-300 font-mono text-[10.5px] font-bold text-left">
+                    ⚠️ DANGEROUS: Suspect known to carry bladed weapons and switch mobile IMEI every 48 hrs.
+                  </div>
+                </div>
+
+                {/* 6. MID-RIGHT: POLAROID CLUSTERS OF LIEUTENANTS (LIKE TOM CRUISE / SIMON PEGG CLUSTERS) */}
+                <div
+                  onMouseEnter={() => setHoveredNode('lt-0')}
+                  onMouseLeave={() => setHoveredNode(null)}
+                  className="md:col-span-4 space-y-3"
+                >
+                  {/* Handwritten Header Note (Like in reference) */}
+                  <div className="bg-[#e0f2fe] text-sky-950 p-2 rounded shadow-md border border-sky-300 font-mono text-[10px] font-black flex items-center justify-between">
+                    <span>PERSONAL FACIAL PROFILE</span>
+                    <span className="text-sky-700">ANPR CONFIRMED</span>
+                  </div>
+
+                  {/* Overlapping Polaroid Cluster of Operatives */}
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {selectedSyndicate.lieutenants.slice(0, 2).map((lt, idx) => (
+                      <div
+                        key={lt.id}
+                        onClick={() => setSelectedEvidenceModal({
+                          title: `OPERATIVE DOSSIER: ${lt.name}`,
+                          type: 'SYNDICATE LIEUTENANT',
+                          mugshot: lt.mugshot,
+                          content: `Role: ${lt.role}. Sector: ${lt.district}. Assignment: ${lt.task}. Risk Rating: ${lt.risk_score}%.`,
+                          date: 'ACTIVE FILE',
+                          stamp: 'KEY ENFORCER'
+                        })}
+                        className="bg-[#faf8f4] text-stone-900 p-2.5 pb-3 rounded shadow-xl border border-stone-300 font-mono cursor-pointer hover:scale-105 transition-transform group relative"
+                      >
+                        {/* Pushpin */}
+                        <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-gradient-to-tr from-amber-600 to-yellow-300 border border-amber-200 shadow-md z-30" />
+                        
+                        <div className="aspect-square rounded overflow-hidden bg-stone-200 border border-stone-300 mb-1.5">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={lt.mugshot} alt={lt.name} className="w-full h-full object-cover object-top" />
+                        </div>
+                        <h6 className="font-extrabold text-[10px] uppercase text-stone-900 truncate">{lt.name}</h6>
+                        <p className="text-[8.5px] text-blue-700 font-bold truncate">{lt.role}</p>
+                        <p className="text-[8px] text-stone-500 mt-0.5 truncate">{lt.district}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Third Lieutenant (Farid Mirza) */}
+                  {selectedSyndicate.lieutenants[2] && (
+                    <div
+                      onClick={() => setSelectedEvidenceModal({
+                        title: `OPERATIVE DOSSIER: ${selectedSyndicate.lieutenants[2].name}`,
+                        type: 'SYNDICATE LIEUTENANT',
+                        mugshot: selectedSyndicate.lieutenants[2].mugshot,
+                        content: `Role: ${selectedSyndicate.lieutenants[2].role}. Sector: ${selectedSyndicate.lieutenants[2].district}. Assignment: ${selectedSyndicate.lieutenants[2].task}. Risk Rating: ${selectedSyndicate.lieutenants[2].risk_score}%.`,
+                        date: 'ACTIVE FILE',
+                        stamp: 'KEY ENFORCER'
+                      })}
+                      className="bg-[#faf8f4] text-stone-900 p-2.5 rounded shadow-xl border border-stone-300 font-mono cursor-pointer hover:scale-102 transition-transform flex items-center gap-2.5 relative"
+                    >
+                      <div className="absolute -top-2 left-4 w-4 h-4 rounded-full bg-gradient-to-tr from-amber-600 to-yellow-300 border border-amber-200 shadow-md z-30" />
+                      <div className="w-11 h-11 rounded overflow-hidden bg-stone-200 border border-stone-300 shrink-0">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={selectedSyndicate.lieutenants[2].mugshot} alt={selectedSyndicate.lieutenants[2].name} className="w-full h-full object-cover object-top" />
+                      </div>
+                      <div className="min-w-0 text-[10px]">
+                        <h6 className="font-extrabold uppercase text-stone-900 truncate">{selectedSyndicate.lieutenants[2].name}</h6>
+                        <p className="text-[9px] text-blue-700 font-bold truncate">{selectedSyndicate.lieutenants[2].role}</p>
+                        <p className="text-[8.5px] text-stone-500 truncate">{selectedSyndicate.lieutenants[2].task}</p>
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+
+              </div>
+
+              {/* ── BOTTOM SECTION: CCTNS FIR CASE DOCKETS & FIELD CLUES ── */}
+              <div className="pt-2 border-t border-stone-700">
+                <div className="flex items-center justify-between mb-3 text-stone-300 font-mono text-xs">
+                  <span className="font-bold text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
+                    <Pin className="w-3.5 h-3.5 text-red-500" />
+                    CCTNS LINKED CASE DOCKETS & INVESTIGATIVE LEADS ({selectedSyndicate.connected_firs.length})
+                  </span>
+                  <span className="text-[10px] text-stone-400 font-bold">CLICK DOCKET TO INSPECT FILE</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                  {selectedSyndicate.connected_firs.map((fir, idx) => (
+                    <div
+                      key={fir.case_number}
+                      onClick={() => handleCaseClick(fir.case_number)}
+                      className="bg-[#faf8f4] text-stone-900 p-3.5 rounded shadow-lg border border-stone-300 font-mono text-left cursor-pointer hover:bg-amber-50 hover:scale-102 transition-all relative group"
+                    >
+                      {/* Green Metal Pushpin */}
+                      <div className="absolute -top-2 left-4 w-4 h-4 rounded-full bg-gradient-to-tr from-emerald-700 to-emerald-400 border border-emerald-200 shadow-md z-30 group-hover:scale-120 transition-transform" />
+                      
+                      <div className="flex items-center justify-between text-[9.5px] border-b border-stone-300 pb-1">
+                        <span className="font-black text-emerald-800">{fir.case_number}</span>
+                        <span className="px-1.5 py-0.2 bg-stone-200 text-stone-800 font-bold rounded text-[8.5px]">
                           {fir.status}
                         </span>
                       </div>
-                      <p className="font-bold text-xs text-slate-900 dark:text-white">{fir.crime}</p>
-                      <p className="text-[11px] text-slate-500 truncate">{fir.station}</p>
+                      <p className="font-bold text-xs text-stone-950 mt-1.5">{fir.crime}</p>
+                      <p className="text-[10px] text-stone-500 truncate">{fir.station}</p>
                       
                       {fir.note && (
-                        <div className="mt-2 pt-2 border-t border-slate-100 dark:border-zinc-800 text-[11px] text-rose-600 dark:text-rose-400 font-medium leading-snug">
+                        <div className="mt-2 pt-1.5 border-t border-stone-200 text-[9.5px] text-red-800 font-bold italic leading-snug">
                           ⚡ {fir.note}
                         </div>
                       )}
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* ── CUSTOM USER PINNED NOTES ROW ── */}
-            {customPins.length > 0 && (
-              <div className="relative z-20 pt-8 max-w-5xl mx-auto">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xs font-bold font-mono text-amber-400 uppercase tracking-wider">
-                    Investigating Officer Field Annotations ({customPins.length})
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-3">
-                  {customPins.map(pin => (
-                    <div
-                      key={pin.id}
-                      className={`${pin.color || 'bg-amber-50 dark:bg-amber-950/60'} text-slate-900 dark:text-white p-3.5 rounded-2xl shadow-md border border-amber-200 dark:border-amber-800 text-xs max-w-xs space-y-1`}
-                    >
-                      <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 pb-1 border-b border-amber-200/60 dark:border-amber-800">
-                        <span>{pin.tag}</span>
-                        <span>{pin.date}</span>
-                      </div>
-                      <p className="font-semibold leading-relaxed">{pin.text}</p>
-                      <p className="text-[10.5px] text-slate-500 italic">— {pin.author}</p>
-                    </div>
                   ))}
                 </div>
               </div>
-            )}
+
+              {/* ── CUSTOM USER PINNED NOTES ROW ── */}
+              {customPins.length > 0 && (
+                <div className="pt-3">
+                  <div className="flex items-center gap-2 mb-2 text-amber-400 font-mono text-xs font-bold uppercase tracking-wider">
+                    <span>Field Annotations & IO Observations ({customPins.length})</span>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {customPins.map(pin => (
+                      <div
+                        key={pin.id}
+                        className={`${pin.color || 'bg-[#fff9db]'} text-stone-950 p-3 rounded shadow-md border border-amber-300 text-xs font-mono max-w-xs space-y-1`}
+                      >
+                        <div className="flex items-center justify-between text-[9px] font-bold text-stone-600 pb-1 border-b border-stone-300">
+                          <span>{pin.tag}</span>
+                          <span>{pin.date}</span>
+                        </div>
+                        <p className="font-bold leading-snug">{pin.text}</p>
+                        <p className="text-[9.5px] text-stone-500 italic">— {pin.author}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            </div>
 
           </div>
         </div>
       )}
 
-      {/* ── 5. VIEW 2: SYNDICATE CARDS WORKBENCH ── */}
+      {/* ── 3. VIEW 2: SYNDICATE CARDS WORKBENCH ── */}
       {viewMode === 'cards' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
           {/* Left: Syndicate Cards Grid (7 Cols) */}
@@ -934,7 +1006,7 @@ export default function NetworkPage() {
                 <div
                   key={syn.id}
                   onClick={() => setSelectedSyndicate(syn)}
-                  className={`p-5 rounded-3xl border transition-all cursor-pointer relative bg-white dark:bg-zinc-900 shadow-sm space-y-4 ${
+                  className={`p-5 rounded-2xl border transition-all cursor-pointer relative bg-white dark:bg-zinc-900 shadow-xs space-y-4 ${
                     isSelected
                       ? 'border-indigo-500 dark:border-indigo-400 ring-2 ring-indigo-500/10'
                       : 'border-slate-200/90 dark:border-zinc-800 hover:border-slate-300'
@@ -943,7 +1015,7 @@ export default function NetworkPage() {
                   {/* Card Header */}
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-300 font-mono">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-300 font-mono">
                         {syn.category_label}
                       </span>
                       <h2 className="text-base font-bold text-slate-900 dark:text-white mt-1.5">
@@ -964,8 +1036,8 @@ export default function NetworkPage() {
                   {/* Kingpin & Lieutenants Strip */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                     {/* Kingpin Capsule */}
-                    <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/80 dark:border-zinc-700/60">
-                      <div className="relative w-11 h-11 rounded-2xl overflow-hidden bg-slate-200 shrink-0 border border-slate-300">
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/80 dark:border-zinc-700/60">
+                      <div className="relative w-11 h-11 rounded-xl overflow-hidden bg-slate-200 shrink-0 border border-slate-300">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={syn.kingpin.mugshot}
@@ -982,7 +1054,7 @@ export default function NetworkPage() {
                     </div>
 
                     {/* Key Lieutenants Capsule */}
-                    <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/80 dark:border-zinc-700/60 space-y-1.5">
+                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/80 dark:border-zinc-700/60 space-y-1.5">
                       <span className="text-[9px] font-bold text-slate-400 uppercase font-mono block">
                         Specialized Cells ({syn.lieutenants.length})
                       </span>
@@ -1022,7 +1094,7 @@ export default function NetworkPage() {
                       }}
                       className="inline-flex items-center gap-1 font-bold text-indigo-600 dark:text-indigo-400 hover:underline text-xs shrink-0 cursor-pointer"
                     >
-                      <span>Investigation Wall</span>
+                      <span>Investigation Pinboard</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -1033,7 +1105,7 @@ export default function NetworkPage() {
 
           {/* Right: Selected Syndicate Focus Panel (5 Cols) */}
           <div className="lg:col-span-5 space-y-4">
-            <div className="sticky top-4 p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 shadow-sm space-y-4">
+            <div className="sticky top-4 p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 shadow-xs space-y-4">
               <div className="pb-3 border-b border-slate-100 dark:border-zinc-800">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 font-mono block">
                   Target Syndicate Focus
@@ -1044,9 +1116,9 @@ export default function NetworkPage() {
               </div>
 
               {/* Kingpin Spotlight */}
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/80 dark:border-zinc-700/60 space-y-3">
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/80 dark:border-zinc-700/60 space-y-3">
                 <div className="flex items-center gap-3.5">
-                  <div className="relative w-14 h-14 rounded-2xl overflow-hidden shrink-0 border border-slate-300 dark:border-zinc-600">
+                  <div className="relative w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-slate-300 dark:border-zinc-600">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={selectedSyndicate.kingpin.mugshot}
@@ -1085,7 +1157,7 @@ export default function NetworkPage() {
                     <div
                       key={fir.case_number}
                       onClick={() => handleCaseClick(fir.case_number)}
-                      className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 border border-slate-200/80 dark:border-zinc-700/60 transition-all cursor-pointer flex items-center justify-between"
+                      className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 border border-slate-200/80 dark:border-zinc-700/60 transition-all cursor-pointer flex items-center justify-between"
                     >
                       <div>
                         <div className="flex items-center gap-1.5 text-xs font-bold font-mono text-indigo-600 dark:text-indigo-400">
@@ -1096,7 +1168,7 @@ export default function NetworkPage() {
                           {fir.crime} · {fir.station}
                         </p>
                       </div>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 font-bold uppercase">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-200 dark:bg-zinc-700 text-slate-700 dark:text-slate-300 font-bold uppercase">
                         {fir.status}
                       </span>
                     </div>
@@ -1105,7 +1177,7 @@ export default function NetworkPage() {
               </div>
 
               {/* Tactical Directives */}
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 space-y-1.5">
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 space-y-1.5">
                 <div className="flex items-center gap-1.5 text-slate-900 dark:text-white font-bold text-xs font-mono">
                   <ShieldAlert className="w-3.5 h-3.5 text-rose-500" />
                   <span>COMMAND TACTICAL DIRECTIVE</span>
@@ -1118,7 +1190,7 @@ export default function NetworkPage() {
               {/* Deep Link to Co-Pilot Chat */}
               <Link
                 href="/dashboard/chat"
-                className="w-full py-2.5 rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-indigo-600 dark:hover:bg-indigo-400 dark:hover:text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-sm"
+                className="w-full py-2.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-indigo-600 dark:hover:bg-indigo-400 dark:hover:text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs"
               >
                 <span>Query DRISHTI Copilot On This Gang</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -1128,9 +1200,9 @@ export default function NetworkPage() {
         </div>
       )}
 
-      {/* ── 6. VIEW 3: STRATEGIC NEXUS MATRIX (CLEAN MODERN LEDGER) ── */}
+      {/* ── 4. VIEW 3: STRATEGIC NEXUS MATRIX ── */}
       {viewMode === 'matrix' && (
-        <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 shadow-sm space-y-4">
+        <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 shadow-xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-zinc-800">
             <div>
               <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider font-mono">
@@ -1161,7 +1233,6 @@ export default function NetworkPage() {
               <tbody className="divide-y divide-slate-100 dark:divide-zinc-800">
                 {SYNDICATES.map((syn) => (
                   <tr key={syn.id} className="hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors">
-                    {/* Syndicate Name */}
                     <td className="px-4 py-4 font-bold text-slate-900 dark:text-white">
                       <div className="flex items-center gap-2.5">
                         <span className="w-2.5 h-2.5 rounded-full" style={{ background: syn.color }} />
@@ -1169,7 +1240,6 @@ export default function NetworkPage() {
                       </div>
                     </td>
 
-                    {/* Kingpin with Mugshot */}
                     <td className="px-4 py-4 text-slate-700 dark:text-slate-300">
                       <div className="flex items-center gap-2.5">
                         <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-200 shrink-0 border border-slate-300">
@@ -1183,17 +1253,14 @@ export default function NetworkPage() {
                       </div>
                     </td>
 
-                    {/* Financial Scale */}
                     <td className="px-4 py-4 font-bold text-emerald-600 dark:text-emerald-400 font-mono">
                       {syn.estimated_volume}
                     </td>
 
-                    {/* Corridor */}
                     <td className="px-4 py-4 text-slate-600 dark:text-slate-400 text-xs max-w-xs truncate">
                       {syn.primary_corridor}
                     </td>
 
-                    {/* Threat Pill */}
                     <td className="px-4 py-4">
                       <span className={`px-2.5 py-1 rounded-full text-[10.5px] font-bold font-mono ${
                         syn.threat_level === 'CRITICAL'
@@ -1204,19 +1271,17 @@ export default function NetworkPage() {
                       </span>
                     </td>
 
-                    {/* Linked FIRs */}
                     <td className="px-4 py-4 font-bold text-indigo-600 dark:text-indigo-400 font-mono">
                       {syn.connected_firs.length} Cases
                     </td>
 
-                    {/* Action */}
                     <td className="px-4 py-4 text-right">
                       <button
                         onClick={() => {
                           setSelectedSyndicate(syn);
                           handleCaseClick(syn.connected_firs[0].case_number);
                         }}
-                        className="px-3.5 py-1.5 rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-indigo-600 font-bold text-xs transition-all cursor-pointer shadow-xs"
+                        className="px-3.5 py-1.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-indigo-600 font-bold text-xs transition-all cursor-pointer shadow-xs"
                       >
                         Inspect Docket
                       </button>
@@ -1229,9 +1294,9 @@ export default function NetworkPage() {
         </div>
       )}
 
-      {/* ── 7. VIEW 4: PREDICTIVE INTERCEPTION MAP ── */}
+      {/* ── 5. VIEW 4: PREDICTIVE INTERCEPTION MAP ── */}
       {viewMode === 'map' && (
-        <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 shadow-sm space-y-4">
+        <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 shadow-xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-zinc-800">
             <div>
               <div className="flex items-center gap-2">
@@ -1245,14 +1310,13 @@ export default function NetworkPage() {
               </p>
             </div>
             <div className="flex items-center gap-2 text-xs font-mono">
-              <span className="px-3 py-1 rounded-2xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200/60 font-bold">
+              <span className="px-3 py-1 rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200/60 font-bold">
                 MULTI-SOURCE INTEL SYNCED
               </span>
             </div>
           </div>
 
-          {/* Predictive Route Highlights Bar */}
-          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200 dark:border-zinc-700 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs font-mono">
+          <div className="p-4 rounded-xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200 dark:border-zinc-700 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs font-mono">
             <div>
               <span className="text-[10px] text-slate-400 uppercase font-semibold">Active Tracking Target</span>
               <p className="font-bold text-slate-900 dark:text-white">{selectedSyndicate.kingpin.name} ({selectedSyndicate.kingpin.alias})</p>
@@ -1268,8 +1332,7 @@ export default function NetworkPage() {
             </div>
           </div>
 
-          {/* Leaflet Network Map */}
-          <div className="h-[580px] rounded-3xl overflow-hidden border border-slate-200 dark:border-zinc-800">
+          <div className="h-[580px] rounded-2xl overflow-hidden border border-slate-200 dark:border-zinc-800">
             <NetworkMapView
               nodes={SYNDICATES.map(s => ({
                 id: s.kingpin.id,
@@ -1293,58 +1356,58 @@ export default function NetworkPage() {
         </div>
       )}
 
-      {/* ── 8. EVIDENCE INSPECTOR LIGHTBOX MODAL ── */}
+      {/* ── 6. EVIDENCE INSPECTOR LIGHTBOX MODAL ── */}
       <AnimatePresence>
         {selectedEvidenceModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/75 backdrop-blur-xs">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-white rounded-3xl max-w-lg w-full shadow-2xl p-6 space-y-4 relative"
+              className="bg-[#1c1e22] border-2 border-stone-700 text-stone-100 rounded-2xl max-w-lg w-full shadow-2xl p-6 space-y-4 relative font-mono"
             >
               <button
                 onClick={() => setSelectedEvidenceModal(null)}
-                className="absolute top-4 right-4 p-2 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition"
+                className="absolute top-4 right-4 p-1.5 rounded-lg bg-stone-800 text-stone-400 hover:text-white"
               >
                 <X className="w-4 h-4" />
               </button>
 
-              <div className="space-y-1 pb-3 border-b border-slate-100 dark:border-zinc-800">
-                <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest font-mono block">
+              <div className="space-y-1 pb-3 border-b border-stone-700">
+                <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest block">
                   {selectedEvidenceModal.type}
                 </span>
-                <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                <h3 className="text-base font-bold text-white uppercase">
                   {selectedEvidenceModal.title}
                 </h3>
               </div>
 
               {selectedEvidenceModal.mugshot && (
-                <div className="w-32 h-32 mx-auto rounded-2xl overflow-hidden border-2 border-slate-300 dark:border-zinc-700 bg-slate-100 shadow-md">
+                <div className="w-32 h-32 mx-auto rounded overflow-hidden border-2 border-stone-600 bg-stone-900 shadow-md">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={selectedEvidenceModal.mugshot} alt="Evidence" className="w-full h-full object-cover object-top" />
                 </div>
               )}
 
-              <div className="bg-slate-50 dark:bg-zinc-800/60 p-4 rounded-2xl border border-slate-200/80 dark:border-zinc-700/60 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+              <div className="bg-[#121316] p-3.5 rounded-xl border border-stone-800 text-xs text-stone-300 leading-relaxed">
                 <p>{selectedEvidenceModal.content}</p>
               </div>
 
-              <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-100 dark:border-zinc-800 font-mono">
+              <div className="flex items-center justify-between text-[11px] text-stone-400 pt-2 border-t border-stone-800">
                 <span>Date: {selectedEvidenceModal.date}</span>
-                <span className="text-emerald-600 font-bold uppercase">{selectedEvidenceModal.stamp}</span>
+                <span className="text-emerald-400 font-bold uppercase">{selectedEvidenceModal.stamp}</span>
               </div>
 
               <div className="pt-2 flex items-center justify-end gap-2">
                 <button
                   onClick={() => setSelectedEvidenceModal(null)}
-                  className="px-4 py-2 rounded-2xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 text-xs font-bold text-slate-700 dark:text-slate-300"
+                  className="px-4 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-xs font-bold text-stone-300"
                 >
                   Close Inspection
                 </button>
                 <Link
                   href="/dashboard/chat"
-                  className="px-4 py-2 rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-indigo-600 text-xs font-bold"
+                  className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-xs font-bold text-white"
                 >
                   Cross-Examine with Co-Pilot
                 </Link>
@@ -1354,52 +1417,52 @@ export default function NetworkPage() {
         )}
       </AnimatePresence>
 
-      {/* ── 9. ADD CLUE / PIN MODAL ── */}
+      {/* ── 7. ADD CLUE / PIN MODAL ── */}
       <AnimatePresence>
         {isAddPinModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-white rounded-3xl max-w-md w-full shadow-2xl p-6 space-y-4 relative"
+              className="bg-[#1e2024] border-2 border-stone-700 text-stone-100 rounded-2xl max-w-md w-full shadow-2xl p-5 space-y-4 relative font-mono"
             >
               <button
                 onClick={() => setIsAddPinModalOpen(false)}
-                className="absolute top-4 right-4 p-2 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition"
+                className="absolute top-4 right-4 p-1.5 rounded-lg bg-stone-800 text-stone-400 hover:text-white"
               >
                 <X className="w-4 h-4" />
               </button>
 
-              <div className="pb-3 border-b border-slate-100 dark:border-zinc-800">
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase font-mono">
-                  📌 Pin Investigation Clue to Wall
+              <div className="pb-3 border-b border-stone-700">
+                <h3 className="text-sm font-bold text-white uppercase">
+                  📌 Pin Investigation Clue to Board
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-stone-400 mt-0.5">
                   Attach field observation or forensic clue to {selectedSyndicate.name}.
                 </p>
               </div>
 
-              <form onSubmit={handleAddCustomPin} className="space-y-3.5 text-xs">
+              <form onSubmit={handleAddCustomPin} className="space-y-3 text-xs">
                 <div className="space-y-1">
-                  <label className="text-slate-700 dark:text-slate-300 font-bold">Clue / Observation *</label>
+                  <label className="text-stone-300 font-bold">Clue / Observation *</label>
                   <textarea
                     required
                     rows={3}
                     placeholder="e.g. Sighted black Pulsar near Silk Board flyover at 23:15 hrs..."
                     value={newPinNote.text}
                     onChange={(e) => setNewPinNote({ ...newPinNote, text: e.target.value })}
-                    className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
+                    className="w-full p-2.5 rounded-xl bg-stone-900 border border-stone-700 text-stone-100 focus:outline-none focus:border-amber-400"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <label className="text-slate-700 dark:text-slate-300 font-bold">Category Tag</label>
+                    <label className="text-stone-300 font-bold">Category Tag</label>
                     <select
                       value={newPinNote.tag}
                       onChange={(e) => setNewPinNote({ ...newPinNote, tag: e.target.value })}
-                      className="w-full p-2.5 rounded-2xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white focus:outline-none cursor-pointer"
+                      className="w-full p-2 rounded-xl bg-stone-900 border border-stone-700 text-stone-100 focus:outline-none"
                     >
                       <option value="ANPR HIT">ANPR HIT</option>
                       <option value="FIELD SIGHTING">FIELD SIGHTING</option>
@@ -1410,12 +1473,12 @@ export default function NetworkPage() {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-slate-700 dark:text-slate-300 font-bold">Officer Sign-Off</label>
+                    <label className="text-stone-300 font-bold">Officer Sign-Off</label>
                     <input
                       type="text"
                       value={newPinNote.author}
                       onChange={(e) => setNewPinNote({ ...newPinNote, author: e.target.value })}
-                      className="w-full p-2.5 rounded-2xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white focus:outline-none"
+                      className="w-full p-2 rounded-xl bg-stone-900 border border-stone-700 text-stone-100 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -1424,13 +1487,13 @@ export default function NetworkPage() {
                   <button
                     type="button"
                     onClick={() => setIsAddPinModalOpen(false)}
-                    className="px-4 py-2 rounded-2xl bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 font-bold"
+                    className="px-3.5 py-1.5 rounded-xl bg-stone-800 text-stone-400 hover:text-white"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-bold hover:bg-indigo-600"
+                    className="px-4 py-1.5 rounded-xl bg-amber-500 text-stone-950 font-bold hover:bg-amber-400"
                   >
                     Pin to Board
                   </button>
@@ -1441,7 +1504,7 @@ export default function NetworkPage() {
         )}
       </AnimatePresence>
 
-      {/* ── 10. INVESTIGATOR WALL SLIDE-OVER ── */}
+      {/* ── 8. INVESTIGATOR WALL SLIDE-OVER ── */}
       {activeCaseData && (
         <InvestigatorWall
           caseData={activeCaseData}
