@@ -2,16 +2,30 @@
 
 import dynamic from 'next/dynamic';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Layers, WifiOff, RefreshCw, Clock } from 'lucide-react';
+import { Layers, WifiOff, RefreshCw, Clock, Box, Map } from 'lucide-react';
 
 import { fetchWithFallback } from '@/lib/fetch-with-fallback';
 import { DEMO_HOTSPOTS } from '@/lib/demo-data';
 
+// 2D flat Leaflet map (fallback / toggled)
 const MapView = dynamic(() => import('./MapView'), {
   ssr: false,
   loading: () => (
     <div className="w-full h-full flex items-center justify-center bg-steel-700/50 text-paper-100/40 font-mono text-xs">
-      Loading Live Map...
+      Loading 2D Map...
+    </div>
+  ),
+});
+
+// 3D MapLibre GL city view (default)
+const MapView3D = dynamic(() => import('./MapView3D'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center bg-[#f8f5f0] font-mono text-xs text-slate-400">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 rounded-full border-2 border-slate-300 border-t-slate-600 animate-spin" />
+        <span>Initialising 3D City Renderer…</span>
+      </div>
     </div>
   ),
 });
@@ -121,6 +135,7 @@ function CachedBadge() {
 // ── Main Page ─────────────────────────────────────────────────────────────
 export default function MapPage() {
   const [mounted, setMounted] = useState(false);
+  const [is3D, setIs3D] = useState(true); // default: 3D city view
 
   // Live data state (pre-filled for instant 0ms mount)
   const [hotspots, setHotspots]       = useState(MOCK_HOTSPOTS_FALLBACK);
@@ -354,14 +369,23 @@ export default function MapPage() {
       {/* ── Map area ── */}
       <div className="flex-1 relative">
         {mounted && (
-          <MapView
-            filtered={filtered}
-            selectedHotspot={selectedHotspot}
-            setSelectedHotspot={setSelectedHotspot}
-            SEVERITY_HEX={SEVERITY_HEX}
-            SEVERITY_RADIUS={SEVERITY_RADIUS}
-            tileUrl={tileUrl}
-          />
+          is3D ? (
+            <MapView3D
+              filtered={filtered}
+              selectedHotspot={selectedHotspot}
+              setSelectedHotspot={setSelectedHotspot}
+              is3D={is3D}
+            />
+          ) : (
+            <MapView
+              filtered={filtered}
+              selectedHotspot={selectedHotspot}
+              setSelectedHotspot={setSelectedHotspot}
+              SEVERITY_HEX={SEVERITY_HEX}
+              SEVERITY_RADIUS={SEVERITY_RADIUS}
+              tileUrl={tileUrl}
+            />
+          )
         )}
 
         {/* Selected hotspot detail card */}
@@ -395,12 +419,45 @@ export default function MapPage() {
           </div>
         )}
 
-        {/* Map overlay badges */}
+        {/* Map overlay badges + 3D/2D Toggle */}
         <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
+          {/* Header badge */}
           <div className="bg-steel-700/90 backdrop-blur border border-steel-600/60 rounded-lg px-3 py-2 flex items-center gap-2">
             <Layers className="w-3.5 h-3.5 text-phosphor-500" />
             <span className="text-xs text-paper-100/80 font-medium">Live Crime Map</span>
           </div>
+
+          {/* 3D / 2D Toggle */}
+          <div className="bg-steel-700/90 backdrop-blur border border-steel-600/60 rounded-lg p-1 flex gap-1">
+            <button
+              id="btn-map-3d"
+              onClick={() => setIs3D(true)}
+              title="3D City View"
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                is3D
+                  ? 'bg-phosphor-500 text-white shadow-sm'
+                  : 'text-paper-100/50 hover:text-paper-100/80'
+              }`}
+            >
+              <Box className="w-3 h-3" />
+              3D
+            </button>
+            <button
+              id="btn-map-2d"
+              onClick={() => setIs3D(false)}
+              title="2D Topographic View"
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                !is3D
+                  ? 'bg-phosphor-500 text-white shadow-sm'
+                  : 'text-paper-100/50 hover:text-paper-100/80'
+              }`}
+            >
+              <Map className="w-3 h-3" />
+              2D
+            </button>
+          </div>
+
+          {/* Hotspot count */}
           <div className="bg-steel-700/90 backdrop-blur border border-steel-600/60 rounded-lg px-3 py-2 text-xs text-paper-100/50 font-mono text-center">
             {loading ? (
               <span className="animate-pulse">Loading…</span>
