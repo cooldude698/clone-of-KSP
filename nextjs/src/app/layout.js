@@ -32,16 +32,6 @@ export const metadata = {
   },
 };
 
-// Inline script that runs synchronously BEFORE any content renders to enforce light mode
-const themeScript = `
-(function() {
-  try {
-    localStorage.setItem('theme', 'light');
-    document.documentElement.classList.remove('dark');
-  } catch(e) {}
-})();
-`;
-
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${montserrat.variable} ${googleSans.variable}`} suppressHydrationWarning>
@@ -52,14 +42,12 @@ export default function RootLayout({ children }) {
         <link rel="shortcut icon" href="/favicon.svg?v=3" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&family=Noto+Sans+Kannada:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
-        {/* Blocking script prevents FOUC — runs before CSS paint */}
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="bg-slate-50 text-slate-900 font-sans antialiased transition-colors duration-200">
+      <body className="bg-[#0b101b] text-slate-100 font-sans antialiased transition-colors duration-200">
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
+          defaultTheme="dark"
+          enableSystem={true}
         >
           <LanguageProvider>
             {children}
