@@ -2,14 +2,14 @@
  * nextjs/src/lib/suspect-media.js
  * Centralized High-Fidelity Police Intelligence Facial & Surveillance Media Engine
  * Maps every suspect, FIR record, surveillance ANPR hit, and investigation chronicle entry
- * to authentic biometric mugshots and tactical camera capture stills.
+ * to authentic South Asian / Indian biometric mugshots and tactical camera capture stills.
  */
 
 // Authentic curated South Asian / Indian portraits for Karnataka State Police suspects
 const SUSPECT_MUGSHOTS = {
   'ramesh-kumar': {
-    mugshot: 'https://images.unsplash.com/photo-1506863530036-1efeddceb993?w=400&auto=format&fit=crop&q=80',
-    surveillance_still: 'https://images.unsplash.com/photo-1506863530036-1efeddceb993?w=600&auto=format&fit=crop&q=80',
+    mugshot: '/mugshots/ramesh-kumar.jpg',
+    surveillance_still: '/mugshots/ramesh-kumar.jpg',
     alias: 'Bullet Ramesh',
     cctns_id: 'SUS-8842',
     primary_crime: 'Inter-District Vehicle Theft & Fencing',
@@ -19,8 +19,8 @@ const SUSPECT_MUGSHOTS = {
     vehicle: 'Hyundai i10 / Bajaj Pulsar (KA-01-MJ-8821)',
   },
   'vikram-malhotra': {
-    mugshot: 'https://images.unsplash.com/photo-1618886614638-80e3c103d31a?w=400&auto=format&fit=crop&q=80',
-    surveillance_still: 'https://images.unsplash.com/photo-1618886614638-80e3c103d31a?w=600&auto=format&fit=crop&q=80',
+    mugshot: '/mugshots/vikram-malhotra.jpg',
+    surveillance_still: '/mugshots/vikram-malhotra.jpg',
     alias: 'Vicky Blade',
     cctns_id: 'SUS-9104',
     primary_crime: 'Cyber Fraud & Cryptocurrency Extortion',
@@ -30,8 +30,8 @@ const SUSPECT_MUGSHOTS = {
     vehicle: 'Yamaha R15 (KA-03-HA-8820)',
   },
   'anand-shinde': {
-    mugshot: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&auto=format&fit=crop&q=80',
-    surveillance_still: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80',
+    mugshot: '/mugshots/anand-shinde.jpg',
+    surveillance_still: '/mugshots/anand-shinde.jpg',
     alias: 'Buda Anand',
     cctns_id: 'SUS-9012',
     primary_crime: 'Organized Vehicle Theft & Border Transit',
@@ -41,8 +41,8 @@ const SUSPECT_MUGSHOTS = {
     vehicle: 'Hero Splendor (KA-36-E-4491)',
   },
   'suresh-naidu': {
-    mugshot: 'https://images.unsplash.com/photo-1506863530036-1efeddceb993?w=400&auto=format&fit=crop&q=80',
-    surveillance_still: 'https://images.unsplash.com/photo-1506863530036-1efeddceb993?w=600&auto=format&fit=crop&q=80',
+    mugshot: '/mugshots/suresh-naidu.jpg',
+    surveillance_still: '/mugshots/suresh-naidu.jpg',
     alias: 'Snake Naidu',
     cctns_id: 'SUS-7104',
     primary_crime: 'Armed Robbery & Extortion Syndicate',
@@ -52,8 +52,8 @@ const SUSPECT_MUGSHOTS = {
     vehicle: 'TVS Apache RTR (KA-04-V-9901)',
   },
   'chetan-shetty': {
-    mugshot: 'https://images.unsplash.com/photo-1618886614638-80e3c103d31a?w=400&auto=format&fit=crop&q=80',
-    surveillance_still: 'https://images.unsplash.com/photo-1618886614638-80e3c103d31a?w=600&auto=format&fit=crop&q=80',
+    mugshot: '/mugshots/chetan-shetty.jpg',
+    surveillance_still: '/mugshots/chetan-shetty.jpg',
     alias: 'Chota Chetan',
     cctns_id: 'SUS-2223',
     primary_crime: 'Commercial Property Burglary & Theft',
@@ -63,8 +63,8 @@ const SUSPECT_MUGSHOTS = {
     vehicle: 'Honda Activa (KA-32-M-1120)',
   },
   'anand-gowda': {
-    mugshot: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&auto=format&fit=crop&q=80',
-    surveillance_still: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80',
+    mugshot: '/mugshots/anand-gowda.jpg',
+    surveillance_still: '/mugshots/anand-gowda.jpg',
     alias: 'Maddur Gowda',
     cctns_id: 'SUS-3302',
     primary_crime: 'Highway Extortion & Cattle Rustling',
@@ -74,8 +74,8 @@ const SUSPECT_MUGSHOTS = {
     vehicle: 'Mahindra Bolero Pickup (KA-11-P-7704)',
   },
   'vikram-singh': {
-    mugshot: 'https://images.unsplash.com/photo-1618886614638-80e3c103d31a?w=400&auto=format&fit=crop&q=80',
-    surveillance_still: 'https://images.unsplash.com/photo-1618886614638-80e3c103d31a?w=600&auto=format&fit=crop&q=80',
+    mugshot: '/mugshots/vikram-singh.jpg',
+    surveillance_still: '/mugshots/vikram-singh.jpg',
     alias: 'Vicky Singh',
     cctns_id: 'SUS-7712',
     primary_crime: 'Reckless Hit & Run / Road Rage',
@@ -85,8 +85,8 @@ const SUSPECT_MUGSHOTS = {
     vehicle: 'Hyundai Creta (KA-32-N-3309)',
   },
   'vikram-reddy': {
-    mugshot: 'https://images.unsplash.com/photo-1506863530036-1efeddceb993?w=400&auto=format&fit=crop&q=80',
-    surveillance_still: 'https://images.unsplash.com/photo-1506863530036-1efeddceb993?w=600&auto=format&fit=crop&q=80',
+    mugshot: '/mugshots/vikram-reddy.jpg',
+    surveillance_still: '/mugshots/vikram-reddy.jpg',
     alias: 'Vicky Reddy',
     cctns_id: 'SUS-5512',
     primary_crime: 'Residential Burglary & Gold Looting',
@@ -96,8 +96,8 @@ const SUSPECT_MUGSHOTS = {
     vehicle: 'Bajaj Discover (KA-18-H-5501)',
   },
   'bhavani-karpe': {
-    mugshot: 'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=400&auto=format&fit=crop&q=80',
-    surveillance_still: 'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=600&auto=format&fit=crop&q=80',
+    mugshot: '/mugshots/bhavani-karpe.jpg',
+    surveillance_still: '/mugshots/bhavani-karpe.jpg',
     alias: 'Karpe Madam',
     cctns_id: 'SUS-3401',
     primary_crime: 'Banking Phishing & Digital Loan Scams',
@@ -107,8 +107,8 @@ const SUSPECT_MUGSHOTS = {
     vehicle: 'Maruti Swift (KA-01-AB-1290)',
   },
   'farid-mirza': {
-    mugshot: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&auto=format&fit=crop&q=80',
-    surveillance_still: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80',
+    mugshot: '/mugshots/farid-mirza.jpg',
+    surveillance_still: '/mugshots/farid-mirza.jpg',
     alias: 'Chotta Mirza',
     cctns_id: 'SUS-6091',
     primary_crime: 'Armed Chain Snatching Syndicate',
@@ -118,8 +118,8 @@ const SUSPECT_MUGSHOTS = {
     vehicle: 'KTM Duke (KA-05-MJ-3312)',
   },
   'mahika-ramachandran': {
-    mugshot: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=80',
-    surveillance_still: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&auto=format&fit=crop&q=80',
+    mugshot: '/mugshots/mahika-ramachandran.jpg',
+    surveillance_still: '/mugshots/mahika-ramachandran.jpg',
     alias: 'Mahi Iron',
     cctns_id: 'SUS-7801',
     primary_crime: 'Physical Assault & Turf Extortion',
@@ -129,8 +129,8 @@ const SUSPECT_MUGSHOTS = {
     vehicle: 'Honda Dio (KA-05-EX-4412)',
   },
   'imran-khan': {
-    mugshot: 'https://images.unsplash.com/photo-1506863530036-1efeddceb993?w=400&auto=format&fit=crop&q=80',
-    surveillance_still: 'https://images.unsplash.com/photo-1506863530036-1efeddceb993?w=600&auto=format&fit=crop&q=80',
+    mugshot: '/mugshots/imran-khan.jpg',
+    surveillance_still: '/mugshots/imran-khan.jpg',
     alias: 'Helmet Imran',
     cctns_id: 'SUS-5921',
     primary_crime: 'Commercial MDMA & Narcotics Distribution',
@@ -142,14 +142,16 @@ const SUSPECT_MUGSHOTS = {
 };
 
 const FALLBACK_PORTRAITS_MALE = [
-  'https://images.unsplash.com/photo-1506863530036-1efeddceb993?w=400&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1618886614638-80e3c103d31a?w=400&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&auto=format&fit=crop&q=80',
+  '/mugshots/ramesh-kumar.jpg',
+  '/mugshots/anand-shinde.jpg',
+  '/mugshots/farid-mirza.jpg',
+  '/mugshots/chetan-shetty.jpg',
+  '/mugshots/vikram-malhotra.jpg'
 ];
 
 const FALLBACK_PORTRAITS_FEMALE = [
-  'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=400&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=80',
+  '/mugshots/bhavani-karpe.jpg',
+  '/mugshots/mahika-ramachandran.jpg'
 ];
 
 function isFemaleName(name = '') {
@@ -164,7 +166,10 @@ function isFemaleName(name = '') {
     n.includes('lakshmi') ||
     n.includes('pooja') ||
     n.includes('devi') ||
-    n.includes('kumari')
+    n.includes('kumari') ||
+    n.includes('sharma, meera') ||
+    n.includes('meera') ||
+    n.includes('ananya')
   );
 }
 
@@ -183,22 +188,7 @@ export function getSuspectMedia(suspect) {
     };
   }
 
-  // 1. If explicit mugshot provided in object
-  if (suspect.mugshot_url || suspect.mugshot) {
-    return {
-      mugshot: suspect.mugshot_url || suspect.mugshot,
-      surveillance_still: suspect.surveillance_still || suspect.mugshot_url || suspect.mugshot,
-      alias: suspect.alias || suspect.accused_alias || 'Unknown Alias',
-      cctns_id: suspect.suspect_id || suspect.cctns_id || 'SUS-9999',
-      primary_crime: suspect.primary_crime || suspect.crime_type || 'General Penal Offense',
-      anpr_camera: suspect.anpr_camera || 'CAM-KSP-ACTIVE',
-      confidence: suspect.confidence || '92.5%',
-      last_seen: suspect.last_known_location || suspect.last_seen || 'Bengaluru Command Area',
-      vehicle: suspect.vehicle || 'Unknown Vehicle',
-    };
-  }
-
-  // 2. Direct key match by name or slug
+  // 1. Direct key match by name or slug
   const rawName = suspect.name || suspect.accused_name || '';
   const slug = rawName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   const idKey = (suspect.suspect_id || suspect.id || '').toLowerCase();
@@ -213,7 +203,25 @@ export function getSuspectMedia(suspect) {
     }
   }
 
-  // 3. Fallback deterministic based on string hash and gender detection
+  // 2. If custom mugshot provided in object that starts with / or http
+  if (suspect.mugshot_url || suspect.mugshot) {
+    const customPic = suspect.mugshot_url || suspect.mugshot;
+    if (!customPic.includes('undefined')) {
+      return {
+        mugshot: customPic,
+        surveillance_still: suspect.surveillance_still || customPic,
+        alias: suspect.alias || suspect.accused_alias || 'Unknown Alias',
+        cctns_id: suspect.suspect_id || suspect.cctns_id || 'SUS-9999',
+        primary_crime: suspect.primary_crime || suspect.crime_type || 'General Penal Offense',
+        anpr_camera: suspect.anpr_camera || 'CAM-KSP-ACTIVE',
+        confidence: suspect.confidence || '92.5%',
+        last_seen: suspect.last_known_location || suspect.last_seen || 'Bengaluru Command Area',
+        vehicle: suspect.vehicle || 'Unknown Vehicle',
+      };
+    }
+  }
+
+  // 3. Deterministic gender-based fallback from local Indian mugshot pools
   let hash = 0;
   for (let i = 0; i < slug.length; i++) {
     hash = (hash << 5) - hash + slug.charCodeAt(i);
