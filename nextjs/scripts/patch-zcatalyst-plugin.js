@@ -63,4 +63,21 @@ targetFiles.forEach((file) => {
 });
 
 console.log('--- PATCH SYSTEM COMPLETE ---');
+
+// CLEANUP: Terminate background file watcher PID so the build process can exit immediately
+try {
+  const pidFile = path.resolve(__dirname, '../../.watcher.pid');
+  if (fs.existsSync(pidFile)) {
+    const pid = parseInt(fs.readFileSync(pidFile, 'utf8').trim(), 10);
+    console.log(`[Cleanup] Terminating background watcher process (PID: ${pid})...`);
+    process.kill(pid, 'SIGTERM');
+    fs.unlinkSync(pidFile);
+    console.log('[Cleanup] Background watcher terminated successfully!');
+  } else {
+    console.log('[Cleanup] No background watcher PID file found.');
+  }
+} catch (err) {
+  console.log('[Cleanup] Warning during background watcher termination:', err.message);
+}
+
 process.exit(0);

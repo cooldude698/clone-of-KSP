@@ -1,6 +1,15 @@
 const fs = require('fs');
 const path = require('path');
 
+// Save PID so it can be killed at the end of the build process
+try {
+  const pidFile = path.resolve(__dirname, '../../.watcher.pid');
+  fs.writeFileSync(pidFile, process.pid.toString(), 'utf8');
+  console.log('[Watcher] Saved PID:', process.pid);
+} catch (e) {
+  console.warn('[Watcher] Failed to write PID:', e.message);
+}
+
 const targetDir = path.resolve(__dirname, '..');
 console.log('[Watcher] Starting file watcher at:', targetDir);
 
