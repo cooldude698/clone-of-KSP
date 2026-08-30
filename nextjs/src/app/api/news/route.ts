@@ -57,10 +57,10 @@ function parseGoogleNewsRSS(xmlText: string, stateName: string) {
 
     // Extract title
     let title = '';
-    const titleMatch = chunk.match(/<title>(.*?)<\/title>/s);
+    const titleMatch = chunk.match(/<title>([\s\S]*?)<\/title>/);
     if (titleMatch) {
       title = titleMatch[1]
-        .replace(/<!\[CDATA\[(.*?)\]\]>/gs, '$1')
+        .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
         .replace(/&amp;/g, '&')
         .replace(/&quot;/g, '"')
         .replace(/&#39;/g, "'")
@@ -72,14 +72,14 @@ function parseGoogleNewsRSS(xmlText: string, stateName: string) {
 
     // Extract link
     let link = 'https://ksp.karnataka.gov.in';
-    const linkMatch = chunk.match(/<link>(.*?)<\/link>/s);
+    const linkMatch = chunk.match(/<link>([\s\S]*?)<\/link>/);
     if (linkMatch) {
-      link = linkMatch[1].replace(/<!\[CDATA\[(.*?)\]\]>/gs, '$1').trim();
+      link = linkMatch[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').trim();
     }
 
     // Extract pubDate
     let publishedAt = new Date().toISOString();
-    const dateMatch = chunk.match(/<pubDate>(.*?)<\/pubDate>/s);
+    const dateMatch = chunk.match(/<pubDate>([\s\S]*?)<\/pubDate>/);
     if (dateMatch) {
       try {
         publishedAt = new Date(dateMatch[1].trim()).toISOString();
@@ -88,9 +88,9 @@ function parseGoogleNewsRSS(xmlText: string, stateName: string) {
 
     // Extract source
     let source = 'Regional News';
-    const sourceMatch = chunk.match(/<source[^>]*>(.*?)<\/source>/s);
+    const sourceMatch = chunk.match(/<source[^>]*>([\s\S]*?)<\/source>/);
     if (sourceMatch) {
-      source = sourceMatch[1].replace(/<!\[CDATA\[(.*?)\]\]>/gs, '$1').trim();
+      source = sourceMatch[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').trim();
     }
 
     if (title) {
