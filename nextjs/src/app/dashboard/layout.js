@@ -60,8 +60,20 @@ function detectLocalIntent(query) {
 
   const nav = (path, reply, followUpQuery) => ({ type: 'navigate', path, reply, followUpQuery });
 
+  // Audio / Mic / Voice Reception Checks
+  if (/\b(can\s*you\s*hear|hear\s*me|listening|hear\s*you|mic\s*test|audio\s*check|testing|am\s*i\s*audible|sound\s*check)\b/i.test(q)) {
+    return {
+      type: 'audio_check',
+      reply: isHindi
+        ? 'जय हिंद सर, आपकी आवाज बिल्कुल स्पष्ट आ रही है। दृष्टि एआई ऑन-ड्यूटी सक्रिय है। बताइए मैं क्या सहायता करूँ?'
+        : isKannada
+        ? 'ನಮಸ್ಕಾರ ಸರ್, ನಿಮ್ಮ ಧ್ವನಿ ಸ್ಪಷ್ಟವಾಗಿ ಕೇಳಿಸುತ್ತಿದೆ. ದೃಷ್ಟಿ ಎಐ ಸಕ್ರಿಯವಾಗಿದೆ. ಆದೇಶ ತಿಳಿಸಿ.'
+        : 'Jai Hind, Officer. I can hear you loud and clear. DRISHTI AI is active and monitoring all feeds. How may I assist your command shift?'
+    };
+  }
+
   // Pure Standalone Greetings
-  if (/^(hi|hello|hey|whats\s*up|what's\s*up|greetings|hello\s*drishti|hi\s*drishti|drishti|good\s*morning|good\s*afternoon|good\s*evening|नमस्ते|हेलो|हाय|ನಮಸ್ಕಾರ)$/.test(q)) {
+  if (/\b(hi|hello|hey|whats\s*up|what's\s*up|greetings|hello\s*drishti|hi\s*drishti|drishti|good\s*morning|good\s*afternoon|good\s*evening|namaste|jai\s*hind|नमस्ते|हेलो|हाय|ನಮಸ್ಕಾರ|ಜೈ ಹಿಂದ್)\b/i.test(q) && q.split(/\s+/).length <= 7) {
     return { type: 'greeting', reply: isHindi ? 'नमस्ते सर। दृष्टि एआई सक्रिय है। आज मैं आपकी कैसे मदद कर सकता हूं?' : isKannada ? 'ನಮಸ್ಕಾರ ಸರ್, ದೃಷ್ಟಿ ಎಐ ಕರ್ತವ್ಯದಲ್ಲಿದೆ. ತನಿಖೆಯಲ್ಲಿ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?' : 'Jai Hind, Sir. DRISHTI AI is active. How may I assist your command shift today?' };
   }
 
