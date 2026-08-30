@@ -113,6 +113,14 @@ export default function FirRegistryPage() {
       setLoading(false);
     }
     loadFirs();
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get('search') || params.get('q');
+      if (q) {
+        setSearch(q);
+      }
+    }
   }, []);
 
   // Live Data Store Search

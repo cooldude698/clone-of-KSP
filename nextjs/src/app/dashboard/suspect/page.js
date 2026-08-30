@@ -63,7 +63,7 @@ export default function SuspectWatchlistPage() {
     associated_fir: 'FIR-2026-BL-9901'
   });
 
-  // Load custom suspects from localStorage
+  // Load custom suspects from localStorage & sync URL search param
   useEffect(() => {
     try {
       const stored = localStorage.getItem('ksp_custom_suspects');
@@ -71,6 +71,14 @@ export default function SuspectWatchlistPage() {
         setCustomSuspects(JSON.parse(stored));
       }
     } catch (_) {}
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get('search') || params.get('q');
+      if (q) {
+        setSearch(q);
+      }
+    }
   }, []);
 
   useEffect(() => {
