@@ -337,14 +337,21 @@ export default function FirRegistryPage() {
                 <div>
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="flex items-center gap-3">
-                      {(() => {
-                        const IconComponent = meta.icon || FileText;
-                        return (
-                          <div className={`w-11 h-11 rounded-xl ${meta.iconBg || 'bg-zinc-100 dark:bg-zinc-800'} ${meta.iconText || 'text-zinc-900 dark:text-zinc-100'} border ${meta.iconBorder || 'border-zinc-200 dark:border-zinc-700'} flex items-center justify-center shrink-0`}>
-                            <IconComponent className="w-5 h-5" />
-                          </div>
-                        );
-                      })()}
+                      {suspectMedia && accusedName ? (
+                        <div className="relative w-11 h-11 rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 shrink-0">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={suspectMedia.mugshot}
+                            alt={accusedName}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-11 h-11 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700 font-mono text-[11px] font-bold">
+                          {meta.ipc.split(' ')[0] || 'FIR'}
+                        </div>
+                      )}
 
                       <div className="min-w-0">
                         <span className="font-mono text-xs font-black text-zinc-950 dark:text-white block truncate max-w-[150px]">
@@ -356,7 +363,7 @@ export default function FirRegistryPage() {
                       </div>
                     </div>
 
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap shrink-0 ${
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                       status === 'open' ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400' :
                       status === 'closed' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400' :
                       'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400'

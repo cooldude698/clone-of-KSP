@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=20.0.0"
+    "node": "22.x"
   },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "node -e \"const fs = require('fs'); fs.rmSync('.next/cache', { recursive: true, force: true }); console.log('Cleaned .next/cache completely');\"",
     "start": "next start",
     "lint": "next lint"
   },
