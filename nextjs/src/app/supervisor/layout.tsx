@@ -35,6 +35,7 @@ import { cleanTextForSpeech } from '@/lib/speechUtils';
 const DrishtiOrb = dynamic(() => import('@/components/DrishtiOrb'), { ssr: false });
 const DrishtiPanel = dynamic(() => import('@/components/DrishtiPanel'), { ssr: false });
 const AlertNotification = dynamic(() => import('@/components/AlertNotification'), { ssr: false });
+import QuickRoleSwitcher from '@/components/QuickRoleSwitcher';
 
 export const SUPERVISOR_NAV_ITEMS = [
   {
@@ -152,6 +153,9 @@ function SupervisorHeader({ onOpenDrishti }: { onOpenDrishti: () => void }) {
             </div>
           )}
         </div>
+
+        {/* Quick Role Switcher */}
+        <QuickRoleSwitcher />
 
         {/* Interactive Language Selector Dropdown */}
         <div className="relative" ref={langRef}>
