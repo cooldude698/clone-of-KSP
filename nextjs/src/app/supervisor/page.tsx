@@ -25,7 +25,6 @@ import {
   MoreVertical,
   Camera
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { useSupervisorTelemetry } from '@/context/SupervisorTelemetryContext';
 
 export default function SupervisorOperationsCommandHub() {
@@ -73,8 +72,8 @@ export default function SupervisorOperationsCommandHub() {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] font-bold text-emerald-600">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-[11px] font-bold text-indigo-700">
+                <span className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
                 Live GPS Vector #{tick}
               </span>
             </div>
@@ -88,16 +87,16 @@ export default function SupervisorOperationsCommandHub() {
             </div>
           )}
 
-          {/* 4-CARD BALANCED INTELLIGENCE GRID (EXACT INSPECTOR STYLE) */}
+          {/* 4-CARD BALANCED INTELLIGENCE GRID (NAVY / INDIGO-LED SUPERVISOR PALETTE) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
             {/* CARD 1: ACTIVE PATROL FLEETS */}
             <div className="rounded-[28px] bg-white border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-11 h-11 rounded-full bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shadow-xs">
+                  <div className="w-11 h-11 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center justify-center shadow-xs">
                     <Navigation className="w-5 h-5" />
                   </div>
-                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-200">
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
                     4 Sectors Active
                   </span>
                 </div>
@@ -163,7 +162,7 @@ export default function SupervisorOperationsCommandHub() {
                 </div>
                 <Link
                   href="/supervisor/dispatch"
-                  className="px-4 py-2 rounded-full bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-all shadow-xs flex items-center gap-1"
+                  className="px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1"
                 >
                   Deploy Patrol
                 </Link>
@@ -218,10 +217,10 @@ export default function SupervisorOperationsCommandHub() {
             <div className="rounded-[28px] bg-white border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-11 h-11 rounded-full bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center shadow-xs">
+                  <div className="w-11 h-11 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center justify-center shadow-xs">
                     <Gauge className="w-5 h-5" />
                   </div>
-                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-purple-50 text-purple-600 border border-purple-200">
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
                     {statewideClearanceRate}% Rate
                   </span>
                 </div>
@@ -305,26 +304,26 @@ export default function SupervisorOperationsCommandHub() {
               ))}
             </div>
 
-            {/* SMOOTH CURVED SVG SPLINE CHART */}
+            {/* SMOOTH CURVED SVG SPLINE CHART IN INDIGO */}
             <div className="relative mt-5 h-28 w-full">
               <svg viewBox="0 0 300 100" className="w-full h-full overflow-visible" preserveAspectRatio="none">
                 <defs>
-                  <linearGradient id="supChartGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#1d6fbf" stopOpacity="0.15" />
-                    <stop offset="100%" stopColor="#1d6fbf" stopOpacity="0.0" />
+                  <linearGradient id="supIndigoChartGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#4f46e5" stopOpacity="0.18" />
+                    <stop offset="100%" stopColor="#4f46e5" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
 
                 <path
                   d="M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45 L 300,100 L 0,100 Z"
-                  fill="url(#supChartGrad)"
+                  fill="url(#supIndigoChartGrad)"
                   className="transition-all duration-500"
                 />
 
                 <path
                   d="M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45"
                   fill="none"
-                  stroke="#1d6fbf"
+                  stroke="#4f46e5"
                   strokeWidth="2.5"
                   strokeLinecap="round"
                   className="transition-all duration-500"
@@ -336,7 +335,7 @@ export default function SupervisorOperationsCommandHub() {
           {/* THE ONE DARK EXCEPTION: SUMMARY / TARGET CARD */}
           <div className="mt-4 p-4 rounded-2xl bg-slate-900 text-white flex items-center justify-between shadow-sm">
             <div>
-              <p className="text-[10px] text-slate-400 font-medium">Sector 4 Plan for 2026</p>
+              <p className="text-[10px] text-indigo-300 font-medium">Sector 4 Plan for 2026</p>
               <p className="text-xs font-bold text-white mt-0.5">Division Clearance Target</p>
             </div>
 
@@ -350,7 +349,7 @@ export default function SupervisorOperationsCommandHub() {
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
                 <path
-                  className="text-blue-500"
+                  className="text-indigo-500"
                   strokeDasharray="85, 100"
                   strokeWidth="4"
                   strokeLinecap="round"
@@ -380,7 +379,7 @@ export default function SupervisorOperationsCommandHub() {
             </div>
             <Link
               href="/supervisor/performance"
-              className="text-xs font-bold text-blue-600 hover:underline"
+              className="text-xs font-bold text-indigo-600 hover:underline"
             >
               View Roster →
             </Link>
@@ -429,14 +428,14 @@ export default function SupervisorOperationsCommandHub() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Navigation className="w-4 h-4 text-blue-600" />
+                <Navigation className="w-4 h-4 text-indigo-600" />
                 Live Moving Patrol Fleets
               </h3>
               <p className="text-xs text-slate-500">2-second vector positioning</p>
             </div>
             <Link
               href="/supervisor/dispatch"
-              className="text-xs font-bold text-blue-600 hover:underline"
+              className="text-xs font-bold text-indigo-600 hover:underline"
             >
               Full Map →
             </Link>
@@ -453,7 +452,7 @@ export default function SupervisorOperationsCommandHub() {
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                     {unit.callsign}
                   </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
                     {unit.type}
                   </span>
                 </div>
@@ -465,7 +464,7 @@ export default function SupervisorOperationsCommandHub() {
                 <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1 border-t border-slate-200/60 font-mono">
                   <span>Speed: <strong className="text-slate-900">{unit.speedKmH} km/h</strong></span>
                   <span>Fuel: <strong className="text-emerald-600">{unit.fuel}%</strong></span>
-                  <span className="text-blue-600 font-bold">{unit.status}</span>
+                  <span className="text-indigo-600 font-bold">{unit.status}</span>
                 </div>
               </div>
             ))}
