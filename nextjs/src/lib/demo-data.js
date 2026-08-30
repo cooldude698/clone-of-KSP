@@ -93,7 +93,40 @@ const STATIC_FIRS = [
   { case_number: "KAR/BID/2024/0897", date_filed: "2024-05-30", time_filed: "02:27:00", crime_type_code: "vehicle_theft", crime_type: "Vehicle Theft", description: "Vehicle theft near Verma Circle.", status: "open", case_status: "open", district_name: "Bidar", police_station: "Bidar Suburban PS", location_name: "Near Verma Circle, Bidar", investigation_office: "Insp. Yashodhara Konda", accused_name: "Ramesh Kumar", risk_score: 94 },
   { case_number: "KAR/BID/2024/2425", date_filed: "2024-05-30", time_filed: "09:24:00", crime_type_code: "vehicle_theft", crime_type: "Vehicle Theft", description: "Stolen motorcycle near Kalita Path.", status: "chargesheeted", case_status: "chargesheeted", district_name: "Bidar", police_station: "Bidar Market PS", location_name: "Near Kalita Path, Bidar", investigation_office: "Insp. Timothy Kota", accused_name: "Ramesh Kumar", risk_score: 94 },
   { case_number: "KAR/DAV/2024/2111", date_filed: "2024-05-30", time_filed: "06:35:00", crime_type_code: "hit_and_run", crime_type: "Hit And Run", description: "Hit and run near Sahota Ganj.", status: "chargesheeted", case_status: "chargesheeted", district_name: "Davangere", police_station: "Davangere Market PS", location_name: "Near Sahota Ganj, Davangere", investigation_office: "Insp. Jyoti Kumer", accused_name: "Vikram Singh", risk_score: 88 },
-  { case_number: "KAR/BEN/2024/0150", date_filed: "2024-05-30", time_filed: "20:49:00", crime_type_code: "robbery", crime_type: "Robbery", description: "Robbery near Saini, Bengaluru Urban.", status: "under_investigation", case_status: "under_investigation", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban North PS", location_name: "Near Saini, Bengaluru Urban", investigation_office: "Insp. Vasana Sastry", accused_name: "Suresh Naidu", risk_score: 91 }
+  { case_number: "KAR/BEN/2024/0150", date_filed: "2024-05-30", time_filed: "20:49:00", crime_type_code: "robbery", crime_type: "Robbery", description: "Robbery near Saini, Bengaluru Urban.", status: "under_investigation", case_status: "under_investigation", district_name: "Bengaluru Urban", police_station: "Bengaluru Urban North PS", location_name: "Near Saini, Bengaluru Urban", investigation_office: "Insp. Vasana Sastry", accused_name: "Suresh Naidu", risk_score: 91 },
+  // ── Mysuru District Hotspots ─────────────────────────────────────────────
+  { case_number: 'KAR/MYS/2026/1101', date_filed: '2026-07-21', time_filed: '18:40:00', crime_type_code: 'theft', crime_type: 'Theft', description: 'Pocket picking and bag theft near Devaraja Market busy lane.', status: 'open', case_status: 'open', district_name: 'Mysuru', police_station: 'Devaraja PS', location_name: 'Near Devaraja Market, Mysuru', investigation_office: 'Insp. Manjunath Swamy', accused_name: 'Ramesh Kumar', risk_score: 84 },
+  { case_number: 'KAR/MYS/2026/1102', date_filed: '2026-07-22', time_filed: '19:15:00', crime_type_code: 'theft', crime_type: 'Theft', description: 'Merchant cash bag stolen at Devaraja Market vegetable stall.', status: 'open', case_status: 'open', district_name: 'Mysuru', police_station: 'Devaraja PS', location_name: 'Near Devaraja Market, Mysuru', investigation_office: 'Insp. Manjunath Swamy', accused_name: 'Ramesh Kumar', risk_score: 86 },
+  { case_number: 'KAR/MYS/2026/1103', date_filed: '2026-07-23', time_filed: '20:30:00', crime_type_code: 'chain_snatching', crime_type: 'Chain Snatching', description: 'Gold chain snatched from pilgrim near KR Circle.', status: 'open', case_status: 'open', district_name: 'Mysuru', police_station: 'KR PS', location_name: 'Near KR Circle, Mysuru', investigation_office: 'Insp. K. Raghu', accused_name: 'Farid Mirza', risk_score: 89 },
+  { case_number: 'KAR/MYS/2026/1104', date_filed: '2026-07-24', time_filed: '02:40:00', crime_type_code: 'burglary', crime_type: 'Burglary', description: 'Night break-in and jewellery theft at Vijayanagar 2nd Stage villa.', status: 'under_investigation', case_status: 'under_investigation', district_name: 'Mysuru', police_station: 'Vijayanagar PS', location_name: 'Near Vijayanagar 2nd Stage, Mysuru', investigation_office: 'Insp. Pradeep Rao', accused_name: 'Vikram Malhotra', risk_score: 91 },
+  { case_number: 'KAR/MYS/2026/1105', date_filed: '2026-07-25', time_filed: '22:10:00', crime_type_code: 'robbery', crime_type: 'Robbery', description: 'Armed extortion at Mysuru Suburban Bus Stand passenger shed.', status: 'chargesheeted', case_status: 'chargesheeted', district_name: 'Mysuru', police_station: 'Lashkar PS', location_name: 'Near Mysuru Suburban Bus Stand, Mysuru', investigation_office: 'Insp. K. Raghu', accused_name: 'Suresh Naidu', risk_score: 92 },
+  // ── Hubballi-Dharwad Hotspots ─────────────────────────────────────────────
+  { case_number: 'KAR/HUB/2026/1201', date_filed: '2026-07-19', time_filed: '21:00:00', crime_type_code: 'robbery', crime_type: 'Robbery', description: 'Inter-district gang robbery near Hubballi CBT Old Bus Stand.', status: 'open', case_status: 'open', district_name: 'Hubballi-Dharwad', police_station: 'Hubballi Town PS', location_name: 'Near Hubballi CBT Old Bus Stand, Hubballi-Dharwad', investigation_office: 'Insp. Basavaraj Patil', accused_name: 'Suresh Naidu', risk_score: 93 },
+  { case_number: 'KAR/HUB/2026/1202', date_filed: '2026-07-20', time_filed: '22:15:00', crime_type_code: 'drug_offence', crime_type: 'Drug Offence', description: 'Illegal ganja and contraband seized at Hubballi CBT Old Bus Stand.', status: 'chargesheeted', case_status: 'chargesheeted', district_name: 'Hubballi-Dharwad', police_station: 'Hubballi Town PS', location_name: 'Near Hubballi CBT Old Bus Stand, Hubballi-Dharwad', investigation_office: 'Insp. Basavaraj Patil', accused_name: 'Imran Khan', risk_score: 95 },
+  { case_number: 'KAR/HUB/2026/1203', date_filed: '2026-07-21', time_filed: '14:20:00', crime_type_code: 'vehicle_theft', crime_type: 'Vehicle Theft', description: 'Two motorcycles stolen outside Dharwad Court Circle.', status: 'open', case_status: 'open', district_name: 'Hubballi-Dharwad', police_station: 'Dharwad Sub-Urban PS', location_name: 'Near Dharwad Court Circle, Hubballi-Dharwad', investigation_office: 'Insp. Shivanand Hegde', accused_name: 'Ramesh Kumar', risk_score: 90 },
+  { case_number: 'KAR/HUB/2026/1204', date_filed: '2026-07-23', time_filed: '03:10:00', crime_type_code: 'burglary', crime_type: 'Burglary', description: 'Warehouse break-in and metal theft at Gokul Road Industrial Area.', status: 'under_investigation', case_status: 'under_investigation', district_name: 'Hubballi-Dharwad', police_station: 'Gokul Road PS', location_name: 'Near Gokul Road Industrial Area, Hubballi-Dharwad', investigation_office: 'Insp. Shivanand Hegde', accused_name: 'Vikram Malhotra', risk_score: 87 },
+  // ── Mangaluru Hotspots ────────────────────────────────────────────────────
+  { case_number: 'KAR/MNG/2026/1301', date_filed: '2026-07-16', time_filed: '15:30:00', crime_type_code: 'drug_offence', crime_type: 'Drug Offence', description: 'Commercial contraband seized near Hampankatta Central market.', status: 'chargesheeted', case_status: 'chargesheeted', district_name: 'Mangaluru', police_station: 'Mangaluru North PS', location_name: 'Near Hampankatta, Mangaluru', investigation_office: 'Insp. Ganesh Alva', accused_name: 'Imran Khan', risk_score: 96 },
+  { case_number: 'KAR/MNG/2026/1302', date_filed: '2026-07-18', time_filed: '23:45:00', crime_type_code: 'robbery', crime_type: 'Robbery', description: 'Extortion and armed threat near Panambur Port Corridor.', status: 'open', case_status: 'open', district_name: 'Mangaluru', police_station: 'Panambur PS', location_name: 'Near Panambur Port Corridor, Mangaluru', investigation_office: 'Insp. Suresh Poojary', accused_name: 'Chetan Shetty', risk_score: 92 },
+  { case_number: 'KAR/MNG/2026/1303', date_filed: '2026-07-22', time_filed: '01:20:00', crime_type_code: 'vehicle_theft', crime_type: 'Vehicle Theft', description: 'Car stolen outside Surathkal Junction hotel parking.', status: 'open', case_status: 'open', district_name: 'Mangaluru', police_station: 'Surathkal PS', location_name: 'Near Surathkal Junction, Mangaluru', investigation_office: 'Insp. Suresh Poojary', accused_name: 'Ramesh Kumar', risk_score: 88 },
+  // ── Belagavi Hotspots ─────────────────────────────────────────────────────
+  { case_number: 'KAR/BEL/2026/1401', date_filed: '2026-07-17', time_filed: '18:50:00', crime_type_code: 'robbery', crime_type: 'Robbery', description: 'Interstate gang extortion at Khade Bazar trade center.', status: 'open', case_status: 'open', district_name: 'Belagavi', police_station: 'Market PS Belagavi', location_name: 'Near Khade Bazar, Belagavi', investigation_office: 'Insp. Vinayak Kulkarni', accused_name: 'Suresh Naidu', risk_score: 94 },
+  { case_number: 'KAR/BEL/2026/1402', date_filed: '2026-07-19', time_filed: '22:10:00', crime_type_code: 'assault', crime_type: 'Assault', description: 'Armed clash between transport syndicates near Bogarves Circle.', status: 'chargesheeted', case_status: 'chargesheeted', district_name: 'Belagavi', police_station: 'Khade Bazar PS', location_name: 'Near Bogarves Circle, Belagavi', investigation_office: 'Insp. Vinayak Kulkarni', accused_name: 'Farid Mirza', risk_score: 90 },
+  // ── Kalaburagi Hotspots ───────────────────────────────────────────────────
+  { case_number: 'KAR/KLB/2026/1501', date_filed: '2026-07-20', time_filed: '17:45:00', crime_type_code: 'robbery', crime_type: 'Robbery', description: 'Armed robbery at Super Market jewellery shop.', status: 'open', case_status: 'open', district_name: 'Kalaburagi', police_station: 'Chowk PS', location_name: 'Near Super Market, Kalaburagi', investigation_office: 'Insp. Mallikarjun Biradar', accused_name: 'Suresh Naidu', risk_score: 93 },
+  { case_number: 'KAR/KLB/2026/1502', date_filed: '2026-07-22', time_filed: '23:15:00', crime_type_code: 'drug_offence', crime_type: 'Drug Offence', description: 'Illicit liquor and narcotics bust near Station Bazar.', status: 'chargesheeted', case_status: 'chargesheeted', district_name: 'Kalaburagi', police_station: 'Station Bazar PS', location_name: 'Near Station Bazar, Kalaburagi', investigation_office: 'Insp. Mallikarjun Biradar', accused_name: 'Imran Khan', risk_score: 92 },
+  // ── Shivamogga Hotspots ───────────────────────────────────────────────────
+  { case_number: 'KAR/SHI/2026/1601', date_filed: '2026-07-18', time_filed: '19:30:00', crime_type_code: 'robbery', crime_type: 'Robbery', description: 'Armed snatching near Gandhi Bazar jewellery hub.', status: 'open', case_status: 'open', district_name: 'Shivamogga', police_station: 'Doddapete PS', location_name: 'Near Gandhi Bazar, Shivamogga', investigation_office: 'Insp. Ravindra Gowda', accused_name: 'Farid Mirza', risk_score: 91 },
+  { case_number: 'KAR/SHI/2026/1602', date_filed: '2026-07-21', time_filed: '03:40:00', crime_type_code: 'burglary', crime_type: 'Burglary', description: 'Locked house break-in at Vinoba Nagar 3rd Cross.', status: 'under_investigation', case_status: 'under_investigation', district_name: 'Shivamogga', police_station: 'Vinoba Nagar PS', location_name: 'Near Vinoba Nagar, Shivamogga', investigation_office: 'Insp. Ravindra Gowda', accused_name: 'Vikram Malhotra', risk_score: 85 },
+  // ── Tumakuru Hotspots ─────────────────────────────────────────────────────
+  { case_number: 'KAR/TUM/2026/1701', date_filed: '2026-07-22', time_filed: '22:00:00', crime_type_code: 'robbery', crime_type: 'Robbery', description: 'Highway truck robbery near Town Hall Circle NH-48 Bypass.', status: 'open', case_status: 'open', district_name: 'Tumakuru', police_station: 'Tumakuru Town PS', location_name: 'Near Town Hall Circle, Tumakuru', investigation_office: 'Insp. Janaki Bhatia', accused_name: 'Anand Gowda', risk_score: 93 },
+  { case_number: 'KAR/TUM/2026/1702', date_filed: '2026-07-24', time_filed: '01:50:00', crime_type_code: 'vehicle_theft', crime_type: 'Vehicle Theft', description: 'Goods carrier truck hijacked near Kyathsandra Highway Hub.', status: 'open', case_status: 'open', district_name: 'Tumakuru', police_station: 'Kyathsandra PS', location_name: 'Near Kyathsandra Highway Hub, Tumakuru', investigation_office: 'Insp. Janaki Bhatia', accused_name: 'Ramesh Kumar', risk_score: 92 },
+  // ── Udupi Hotspots ────────────────────────────────────────────────────────
+  { case_number: 'KAR/UDU/2026/1801', date_filed: '2026-07-20', time_filed: '16:15:00', crime_type_code: 'fraud', crime_type: 'Fraud', description: 'Gold exchange counterfeiting fraud at Udupi Service Bus Stand.', status: 'under_investigation', case_status: 'under_investigation', district_name: 'Udupi', police_station: 'Udupi Town PS', location_name: 'Near Service Bus Stand, Udupi', investigation_office: 'Insp. Saanvi Dara', accused_name: 'Bhavani Karpe', risk_score: 86 },
+  { case_number: 'KAR/UDU/2026/1802', date_filed: '2026-07-23', time_filed: '23:30:00', crime_type_code: 'drug_offence', crime_type: 'Drug Offence', description: 'Party drug peddling ring busted near Manipal Commercial Hub.', status: 'chargesheeted', case_status: 'chargesheeted', district_name: 'Udupi', police_station: 'Manipal PS', location_name: 'Near Manipal Commercial Hub, Udupi', investigation_office: 'Insp. Saanvi Dara', accused_name: 'Imran Khan', risk_score: 94 },
+  // ── Bidar & Raichur Hotspots ──────────────────────────────────────────────
+  { case_number: 'KAR/BID/2026/1901', date_filed: '2026-07-24', time_filed: '21:40:00', crime_type_code: 'robbery', crime_type: 'Robbery', description: 'Inter-state contraband heist near Gandhi Gunj.', status: 'open', case_status: 'open', district_name: 'Bidar', police_station: 'Gandhi Gunj PS', location_name: 'Near Gandhi Gunj, Bidar', investigation_office: 'Insp. Yashodhara Konda', accused_name: 'Suresh Naidu', risk_score: 91 },
+  { case_number: 'KAR/RAI/2026/2001', date_filed: '2026-07-25', time_filed: '20:10:00', crime_type_code: 'robbery', crime_type: 'Robbery', description: 'Armed extortion at Raichur Station Road market.', status: 'open', case_status: 'open', district_name: 'Raichur', police_station: 'Raichur Town PS', location_name: 'Near Station Road, Raichur', investigation_office: 'Insp. Jonathan Iyengar', accused_name: 'Anand Shinde', risk_score: 90 }
 ];
 
 export const DEMO_FIRS = {
@@ -217,6 +250,29 @@ export function aggregateFirsToHotspots(firList) {
     'Hulimavu Junction':     { lat: 12.8745, lng: 77.6009 },
     'Uttarahalli Main Road': { lat: 12.8884, lng: 77.5388 },
     'Nayandahalli Junction': { lat: 12.9504, lng: 77.5119 },
+    // ── Karnataka Statewide Hotspot Coordinates ───────────────────────────
+    'Devaraja Market':       { lat: 12.3115, lng: 76.6528 },
+    'KR Circle':             { lat: 12.3082, lng: 76.6534 },
+    'Vijayanagar 2nd Stage': { lat: 12.3350, lng: 76.6120 },
+    'Mysuru Suburban Bus Stand': { lat: 12.3105, lng: 76.6570 },
+    'Hubballi CBT Old Bus Stand': { lat: 15.3520, lng: 75.1320 },
+    'Dharwad Court Circle':  { lat: 15.4580, lng: 75.0080 },
+    'Gokul Road Industrial Area': { lat: 15.3620, lng: 75.0920 },
+    'Hampankatta':           { lat: 12.8703, lng: 74.8427 },
+    'Panambur Port Corridor': { lat: 12.9460, lng: 74.8120 },
+    'Surathkal Junction':    { lat: 13.0110, lng: 74.7930 },
+    'Khade Bazar':           { lat: 15.8560, lng: 74.5120 },
+    'Bogarves Circle':       { lat: 15.8620, lng: 74.5050 },
+    'Super Market':          { lat: 17.3320, lng: 76.8390 },
+    'Station Bazar':         { lat: 17.3390, lng: 76.8290 },
+    'Gandhi Bazar':          { lat: 13.9320, lng: 75.5720 },
+    'Vinoba Nagar':          { lat: 13.9480, lng: 75.5560 },
+    'Town Hall Circle':      { lat: 13.3392, lng: 77.1014 },
+    'Kyathsandra Highway Hub': { lat: 13.3150, lng: 77.1620 },
+    'Service Bus Stand':     { lat: 13.3409, lng: 74.7421 },
+    'Manipal Commercial Hub': { lat: 13.3520, lng: 74.7860 },
+    'Gandhi Gunj':           { lat: 17.9180, lng: 77.5140 },
+    'Station Road':          { lat: 16.2076, lng: 77.3463 },
   };
 
   const districtCenterCoords = {
@@ -736,6 +792,242 @@ export const DEMO_TRAIL = {
   total_distance_km: 12.1,
   duration_minutes: 48
 };
+
+export const DEMO_CRIME_ROUTES = [
+  {
+    id: 'SYN-VT-01',
+    name: 'Bullet Ramesh — NH-44 South Escape Corridor',
+    short_name: 'NH-44 South Escape',
+    syndicate: 'Bullet Ramesh Syndicate',
+    suspect_id: 'SUS-8842',
+    suspect_name: 'Ramesh Kumar (Bullet Ramesh)',
+    crime_type: 'vehicle_theft',
+    threat_level: 'critical',
+    color: '#ef4444',
+    distance_km: 36.4,
+    est_transit_time: '42 mins',
+    description: 'High-speed southern extraction corridor moving stolen motorcycles and luxury sedans via Hosur Road to interstate chopshops across Tamil Nadu border.',
+    points: [
+      [77.6215, 12.9175], // Silk Board Junction
+      [77.6374, 12.8951], // Bommanahalli Signal
+      [77.6600, 12.8452], // Electronic City Phase 1 Toll
+      [77.7020, 12.8150], // Chandapura Flyover
+      [77.7200, 12.7800], // Attibele Border Checkpost
+    ],
+    checkpoints: [
+      { name: 'Silk Board TTMC', cam_id: 'CAM-BLR-0045', status: 'LOCKED_SWEEP' },
+      { name: 'Bommanahalli Signal', cam_id: 'CAM-BLR-0062', status: 'ACTIVE_TRACKING' },
+      { name: 'Electronic City Toll Gate', cam_id: 'CAM-BLR-0078', status: 'INTERCEPT_READY' },
+      { name: 'Attibele Border Post', cam_id: 'CAM-ATT-0001', status: 'INTERCEPT_READY' }
+    ]
+  },
+  {
+    id: 'SYN-ND-02',
+    name: 'Helmet Imran — Outer Ring Road Narcotics Run',
+    short_name: 'ORR Narcotics Belt',
+    syndicate: 'Helmet Imran Narcotics Ring',
+    suspect_id: 'SUS-5519',
+    suspect_name: 'Imran Khan (Helmet Imran)',
+    crime_type: 'drug_offence',
+    threat_level: 'high',
+    color: '#10b981',
+    distance_km: 44.8,
+    est_transit_time: '55 mins',
+    description: 'Midnight ring road pipeline distributing commercial MDMA, synthetic drugs, and contraband payloads connecting eastern tech parks to northern industrial zones.',
+    points: [
+      [77.6990, 12.9263], // Bellandur Lake Road
+      [77.7011, 12.9562], // Marathahalli Bridge
+      [77.6927, 13.0090], // KR Puram Cable Bridge
+      [77.6483, 13.0420], // Kalyan Nagar ORR
+      [77.6256, 13.0456], // Hebbal Expressway Flyover
+      [77.5499, 13.0255], // Yeshwanthpur Junction
+      [77.1000, 13.3400], // Tumakuru Highway Gate
+    ],
+    checkpoints: [
+      { name: 'Bellandur ORR Node', cam_id: 'CAM-WF-0019', status: 'LOCKED_SWEEP' },
+      { name: 'Marathahalli Bridge', cam_id: 'CAM-MAR-0011', status: 'SWEEPING' },
+      { name: 'KR Puram Bridge Cam', cam_id: 'CAM-KRP-0031', status: 'HIGH_SPEED_CAPTURE' },
+      { name: 'Hebbal Expressway Dome', cam_id: 'CAM-HEB-0012', status: 'PATROL_DEPLOYED' }
+    ]
+  },
+  {
+    id: 'SYN-RB-03',
+    name: 'Snake Naidu — CBD Heist & Extraction Vector',
+    short_name: 'Central CBD Heist Vector',
+    syndicate: 'Naidu Extraction Squad',
+    suspect_id: 'SUS-7104',
+    suspect_name: 'Suresh Naidu (Snake Naidu)',
+    crime_type: 'robbery',
+    threat_level: 'high',
+    color: '#f59e0b',
+    distance_km: 24.2,
+    est_transit_time: '34 mins',
+    description: 'High-density urban extraction vector following commercial jewellery and bank robberies from Indiranagar/MG Road heading towards northern outskirts.',
+    points: [
+      [77.6408, 12.9784], // Indiranagar 100ft Road
+      [77.6070, 12.9760], // MG Road / Brigade Road
+      [77.5699, 12.9774], // Majestic KSRTC Hub
+      [77.5680, 13.0024], // Malleshwaram 18th Cross
+      [77.5963, 13.1007], // Yelahanka New Town Outer
+    ],
+    checkpoints: [
+      { name: 'Indiranagar 100ft Pole', cam_id: 'CAM-BLR-0088', status: 'SWEEPING' },
+      { name: 'Brigade Road Junction', cam_id: 'CAM-CBD-0021', status: 'ACTIVE_RECORD' },
+      { name: 'Majestic Central Terminus', cam_id: 'CAM-MAJ-0009', status: '360_SWEEP' },
+      { name: 'Yelahanka Highway Post', cam_id: 'CAM-YLH-0004', status: 'INTERCEPT_READY' }
+    ]
+  },
+  {
+    id: 'SYN-CY-04',
+    name: 'DarkNet Cyber Mules — South FinTech Corridor',
+    short_name: 'South FinTech Mule Belt',
+    syndicate: 'FinTech Syndicate Mules',
+    suspect_id: 'SUS-3190',
+    suspect_name: 'Bhavani Karpe',
+    crime_type: 'cybercrime',
+    threat_level: 'medium',
+    color: '#a855f7',
+    distance_km: 18.5,
+    est_transit_time: '28 mins',
+    description: 'Coordinated ATM withdrawal and crypto cash pickup network hopping between multiple bank branches across south Bengaluru tech suburbs.',
+    points: [
+      [77.6245, 12.9352], // Koramangala 80ft Road
+      [77.6101, 12.9165], // BTM Layout 2nd Stage
+      [77.5971, 12.8933], // Bannerghatta Road
+      [77.5840, 12.9081], // JP Nagar 3rd Phase
+      [77.5475, 12.9256], // Banashankari Metro
+    ],
+    checkpoints: [
+      { name: 'Koramangala Sony World', cam_id: 'CAM-KOR-0023', status: 'ACTIVE_TRACKING' },
+      { name: 'BTM Water Tank Signal', cam_id: 'CAM-BTM-0015', status: 'SWEEPING' },
+      { name: 'JP Nagar Ring Rd Post', cam_id: 'CAM-JPN-0033', status: 'ANPR_RECORDING' }
+    ]
+  },
+  {
+    id: 'SYN-ST-05',
+    name: 'Vicky Blade — West Industrial Smuggling Vector',
+    short_name: 'West Industrial Vector',
+    syndicate: 'Vicky Blade Crew',
+    suspect_id: 'SUS-8890',
+    suspect_name: 'Vikram Malhotra (Vicky Blade)',
+    crime_type: 'burglary',
+    threat_level: 'high',
+    color: '#ec4899',
+    distance_km: 21.0,
+    est_transit_time: '32 mins',
+    description: 'Industrial warehouse theft & machinery dismantling corridor traversing Mysore Road through Peenya industrial belts.',
+    points: [
+      [77.5119, 12.9504], // Nayandahalli Junction
+      [77.5348, 12.9651], // Vijayanagar TTMC
+      [77.5530, 12.9952], // Rajajinagar 1st Block
+      [77.5206, 13.0322], // Peenya Industrial Area
+      [77.5150, 13.0600], // Jalahalli Cross
+    ],
+    checkpoints: [
+      { name: 'Nayandahalli Flyover', cam_id: 'CAM-NYD-0007', status: 'SWEEPING' },
+      { name: 'Vijayanagar TTMC CCTV', cam_id: 'CAM-BLR-0010', status: 'LOCKED_SWEEP' },
+      { name: 'Peenya Gate 1 ANPR', cam_id: 'CAM-PNY-0014', status: 'ANPR_RECORDING' }
+    ]
+  },
+  {
+    id: 'SYN-CS-06',
+    name: 'East Rapid Snatch & Getaway Vector',
+    short_name: 'East Rapid Snatch Corridor',
+    syndicate: 'East Biker Syndicate',
+    suspect_id: 'SUS-6421',
+    suspect_name: 'Farid Mirza',
+    crime_type: 'chain_snatching',
+    threat_level: 'high',
+    color: '#06b6d4',
+    distance_km: 23.6,
+    est_transit_time: '30 mins',
+    description: 'Rapid two-wheeler chain and mobile snatching vector operating during peak rush hour along tech campus corridors.',
+    points: [
+      [77.7500, 12.9698], // Whitefield Hope Farm
+      [77.7742, 12.9991], // Kadugodi Signal
+      [77.7437, 12.9397], // Varthur Main Road
+      [77.6881, 12.9121], // Sarjapur Road IT Cluster
+      [77.6474, 12.9116], // HSR Layout Sector 4
+    ],
+    checkpoints: [
+      { name: 'Whitefield Hope Farm Pole', cam_id: 'CAM-WTF-0012', status: 'ACTIVE_RECORD' },
+      { name: 'Varthur Lake Junction', cam_id: 'CAM-VAR-0008', status: 'SWEEPING' },
+      { name: 'Sarjapur Junction Cam', cam_id: 'CAM-SAR-0019', status: 'PATROL_DEPLOYED' }
+    ]
+  },
+  {
+    id: 'SYN-HW-07',
+    name: 'Bengaluru-Mysuru Expressway Syndicate Pipeline',
+    short_name: 'Mysuru Expressway Pipeline',
+    syndicate: 'Highway Express Syndicate',
+    suspect_id: 'SUS-3302',
+    suspect_name: 'Anand Gowda (Maddur Gowda)',
+    crime_type: 'robbery',
+    threat_level: 'critical',
+    color: '#f97316',
+    distance_km: 138.0,
+    est_transit_time: '1 hr 35 mins',
+    description: 'Inter-district express highway corridor facilitating rapid escape, stolen vehicle movement, and illegal contraband between Bengaluru, Ramanagara, Mandya, and Mysuru.',
+    points: [
+      [77.4843, 12.9063], // Kengeri Satellite Town
+      [77.3820, 12.7980], // Bidadi Industrial
+      [77.2800, 12.7150], // Ramanagara Bypass
+      [77.0420, 12.5840], // Maddur Toll Plaza
+      [76.8980, 12.5240], // Mandya City Center
+      [76.6620, 12.3380], // Mysuru Columbia Asia Junction
+    ],
+    checkpoints: [
+      { name: 'Kengeri Toll ANPR', cam_id: 'CAM-KNG-0003', status: 'INTERCEPT_READY' },
+      { name: 'Ramanagara Expressway Cam', cam_id: 'CAM-RAM-0011', status: 'SWEEPING' },
+      { name: 'Maddur Toll Gate 4', cam_id: 'CAM-MDR-0002', status: 'LOCKED_SWEEP' },
+      { name: 'Mysuru Entry Checkpost', cam_id: 'CAM-MYS-0005', status: 'INTERCEPT_READY' }
+    ]
+  },
+  {
+    id: 'SYN-COAST-08',
+    name: 'NH-66 Arabian Coast Smuggling Vector',
+    short_name: 'NH-66 Coastal Transit Vector',
+    syndicate: 'Coastal Transit Syndicate',
+    suspect_id: 'SUS-9104',
+    suspect_name: 'Chetan Shetty',
+    crime_type: 'drug_offence',
+    threat_level: 'high',
+    color: '#14b8a6',
+    distance_km: 62.5,
+    est_transit_time: '1 hr 10 mins',
+    description: 'Maritime and highway corridor connecting Mangaluru Old Port through Panambur port gates to Udupi district for illicit marine and narcotics transit.',
+    points: [
+      [74.8340, 12.8610], // Mangaluru Old Port
+      [74.8427, 12.8703], // Hampankatta City Hub
+      [74.8120, 12.9460], // Panambur Port Gate
+      [74.7930, 13.0110], // Surathkal NITK Junction
+      [74.7860, 13.0920], // Mulki Checkpost
+      [74.7421, 13.3409], // Udupi City Bus Stand
+    ],
+    checkpoints: [
+      { name: 'Mangaluru Port Gate 2', cam_id: 'CAM-MNG-0002', status: 'COASTAL_RADAR' },
+      { name: 'Surathkal Highway Post', cam_id: 'CAM-SRT-0018', status: 'SWEEPING' },
+      { name: 'Udupi Town Entry ANPR', cam_id: 'CAM-UDP-0009', status: 'ACTIVE_RECORD' }
+    ]
+  }
+];
+
+export const DEMO_ANPR_CAMERAS = [
+  { id: 'CAM-BLR-0045', name: 'Silk Board TTMC Pole 2',       lng: 77.6215, lat: 12.9175, district: 'Bengaluru Urban', status: 'LOCKED_SWEEP' },
+  { id: 'CAM-BLR-0088', name: 'Indiranagar 100ft Junction',   lng: 77.6408, lat: 12.9784, district: 'Bengaluru Urban', status: 'SWEEPING' },
+  { id: 'CAM-WF-0019',  name: 'Bellandur ORR South Gate',     lng: 77.6900, lat: 12.9350, district: 'Bengaluru Urban', status: 'LOCKED_SWEEP' },
+  { id: 'CAM-HEB-0012', name: 'Hebbal Expressway Dome 12',    lng: 77.6256, lat: 13.0456, district: 'Bengaluru Urban', status: 'PATROL_DEPLOYED' },
+  { id: 'CAM-ATT-0001', name: 'Attibele Border Checkpost',    lng: 77.7200, lat: 12.7800, district: 'Bengaluru Urban', status: 'INTERCEPT_READY' },
+  { id: 'CAM-KOR-0023', name: 'Koramangala Sony World Signal', lng: 77.6245, lat: 12.9352, district: 'Bengaluru Urban', status: 'ACTIVE_TRACKING' },
+  { id: 'CAM-MAJ-0009', name: 'Majestic Central Terminus',     lng: 77.5699, lat: 12.9774, district: 'Bengaluru Urban', status: '360_SWEEP' },
+  { id: 'CAM-PNY-0014', name: 'Peenya Industrial 1st Stage',  lng: 77.5206, lat: 13.0322, district: 'Bengaluru Urban', status: 'ANPR_RECORDING' },
+  { id: 'CAM-KRP-0031', name: 'KR Puram Cable Bridge Cam',    lng: 77.6927, lat: 13.0090, district: 'Bengaluru Urban', status: 'HIGH_SPEED_CAPTURE' },
+  { id: 'CAM-MYS-0005', name: 'Mysuru Expressway Entry Post', lng: 76.6620, lat: 12.3380, district: 'Mysuru',          status: 'INTERCEPT_READY' },
+  { id: 'CAM-MNG-0002', name: 'Mangaluru Port Security Gate',  lng: 74.8120, lat: 12.9460, district: 'Mangaluru',       status: 'COASTAL_RADAR' },
+  { id: 'CAM-HUB-0007', name: 'Hubballi CBT Old Bus Stand',   lng: 75.1320, lat: 15.3520, district: 'Hubballi-Dharwad', status: 'SWEEPING' },
+  { id: 'CAM-BEL-0010', name: 'Belagavi Khade Bazar Node',     lng: 74.5120, lat: 15.8560, district: 'Belagavi',        status: 'ANPR_RECORDING' },
+  { id: 'CAM-KLB-0004', name: 'Kalaburagi Super Market Cam',   lng: 76.8390, lat: 17.3320, district: 'Kalaburagi',      status: 'PATROL_DEPLOYED' }
+];
 
 export const DEMO_ANPR_RESULT = {
   alert: true,
