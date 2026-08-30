@@ -1340,8 +1340,13 @@ export default function ChatPage() {
     };
 
     rec.onerror = (e) => {
-      setError(e.error);
-      if (e.error === 'no-speech' || e.error === 'network') return;
+      const err = e?.error;
+      if (err === 'no-speech' || err === 'aborted') {
+        setError(null);
+        return;
+      }
+      setError(err);
+      if (err === 'network') return;
       consecutiveErrorsRef.current += 1;
       shouldRestartRef.current = false;
       setIsRecording(false);
@@ -1357,6 +1362,7 @@ export default function ChatPage() {
 
     try {
       shouldRestartRef.current = true;
+      setError(null);
       rec.start();
       setIsRecording(true);
     } catch (_) {
@@ -1366,6 +1372,7 @@ export default function ChatPage() {
 
   const stopVoice = () => {
     shouldRestartRef.current = false;
+    setError(null);
     if (recognitionRef.current) {
       try { recognitionRef.current.stop(); } catch (_) {}
     }
