@@ -259,7 +259,7 @@ export default function InvestigatorWall({
   ];
 
   return (
-    <div className="relative w-full rounded-2xl bg-[#FAF7F2] border-4 border-double border-slate-700/60 p-5 sm:p-7 md:p-8 shadow-2xl text-slate-800 font-serif transition-colors duration-200 overflow-hidden select-text">
+    <div className="investigator-wall-print-container relative w-full rounded-2xl bg-[#FAF7F2] border-4 border-double border-slate-700/60 p-5 sm:p-7 md:p-8 shadow-2xl text-slate-800 font-serif transition-colors duration-200 overflow-hidden print:overflow-visible print:border-none print:shadow-none print:p-2 print:bg-white select-text">
       
       {/* Authentic micro-texture overlay */}
       <div

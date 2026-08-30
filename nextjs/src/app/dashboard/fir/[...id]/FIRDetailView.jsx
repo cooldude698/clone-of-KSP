@@ -1321,8 +1321,8 @@ export default function FIRDetailView({ caseNumber, fir, suspects, trailData, tr
 
       {/* INVESTIGATION CHRONICLE MODAL OVERLAY */}
       {chronicleOpen && (
-        <div className="fixed inset-0 bg-[#F5F2EB] flex flex-col z-[99999] overflow-y-auto animate-newspaper-spin">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-300 shrink-0 bg-[#F5F2EB]/95 sticky top-0 z-30 backdrop-blur-md">
+        <div className="fixed inset-0 bg-[#F5F2EB] flex flex-col z-[99999] overflow-y-auto animate-newspaper-spin print:static print:overflow-visible print:bg-white print:z-auto print:animate-none print:p-0">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-300 shrink-0 bg-[#F5F2EB]/95 sticky top-0 z-30 backdrop-blur-md print:hidden">
             <div className="flex items-center gap-2.5 text-slate-800">
               <ShieldAlert className="w-5 h-5 text-red-600" />
               <h3 className="text-base font-extrabold font-serif tracking-wider uppercase">
@@ -1338,7 +1338,7 @@ export default function FIRDetailView({ caseNumber, fir, suspects, trailData, tr
             </button>
           </div>
 
-          <div className="flex-1 p-6 md:p-8 lg:p-10 max-w-[1200px] w-full mx-auto">
+          <div className="flex-1 p-6 md:p-8 lg:p-10 max-w-[1200px] w-full mx-auto print:p-0 print:max-w-none">
             <InvestigatorWall
               fir={wallData.fir}
               accused={wallData.accused}

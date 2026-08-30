@@ -23,6 +23,7 @@ import { cleanTextForSpeech } from '@/lib/speechUtils';
 const AlertNotification = dynamic(() => import('@/components/AlertNotification'), { ssr: false });
 const DrishtiOrb = dynamic(() => import('@/components/DrishtiOrb'), { ssr: false });
 const DrishtiPanel = dynamic(() => import('@/components/DrishtiPanel'), { ssr: false });
+import QuickRoleSwitcher from '@/components/QuickRoleSwitcher';
 
 
 const NAV_ITEMS = [
@@ -1121,8 +1122,11 @@ export default function DashboardLayout({ children }) {
             />
           </div>
 
-          {/* Right Section: Language, Alert Bell, Profile */}
-          <div className="flex items-center gap-4">
+          {/* Right Section: Role Switcher, Language, Alert Bell, Profile */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Quick Role Switcher */}
+            <QuickRoleSwitcher />
+
             {/* Interactive Language Selector Dropdown */}
             <div className="relative" ref={langDropdownRef}>
               <button
