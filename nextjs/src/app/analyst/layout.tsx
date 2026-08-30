@@ -29,8 +29,6 @@ import {
   Scale,
   User,
   Map,
-  Camera,
-  BarChart2,
   History,
   Navigation,
   Newspaper
@@ -49,8 +47,6 @@ const ANALYST_NAV_ITEMS = [
   { href: '/analyst/watchlist', icon: User, label: 'Suspect Roster', id: 'nav-suspect' },
   { href: '/analyst/heatmap', icon: Map, label: 'Crime Map', id: 'nav-map' },
   { href: '/analyst/network', icon: GitBranch, label: 'Network Graph', id: 'nav-network' },
-  { href: '/analyst/watchlist', icon: Camera, label: 'Surveillance', id: 'nav-surveillance' },
-  { href: '/analyst', icon: BarChart2, label: 'Analytics', id: 'nav-analytics' },
 ];
 
 function AnalystHeader() {
