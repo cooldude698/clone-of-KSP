@@ -219,15 +219,14 @@ export default function SupervisorAuditPage() {
 
                   <td className="py-3.5">
                     <span
-                      className={`text-[9px] px-2.5 py-1 rounded-full font-semibold ${
-                        log.type === 'AI_QUERY'
+                      className={`text-[9px] px-2.5 py-1 rounded-full font-semibold ${log.type === 'AI_QUERY'
                           ? 'bg-blue-50 text-blue-700 border border-blue-200'
                           : log.type === 'SANCTION_APPROVAL'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : log.type === 'STATUTORY_DIRECTIVE'
-                          ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                          : 'bg-purple-50 text-purple-700 border border-purple-200'
-                      }`}
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : log.type === 'STATUTORY_DIRECTIVE'
+                              ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                              : 'bg-purple-50 text-purple-700 border border-purple-200'
+                        }`}
                     >
                       {log.type}
                     </span>
@@ -246,11 +245,10 @@ export default function SupervisorAuditPage() {
 
                   <td className="py-3.5">
                     <span
-                      className={`text-[9px] px-2 py-0.5 rounded-full font-semibold ${
-                        log.status === 'SUCCESS'
+                      className={`text-[9px] px-2 py-0.5 rounded-full font-semibold ${log.status === 'SUCCESS'
                           ? 'text-emerald-700 bg-emerald-50 border border-emerald-200'
                           : 'text-amber-700 bg-amber-50 border border-amber-200'
-                      }`}
+                        }`}
                     >
                       {log.status}
                     </span>

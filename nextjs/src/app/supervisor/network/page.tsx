@@ -169,11 +169,10 @@ export default function SupervisorNetworkGraphPage() {
                   <div
                     key={syn.id}
                     onClick={() => setSelectedSyndicate(syn)}
-                    className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col gap-2 ${
-                      isSelected
+                    className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col gap-2 ${isSelected
                         ? 'bg-blue-50/60 border-blue-300 shadow-sm'
                         : 'bg-slate-50 border-slate-100 hover:border-slate-300'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] px-2.5 py-0.5 rounded-full font-semibold bg-rose-50 text-rose-700 border border-rose-200">

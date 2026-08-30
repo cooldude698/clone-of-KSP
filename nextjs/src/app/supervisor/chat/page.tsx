@@ -151,27 +151,24 @@ export default function SupervisorCoPilotPage() {
               className={`flex gap-3 max-w-3xl ${isUser ? 'ml-auto flex-row-reverse' : ''}`}
             >
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${
-                  isUser
+                className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${isUser
                     ? 'bg-slate-900 text-white shadow-xs'
                     : 'bg-blue-50 text-blue-600 border border-blue-100'
-                }`}
+                  }`}
               >
                 {isUser ? <User className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
               </div>
 
               <div
-                className={`p-4 rounded-2xl border text-xs leading-relaxed ${
-                  isUser
+                className={`p-4 rounded-2xl border text-xs leading-relaxed ${isUser
                     ? 'bg-slate-900 text-white border-slate-900 rounded-tr-none'
                     : 'bg-slate-50 border-slate-200/80 text-slate-800 rounded-tl-none'
-                }`}
+                  }`}
               >
                 <div className="whitespace-pre-wrap">{msg.content}</div>
                 <span
-                  className={`text-[9px] font-mono mt-2 block ${
-                    isUser ? 'text-slate-400' : 'text-slate-400'
-                  }`}
+                  className={`text-[9px] font-mono mt-2 block ${isUser ? 'text-slate-400' : 'text-slate-400'
+                    }`}
                 >
                   {msg.timestamp}
                 </span>
