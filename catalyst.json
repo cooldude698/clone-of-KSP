@@ -50,8 +50,6 @@
       "source": "nextjs",
       "ignore": [
         "**/node_modules/**",
-        "**/.next/**",
-        "**/.open-next/**",
         "**/.git/**",
         "**/.cache/**",
         "**/*.log",
