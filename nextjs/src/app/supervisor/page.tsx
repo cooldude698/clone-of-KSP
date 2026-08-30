@@ -282,7 +282,13 @@ export default function SupervisorOperationsCommandHub() {
           <div className="rounded-[28px] bg-white border border-slate-200 p-6 shadow-sm flex-1 flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-slate-500">
-                Division Disposals This Month
+                {timeFilter === 'Day'
+                  ? 'Division Disposals Today'
+                  : timeFilter === 'Week'
+                  ? 'Division Disposals This Week'
+                  : timeFilter === 'Year'
+                  ? 'Division Disposals This Year'
+                  : 'Division Disposals This Month'}
               </span>
               <button className="text-slate-400 hover:text-slate-600 transition-colors">
                 <MoreVertical className="w-4 h-4" />
@@ -292,10 +298,22 @@ export default function SupervisorOperationsCommandHub() {
             <div className="my-2">
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
-                  {statewideClearanceRate}%
+                  {timeFilter === 'Day'
+                    ? '94.2%'
+                    : timeFilter === 'Week'
+                    ? '89.0%'
+                    : timeFilter === 'Year'
+                    ? '82.1%'
+                    : `${statewideClearanceRate}%`}
                 </span>
                 <span className="text-xs font-medium text-slate-400">
-                  / 152 Dossiers
+                  / {timeFilter === 'Day'
+                    ? '18 Dossiers'
+                    : timeFilter === 'Week'
+                    ? '64 Dossiers'
+                    : timeFilter === 'Year'
+                    ? '1,940 Dossiers'
+                    : '152 Dossiers'}
                 </span>
               </div>
             </div>
@@ -306,7 +324,7 @@ export default function SupervisorOperationsCommandHub() {
                 <button
                   key={tab}
                   onClick={() => setTimeFilter(tab)}
-                  className={`px-3 py-1 rounded-full transition-all ${
+                  className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
                     timeFilter === tab
                       ? 'bg-slate-900 text-white shadow-xs font-bold'
                       : 'hover:text-slate-900'
@@ -328,13 +346,29 @@ export default function SupervisorOperationsCommandHub() {
                 </defs>
 
                 <path
-                  d="M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45 L 300,100 L 0,100 Z"
+                  d={
+                    timeFilter === 'Day'
+                      ? 'M 0,80 C 40,75 70,60 100,48 C 130,35 160,55 190,30 C 220,15 240,25 260,18 C 280,15 290,22 300,18 L 300,100 L 0,100 Z'
+                      : timeFilter === 'Week'
+                      ? 'M 0,72 C 30,60 60,75 90,42 C 120,25 150,52 180,32 C 210,14 230,28 250,20 C 275,15 290,28 300,22 L 300,100 L 0,100 Z'
+                      : timeFilter === 'Year'
+                      ? 'M 0,85 C 40,72 80,60 120,48 C 160,38 200,28 240,18 C 260,14 275,12 300,10 L 300,100 L 0,100 Z'
+                      : 'M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45 L 300,100 L 0,100 Z'
+                  }
                   fill="url(#supChartGrad)"
                   className="transition-all duration-500"
                 />
 
                 <path
-                  d="M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45"
+                  d={
+                    timeFilter === 'Day'
+                      ? 'M 0,80 C 40,75 70,60 100,48 C 130,35 160,55 190,30 C 220,15 240,25 260,18 C 280,15 290,22 300,18'
+                      : timeFilter === 'Week'
+                      ? 'M 0,72 C 30,60 60,75 90,42 C 120,25 150,52 180,32 C 210,14 230,28 250,20 C 275,15 290,28 300,22'
+                      : timeFilter === 'Year'
+                      ? 'M 0,85 C 40,72 80,60 120,48 C 160,38 200,28 240,18 C 260,14 275,12 300,10'
+                      : 'M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45'
+                  }
                   fill="none"
                   stroke="#4f46e5"
                   strokeWidth="2.5"
