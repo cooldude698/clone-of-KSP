@@ -586,13 +586,87 @@ export default function AnalystIntelligenceHub() {
         </div>
       </div>
 
-      {/* FIR Detail Modal */}
-      {selectedFIR && (
-        <InvestigatorWall
-          fir={selectedFIR}
-          onClose={() => setSelectedFIR(null)}
-        />
-      )}
+      {/* FIR Detail Modal (Investigator Wall) */}
+      <AnimatePresence>
+        {selectedFIR && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-10 bg-slate-950/70 backdrop-blur-md animate-in fade-in duration-200">
+            <div className="relative w-full max-w-6xl max-h-[92vh] bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col">
+              {/* Modal Topbar */}
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-teal-50 text-teal-700 border border-teal-100 flex items-center justify-center font-black text-xs font-mono">
+                    SCRB
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      <span>Dossier Intelligence Chronicle</span>
+                      <span className="font-mono text-xs text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
+                        {selectedFIR.case_number || 'KAR/SCRB/2026/089'}
+                      </span>
+                    </h3>
+                    <p className="text-[11px] text-slate-500 font-medium">
+                      Karnataka State Police · Central Forensic & Pattern Archive
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setSelectedFIR(null)}
+                  className="px-3.5 py-1.5 rounded-full bg-slate-900 hover:bg-black text-white font-bold text-xs transition-all cursor-pointer shadow-xs flex items-center gap-1.5 hover:scale-105"
+                  title="Close Dossier"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  <span>Close</span>
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                <InvestigatorWall
+                  fir={{
+                    case_number: selectedFIR.case_number || 'KAR/BLR/2026/04921',
+                    crime_type: selectedFIR.crime_type || selectedFIR.crime_type_code || 'Vehicle Theft',
+                    date_filed: selectedFIR.date_filed || '2026-07-22',
+                    location_name: selectedFIR.location_name || selectedFIR.district_name || 'Central PS',
+                    case_status: selectedFIR.status || selectedFIR.case_status || 'open',
+                    description: selectedFIR.description || 'Target vehicle theft and commercial chopshop transport operation.',
+                    police_station: selectedFIR.police_station || 'Bengaluru Urban East PS',
+                    district_name: selectedFIR.district_name || 'Bengaluru Urban',
+                    investigation_office: selectedFIR.investigation_office || 'Insp. Dr. Priya Rao',
+                  }}
+                  accused={[
+                    {
+                      full_name: selectedFIR.accused_name || 'Ramesh Kumar',
+                      alias: 'The Snake',
+                      age: 34,
+                      gender: 'Male',
+                      district_name: selectedFIR.district_name || 'Bengaluru Urban',
+                      occupation: 'Fence / Chopshop Logistics',
+                      prior_convictions: 6,
+                      risk_score: selectedFIR.risk_score || 94,
+                      modus_operandi: 'Inter-district night heist using fake ANPR plates.'
+                    }
+                  ]}
+                  victims={[
+                    {
+                      full_name: selectedFIR.complainant_name || 'KSP Commercial Unit',
+                      age: 42,
+                      gender: 'Male',
+                      district_name: selectedFIR.district_name || 'Bengaluru Urban',
+                      vulnerability_score: 65,
+                    }
+                  ]}
+                  related_firs={[
+                    { case_number: 'KAR/BLR/2026/01184', crime_type: 'Armed Robbery', date_filed: '2026-07-20', link_reason: 'Matching MO & Getaway Vehicle' },
+                    { case_number: 'KAR/MYS/2026/00199', crime_type: 'Physical Assault', date_filed: '2026-07-15', link_reason: 'Co-Accused Communication Log' }
+                  ]}
+                  case_summary={selectedFIR.description || 'Verified CCTNS first information report statement filed at Karnataka State Police command center.'}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
