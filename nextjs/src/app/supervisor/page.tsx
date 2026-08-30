@@ -81,75 +81,67 @@ export default function SupervisorOperationsCommandHub() {
         <div className="lg:col-span-8 flex flex-col justify-between space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-sm bg-[#1B2A4A]/10 text-[#1B2A4A] border border-[#1B2A4A]/25">
-                  DIVISION COMMAND // PLOTTING BOARD
-                </span>
-              </div>
-              <h1 className="text-2xl font-serif font-bold text-[#1B2A4A] tracking-tight mt-1">
-                Operations & Sector Command
+              <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+                Operations Command
               </h1>
-              <p className="text-xs text-[#1C1F26]/70 mt-0.5 font-sans">
-                Karnataka State Police · Sector 4 Supervisory Command & Jurisdiction Matrix
+              <p className="text-xs text-slate-500 mt-0.5">
+                Karnataka State Police · Sector 4 Supervisory Command & Fleet Matrix
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1B2A4A]/10 border border-[#1B2A4A]/25 text-[11px] font-mono font-bold text-[#1B2A4A]">
-                <span className="w-2 h-2 rounded-full bg-[#C48A3A] animate-pulse" />
-                SEC-4 // VECTOR #{tick}
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-[11px] font-bold text-indigo-700">
+                <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                Live GPS Vector #{tick}
               </span>
             </div>
           </div>
 
           {/* Toast */}
           {approvedNotification && (
-            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
+            <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>{approvedNotification}</span>
             </div>
           )}
 
-          {/* 4-CARD PLOTTING BOARD GRID (SUPERVISOR SERIF + SECTOR TAGS) */}
+          {/* 4-CARD BALANCED INTELLIGENCE GRID (SUPERVISOR NAVY/INDIGO PALETTE) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
-            
             {/* CARD 1: ACTIVE PATROL FLEETS */}
-            <div className="rounded-2xl bg-white/95 border border-[#1B2A4A]/20 p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between group">
+            <div className="rounded-[28px] bg-white border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
               <div>
-                <div className="flex items-center justify-between mb-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-[#1B2A4A]/10 text-[#1B2A4A] border border-[#1B2A4A]/20 flex items-center justify-center">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-11 h-11 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center justify-center shadow-xs">
                     <Navigation className="w-5 h-5" />
                   </div>
-                  
-                  {/* SIGNATURE ELEMENT: Monospace Sector Reference Tag */}
-                  <span className="font-mono text-[9px] font-bold px-2 py-0.5 rounded-sm bg-[#1B2A4A]/5 border border-[#1B2A4A]/25 text-[#1B2A4A] tracking-wider">
-                    SEC-4 // FLEET-V1
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                    4 Sectors Active
                   </span>
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-xs text-[#1C1F26]/60 font-medium">
+                  <p className="text-xs text-slate-500 font-medium">
                     Patrol Fleets On Beat
                   </p>
-                  <h3 className="text-lg font-serif font-bold text-[#1B2A4A] tracking-tight leading-snug">
+                  <h3 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug">
                     {activePatrolCount} Units Operational
                   </h3>
-                  <div className="flex items-center gap-2 pt-1.5">
-                    <span className="text-[10px] font-mono font-bold text-[#3D6B6B]">
-                      100% Satellite Sync · 2s Sector Refresh
+                  <div className="flex items-center gap-2 pt-2">
+                    <span className="text-[10px] font-mono font-bold text-indigo-600">
+                      100% Satellite Connected · 2s Refresh
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-3.5 mt-3 border-t border-[#1B2A4A]/10 flex items-center justify-between">
+              <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-bold text-[#1B2A4A]">Beat Coverage</span>
-                  <span className="block text-[10px] text-[#1C1F26]/60 font-mono">PCR & Cheetah Active</span>
+                  <span className="text-xs font-extrabold text-slate-900">Beat Coverage</span>
+                  <span className="block text-[10px] text-slate-500 font-medium">PCR & Cheetah Active</span>
                 </div>
                 <Link
                   href="/supervisor/dispatch"
-                  className="px-4 py-1.5 rounded-full bg-[#1B2A4A] text-white text-xs font-bold hover:bg-[#253961] transition-all shadow-xs flex items-center gap-1"
+                  className="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
                 >
                   Fleet Map
                 </Link>
@@ -157,40 +149,38 @@ export default function SupervisorOperationsCommandHub() {
             </div>
 
             {/* CARD 2: 112 RESPONSE TIME */}
-            <div className="rounded-2xl bg-white/95 border border-[#1B2A4A]/20 p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between group">
+            <div className="rounded-[28px] bg-white border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
               <div>
-                <div className="flex items-center justify-between mb-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#3D6B6B] border border-emerald-200 flex items-center justify-center">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-11 h-11 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shadow-xs">
                     <Clock className="w-5 h-5" />
                   </div>
-                  
-                  {/* SIGNATURE ELEMENT: Monospace Sector Reference Tag */}
-                  <span className="font-mono text-[9px] font-bold px-2 py-0.5 rounded-sm bg-emerald-50 border border-emerald-200 text-[#3D6B6B] tracking-wider">
-                    SEC-4 // SLA-01
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">
+                    SLA Compliant
                   </span>
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-xs text-[#1C1F26]/60 font-medium">
+                  <p className="text-xs text-slate-500 font-medium">
                     112 Average Response ETA
                   </p>
-                  <h3 className="text-lg font-serif font-bold text-[#1B2A4A] tracking-tight leading-snug">
+                  <h3 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug">
                     {timeFormatted} Latency
                   </h3>
-                  <p className="text-[11px] text-[#1C1F26]/70 line-clamp-2 pt-1 font-sans">
+                  <p className="text-[11px] text-slate-500 line-clamp-2 pt-1">
                     Sector 4 urban beat benchmark &lt;10m; dispatch to on-scene verified.
                   </p>
                 </div>
               </div>
 
-              <div className="pt-3.5 mt-3 border-t border-[#1B2A4A]/10 flex items-center justify-between">
+              <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-bold text-[#1B2A4A]">Dispatch Queue</span>
-                  <span className="block text-[10px] text-[#1C1F26]/60 font-mono">Auto-Routed</span>
+                  <span className="text-xs font-extrabold text-slate-900">Dispatch Queue</span>
+                  <span className="block text-[10px] text-slate-500 font-medium">Auto-Routed</span>
                 </div>
                 <Link
                   href="/supervisor/dispatch"
-                  className="px-4 py-1.5 rounded-full bg-[#C48A3A] hover:bg-[#a8752e] text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1"
+                  className="px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1"
                 >
                   Deploy Patrol
                 </Link>
@@ -198,45 +188,43 @@ export default function SupervisorOperationsCommandHub() {
             </div>
 
             {/* CARD 3: STATUTORY SANCTIONS DESK */}
-            <div className="rounded-2xl bg-white/95 border border-[#1B2A4A]/20 p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between group">
+            <div className="rounded-[28px] bg-white border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
               <div>
-                <div className="flex items-center justify-between mb-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-rose-50 text-[#B23A2E] border border-rose-200 flex items-center justify-center">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-11 h-11 rounded-full bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center shadow-xs">
                     <FileCheck className="w-5 h-5" />
                   </div>
-                  
-                  {/* SIGNATURE ELEMENT: Monospace Sector Reference Tag */}
-                  <span className="font-mono text-[9px] font-bold px-2 py-0.5 rounded-sm bg-rose-50 border border-rose-200 text-[#B23A2E] tracking-wider">
-                    SEC-4 // SANCTION-02
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
+                    Action Required
                   </span>
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-xs text-[#1C1F26]/60 font-medium">
+                  <p className="text-xs text-slate-500 font-medium">
                     SP Statutory Clearance Desk
                   </p>
-                  <h3 className="text-lg font-serif font-bold text-[#1B2A4A] tracking-tight leading-snug">
+                  <h3 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug">
                     {pendingSanctionsCount} Warrants Pending
                   </h3>
-                  <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
-                    <span className="px-2 py-0.5 rounded-sm bg-[#1B2A4A]/5 border border-[#1B2A4A]/10 text-[10px] font-semibold text-[#1C1F26]">
+                  <div className="flex flex-wrap items-center gap-1.5 pt-2 pb-1">
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-semibold text-slate-700">
                       Goonda Act
                     </span>
-                    <span className="px-2 py-0.5 rounded-sm bg-[#1B2A4A]/5 border border-[#1B2A4A]/10 text-[10px] font-mono font-bold text-[#1B2A4A]">
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-semibold text-slate-700 font-mono">
                       Sec 110 BNSS
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-3.5 mt-3 border-t border-[#1B2A4A]/10 flex items-center justify-between">
+              <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-bold text-[#1B2A4A]">Statutory Orders</span>
-                  <span className="block text-[10px] text-[#1C1F26]/60 font-mono">Awaiting Sign-off</span>
+                  <span className="text-xs font-extrabold text-slate-900">Statutory Orders</span>
+                  <span className="block text-[10px] text-slate-500 font-medium">Awaiting Sign-off</span>
                 </div>
                 <Link
                   href="/supervisor/approvals"
-                  className="px-4 py-1.5 rounded-full bg-[#1B2A4A] text-white text-xs font-bold hover:bg-[#253961] transition-all shadow-xs flex items-center gap-1"
+                  className="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
                 >
                   Review Warrants
                 </Link>
@@ -244,45 +232,43 @@ export default function SupervisorOperationsCommandHub() {
             </div>
 
             {/* CARD 4: CLEARANCE VELOCITY */}
-            <div className="rounded-2xl bg-white/95 border border-[#1B2A4A]/20 p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between group">
+            <div className="rounded-[28px] bg-white border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
               <div>
-                <div className="flex items-center justify-between mb-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-[#1B2A4A]/10 text-[#1B2A4A] border border-[#1B2A4A]/20 flex items-center justify-center">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-11 h-11 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center justify-center shadow-xs">
                     <Gauge className="w-5 h-5" />
                   </div>
-                  
-                  {/* SIGNATURE ELEMENT: Monospace Sector Reference Tag */}
-                  <span className="font-mono text-[9px] font-bold px-2 py-0.5 rounded-sm bg-[#1B2A4A]/5 border border-[#1B2A4A]/25 text-[#1B2A4A] tracking-wider">
-                    SEC-4 // GRID-B7
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                    {statewideClearanceRate}% Rate
                   </span>
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-xs text-[#1C1F26]/60 font-medium">
+                  <p className="text-xs text-slate-500 font-medium">
                     Division Clearance & Disposal
                   </p>
-                  <h3 className="text-lg font-serif font-bold text-[#1B2A4A] tracking-tight leading-snug">
+                  <h3 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug">
                     148 Cases Closed (MoM)
                   </h3>
-                  <div className="flex items-center gap-2 pt-1.5">
-                    <span className="px-2 py-0.5 rounded-sm bg-[#1B2A4A]/5 border border-[#1B2A4A]/10 text-[10px] font-semibold text-[#1C1F26]">
+                  <div className="flex items-center gap-2 pt-2">
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-semibold text-slate-700">
                       4 PS Synced
                     </span>
-                    <span className="text-[10px] font-mono font-bold text-[#3D6B6B]">
+                    <span className="text-[10px] font-mono font-bold text-emerald-600">
                       +4.2% Velocity
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-3.5 mt-3 border-t border-[#1B2A4A]/10 flex items-center justify-between">
+              <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-bold text-[#1B2A4A]">Officer Metrics</span>
-                  <span className="block text-[10px] text-[#1C1F26]/60 font-mono">4 Inspectors</span>
+                  <span className="text-xs font-extrabold text-slate-900">Officer Metrics</span>
+                  <span className="block text-[10px] text-slate-500 font-medium">4 Inspectors</span>
                 </div>
                 <Link
                   href="/supervisor/performance"
-                  className="px-4 py-1.5 rounded-full bg-[#1B2A4A] text-white text-xs font-bold hover:bg-[#253961] transition-all shadow-xs flex items-center gap-1"
+                  className="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
                 >
                   Scorecards
                 </Link>
@@ -293,9 +279,9 @@ export default function SupervisorOperationsCommandHub() {
 
         {/* RIGHT COLUMN: DIVISION DISPOSALS THIS MONTH + SECTOR 4 TARGET (4 COLS) */}
         <div className="lg:col-span-4 flex flex-col justify-between">
-          <div className="rounded-2xl bg-white/95 border border-[#1B2A4A]/20 p-5 shadow-2xs flex-1 flex flex-col justify-between">
+          <div className="rounded-[28px] bg-white border border-slate-200 p-6 shadow-sm flex-1 flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1C1F26]/70">
+              <span className="text-xs font-medium text-slate-500">
                 {timeFilter === 'Day'
                   ? 'Division Disposals Today'
                   : timeFilter === 'Week'
@@ -304,14 +290,14 @@ export default function SupervisorOperationsCommandHub() {
                   ? 'Division Disposals This Year'
                   : 'Division Disposals This Month'}
               </span>
-              <button className="text-[#1C1F26]/40 hover:text-[#1B2A4A] transition-colors">
+              <button className="text-slate-400 hover:text-slate-600 transition-colors">
                 <MoreVertical className="w-4 h-4" />
               </button>
             </div>
 
             <div className="my-2">
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-[#1B2A4A]">
+                <span className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
                   {timeFilter === 'Day'
                     ? '94.2%'
                     : timeFilter === 'Week'
@@ -320,7 +306,7 @@ export default function SupervisorOperationsCommandHub() {
                     ? '82.1%'
                     : `${statewideClearanceRate}%`}
                 </span>
-                <span className="text-xs font-mono font-medium text-[#1C1F26]/60">
+                <span className="text-xs font-medium text-slate-400">
                   / {timeFilter === 'Day'
                     ? '18 Dossiers'
                     : timeFilter === 'Week'
@@ -333,15 +319,15 @@ export default function SupervisorOperationsCommandHub() {
             </div>
 
             {/* Time Filter Pills */}
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#1B2A4A]/10 text-xs font-mono font-semibold text-[#1C1F26]/60">
+            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-xs font-semibold text-slate-500">
               {['Day', 'Week', 'Month', 'Year'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setTimeFilter(tab)}
                   className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
                     timeFilter === tab
-                      ? 'bg-[#1B2A4A] text-white shadow-xs font-bold'
-                      : 'hover:text-[#1B2A4A]'
+                      ? 'bg-slate-900 text-white shadow-xs font-bold'
+                      : 'hover:text-slate-900'
                   }`}
                 >
                   {tab}
@@ -349,13 +335,13 @@ export default function SupervisorOperationsCommandHub() {
               ))}
             </div>
 
-            {/* SMOOTH CURVED SVG SPLINE CHART (INDIGO #1B2A4A) */}
+            {/* SMOOTH CURVED SVG SPLINE CHART (INDIGO #4f46e5) */}
             <div className="relative mt-5 h-28 w-full">
               <svg viewBox="0 0 300 100" className="w-full h-full overflow-visible" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="supChartGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#1B2A4A" stopOpacity="0.22" />
-                    <stop offset="100%" stopColor="#1B2A4A" stopOpacity="0.0" />
+                    <stop offset="0%" stopColor="#4f46e5" stopOpacity="0.2" />
+                    <stop offset="100%" stopColor="#4f46e5" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
 
@@ -384,7 +370,7 @@ export default function SupervisorOperationsCommandHub() {
                       : 'M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45'
                   }
                   fill="none"
-                  stroke="#1B2A4A"
+                  stroke="#4f46e5"
                   strokeWidth="2.5"
                   strokeLinecap="round"
                   className="transition-all duration-500"
@@ -394,10 +380,10 @@ export default function SupervisorOperationsCommandHub() {
           </div>
 
           {/* THE ONE DARK EXCEPTION: SUMMARY / TARGET CARD (INDIGO ACCENT) */}
-          <div className="mt-4 p-4 rounded-xl bg-[#1B2A4A] text-white flex items-center justify-between shadow-sm border border-[#1B2A4A]">
+          <div className="mt-4 p-4 rounded-2xl bg-slate-900 text-white flex items-center justify-between shadow-sm">
             <div>
-              <p className="text-[10px] text-slate-300 font-mono font-medium">SEC-4 // PLAN 2026</p>
-              <p className="text-xs font-serif font-bold text-white mt-0.5">Division Clearance Target</p>
+              <p className="text-[10px] text-slate-400 font-medium">Sector 4 Plan for 2026</p>
+              <p className="text-xs font-bold text-white mt-0.5">Division Clearance Target</p>
             </div>
 
             <div className="relative w-12 h-12 flex items-center justify-center">
@@ -410,7 +396,7 @@ export default function SupervisorOperationsCommandHub() {
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
                 <path
-                  className="text-[#C48A3A]"
+                  className="text-indigo-500"
                   strokeDasharray="85, 100"
                   strokeWidth="4"
                   strokeLinecap="round"
@@ -419,9 +405,7 @@ export default function SupervisorOperationsCommandHub() {
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
               </svg>
-              <span className="absolute text-[11px] font-bold text-white font-mono">
-                85%
-              </span>
+              <span className="absolute text-[10px] font-black text-white">85%</span>
             </div>
           </div>
         </div>

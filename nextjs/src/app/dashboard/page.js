@@ -7,8 +7,7 @@ import {
   Search, MapPin, FileText, Camera, Shield,
   ArrowUpDown, ChevronDown, MoreVertical, Wifi,
   Cpu, Car, Laptop, Home, ShieldAlert, Activity,
-  Users, CheckCircle2, AlertCircle, ArrowUpRight, Sparkles, ChevronRight, X,
-  TrendingUp, Clock, Target
+  Users, CheckCircle2, AlertCircle, ArrowUpRight, Sparkles, ChevronRight, X
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { fetchWithFallback } from '@/lib/fetch-with-fallback';
@@ -108,7 +107,7 @@ export default function DashboardPage() {
   }, [filteredFIRs, visibleCount]);
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6 text-[#14141A]">
+    <div className="w-full max-w-7xl mx-auto space-y-6 text-slate-900 dark:text-white">
       
       {/* ── TOP SECTION: COMMAND DASHBOARD GRID ── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
@@ -117,22 +116,17 @@ export default function DashboardPage() {
         <div className="lg:col-span-8 flex flex-col justify-between space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-[10px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-sm bg-[#C7362F]/10 text-[#C7362F] border border-[#C7362F]/30">
-                  FIELD OPS // CONSOLE
-                </span>
-              </div>
-              <h1 className="text-2xl font-black text-[#14141A] tracking-tight uppercase mt-1">
-                {t('nav.dashboard', 'Tactical Dispatch & Case Console')}
+              <h1 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">
+                {t('nav.dashboard', 'Dashboard')}
               </h1>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Karnataka State Police · Central Sector Dispatch & Live Tactical Radar
+              <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                Karnataka State Police · Sector 4 Tactical Command & Analytics
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] font-bold text-[#1E8A5F]">
-                <span className="w-2 h-2 rounded-full bg-[#1E8A5F] animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 Live CCTNS Sync
               </span>
             </div>
@@ -143,45 +137,41 @@ export default function DashboardPage() {
             
             {/* CARD 1: CRIME NETWORK / SYNDICATE */}
             <div
-              className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden"
+              className="rounded-[28px] bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
             >
               <div>
-                <div className="flex items-center justify-between mb-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-rose-50 text-[#C7362F] border border-rose-100 flex items-center justify-center shadow-xs">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-11 h-11 rounded-full bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-white border border-blue-100 dark:border-slate-700 flex items-center justify-center shadow-xs">
                     <ShieldAlert className="w-5 h-5" />
                   </div>
-                  
-                  {/* SIGNATURE ELEMENT: Physical Field Report Case Stamp */}
-                  <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm border border-[#C7362F]/50 bg-[#C7362F]/10 text-[#C7362F] font-mono text-[9px] font-black uppercase tracking-wider -rotate-1 shadow-2xs">
-                    FIR #04921 // URGENT
-                  </div>
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50">
+                    High Risk Alert
+                  </span>
                 </div>
 
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#C7362F]">
-                      Imminent Target Corridor
-                    </span>
-                  </div>
-                  <h3 className="text-base font-black text-[#14141A] tracking-tight leading-snug">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    Imminent Target Corridor
+                  </p>
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug">
                     Silk Board TTMC – Hosur Corridor
                   </h3>
-                  <div className="flex items-center gap-2 pt-1">
-                    <span className="text-[10px] font-mono font-bold text-[#C7362F]">
+                  <div className="flex items-center gap-2 pt-2">
+                    <span className="text-[10px] font-mono font-bold text-rose-600 dark:text-rose-400">
                       Predicted Window: 28 Jul 2026 – 30 Jul 2026
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-3.5 mt-3 border-t border-slate-100 flex items-center justify-between">
+              <div className="pt-4 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-black text-[#14141A]">Gang Syndicate</span>
-                  <span className="block text-[10px] text-slate-500 font-mono font-semibold">GANG-NORTH Active</span>
+                  <span className="text-xs font-extrabold text-slate-900 dark:text-white">Gang Syndicate</span>
+                  <span className="block text-[10px] text-slate-500 font-medium">GANG-NORTH Active</span>
                 </div>
                 <Link
                   href="/dashboard/network"
-                  className="px-4 py-1.5 rounded-full bg-[#14141A] text-white text-xs font-bold hover:bg-[#C7362F] transition-all shadow-xs flex items-center gap-1"
+                  className="px-4 py-2 rounded-full bg-slate-900 text-white dark:bg-white dark:text-black text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
                 >
                   View Network
                 </Link>
@@ -190,43 +180,39 @@ export default function DashboardPage() {
 
             {/* CARD 2: HOTSPOT INTELLIGENCE */}
             <div
-              className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden"
+              className="rounded-[28px] bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
             >
               <div>
-                <div className="flex items-center justify-between mb-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-amber-50 text-[#D08A1E] border border-amber-100 flex items-center justify-center shadow-xs">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-11 h-11 rounded-full bg-amber-50 dark:bg-slate-800 text-amber-600 dark:text-white border border-amber-100 dark:border-slate-700 flex items-center justify-center shadow-xs">
                     <MapPin className="w-5 h-5" />
                   </div>
-                  
-                  {/* SIGNATURE ELEMENT: Physical Field Report Case Stamp */}
-                  <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm border border-[#D08A1E]/50 bg-[#D08A1E]/10 text-[#D08A1E] font-mono text-[9px] font-black uppercase tracking-wider -rotate-1 shadow-2xs">
-                    GRID #BGL-06 // ACTIVE
-                  </div>
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50">
+                    6 Active Hotspots
+                  </span>
                 </div>
 
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#D08A1E]">
-                      Primary Crime Vector & MO
-                    </span>
-                  </div>
-                  <h3 className="text-base font-black text-[#14141A] tracking-tight leading-snug">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    Primary Crime Vector & MO
+                  </p>
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug">
                     Vehicle Theft & Commercial Hijack
                   </h3>
-                  <p className="text-[11px] text-slate-500 line-clamp-2 pt-1 font-medium">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 pt-1">
                     Peak window 22:00–03:00 hrs targeting Pulsar & TVS Apache transit.
                   </p>
                 </div>
               </div>
 
-              <div className="pt-3.5 mt-3 border-t border-slate-100 flex items-center justify-between">
+              <div className="pt-4 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-black text-[#14141A]">Hotspot Grid</span>
-                  <span className="block text-[10px] text-slate-500 font-mono font-semibold">GIS Patrol Active</span>
+                  <span className="text-xs font-extrabold text-slate-900 dark:text-white">Hotspot Grid</span>
+                  <span className="block text-[10px] text-slate-500 font-medium">GIS Patrol Active</span>
                 </div>
                 <Link
                   href="/dashboard/map"
-                  className="px-4 py-1.5 rounded-full bg-[#2E5FE0] text-white text-xs font-bold hover:bg-blue-700 transition-all shadow-xs flex items-center gap-1"
+                  className="px-4 py-2 rounded-full bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-all shadow-xs flex items-center gap-1"
                 >
                   Deploy Patrol
                 </Link>
@@ -235,46 +221,44 @@ export default function DashboardPage() {
 
             {/* CARD 3: SUSPECT WATCHLIST ALERT */}
             <div
-              className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden"
+              className="rounded-[28px] bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
             >
               <div>
-                <div className="flex items-center justify-between mb-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center shadow-xs">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-11 h-11 rounded-full bg-purple-50 dark:bg-slate-800 text-purple-600 dark:text-white border border-purple-100 dark:border-slate-700 flex items-center justify-center shadow-xs">
                     <Users className="w-5 h-5" />
                   </div>
-                  
-                  {/* SIGNATURE ELEMENT: Physical Field Report Case Stamp */}
-                  <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm border border-[#C7362F]/50 bg-[#C7362F]/10 text-[#C7362F] font-mono text-[9px] font-black uppercase tracking-wider -rotate-1 shadow-2xs">
-                    WARRANT #SUS-7701
-                  </div>
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-900/50">
+                    Watchlist Hit
+                  </span>
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-xs text-slate-500 font-medium">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                     ANPR Hit 14m ago · Indiranagar
                   </p>
-                  <h3 className="text-base font-black text-[#14141A] tracking-tight leading-snug">
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug">
                     Vicky “The Snake” (Repeat)
                   </h3>
                   <div className="flex flex-wrap items-center gap-1.5 pt-2 pb-1">
-                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-semibold text-slate-700">
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300">
                       Non-Bailable Warrant
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-bold text-slate-700 font-mono">
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300 font-mono">
                       SUS-7701
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-3.5 mt-3 border-t border-slate-100 flex items-center justify-between">
+              <div className="pt-4 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-black text-[#14141A]">Active Warrant</span>
-                  <span className="block text-[10px] text-slate-500 font-mono font-semibold">Patrol Alerted</span>
+                  <span className="text-xs font-extrabold text-slate-900 dark:text-white">Active Warrant</span>
+                  <span className="block text-[10px] text-slate-500 font-medium">Patrol Alerted</span>
                 </div>
                 <Link
                   href="/dashboard/suspect"
-                  className="px-4 py-1.5 rounded-full bg-[#14141A] text-white text-xs font-bold hover:bg-[#C7362F] transition-all shadow-xs flex items-center gap-1"
+                  className="px-4 py-2 rounded-full bg-slate-900 text-white dark:bg-white dark:text-black text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
                 >
                   Track Suspect
                 </Link>
@@ -283,46 +267,44 @@ export default function DashboardPage() {
 
             {/* CARD 4: ANPR SENSOR TELEMETRY */}
             <div
-              className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden"
+              className="rounded-[28px] bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
             >
               <div>
-                <div className="flex items-center justify-between mb-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#1E8A5F] border border-emerald-100 flex items-center justify-center shadow-xs">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-11 h-11 rounded-full bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-white border border-emerald-100 dark:border-slate-700 flex items-center justify-center shadow-xs">
                     <Camera className="w-5 h-5" />
                   </div>
-                  
-                  {/* SIGNATURE ELEMENT: Physical Field Report Case Stamp */}
-                  <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm border border-[#1E8A5F]/50 bg-[#1E8A5F]/10 text-[#1E8A5F] font-mono text-[9px] font-black uppercase tracking-wider -rotate-1 shadow-2xs">
-                    SENSOR #12.5K // LIVE
-                  </div>
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50">
+                    99.4% Grid Uptime
+                  </span>
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-xs text-slate-500 font-medium">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                     Surveillance Network · Bengaluru City
                   </p>
-                  <h3 className="text-base font-black text-[#14141A] tracking-tight leading-snug">
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug">
                     12,500+ ANPR Nodes Active
                   </h3>
                   <div className="flex flex-wrap items-center gap-1.5 pt-2 pb-1">
-                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-semibold text-slate-700">
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300">
                       14 PCR Units
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-[#1E8A5F] text-[10px] font-bold font-mono">
-                      Optical Sync 99.4%
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300">
+                      Optical Sync Live
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-3.5 mt-3 border-t border-slate-100 flex items-center justify-between">
+              <div className="pt-4 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-black text-[#14141A]">Sensor Grid</span>
-                  <span className="block text-[10px] text-slate-500 font-mono font-semibold">Real-Time Streams</span>
+                  <span className="text-xs font-extrabold text-slate-900 dark:text-white">Sensor Grid</span>
+                  <span className="block text-[10px] text-slate-500 font-medium">Real-Time Streams</span>
                 </div>
                 <Link
                   href="/dashboard/surveillance"
-                  className="px-4 py-1.5 rounded-full bg-[#14141A] text-white text-xs font-bold hover:bg-[#2E5FE0] transition-all shadow-xs flex items-center gap-1"
+                  className="px-4 py-2 rounded-full bg-slate-900 text-white dark:bg-white dark:text-black text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
                 >
                   View Feed
                 </Link>
@@ -333,47 +315,26 @@ export default function DashboardPage() {
         </div>
 
         {/* RIGHT COLUMN: CASES RESOLVED GRAPH CARD (4 COLS) */}
-<<<<<<< HEAD
-        <div className="lg:col-span-4 rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs flex flex-col justify-between h-full">
+        <div className="lg:col-span-4 rounded-3xl bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col justify-between h-full">
           <div>
             <div className="flex items-center justify-between text-slate-400">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wide font-mono">
-=======
-        <div className="lg:col-span-4 rounded-3xl bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col justify-between h-full space-y-4">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between text-slate-400">
-              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
->>>>>>> 087f0bff3817d2a331610787dc9e0e5782f51f1f
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                 {timeFilter === 'Day' ? 'Cases Resolved Today' :
                  timeFilter === 'Week' ? 'Cases Resolved This Week' :
                  timeFilter === 'Year' ? 'Cases Resolved This Year' :
                  'Cases Resolved This Month'}
               </p>
-<<<<<<< HEAD
-              <button className="text-slate-400 hover:text-slate-900">
+              <button className="text-slate-400 hover:text-slate-900 dark:hover:text-white">
                 <MoreVertical className="w-4 h-4" />
               </button>
             </div>
             
-            <p className="text-3xl font-black text-[#14141A] mt-1 tracking-tight">
-=======
-              <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-                <TrendingUp className="w-3 h-3" />
-                +4.2% KPI
-              </span>
-            </div>
-            
-            <p className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
->>>>>>> 087f0bff3817d2a331610787dc9e0e5782f51f1f
+            <p className="text-3xl font-extrabold text-slate-900 dark:text-white mt-1 tracking-tight">
               {timeFilter === 'Day' ? '92.0%' :
                timeFilter === 'Week' ? '88.2%' :
                timeFilter === 'Year' ? '81.4%' :
                '84.5%'}
-<<<<<<< HEAD
-              <span className="text-sm font-semibold text-slate-500 ml-1.5 font-mono">
-=======
-              <span className="text-xs sm:text-sm font-medium text-slate-500 ml-1.5">
->>>>>>> 087f0bff3817d2a331610787dc9e0e5782f51f1f
+              <span className="text-sm font-normal text-slate-500 ml-1.5">
                 / {timeFilter === 'Day' ? '12 Dossiers' :
                    timeFilter === 'Week' ? '48 Dossiers' :
                    timeFilter === 'Year' ? '1,840 Dossiers' :
@@ -382,20 +343,15 @@ export default function DashboardPage() {
             </p>
 
             {/* Time Filter Pills */}
-            <div className="flex items-center justify-between p-1 rounded-2xl bg-slate-100 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/60 text-xs font-semibold">
+            <div className="flex items-center justify-between text-xs font-bold text-slate-500 mt-4 px-2">
               {['Day', 'Week', 'Month', 'Year'].map(tab => (
                 <button
                   key={tab}
                   onClick={() => setTimeFilter(tab)}
-                  className={`flex-1 py-1.5 rounded-xl transition-all cursor-pointer text-center ${
+                  className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
                     timeFilter === tab 
-<<<<<<< HEAD
-                      ? 'bg-[#14141A] text-white font-bold shadow-xs' 
-                      : 'hover:text-slate-900'
-=======
-                      ? 'bg-white dark:bg-zinc-900 text-slate-900 dark:text-white font-extrabold shadow-xs' 
-                      : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
->>>>>>> 087f0bff3817d2a331610787dc9e0e5782f51f1f
+                      ? 'bg-slate-900 text-white dark:bg-white dark:text-black font-bold shadow-xs' 
+                      : 'hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   {tab}
@@ -403,39 +359,25 @@ export default function DashboardPage() {
               ))}
             </div>
 
-<<<<<<< HEAD
-            {/* SMOOTH CURVED SVG BEZIER SPLINE CHART (COBALT #2E5FE0) */}
+            {/* SMOOTH CURVED SVG BEZIER SPLINE CHART */}
             <div className="relative mt-5 h-28 w-full">
               <svg viewBox="0 0 300 100" className="w-full h-full overflow-visible" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#2E5FE0" stopOpacity="0.18" />
-                    <stop offset="100%" stopColor="#2E5FE0" stopOpacity="0.0" />
-=======
-            {/* SMOOTH CURVED SVG BEZIER SPLINE CHART */}
-            <div className="relative mt-2 h-36 w-full">
-              <svg viewBox="0 0 300 110" className="w-full h-full overflow-visible" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#2563eb" stopOpacity="0.2" />
-                    <stop offset="100%" stopColor="#2563eb" stopOpacity="0.0" />
->>>>>>> 087f0bff3817d2a331610787dc9e0e5782f51f1f
+                    <stop offset="0%" stopColor="#1d6fbf" stopOpacity="0.15" />
+                    <stop offset="100%" stopColor="#1d6fbf" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
                 
-                {/* Baseline Grid lines */}
-                <line x1="0" y1="30" x2="300" y2="30" stroke="currentColor" strokeDasharray="3 3" className="text-slate-100 dark:text-slate-800/80" strokeWidth="1" />
-                <line x1="0" y1="70" x2="300" y2="70" stroke="currentColor" strokeDasharray="3 3" className="text-slate-100 dark:text-slate-800/80" strokeWidth="1" />
-
                 <path
                   d={
                     timeFilter === 'Day'
-                      ? 'M 0,85 C 40,80 70,65 100,50 C 130,35 160,55 190,30 C 220,15 240,25 260,18 C 280,15 290,22 300,18 L 300,110 L 0,110 Z'
+                      ? 'M 0,80 C 40,75 70,60 100,48 C 130,35 160,55 190,30 C 220,15 240,25 260,18 C 280,15 290,22 300,18 L 300,100 L 0,100 Z'
                       : timeFilter === 'Week'
-                      ? 'M 0,78 C 30,65 60,80 90,45 C 120,28 150,55 180,35 C 210,16 230,30 250,22 C 275,16 290,30 300,24 L 300,110 L 0,110 Z'
+                      ? 'M 0,72 C 30,60 60,75 90,42 C 120,25 150,52 180,32 C 210,14 230,28 250,20 C 275,15 290,28 300,22 L 300,100 L 0,100 Z'
                       : timeFilter === 'Year'
-                      ? 'M 0,90 C 40,75 80,62 120,50 C 160,40 200,30 240,20 C 260,15 275,13 300,10 L 300,110 L 0,110 Z'
-                      : 'M 0,70 C 20,45 40,85 70,55 C 100,25 120,75 150,50 C 180,24 200,12 230,15 C 250,18 270,75 300,48 L 300,110 L 0,110 Z'
+                      ? 'M 0,85 C 40,72 80,60 120,48 C 160,38 200,28 240,18 C 260,14 275,12 300,10 L 300,100 L 0,100 Z'
+                      : 'M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45 L 300,100 L 0,100 Z'
                   }
                   fill="url(#chartGradient)"
                   className="transition-all duration-500"
@@ -444,119 +386,59 @@ export default function DashboardPage() {
                 <path
                   d={
                     timeFilter === 'Day'
-                      ? 'M 0,85 C 40,80 70,65 100,50 C 130,35 160,55 190,30 C 220,15 240,25 260,18 C 280,15 290,22 300,18'
+                      ? 'M 0,80 C 40,75 70,60 100,48 C 130,35 160,55 190,30 C 220,15 240,25 260,18 C 280,15 290,22 300,18'
                       : timeFilter === 'Week'
-                      ? 'M 0,78 C 30,65 60,80 90,45 C 120,28 150,55 180,35 C 210,16 230,30 250,22 C 275,16 290,30 300,24'
+                      ? 'M 0,72 C 30,60 60,75 90,42 C 120,25 150,52 180,32 C 210,14 230,28 250,20 C 275,15 290,28 300,22'
                       : timeFilter === 'Year'
-                      ? 'M 0,90 C 40,75 80,62 120,50 C 160,40 200,30 240,20 C 260,15 275,13 300,10'
-                      : 'M 0,70 C 20,45 40,85 70,55 C 100,25 120,75 150,50 C 180,24 200,12 230,15 C 250,18 270,75 300,48'
+                      ? 'M 0,85 C 40,72 80,60 120,48 C 160,38 200,28 240,18 C 260,14 275,12 300,10'
+                      : 'M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45'
                   }
                   fill="none"
-<<<<<<< HEAD
-                  stroke="#2E5FE0"
+                  stroke="#1d6fbf"
                   strokeWidth="2.5"
-=======
-                  stroke="#2563eb"
-                  strokeWidth="3"
->>>>>>> 087f0bff3817d2a331610787dc9e0e5782f51f1f
                   strokeLinecap="round"
                   className="transition-all duration-500"
                 />
-
-                {/* Peak Highlight Circle */}
-                <circle
-                  cx="300"
-                  cy={timeFilter === 'Year' ? 10 : timeFilter === 'Day' ? 18 : timeFilter === 'Week' ? 24 : 48}
-                  r="4"
-                  fill="#2563eb"
-                  className="animate-pulse"
-                />
               </svg>
-
-              {/* X-Axis Timeline Markers */}
-              <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
-                <span>{timeFilter === 'Day' ? '06:00' : timeFilter === 'Week' ? 'Mon' : timeFilter === 'Year' ? 'Q1 2026' : 'Week 1'}</span>
-                <span>{timeFilter === 'Day' ? '12:00' : timeFilter === 'Week' ? 'Wed' : timeFilter === 'Year' ? 'Q2' : 'Week 2'}</span>
-                <span>{timeFilter === 'Day' ? '18:00' : timeFilter === 'Week' ? 'Fri' : timeFilter === 'Year' ? 'Q3' : 'Week 3'}</span>
-                <span className="font-bold text-blue-600 dark:text-blue-400">{timeFilter === 'Day' ? 'Now' : timeFilter === 'Week' ? 'Sun' : timeFilter === 'Year' ? 'Q4 (Active)' : 'Week 4'}</span>
-              </div>
-            </div>
-
-            {/* 2-Column Resolution Velocity Stats */}
-            <div className="grid grid-cols-2 gap-3 pt-1">
-              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 flex flex-col justify-between">
-                <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 font-mono">
-                  <Clock className="w-3.5 h-3.5 text-blue-500" />
-                  <span>Avg. Resolution</span>
-                </div>
-                <p className="text-base font-extrabold text-slate-900 dark:text-white mt-1 font-mono">
-                  {timeFilter === 'Day' ? '3.8 hrs' : timeFilter === 'Week' ? '4.2 hrs' : timeFilter === 'Year' ? '5.1 days' : '4.6 hrs'}
-                </p>
-                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold font-mono">
-                  ↓ 18% faster
-                </span>
-              </div>
-
-              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 flex flex-col justify-between">
-                <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 font-mono">
-                  <Shield className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>Chargesheet Rate</span>
-                </div>
-                <p className="text-base font-extrabold text-slate-900 dark:text-white mt-1 font-mono">
-                  {timeFilter === 'Day' ? '96.2%' : timeFilter === 'Week' ? '91.8%' : timeFilter === 'Year' ? '89.6%' : '90.4%'}
-                </p>
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold font-mono">
-                  Benchmark Met
-                </span>
-              </div>
             </div>
           </div>
 
           {/* BOTTOM TARGET CARD */}
-<<<<<<< HEAD
-          <div className="mt-4 p-4 rounded-xl bg-[#14141A] text-white flex items-center justify-between shadow-sm">
+          <div className="mt-4 p-4 rounded-2xl bg-slate-900 text-white flex items-center justify-between shadow-sm">
             <div>
-              <p className="text-[10px] text-slate-400 font-mono font-medium">FIELD OPS // PLAN 2026</p>
-              <p className="text-xs font-black text-white mt-0.5 uppercase tracking-wide">Clearance Target</p>
-=======
-          <div className="p-4 rounded-2xl bg-slate-900 text-white flex items-center justify-between shadow-xs border border-slate-800">
-            <div>
-              <div className="flex items-center gap-1.5">
-                <Target className="w-3.5 h-3.5 text-blue-400" />
-                <p className="text-[10px] text-slate-400 font-mono font-bold uppercase tracking-wider">Plan for 2026</p>
-              </div>
-              <p className="text-xs font-extrabold text-white mt-0.5">Annual Clearance Target</p>
->>>>>>> 087f0bff3817d2a331610787dc9e0e5782f51f1f
+              <p className="text-[10px] text-slate-400 font-medium">Plan for 2026</p>
+              <p className="text-xs font-bold text-white mt-0.5">Clearance Target</p>
             </div>
 
             <div className="relative w-12 h-12 flex items-center justify-center">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
                 <path
-                  className="text-slate-800"
+                  className="text-slate-700"
                   strokeWidth="4"
                   stroke="currentColor"
                   fill="none"
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
                 <path
-                  className="text-[#2E5FE0]"
-                  strokeDasharray="75, 100"
+                  className="text-blue-500"
+                  strokeDasharray={`${
+                    timeFilter === 'Day' ? 92 :
+                    timeFilter === 'Week' ? 88 :
+                    timeFilter === 'Year' ? 81 :
+                    75
+                  }, 100`}
                   strokeWidth="4"
                   strokeLinecap="round"
                   stroke="currentColor"
                   fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
               </svg>
-<<<<<<< HEAD
-              <span className="absolute text-[11px] font-black text-white font-mono">
-                75%
-=======
-              <span className="absolute text-[10px] font-black font-mono text-white">
+              <span className="absolute text-[10px] font-black text-white">
                 {timeFilter === 'Day' ? '92%' :
                  timeFilter === 'Week' ? '88%' :
                  timeFilter === 'Year' ? '81%' :
                  '75%'}
->>>>>>> 087f0bff3817d2a331610787dc9e0e5782f51f1f
               </span>
             </div>
           </div>
