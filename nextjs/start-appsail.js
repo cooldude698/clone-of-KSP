@@ -26,27 +26,38 @@ function copyDirSync(src, dest) {
   }
 }
 
-const standaloneDir = path.join(__dirname, '.next', 'standalone');
-const standaloneServer = path.join(standaloneDir, 'server.js');
+const directStandaloneDir = path.join(__dirname, '.next', 'standalone');
+const nestedStandaloneDir = path.join(directStandaloneDir, 'nextjs');
 
-if (fs.existsSync(standaloneServer)) {
-  // Ensure .next/static and public are present in standalone directory
+let targetServer = null;
+let targetDir = null;
+
+if (fs.existsSync(path.join(directStandaloneDir, 'server.js'))) {
+  targetServer = path.join(directStandaloneDir, 'server.js');
+  targetDir = directStandaloneDir;
+} else if (fs.existsSync(path.join(nestedStandaloneDir, 'server.js'))) {
+  targetServer = path.join(nestedStandaloneDir, 'server.js');
+  targetDir = nestedStandaloneDir;
+}
+
+if (targetServer && targetDir) {
+  // Ensure .next/static and public are present in target standalone directory
   const srcStatic = path.join(__dirname, '.next', 'static');
-  const destStatic = path.join(standaloneDir, '.next', 'static');
+  const destStatic = path.join(targetDir, '.next', 'static');
   if (fs.existsSync(srcStatic) && !fs.existsSync(destStatic)) {
-    console.log('[AppSail] Syncing .next/static into standalone distribution...');
+    console.log(`[AppSail] Syncing .next/static into ${destStatic}...`);
     copyDirSync(srcStatic, destStatic);
   }
 
   const srcPublic = path.join(__dirname, 'public');
-  const destPublic = path.join(standaloneDir, 'public');
+  const destPublic = path.join(targetDir, 'public');
   if (fs.existsSync(srcPublic) && !fs.existsSync(destPublic)) {
-    console.log('[AppSail] Syncing public assets into standalone distribution...');
+    console.log(`[AppSail] Syncing public assets into ${destPublic}...`);
     copyDirSync(srcPublic, destPublic);
   }
 
-  console.log(`[AppSail] Starting standalone server on http://0.0.0.0:${port}...`);
-  const child = spawn(process.execPath, [standaloneServer], {
+  console.log(`[AppSail] Starting standalone server from ${targetServer} on http://0.0.0.0:${port}...`);
+  const child = spawn(process.execPath, [targetServer], {
     stdio: 'inherit',
     env: {
       ...process.env,
@@ -54,7 +65,7 @@ if (fs.existsSync(standaloneServer)) {
       HOSTNAME: '0.0.0.0',
       NODE_ENV: 'production'
     },
-    cwd: standaloneDir
+    cwd: targetDir
   });
 
   child.on('exit', (code) => {

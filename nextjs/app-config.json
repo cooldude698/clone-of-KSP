@@ -1,5 +1,5 @@
 {
-  "command": "npm run start",
+  "command": "node start-appsail.js",
   "buildPath": "./",
   "stack": "node20",
   "env_variables": {
