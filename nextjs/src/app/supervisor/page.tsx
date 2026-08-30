@@ -58,6 +58,23 @@ export default function SupervisorOperationsCommandHub() {
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6 text-slate-900">
+      
+      {/* ── TOP KPI METRIC STRIP (DIVISION-LEVEL OPERATIONAL METRICS) ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          { label: 'Active Patrol Fleets', value: `${activePatrolCount} Units`, sub: '100% GPS Vector Connected', color: 'text-indigo-600' },
+          { label: '112 Average Response', value: timeFormatted, sub: 'Sector 4 Beat Benchmark <10m', color: 'text-emerald-600' },
+          { label: 'Pending Sanctions', value: `${pendingSanctionsCount} Warrants`, sub: 'SP Statutory Clearance Desk', color: 'text-rose-600' },
+          { label: 'Disposal Velocity', value: `${statewideClearanceRate}%`, sub: '148 Cases Closed (MoM)', color: 'text-indigo-700' },
+        ].map((kpi) => (
+          <div key={kpi.label} className="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm flex flex-col gap-1 hover:border-indigo-200 transition-colors">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{kpi.label}</span>
+            <span className={`text-2xl font-extrabold tracking-tight ${kpi.color}`}>{kpi.value}</span>
+            <span className="text-[10px] text-slate-400 font-medium">{kpi.sub}</span>
+          </div>
+        ))}
+      </div>
+
       {/* ── TOP SECTION: COMMAND DASHBOARD GRID ── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         {/* LEFT COLUMN: ACTIVE DUTY & TACTICAL INTEL (8 COLS) */}
@@ -73,8 +90,8 @@ export default function SupervisorOperationsCommandHub() {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] font-bold text-emerald-600">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-[11px] font-bold text-indigo-700">
+                <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
                 Live GPS Vector #{tick}
               </span>
             </div>
@@ -88,16 +105,16 @@ export default function SupervisorOperationsCommandHub() {
             </div>
           )}
 
-          {/* 4-CARD BALANCED INTELLIGENCE GRID (EXACT INSPECTOR STYLE) */}
+          {/* 4-CARD BALANCED INTELLIGENCE GRID (SUPERVISOR NAVY/INDIGO PALETTE) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
             {/* CARD 1: ACTIVE PATROL FLEETS */}
             <div className="rounded-[28px] bg-white border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-11 h-11 rounded-full bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shadow-xs">
+                  <div className="w-11 h-11 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center justify-center shadow-xs">
                     <Navigation className="w-5 h-5" />
                   </div>
-                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-200">
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
                     4 Sectors Active
                   </span>
                 </div>
@@ -110,7 +127,7 @@ export default function SupervisorOperationsCommandHub() {
                     {activePatrolCount} Units Operational
                   </h3>
                   <div className="flex items-center gap-2 pt-2">
-                    <span className="text-[10px] font-mono font-bold text-emerald-600">
+                    <span className="text-[10px] font-mono font-bold text-indigo-600">
                       100% Satellite Connected · 2s Refresh
                     </span>
                   </div>
@@ -131,7 +148,7 @@ export default function SupervisorOperationsCommandHub() {
               </div>
             </div>
 
-            {/* CARD 2: STATEWIDE 112 RESPONSE TIME */}
+            {/* CARD 2: 112 RESPONSE TIME */}
             <div className="rounded-[28px] bg-white border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
               <div>
                 <div className="flex items-center justify-between mb-4">
@@ -163,21 +180,21 @@ export default function SupervisorOperationsCommandHub() {
                 </div>
                 <Link
                   href="/supervisor/dispatch"
-                  className="px-4 py-2 rounded-full bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-all shadow-xs flex items-center gap-1"
+                  className="px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1"
                 >
                   Deploy Patrol
                 </Link>
               </div>
             </div>
 
-            {/* CARD 3: PENDING STATUTORY SANCTIONS */}
+            {/* CARD 3: STATUTORY SANCTIONS DESK */}
             <div className="rounded-[28px] bg-white border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="w-11 h-11 rounded-full bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center shadow-xs">
                     <FileCheck className="w-5 h-5" />
                   </div>
-                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-rose-50 text-rose-600 border border-rose-200">
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
                     Action Required
                   </span>
                 </div>
@@ -214,14 +231,14 @@ export default function SupervisorOperationsCommandHub() {
               </div>
             </div>
 
-            {/* CARD 4: DISPOSAL VELOCITY */}
+            {/* CARD 4: CLEARANCE VELOCITY */}
             <div className="rounded-[28px] bg-white border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-11 h-11 rounded-full bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center shadow-xs">
+                  <div className="w-11 h-11 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center justify-center shadow-xs">
                     <Gauge className="w-5 h-5" />
                   </div>
-                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-purple-50 text-purple-600 border border-purple-200">
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
                     {statewideClearanceRate}% Rate
                   </span>
                 </div>
@@ -233,11 +250,11 @@ export default function SupervisorOperationsCommandHub() {
                   <h3 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug">
                     148 Cases Closed (MoM)
                   </h3>
-                  <div className="flex flex-wrap items-center gap-1.5 pt-2 pb-1">
+                  <div className="flex items-center gap-2 pt-2">
                     <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-semibold text-slate-700">
                       4 PS Synced
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-[10px] font-semibold text-emerald-700">
+                    <span className="text-[10px] font-mono font-bold text-emerald-600">
                       +4.2% Velocity
                     </span>
                   </div>
@@ -260,43 +277,38 @@ export default function SupervisorOperationsCommandHub() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: CASES RESOLVED GRAPH CARD (4 COLS) */}
-        <div className="lg:col-span-4 rounded-3xl bg-white border border-slate-200 p-6 shadow-sm flex flex-col justify-between h-full">
-          <div>
-            <div className="flex items-center justify-between text-slate-400">
-              <p className="text-xs font-medium text-slate-500">
-                {timeFilter === 'Day' ? 'Division Disposals Today' :
-                 timeFilter === 'Week' ? 'Division Disposals This Week' :
-                 timeFilter === 'Year' ? 'Division Disposals This Year' :
-                 'Division Disposals This Month'}
-              </p>
-              <button className="text-slate-400 hover:text-slate-900">
+        {/* RIGHT COLUMN: DIVISION DISPOSALS THIS MONTH + SECTOR 4 TARGET (4 COLS) */}
+        <div className="lg:col-span-4 flex flex-col justify-between">
+          <div className="rounded-[28px] bg-white border border-slate-200 p-6 shadow-sm flex-1 flex flex-col justify-between">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-slate-500">
+                Division Disposals This Month
+              </span>
+              <button className="text-slate-400 hover:text-slate-600 transition-colors">
                 <MoreVertical className="w-4 h-4" />
               </button>
             </div>
 
-            <p className="text-3xl font-extrabold text-slate-900 mt-1 tracking-tight">
-              {timeFilter === 'Day' ? '92.0%' :
-               timeFilter === 'Week' ? '88.2%' :
-               timeFilter === 'Year' ? '81.4%' :
-               '84.5%'}
-              <span className="text-sm font-normal text-slate-500 ml-1.5">
-                / {timeFilter === 'Day' ? '12 Dossiers' :
-                   timeFilter === 'Week' ? '48 Dossiers' :
-                   timeFilter === 'Year' ? '1,840 Dossiers' :
-                   '152 Dossiers'}
-              </span>
-            </p>
+            <div className="my-2">
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
+                  {statewideClearanceRate}%
+                </span>
+                <span className="text-xs font-medium text-slate-400">
+                  / 152 Dossiers
+                </span>
+              </div>
+            </div>
 
             {/* Time Filter Pills */}
-            <div className="flex items-center justify-between text-xs font-bold text-slate-500 mt-4 px-2">
-              {['Day', 'Week', 'Month', 'Year'].map(tab => (
+            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-xs font-semibold text-slate-500">
+              {['Day', 'Week', 'Month', 'Year'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setTimeFilter(tab)}
-                  className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                  className={`px-3 py-1 rounded-full transition-all ${
                     timeFilter === tab
-                      ? 'bg-slate-900 text-white font-bold shadow-xs'
+                      ? 'bg-slate-900 text-white shadow-xs font-bold'
                       : 'hover:text-slate-900'
                   }`}
                 >
@@ -305,13 +317,13 @@ export default function SupervisorOperationsCommandHub() {
               ))}
             </div>
 
-            {/* SMOOTH CURVED SVG SPLINE CHART */}
+            {/* SMOOTH CURVED SVG SPLINE CHART (INDIGO #4f46e5) */}
             <div className="relative mt-5 h-28 w-full">
               <svg viewBox="0 0 300 100" className="w-full h-full overflow-visible" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="supChartGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#1d6fbf" stopOpacity="0.15" />
-                    <stop offset="100%" stopColor="#1d6fbf" stopOpacity="0.0" />
+                    <stop offset="0%" stopColor="#4f46e5" stopOpacity="0.2" />
+                    <stop offset="100%" stopColor="#4f46e5" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
 
@@ -324,7 +336,7 @@ export default function SupervisorOperationsCommandHub() {
                 <path
                   d="M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45"
                   fill="none"
-                  stroke="#1d6fbf"
+                  stroke="#4f46e5"
                   strokeWidth="2.5"
                   strokeLinecap="round"
                   className="transition-all duration-500"
@@ -333,7 +345,7 @@ export default function SupervisorOperationsCommandHub() {
             </div>
           </div>
 
-          {/* THE ONE DARK EXCEPTION: SUMMARY / TARGET CARD */}
+          {/* THE ONE DARK EXCEPTION: SUMMARY / TARGET CARD (INDIGO ACCENT) */}
           <div className="mt-4 p-4 rounded-2xl bg-slate-900 text-white flex items-center justify-between shadow-sm">
             <div>
               <p className="text-[10px] text-slate-400 font-medium">Sector 4 Plan for 2026</p>
@@ -350,7 +362,7 @@ export default function SupervisorOperationsCommandHub() {
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
                 <path
-                  className="text-blue-500"
+                  className="text-indigo-500"
                   strokeDasharray="85, 100"
                   strokeWidth="4"
                   strokeLinecap="round"
@@ -380,7 +392,7 @@ export default function SupervisorOperationsCommandHub() {
             </div>
             <Link
               href="/supervisor/performance"
-              className="text-xs font-bold text-blue-600 hover:underline"
+              className="text-xs font-bold text-indigo-600 hover:underline"
             >
               View Roster →
             </Link>
@@ -429,14 +441,14 @@ export default function SupervisorOperationsCommandHub() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Navigation className="w-4 h-4 text-blue-600" />
+                <Navigation className="w-4 h-4 text-indigo-600" />
                 Live Moving Patrol Fleets
               </h3>
               <p className="text-xs text-slate-500">2-second vector positioning</p>
             </div>
             <Link
               href="/supervisor/dispatch"
-              className="text-xs font-bold text-blue-600 hover:underline"
+              className="text-xs font-bold text-indigo-600 hover:underline"
             >
               Full Map →
             </Link>
@@ -453,7 +465,7 @@ export default function SupervisorOperationsCommandHub() {
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                     {unit.callsign}
                   </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
                     {unit.type}
                   </span>
                 </div>
@@ -465,7 +477,7 @@ export default function SupervisorOperationsCommandHub() {
                 <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1 border-t border-slate-200/60 font-mono">
                   <span>Speed: <strong className="text-slate-900">{unit.speedKmH} km/h</strong></span>
                   <span>Fuel: <strong className="text-emerald-600">{unit.fuel}%</strong></span>
-                  <span className="text-blue-600 font-bold">{unit.status}</span>
+                  <span className="text-indigo-600 font-bold">{unit.status}</span>
                 </div>
               </div>
             ))}
