@@ -72,7 +72,6 @@ function AnalystHeader() {
         />
       </div>
 
-<<<<<<< HEAD
       {/* Right Controls: Telemetry Badges, Language, Drishti AI Button, Bell, Avatar */}
       <div className="flex items-center gap-3 sm:gap-4">
         {/* Real-time Analyst Status Badges (Teal Palette) */}
@@ -87,17 +86,6 @@ function AnalystHeader() {
             <span className="text-[10px] uppercase font-mono font-bold">AI ACCURACY:</span>
             <span className="text-[11px] font-mono font-bold">97.4%</span>
           </div>
-=======
-      {/* Right Controls: Quick Role Switcher, Language, Drishti AI Button, Bell, Avatar, Theme */}
-      <div className="flex items-center gap-2.5 sm:gap-3">
-        {/* Quick Role Switcher */}
-        <QuickRoleSwitcher />
-
-        {/* Language selector pill */}
-        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300">
-          <Globe className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-          <span>EN</span>
->>>>>>> 4a53fbdd0d7c3be898549dd1dccb9ac9050717eb
         </div>
 
         {/* Language Selector Dropdown */}
