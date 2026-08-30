@@ -1069,74 +1069,79 @@ export default function NetworkPage() {
         <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 shadow-xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-zinc-800">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider font-mono">
+              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider font-sans">
                 Cross-District Criminal Syndicate Nexus Matrix
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 mt-0.5">
                 Inter-state crime nexus, financial volume, corridor tracking & linked CCTNS evidence
               </p>
             </div>
-            <span className="text-xs font-mono text-indigo-600 dark:text-indigo-400 font-bold">
+            <span className="text-xs font-mono text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-950/50 px-3 py-1 rounded-xl border border-blue-200 dark:border-blue-900/60 self-start sm:self-auto">
               5 Primary Rings • 51 Linked Case Dockets
             </span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left border-collapse">
+          <div className="overflow-x-auto scrollbar-thin">
+            <table className="min-w-[1050px] w-full text-xs text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50 dark:bg-zinc-800/80 border-b border-slate-200 dark:border-zinc-700 text-slate-500 font-mono text-[10px] uppercase">
-                  <th className="px-4 py-3.5 font-bold">Syndicate Network</th>
-                  <th className="px-4 py-3.5 font-bold">Prime Kingpin</th>
-                  <th className="px-4 py-3.5 font-bold">Financial Scale</th>
-                  <th className="px-4 py-3.5 font-bold">Operating Corridor</th>
-                  <th className="px-4 py-3.5 font-bold">Threat Level</th>
-                  <th className="px-4 py-3.5 font-bold">Linked FIRs</th>
-                  <th className="px-4 py-3.5 font-bold text-right">Dossier Action</th>
+                <tr className="bg-slate-50 dark:bg-zinc-800/80 border-b border-slate-200 dark:border-zinc-700 text-slate-500 font-mono text-[10.5px] uppercase">
+                  <th className="px-4 py-3.5 font-bold w-[260px]">Syndicate Network</th>
+                  <th className="px-4 py-3.5 font-bold w-[200px]">Prime Kingpin</th>
+                  <th className="px-4 py-3.5 font-bold w-[160px]">Financial Scale</th>
+                  <th className="px-4 py-3.5 font-bold w-[220px]">Operating Corridor</th>
+                  <th className="px-4 py-3.5 font-bold w-[130px]">Threat Level</th>
+                  <th className="px-4 py-3.5 font-bold text-center w-[110px]">Linked FIRs</th>
+                  <th className="px-4 py-3.5 font-bold text-right w-[140px]">Dossier Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-zinc-800">
                 {SYNDICATES.map((syn) => (
-                  <tr key={syn.id} className="hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors">
+                  <tr key={syn.id} className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors">
                     <td className="px-4 py-4 font-bold text-slate-900 dark:text-white">
                       <div className="flex items-center gap-2.5">
-                        <span className="w-2.5 h-2.5 rounded-full" style={{ background: syn.color }} />
-                        <span className="truncate max-w-xs">{syn.name}</span>
+                        <span className="w-2.5 h-2.5 rounded-full shrink-0 shadow-xs" style={{ background: syn.color }} />
+                        <span className="font-bold text-slate-900 dark:text-white line-clamp-1">{syn.name}</span>
                       </div>
                     </td>
 
                     <td className="px-4 py-4 text-slate-700 dark:text-slate-300">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-200 shrink-0 border border-slate-300">
+                        <div className="w-9 h-9 rounded-xl overflow-hidden bg-slate-200 shrink-0 border border-slate-300 dark:border-zinc-700 shadow-2xs">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={syn.kingpin.mugshot} alt={syn.kingpin.name} className="w-full h-full object-cover object-top" />
                         </div>
-                        <div>
-                          <div className="font-bold text-slate-900 dark:text-white">{syn.kingpin.name}</div>
-                          <div className="text-[10px] text-slate-400 font-mono">“{syn.kingpin.alias}”</div>
+                        <div className="min-w-0">
+                          <div className="font-bold text-slate-900 dark:text-white text-xs truncate">{syn.kingpin.name}</div>
+                          <div className="text-[10px] text-slate-400 font-medium">“{syn.kingpin.alias}”</div>
                         </div>
                       </div>
                     </td>
 
-                    <td className="px-4 py-4 font-bold text-emerald-600 dark:text-emerald-400 font-mono">
-                      {syn.estimated_volume}
-                    </td>
-
-                    <td className="px-4 py-4 text-slate-600 dark:text-slate-400 text-xs max-w-xs truncate">
-                      {syn.primary_corridor}
-                    </td>
-
                     <td className="px-4 py-4">
-                      <span className={`px-2.5 py-1 rounded-full text-[10.5px] font-bold font-mono ${
-                        syn.threat_level === 'CRITICAL'
-                          ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200/60'
-                          : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200/60'
-                      }`}>
-                        {syn.threat_level} ({syn.risk_score}%)
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400 text-xs whitespace-nowrap block">
+                        {syn.estimated_volume}
                       </span>
                     </td>
 
-                    <td className="px-4 py-4 font-bold text-indigo-600 dark:text-indigo-400 font-mono">
-                      {syn.connected_firs.length} Cases
+                    <td className="px-4 py-4 text-slate-600 dark:text-slate-400 text-xs">
+                      <span className="line-clamp-2 leading-snug">{syn.primary_corridor}</span>
+                    </td>
+
+                    <td className="px-4 py-4">
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10.5px] font-bold whitespace-nowrap border ${
+                        syn.threat_level === 'CRITICAL'
+                          ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800'
+                          : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800'
+                      }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${syn.threat_level === 'CRITICAL' ? 'bg-rose-500 animate-pulse' : 'bg-amber-500'}`} />
+                        <span>{syn.threat_level} ({syn.risk_score}%)</span>
+                      </span>
+                    </td>
+
+                    <td className="px-4 py-4 text-center">
+                      <span className="inline-block font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-2.5 py-0.5 rounded-lg border border-blue-200 dark:border-blue-900/60 text-xs whitespace-nowrap font-mono">
+                        {syn.connected_firs.length} Cases
+                      </span>
                     </td>
 
                     <td className="px-4 py-4 text-right">
@@ -1145,9 +1150,9 @@ export default function NetworkPage() {
                           setSelectedSyndicate(syn);
                           handleCaseClick(syn.connected_firs[0].case_number);
                         }}
-                        className="px-3.5 py-1.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-indigo-600 font-bold text-xs transition-all cursor-pointer shadow-xs"
+                        className="whitespace-nowrap px-3.5 py-1.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-blue-600 dark:hover:bg-blue-600 dark:hover:text-white font-bold text-xs transition-all cursor-pointer shadow-2xs"
                       >
-                        Inspect Docket
+                        Inspect Docket →
                       </button>
                     </td>
                   </tr>
