@@ -21,10 +21,13 @@ import {
   Radio,
   Sliders
 } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import DrishtiLogo from '@/components/DrishtiLogo';
 import QuickRoleSwitcher from '@/components/QuickRoleSwitcher';
 import { LanguageProvider, useLanguage } from '@/context/LanguageContext';
 import { AnalystTelemetryProvider } from '@/context/AnalystTelemetryContext';
+
+const AlertNotification = dynamic(() => import('@/components/AlertNotification'), { ssr: false });
 
 const ANALYST_NAV_ITEMS = [
   { id: 'overview', label: 'Intelligence Overview', href: '/analyst', icon: LayoutDashboard },
@@ -142,15 +145,7 @@ function AnalystHeader() {
         </Link>
 
         {/* Notification Bell */}
-        <div className="relative">
-          <button
-            className="w-9 h-9 rounded-full bg-white border border-gray-200/80 flex items-center justify-center text-gray-500 hover:text-gray-900 transition-colors shadow-xs"
-            title="Notifications"
-          >
-            <Bell className="w-4 h-4" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500" />
-          </button>
-        </div>
+        <AlertNotification />
 
         {/* Avatar Circle */}
         <div className="w-9 h-9 rounded-full bg-teal-900 text-teal-100 flex items-center justify-center font-bold text-xs shadow-xs">
