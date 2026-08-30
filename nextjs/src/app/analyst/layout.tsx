@@ -41,12 +41,12 @@ import { AnalystTelemetryProvider, useAnalystTelemetry } from '@/context/Analyst
 
 const ANALYST_NAV_ITEMS = [
   { href: '/analyst', icon: LayoutDashboard, label: 'Overview', id: 'nav-overview' },
+  { href: '/analyst/heatmap', icon: Map, label: 'Crime Map', id: 'nav-map' },
+  { href: '/analyst/network', icon: GitBranch, label: 'Network Graph', id: 'nav-network' },
   { href: '/analyst/chat', icon: MessageSquare, label: 'Co-Pilot Chat', id: 'nav-chat' },
   { href: '/analyst/reports', icon: FileText, label: 'FIR Registry', id: 'nav-fir' },
   { href: '/analyst/patterns', icon: Fingerprint, label: 'Pattern & MO Intel', id: 'nav-patterns' },
   { href: '/analyst/watchlist', icon: User, label: 'Suspect Roster', id: 'nav-suspect' },
-  { href: '/analyst/heatmap', icon: Map, label: 'Crime Map', id: 'nav-map' },
-  { href: '/analyst/network', icon: GitBranch, label: 'Network Graph', id: 'nav-network' },
 ];
 
 function AnalystHeader() {
