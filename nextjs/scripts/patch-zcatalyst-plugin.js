@@ -7,7 +7,7 @@ const targetFiles = [
   '/catalyst/kspdatathon2026/node_modules/@zcatalyst/nextjs-plugin/dist/adapters/wrapper.js'
 ];
 
-console.log('--- STARTING VERBOSE ZCATALYST NEXTJS PLUGIN PATCH ---');
+console.log('--- STARTING GLOBAL REGEX ZCATALYST NEXTJS PLUGIN PATCH ---');
 
 targetFiles.forEach((file) => {
   console.log(`[Patching] Checking path: ${file}`);
@@ -15,13 +15,36 @@ targetFiles.forEach((file) => {
     console.log(`[Patching] Target file EXISTS: ${file}`);
     try {
       let content = fs.readFileSync(file, 'utf8');
-      console.log(`[Patching] Current file content of ${file}:\n${content}`);
+      console.log(`[Patching] Original file content of ${file}:\n${content}`);
       
+      let modified = false;
+      
+      // Global regex replace to update ALL occurrences
       if (content.includes('../image-optimization-function/index.mjs')) {
         content = content.replace(
-          '../image-optimization-function/index.mjs',
+          /\.\.\/image-optimization-function\/index\.mjs/g,
           './index.mjs'
         );
+        modified = true;
+      }
+      
+      if (content.includes('../revalidation-function/index.mjs')) {
+        content = content.replace(
+          /\.\.\/revalidation-function\/index\.mjs/g,
+          './index.mjs'
+        );
+        modified = true;
+      }
+      
+      if (content.includes('../warmer-function/index.mjs')) {
+        content = content.replace(
+          /\.\.\/warmer-function\/index\.mjs/g,
+          './index.mjs'
+        );
+        modified = true;
+      }
+
+      if (modified) {
         fs.writeFileSync(file, content, 'utf8');
         console.log(`[Patching] Successfully updated wrapper file!`);
         
@@ -29,7 +52,7 @@ targetFiles.forEach((file) => {
         const updatedContent = fs.readFileSync(file, 'utf8');
         console.log(`[Patching] Verified patched content:\n${updatedContent}`);
       } else {
-        console.log(`[Patching] String '../image-optimization-function/index.mjs' NOT found in content.`);
+        console.log(`[Patching] No matching paths found in wrapper file.`);
       }
     } catch (err) {
       console.error(`[Patching] Error handling file ${file}:`, err.message);
