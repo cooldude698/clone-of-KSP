@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { fetchWithFallback } from '@/lib/fetch-with-fallback';
 import { DEMO_ANPR_RESULT } from '@/lib/demo-data';
@@ -10,7 +10,7 @@ import {
   ShieldAlert, Search, AlertTriangle, CheckCircle2, ChevronRight,
   ExternalLink, Zap, Radio, Volume2, ShieldCheck, RefreshCw,
   UserCheck, Layers, Grid, List, Activity, Filter, FileText, Info,
-  Pause, Play, Target, User
+  Pause, Play, Target, User, Scan, Sparkles, Sliders, EyeOff
 } from 'lucide-react';
 
 // ─── Clean Audio Engine (Tone Synth + Audio Files) ───────────────────────────
@@ -25,7 +25,7 @@ function playSurveillanceSound(type) {
 
     if (audioMap[type]) {
       const audio = new Audio(audioMap[type]);
-      audio.volume = 0.7;
+      audio.volume = 0.6;
       audio.play().catch(() => playWebAudioSynth(type));
     } else {
       playWebAudioSynth(type);
@@ -48,19 +48,19 @@ function playWebAudioSynth(type) {
       osc.connect(gain); gain.connect(ctx.destination);
       osc.type = 'sine';
       osc.frequency.setValueAtTime(800, now);
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-      osc.start(now); osc.stop(now + 0.12);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+      osc.start(now); osc.stop(now + 0.1);
     } else if (type === 'lock') {
-      [0, 0.06].forEach((delay, idx) => {
+      [0, 0.05].forEach((delay, idx) => {
         const o = ctx.createOscillator();
         const g = ctx.createGain();
         o.connect(g); g.connect(ctx.destination);
         o.type = 'sine';
-        o.frequency.setValueAtTime(1200 + idx * 250, now + delay);
-        g.gain.setValueAtTime(0.25, now + delay);
-        g.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.05);
-        o.start(now + delay); o.stop(now + delay + 0.05);
+        o.frequency.setValueAtTime(1100 + idx * 250, now + delay);
+        g.gain.setValueAtTime(0.2, now + delay);
+        g.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.04);
+        o.start(now + delay); o.stop(now + delay + 0.04);
       });
     } else if (type === 'alert') {
       const osc = ctx.createOscillator();
@@ -68,23 +68,22 @@ function playWebAudioSynth(type) {
       osc.connect(gain); gain.connect(ctx.destination);
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(650, now);
-      osc.frequency.linearRampToValueAtTime(1200, now + 0.3);
-      gain.gain.setValueAtTime(0.3, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
-      osc.start(now); osc.stop(now + 0.45);
+      osc.frequency.linearRampToValueAtTime(1100, now + 0.25);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+      osc.start(now); osc.stop(now + 0.4);
     }
   } catch (e) {
     console.warn('[Surveillance Sound]', e);
   }
 }
 
-// ─── DRISHTI Voice Alert Speech ──────────────────────────────────────────────
 function speakDrishtiAlert(text) {
   if (!text) return;
   speakText(text, 'en').catch(() => {});
 }
 
-// CCTV Video Mapping — High-speed jsDelivr CDN with HTTP 206 Byte-Range Video Streaming support!
+// CCTV Video CDN Mapping
 const CDN_BASE = 'https://cdn.jsdelivr.net/gh/vedeshskhatri/kspdatathon2026@6b33c15b04de078cc4b0723c051a559d69cd6e64/nextjs/public/videos';
 
 const CAMERA_SPECIFIC_VIDEOS = {
@@ -98,23 +97,29 @@ const CAMERA_SPECIFIC_VIDEOS = {
   'CAM-BLR-0060': `${CDN_BASE}/traffic4.mp4`,
 };
 
-// ── Pinpoint Biometric Data & Precise Face/Plate Box Framing ──
-const CINEMATIC_SUSPECT_DATA = {
+// Dynamic AI Tracking Timeline Profiles per Camera
+// Defines exact time windows (start/end in seconds) and dynamic coordinate interpolation
+const DYNAMIC_DETECTION_PROFILES = {
   'CAM-BLR-0055': {
     name: 'Farid Mirza',
     alias: 'Chotta Mirza',
     suspectId: 'SUS-6091',
     riskScore: 92,
     confidence: 95.3,
+    type: 'FACE AI',
+    tag: 'FARID MIRZA (RED SHIRT)',
     fir: 'FIR-2026-BL-3104',
-    ipc: 'IPC §395, §397 (Dacoity with Deadly Weapons)',
+    ipc: 'IPC §395, §397 (Armed Dacoity)',
     lastSeen: 'KSRTC Majestic Terminal 3 Platform',
-    status: 'WANTED / HIGH DANGER',
-    targetCue: 'Man wearing Red Shirt & Travel Bag walking left-to-right across bus platform',
-    incidentBriefing: 'Subject identified walking across KSRTC Bus Terminal Platform 3 during routine AI biometric sweep. Wanted in connection with armed dacoity at Majestic jewelry store (FIR-2026-BL-3104). Subject spotted wearing red shirt carrying travel bag.',
-    aiRationale: '128-point facial landmark alignment matched against KSP Wanted Biometric Registry with 95.3% confidence score.',
-    drishtiSpeech: 'Alert. Facial match confirmed on Camera BLR 0055. Farid Mirza detected at Majestic Bus Stand Terminal 3.',
-    cropBox: { x: 25, y: 32, w: 14, h: 22 }, // Tight face box framing the man in red shirt
+    status: 'WANTED / CRITICAL',
+    targetCue: 'Pedestrian in Red Shirt with Travel Bag walking left-to-right on platform',
+    incidentBriefing: 'Subject Farid Mirza identified walking across KSRTC Majestic Terminal Platform 3 during live biometric sweep. Linked to armed robbery series under FIR-2026-BL-3104.',
+    aiRationale: '128-point biometric facial landmarks aligned against KSP wanted database with 95.3% confidence.',
+    drishtiSpeech: 'Alert. Biometric match confirmed on Camera BLR 0055. Farid Mirza detected at Majestic Terminal 3.',
+    // Active detection window: appears after 1.2s, tracks left to right, disappears at 8.8s
+    activeWindow: { start: 1.2, end: 8.8 },
+    startBox: { x: 18, y: 30, w: 14, h: 22 },
+    endBox:   { x: 44, y: 33, w: 15, h: 23 },
   },
   'CAM-BLR-0012': {
     name: 'Ramesh Kumar',
@@ -122,15 +127,19 @@ const CINEMATIC_SUSPECT_DATA = {
     suspectId: 'SUS-8842',
     riskScore: 94,
     confidence: 96.1,
+    type: 'FACE AI',
+    tag: 'RAMESH KUMAR (SUSPECT)',
     fir: 'FIR-2024-BLR-0842',
-    ipc: 'IPC §379, §392, §34 (Armed Robbery)',
+    ipc: 'IPC §379, §392 (Serial Vehicle Theft & Robbery)',
     lastSeen: 'Commercial Street Pedestrian Arcade',
     status: 'WANTED / CRITICAL',
-    targetCue: 'Pedestrian in center walkway walking towards camera',
-    incidentBriefing: 'Primary suspect Ramesh Kumar identified walking along Commercial Street pedestrian plaza arcade. Active warrant in armed robbery and chain snatching series (FIR-2024-BLR-0842).',
-    aiRationale: 'Facial feature vector matched against CCTNS suspect wanted profile with 96.1% confidence score.',
-    drishtiSpeech: 'Alert. Facial match confirmed on Camera BLR 0012. Ramesh Kumar, alias Bullet Ramesh. Commercial Street Pedestrian Arcade.',
-    cropBox: { x: 42, y: 20, w: 12, h: 20 },
+    targetCue: 'Subject in dark jacket walking along pedestrian walkway towards camera',
+    incidentBriefing: 'Prime kingpin Ramesh Kumar identified on Commercial Street walkway. Active non-bailable warrant in multiple vehicle theft syndicates.',
+    aiRationale: 'Facial vector match confirmed against CCTNS high-risk repeat offender profile (96.1% score).',
+    drishtiSpeech: 'Alert. Suspect match confirmed on Camera BLR 0012. Bullet Ramesh at Commercial Street Arcade.',
+    activeWindow: { start: 1.0, end: 8.5 },
+    startBox: { x: 40, y: 18, w: 13, h: 21 },
+    endBox:   { x: 43, y: 22, w: 15, h: 24 },
   },
   'CAM-BLR-0015': {
     name: 'KA-05-NB-1102',
@@ -138,79 +147,59 @@ const CINEMATIC_SUSPECT_DATA = {
     suspectId: 'VEH-1102',
     riskScore: 91,
     confidence: 99.1,
+    type: 'ANPR',
+    tag: 'KA-05-NB-1102 (STOLEN SWIFT)',
     fir: 'FIR-2026-MYS-0112',
-    ipc: 'IPC §379 (Stolen Car Watchlist)',
+    ipc: 'IPC §379 (Stolen Vehicle Watchlist)',
     lastSeen: 'Chickpet Main Road Traffic Checkpoint',
-    status: 'STOLEN CAR MATCH',
-    targetCue: 'Silver Maruti Suzuki Swift approaching checkpoint',
-    incidentBriefing: 'Silver Maruti Suzuki Swift flagged by optical ANPR sensor approaching Chickpet Main Road checkpoint. Vehicle reported stolen from Jayanagar 4th Block (FIR-2026-MYS-0112).',
-    aiRationale: 'Optical character recognition (OCR) plate extraction matched active Karnataka Stolen Vehicle Registry with 99.1% confidence.',
-    drishtiSpeech: 'ANPR Alert. Silver Maruti Swift KA 05 NB 1102 detected at Chickpet Checkpoint. Stolen vehicle alert.',
-    cropBox: { x: 22, y: 44, w: 28, h: 22 },
-  },
-  'CAM-BLR-0010': {
-    name: 'KSP HQ Press Briefing',
-    alias: 'Senior IPS Officer Command Stream',
-    suspectId: 'HQ-CMD-01',
-    riskScore: 0,
-    confidence: 99.4,
-    fir: 'COMMAND-HQ',
-    ipc: 'Live Briefing · Karnataka State Police HQ',
-    lastSeen: 'Nrupatunga Road, Bengaluru',
-    status: 'COMMAND STREAM ACTIVE',
-    targetCue: 'Senior IPS Officer at Podium',
-    incidentBriefing: 'Karnataka State Police Headquarters live press briefing stream. Senior IPS officer detailing city-wide CCTNS surveillance matrix deployment to news media.',
-    aiRationale: 'Authorized official stream — Headquarters Command Pass (99.4% stream health).',
-    drishtiSpeech: 'KSP Headquarters Press Briefing Stream active. Senior IPS officer live briefing in progress.',
-    cropBox: { x: 38, y: 15, w: 25, h: 35 },
-  },
-  'CAM-BLR-0035': {
-    name: 'KSP Night Barricade Checkpost',
-    alias: 'Outer Ring Road Security Check',
-    suspectId: 'CHECK-ORR-04',
-    riskScore: 15,
-    confidence: 94.0,
-    fir: 'PATROL-BARRICADE',
-    ipc: 'Barricade Security Sweep Active',
-    lastSeen: 'Outer Ring Road Checkpost, Bengaluru',
-    status: 'BARRICADE ACTIVE',
-    targetCue: 'Karnataka Police Night Barricade Checkpoint',
-    incidentBriefing: 'Karnataka State Police night security checkpoint active on Outer Ring Road. Barricade security sweep and vehicle inspection in progress.',
-    aiRationale: 'Sector Security Checkpoint — Area Monitoring Active (94.0% confidence).',
-    drishtiSpeech: 'Karnataka Police checkpost active on Outer Ring Road. Barricade security sweep in progress.',
-    cropBox: { x: 34, y: 38, w: 32, h: 26 },
+    status: 'STOLEN VEHICLE HIT',
+    targetCue: 'Silver Maruti Swift approaching traffic checkpoint lane',
+    incidentBriefing: 'Silver Maruti Swift flagged by optical ANPR sensor entering Chickpet intersection. Vehicle reported stolen from Jayanagar (FIR-2026-MYS-0112).',
+    aiRationale: 'Optical Character Recognition (OCR) verified plate number with 99.1% match against KSP Stolen Vehicle Registry.',
+    drishtiSpeech: 'ANPR Alert. Stolen vehicle KA 05 NB 1102 detected at Chickpet Checkpoint.',
+    activeWindow: { start: 1.5, end: 8.2 },
+    startBox: { x: 20, y: 42, w: 26, h: 22 },
+    endBox:   { x: 30, y: 45, w: 28, h: 23 },
   },
   'CAM-BLR-0042': {
     name: 'Suresh Naidu',
-    alias: 'Naidu Bhai',
+    alias: 'Snake Naidu',
     suspectId: 'SUS-7104',
     riskScore: 88,
     confidence: 92.8,
+    type: 'FACE AI',
+    tag: 'SURESH NAIDU (CO-ACCUSED)',
     fir: 'FIR-2026-BL-4921',
-    ipc: 'IPC §420, §120B (Extortion & Fraud)',
+    ipc: 'IPC §420, §120B (Extortion & Highway Loot)',
     lastSeen: 'Koramangala 5th Block Portico',
-    status: 'CO-ACCUSED',
-    targetCue: 'Executive Portico Entrance',
-    incidentBriefing: 'Co-accused Suresh Naidu spotted at Koramangala 5th Block executive portico. Linked to active extortion and fraud syndicate (FIR-2026-BL-4921).',
-    aiRationale: 'Low-light facial biometric match against co-accused database with 92.8% confidence score.',
-    drishtiSpeech: 'Alert. Facial match confirmed on Camera BLR 0042. Suresh Naidu at Koramangala 5th Block portico.',
-    cropBox: { x: 28, y: 26, w: 16, h: 25 },
+    status: 'CO-ACCUSED HIT',
+    targetCue: 'Subject standing near building entrance portico',
+    incidentBriefing: 'Co-accused Suresh Naidu spotted at Koramangala portico entrance. Subject associated with active inter-district extortion syndicate.',
+    aiRationale: 'Low-light biometric facial classification matched against absconding list (92.8% confidence).',
+    drishtiSpeech: 'Alert. Facial hit confirmed on Camera BLR 0042. Suresh Naidu at Koramangala 5th Block.',
+    activeWindow: { start: 1.8, end: 9.0 },
+    startBox: { x: 26, y: 24, w: 15, h: 24 },
+    endBox:   { x: 29, y: 26, w: 16, h: 25 },
   },
   'CAM-BLR-0050': {
     name: 'KA-03-HA-4410',
-    alias: 'Dark Blue Honda City Sedan',
+    alias: 'Dark Blue Honda City',
     suspectId: 'VEH-4410',
     riskScore: 89,
     confidence: 97.6,
+    type: 'ANPR',
+    tag: 'KA-03-HA-4410 (HONDA CITY)',
     fir: 'FIR-2026-BL-5012',
-    ipc: 'IPC §379 (Vehicle Theft / Highway Intercept)',
+    ipc: 'IPC §379 (Highway Robbery Watchlist)',
     lastSeen: 'Silk Board Flyover BTP Junction',
-    status: 'WATCHLIST MATCH',
-    targetCue: 'Dark Blue Honda City Sedan',
-    incidentBriefing: 'Dark Blue Honda City flagged passing Silk Board flyover ANPR reader. Vehicle linked to active highway robbery investigation (FIR-2026-BL-5012).',
-    aiRationale: 'ANPR plate scan matched active watchlist entry with 97.6% confidence.',
-    drishtiSpeech: 'ANPR Alert. License plate KA 03 HA 4410 detected at Silk Board Flyover Junction. Watchlist pass match.',
-    cropBox: { x: 32, y: 38, w: 30, h: 22 },
+    status: 'WATCHLIST HIT',
+    targetCue: 'Dark Blue Sedan passing high-speed ANPR camera lane',
+    incidentBriefing: 'Dark Blue Honda City flagged passing Silk Board flyover checkpoint. Vehicle linked to active highway crime investigation (FIR-2026-BL-5012).',
+    aiRationale: 'High-speed ANPR camera plate recognition hit against active intelligence watchlist (97.6%).',
+    drishtiSpeech: 'ANPR Alert. License plate KA 03 HA 4410 detected at Silk Board Flyover.',
+    activeWindow: { start: 1.4, end: 8.0 },
+    startBox: { x: 30, y: 36, w: 28, h: 22 },
+    endBox:   { x: 36, y: 40, w: 30, h: 23 },
   },
   'CAM-BLR-0060': {
     name: 'KA-04-MH-9002',
@@ -218,16 +207,60 @@ const CINEMATIC_SUSPECT_DATA = {
     suspectId: 'VEH-9002',
     riskScore: 85,
     confidence: 98.9,
+    type: 'ANPR',
+    tag: 'KA-04-MH-9002 (FREIGHT TRUCK)',
     fir: 'FIR-2026-RUR-0089',
-    ipc: 'IPC §379, §411 (Stolen Goods Transport)',
-    lastSeen: 'Nelamangala Expressway Toll Plaza (Lane 4)',
+    ipc: 'IPC §379, §411 (Stolen Cargo Transit)',
+    lastSeen: 'Nelamangala Expressway Toll (Lane 4)',
     status: 'TOLL INTERCEPT',
-    targetCue: 'Commercial Freight Truck in Lane 4',
-    incidentBriefing: 'Commercial freight truck intercepted at Nelamangala Toll Plaza Lane 4. Suspected of transporting stolen commercial goods (FIR-2026-RUR-0089).',
-    aiRationale: 'Commercial vehicle ANPR scan triggered toll gate intercept protocol with 98.9% confidence.',
-    drishtiSpeech: 'ANPR Toll Alert. Commercial truck KA 04 MH 9002 intercepted at Nelamangala Expressway Toll Plaza.',
-    cropBox: { x: 28, y: 30, w: 32, h: 32 },
+    targetCue: 'Commercial truck passing toll collection lane 4',
+    incidentBriefing: 'Commercial cargo truck intercepted at Nelamangala Toll Plaza Lane 4. Suspected of transporting contraband cargo across border checkpoint.',
+    aiRationale: 'ANPR optical toll scanner matched active vehicle seizure alert (98.9% match).',
+    drishtiSpeech: 'ANPR Toll Alert. Commercial truck KA 04 MH 9002 intercepted at Nelamangala Expressway.',
+    activeWindow: { start: 1.6, end: 8.6 },
+    startBox: { x: 26, y: 28, w: 30, h: 30 },
+    endBox:   { x: 32, y: 32, w: 32, h: 32 },
   },
+  'CAM-BLR-0010': {
+    name: 'KSP HQ Command Stream',
+    alias: 'Senior IPS Officer Briefing',
+    suspectId: 'HQ-CMD-01',
+    riskScore: 0,
+    confidence: 99.4,
+    type: 'COMMAND',
+    tag: 'KSP STATE HQ LIVE STREAM',
+    fir: 'COMMAND-HQ',
+    ipc: 'Official Press & Intelligence Briefing',
+    lastSeen: 'Nrupatunga Road, Bengaluru',
+    status: 'COMMAND PASS',
+    targetCue: 'Senior IPS Officer Press Briefing',
+    incidentBriefing: 'Official Karnataka State Police live headquarters press room feed. Senior officers presenting state-wide surveillance coordination.',
+    aiRationale: 'Official authorized command stream pass.',
+    drishtiSpeech: 'KSP Headquarters Press Briefing Stream active.',
+    activeWindow: { start: 0.5, end: 9.5 },
+    startBox: { x: 36, y: 14, w: 24, h: 34 },
+    endBox:   { x: 38, y: 16, w: 25, h: 35 },
+  },
+  'CAM-BLR-0035': {
+    name: 'KSP Night Checkpoint',
+    alias: 'Outer Ring Road Patrol Sweep',
+    suspectId: 'CHECK-ORR-04',
+    riskScore: 10,
+    confidence: 94.0,
+    type: 'CCTV',
+    tag: 'PATROL BARRICADE SWEEP',
+    fir: 'PATROL-BARRICADE',
+    ipc: 'Area Security Check Active',
+    lastSeen: 'Outer Ring Road, Bengaluru',
+    status: 'AREA SECURED',
+    targetCue: 'Night Barricade Vehicle Inspection Checkpoint',
+    incidentBriefing: 'Night barricade security checkpoint active on Outer Ring Road corridor. Routine inspection protocol in effect.',
+    aiRationale: 'Sector monitoring stream active.',
+    drishtiSpeech: 'Barricade inspection active on Outer Ring Road.',
+    activeWindow: { start: 1.0, end: 9.0 },
+    startBox: { x: 32, y: 36, w: 30, h: 25 },
+    endBox:   { x: 35, y: 38, w: 31, h: 26 },
+  }
 };
 
 const MOCK_CAMERAS = [
@@ -239,11 +272,7 @@ const MOCK_CAMERAS = [
     is_active: true,
     has_anpr: true,
     has_face_recog: true,
-    detected_target: 'Farid Mirza (Red Shirt)',
-    target_type: 'FACE MATCH: RISK 92%',
-    confidence: 95.3,
     fps: 60,
-    boxPos: 'center-left',
   },
   {
     id: 'CAM-BLR-0012',
@@ -253,11 +282,7 @@ const MOCK_CAMERAS = [
     is_active: true,
     has_anpr: true,
     has_face_recog: true,
-    detected_target: 'Ramesh Kumar (Suspect)',
-    target_type: 'FACE MATCH: RISK 94%',
-    confidence: 96.1,
     fps: 60,
-    boxPos: 'center-center',
   },
   {
     id: 'CAM-BLR-0015',
@@ -267,11 +292,7 @@ const MOCK_CAMERAS = [
     is_active: true,
     has_anpr: true,
     has_face_recog: false,
-    detected_target: 'KA-05-NB-1102 (Maruti Swift)',
-    target_type: 'ANPR MATCH: STOLEN CAR',
-    confidence: 99.1,
     fps: 30,
-    boxPos: 'bottom-left',
   },
   {
     id: 'CAM-BLR-0010',
@@ -281,11 +302,7 @@ const MOCK_CAMERAS = [
     is_active: true,
     has_anpr: false,
     has_face_recog: true,
-    detected_target: 'Senior IPS Officer Briefing',
-    target_type: 'HQ COMMAND STREAM',
-    confidence: 99.4,
     fps: 30,
-    boxPos: 'bottom-left',
   },
   {
     id: 'CAM-BLR-0035',
@@ -295,11 +312,7 @@ const MOCK_CAMERAS = [
     is_active: true,
     has_anpr: false,
     has_face_recog: false,
-    detected_target: 'KSP Night Checkpoint Active',
-    target_type: 'BARRICADE CHECKPOINT',
-    confidence: 94.0,
     fps: 30,
-    boxPos: 'bottom-left',
   },
   {
     id: 'CAM-BLR-0042',
@@ -309,11 +322,7 @@ const MOCK_CAMERAS = [
     is_active: true,
     has_anpr: true,
     has_face_recog: true,
-    detected_target: 'Suresh Naidu (Co-Accused)',
-    target_type: 'FACE MATCH: RISK 88%',
-    confidence: 92.8,
     fps: 60,
-    boxPos: 'bottom-left',
   },
   {
     id: 'CAM-BLR-0050',
@@ -323,11 +332,7 @@ const MOCK_CAMERAS = [
     is_active: true,
     has_anpr: true,
     has_face_recog: false,
-    detected_target: 'KA-03-HA-4410 (Honda City)',
-    target_type: 'ANPR MATCH: WATCHLIST PASS',
-    confidence: 97.6,
     fps: 30,
-    boxPos: 'bottom-right',
   },
   {
     id: 'CAM-BLR-0060',
@@ -337,11 +342,7 @@ const MOCK_CAMERAS = [
     is_active: true,
     has_anpr: true,
     has_face_recog: false,
-    detected_target: 'KA-04-MH-9002 (Freight Truck)',
-    target_type: 'ANPR MATCH: TOLL INTERCEPT',
-    confidence: 98.9,
     fps: 30,
-    boxPos: 'bottom-left',
   },
   {
     id: 'CAM-BLR-0002',
@@ -351,11 +352,7 @@ const MOCK_CAMERAS = [
     is_active: false,
     has_anpr: false,
     has_face_recog: false,
-    detected_target: null,
-    target_type: null,
-    confidence: 0,
     fps: 0,
-    boxPos: null,
   },
 ];
 
@@ -369,40 +366,90 @@ const INITIAL_EVENTS = [
   { time: '14:25:13', cam: 'CAM-BLR-0010', type: 'COMMAND', severity: 'info',     desc: 'KSP State HQ Press Briefing Stream Live · Nrupatunga Road' },
 ];
 
-function CameraStream({ cam, videoRef, isPaused }) {
+// ─── Dynamic AI Stream Component ─────────────────────────────────────────────
+function CameraStream({ cam, videoRef, isPaused, aiOverlayEnabled = true }) {
   const localVideo = CAMERA_SPECIFIC_VIDEOS[cam.id] || 'https://vjs.zencdn.net/v/oceans.mp4';
+  const internalVideoRef = useRef(null);
+  const activeVideoRef = videoRef || internalVideoRef;
+
+  const profile = DYNAMIC_DETECTION_PROFILES[cam.id];
   const [hasError, setHasError] = useState(false);
   const [timeStr, setTimeStr] = useState('');
+  const [isTargetVisible, setIsTargetVisible] = useState(false);
+  const [currentBox, setCurrentBox] = useState(null);
+  const [detectionConfidence, setDetectionConfidence] = useState(90);
 
+  // High-frequency live timestamp OSD
   useEffect(() => {
     const updateClock = () => {
       const now = new Date();
-      setTimeStr(now.toISOString().replace('T', ' ').slice(0, 19) + '.' + String(now.getMilliseconds()).padStart(3, '0'));
+      setTimeStr(
+        now.toISOString().replace('T', ' ').slice(0, 19) +
+        '.' + String(now.getMilliseconds()).padStart(3, '0')
+      );
     };
     updateClock();
     const interval = setInterval(updateClock, 100);
     return () => clearInterval(interval);
   }, []);
 
+  // Sync Pause/Resume
   useEffect(() => {
-    if (!videoRef || !videoRef.current) return;
+    if (!activeVideoRef || !activeVideoRef.current) return;
     if (isPaused) {
-      videoRef.current.pause();
+      activeVideoRef.current.pause();
     } else {
-      videoRef.current.play().catch(() => {});
+      activeVideoRef.current.play().catch(() => {});
     }
-  }, [isPaused, videoRef]);
+  }, [isPaused, activeVideoRef]);
 
-  const handleError = () => {
-    setHasError(true);
-  };
+  // Real-time Computer Vision Detection Loop tied to Video Playback
+  useEffect(() => {
+    const video = activeVideoRef.current;
+    if (!video || !profile) return;
+
+    let animId;
+    const updateTracking = () => {
+      if (video && !video.paused && !video.ended) {
+        const currentTime = video.currentTime % 10; // Normalized 10s loop cycle
+        const { start, end } = profile.activeWindow;
+
+        if (currentTime >= start && currentTime <= end) {
+          setIsTargetVisible(true);
+          const progress = (currentTime - start) / (end - start);
+          
+          // Smooth Linear Interpolation (LERP) between start and end bounding boxes
+          const interpX = profile.startBox.x + (profile.endBox.x - profile.startBox.x) * progress;
+          const interpY = profile.startBox.y + (profile.endBox.y - profile.startBox.y) * progress;
+          const interpW = profile.startBox.w + (profile.endBox.w - profile.startBox.w) * progress;
+          const interpH = profile.startBox.h + (profile.endBox.h - profile.startBox.h) * progress;
+
+          setCurrentBox({ x: interpX, y: interpY, w: interpW, h: interpH });
+          
+          // Slight realistic sensor confidence jitter
+          const jitter = Math.sin(currentTime * 4) * 0.8;
+          setDetectionConfidence((profile.confidence + jitter).toFixed(1));
+        } else {
+          // Out of detection window — subject has left or not yet entered frame
+          setIsTargetVisible(false);
+        }
+      }
+      animId = requestAnimationFrame(updateTracking);
+    };
+
+    animId = requestAnimationFrame(updateTracking);
+    return () => cancelAnimationFrame(animId);
+  }, [activeVideoRef, profile]);
+
+  const isRed = profile?.riskScore > 50 || profile?.type === 'FACE AI';
 
   return (
-    <div className="absolute inset-0 w-full h-full bg-slate-950 flex flex-col justify-between p-3 overflow-hidden select-none font-mono">
-      {/* Background Cyber CCTV Video Stream */}
-      {!hasError && (
+    <div className="absolute inset-0 w-full h-full bg-black flex flex-col justify-between p-3 overflow-hidden select-none font-mono">
+      
+      {/* Authentic High-Definition Video Stream */}
+      {!hasError ? (
         <video
-          ref={videoRef}
+          ref={activeVideoRef}
           src={localVideo}
           autoPlay
           loop
@@ -410,75 +457,100 @@ function CameraStream({ cam, videoRef, isPaused }) {
           playsInline
           preload="auto"
           crossOrigin="anonymous"
-          onError={handleError}
-          className="absolute inset-0 w-full h-full object-cover filter brightness-[0.85] contrast-[1.15] opacity-80"
+          onError={() => setHasError(true)}
+          className="absolute inset-0 w-full h-full object-cover filter brightness-[0.95] contrast-[1.08]"
         />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center text-zinc-500 text-xs">
+          Stream Connection Restoring...
+        </div>
       )}
 
-      {/* Cyber Grid & Scanline Overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0284c7_1px,transparent_1px),linear-gradient(to_bottom,#0284c7_1px,transparent_1px)] bg-[size:24px_24px] opacity-15 pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 via-transparent to-black/60 pointer-events-none" />
+      {/* Subtle Cinematic Vignette (Zero artificial grid mesh) */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40 pointer-events-none" />
 
-      {/* Top Feed HUD */}
+      {/* Top Stream OSD Telemetry HUD */}
       <div className="relative z-10 flex justify-between items-start">
-        <div className="flex items-center gap-2 bg-slate-950/90 backdrop-blur-md px-2 py-0.5 rounded border border-cyan-500/30 shadow-sm">
-          <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-          <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">LIVE CCTNS SENSOR</span>
+        <div className="flex items-center gap-2 bg-black/80 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/10 shadow-sm">
+          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+          <span className="text-[10px] font-bold text-white uppercase tracking-wider">LIVE</span>
+          <span className="text-[10px] text-zinc-400 font-mono border-l border-white/20 pl-2">
+            {cam.id}
+          </span>
         </div>
-        <span className="text-[9px] font-bold text-emerald-400 bg-slate-950/90 backdrop-blur-md px-2 py-0.5 rounded border border-emerald-500/30">
-          {timeStr || 'LIVE'}
-        </span>
+
+        <div className="flex items-center gap-1.5">
+          {aiOverlayEnabled && isTargetVisible && (
+            <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded backdrop-blur-md border ${
+              isRed
+                ? 'bg-red-500/20 text-red-300 border-red-500/40 shadow-xs'
+                : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-xs'
+            }`}>
+              {profile?.type} LOCK
+            </span>
+          )}
+          <span className="text-[9.5px] font-mono text-zinc-300 bg-black/80 backdrop-blur-md px-2 py-0.5 rounded border border-white/10">
+            {timeStr || 'LIVE'}
+          </span>
+        </div>
       </div>
 
-      {/* Targeted Bounding Box — rendered precisely over the suspect/vehicle target */}
-      {cam.detected_target && (() => {
-        const cropBox = CINEMATIC_SUSPECT_DATA[cam.id]?.cropBox || { x: 32, y: 25, w: 22, h: 32 };
-        const isRed = cam.has_face_recog;
-        return (
-          <div
-            className={`absolute z-20 rounded-md border-2 ${
-              isRed
-                ? 'border-red-500 bg-red-500/10 shadow-[0_0_15px_rgba(239,68,68,0.5)] ring-2 ring-red-500/20'
-                : 'border-emerald-500 bg-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.5)] ring-2 ring-emerald-500/20'
-            } transition-all pointer-events-none`}
-            style={{
-              top: `${cropBox.y}%`,
-              left: `${cropBox.x}%`,
-              width: `${cropBox.w}%`,
-              height: `${cropBox.h}%`,
-            }}
-          >
-            {/* Precise Corner Reticles */}
-            <span className={`absolute -top-1 -left-1 w-2.5 h-2.5 border-t-2 border-l-2 ${isRed ? 'border-red-400' : 'border-emerald-400'}`} />
-            <span className={`absolute -top-1 -right-1 w-2.5 h-2.5 border-t-2 border-r-2 ${isRed ? 'border-red-400' : 'border-emerald-400'}`} />
-            <span className={`absolute -bottom-1 -left-1 w-2.5 h-2.5 border-b-2 border-l-2 ${isRed ? 'border-red-400' : 'border-emerald-400'}`} />
-            <span className={`absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b-2 border-r-2 ${isRed ? 'border-red-400' : 'border-emerald-400'}`} />
+      {/* ── Dynamic Real-time AI Bounding Box (Only visible when target is detected) ── */}
+      {aiOverlayEnabled && isTargetVisible && currentBox && (
+        <div
+          className={`absolute z-20 rounded-md border-2 transition-transform duration-75 pointer-events-none ${
+            isRed
+              ? 'border-red-500 bg-red-500/10 shadow-[0_0_20px_rgba(239,68,68,0.4)]'
+              : 'border-emerald-400 bg-emerald-500/10 shadow-[0_0_20px_rgba(52,211,153,0.4)]'
+          }`}
+          style={{
+            top: `${currentBox.y}%`,
+            left: `${currentBox.x}%`,
+            width: `${currentBox.w}%`,
+            height: `${currentBox.h}%`,
+          }}
+        >
+          {/* Authentic Target Corner Reticles */}
+          <span className={`absolute -top-1 -left-1 w-2.5 h-2.5 border-t-2 border-l-2 ${isRed ? 'border-red-400' : 'border-emerald-300'}`} />
+          <span className={`absolute -top-1 -right-1 w-2.5 h-2.5 border-t-2 border-r-2 ${isRed ? 'border-red-400' : 'border-emerald-300'}`} />
+          <span className={`absolute -bottom-1 -left-1 w-2.5 h-2.5 border-b-2 border-l-2 ${isRed ? 'border-red-400' : 'border-emerald-300'}`} />
+          <span className={`absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b-2 border-r-2 ${isRed ? 'border-red-400' : 'border-emerald-300'}`} />
 
-            {/* Micro Badge tag */}
-            <div className={`absolute -top-5 left-0 px-1.5 py-0.5 rounded text-[8px] font-extrabold whitespace-nowrap shadow-md ${
-              isRed ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'
-            }`}>
-              🎯 {cam.detected_target} ({cam.confidence || 95}% MATCH)
-            </div>
+          {/* Dynamic AI Recognition Header Badge */}
+          <div className={`absolute -top-6 left-0 px-2 py-0.5 rounded text-[9px] font-extrabold whitespace-nowrap shadow-lg flex items-center gap-1 ${
+            isRed
+              ? 'bg-red-600 text-white'
+              : 'bg-emerald-600 text-white'
+          }`}>
+            <Target className="w-3 h-3 animate-spin text-white" style={{ animationDuration: '4s' }} />
+            <span>{profile?.tag}</span>
+            <span className="opacity-85 font-mono">({detectionConfidence}%)</span>
           </div>
-        );
-      })()}
+        </div>
+      )}
 
-      {/* Bottom Sensor Footer */}
-      <div className="relative z-10 flex justify-between items-center text-[8px] text-slate-400 mt-auto">
-        <span>SENSOR: {cam.id}</span>
-        <span>LAT 12.9716° N · LNG 77.5946° E</span>
+      {/* Optical Scan Line (Shows only when AI is searching) */}
+      {aiOverlayEnabled && !isTargetVisible && (
+        <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-blue-400/50 to-transparent animate-pulse pointer-events-none top-1/2" />
+      )}
+
+      {/* Bottom Telemetry OSD */}
+      <div className="relative z-10 flex justify-between items-center text-[9px] text-zinc-400 mt-auto bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded">
+        <span>{cam.fps || 30} FPS · 1080p HD</span>
+        <span className="hidden sm:inline font-mono">LAT 12.9716° N · LNG 77.5946° E</span>
+        <span className="text-zinc-300 font-bold">{cam.camera_type === 'face_recognition' ? 'Biometrics' : cam.camera_type === 'anpr' ? 'Optical ANPR' : 'Surveillance'}</span>
       </div>
     </div>
   );
 }
 
-// ─── High-Contrast Executive Detection Inspection Modal ───────────────────
+// ─── Forensic Deep Inspection Modal ─────────────────────────────────────────
 function CameraInspectionModal({ cam, onClose, onDispatch }) {
-  const suspectData = CINEMATIC_SUSPECT_DATA[cam.id] || CINEMATIC_SUSPECT_DATA['CAM-BLR-0055'];
+  const suspectData = DYNAMIC_DETECTION_PROFILES[cam.id] || DYNAMIC_DETECTION_PROFILES['CAM-BLR-0055'];
   const [stage, setStage] = useState('scan');
   const [dispatched, setDispatched] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [aiOverlayEnabled, setAiOverlayEnabled] = useState(true);
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -511,38 +583,19 @@ function CameraInspectionModal({ cam, onClose, onDispatch }) {
     setDispatched(true);
     playSurveillanceSound('beep');
 
-    // 1. Catalyst Push Notification to Patrol Units (Cap #25)
     try {
       fetch('/server/push-notify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: 'PATROL_UNIT_BLR_04',
-          title: `🚨 ANPR MATCH: ${suspectData.name}`,
+          title: `🚨 TARGET HIT: ${suspectData.name}`,
           message: `Camera ${cam.id} (${cam.location}) flagged target. Risk: ${suspectData.riskScore}%. Immediate intercept required.`
         })
       }).catch(() => {});
     } catch (_) {}
 
-    // 2. Catalyst Signals Bus Broadcast (Cap #22)
-    try {
-      fetch('/server/on-alert-broadcast', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          case_number: suspectData.fir || 'KAR/2026/ANPR',
-          accused_name: suspectData.name,
-          district: 'Bengaluru Urban',
-          severity: 'CRITICAL'
-        })
-      }).catch(() => {});
-    } catch (_) {}
-
     if (onDispatch) onDispatch(suspectData);
-  };
-
-  const togglePause = () => {
-    setIsPaused(!isPaused);
   };
 
   return (
@@ -552,153 +605,147 @@ function CameraInspectionModal({ cam, onClose, onDispatch }) {
         className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[99998] transition-opacity"
       />
 
-      <div className="fixed inset-4 md:inset-8 bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl z-[99999] flex flex-col overflow-hidden animate-fade-in text-slate-100">
+      <div className="fixed inset-3 sm:inset-6 md:inset-8 bg-zinc-900 border border-zinc-700/80 rounded-2xl shadow-2xl z-[99999] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 text-zinc-100 font-sans">
         
-        {/* High Contrast Topbar */}
-        <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-900">
+        {/* Modal Top Bar */}
+        <div className="px-5 py-3.5 border-b border-zinc-800 flex items-center justify-between bg-zinc-950">
           <div className="flex items-center gap-3">
-            <div className="w-3 h-3 rounded-full bg-red-500 animate-ping" />
+            <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
             <div>
-              <h3 className="text-base font-bold text-white tracking-wide">{cam.name}</h3>
-              <p className="text-xs text-slate-400 font-medium">{cam.id} · {cam.location}</p>
+              <h3 className="text-sm sm:text-base font-extrabold text-white tracking-tight">{cam.name}</h3>
+              <p className="text-xs text-zinc-400 font-mono">{cam.id} · {cam.location}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <button
-              onClick={togglePause}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-white transition-all"
+              onClick={() => setIsPaused(!isPaused)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-xs font-bold text-white transition-all cursor-pointer"
             >
               {isPaused ? <Play className="w-3.5 h-3.5 text-emerald-400" /> : <Pause className="w-3.5 h-3.5 text-amber-400" />}
-              {isPaused ? 'Resume Playback' : 'Freeze & Pinpoint Target'}
+              <span>{isPaused ? 'Resume' : 'Freeze'}</span>
             </button>
 
-            <span className={`text-xs font-bold px-3 py-1 rounded-md border ${
-              suspectData.riskScore > 50
-                ? 'bg-red-500/20 text-red-400 border-red-500/40'
-                : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
-            }`}>
-              {suspectData.status}
-            </span>
+            <button
+              onClick={() => setAiOverlayEnabled(!aiOverlayEnabled)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                aiOverlayEnabled
+                  ? 'bg-blue-600/20 text-blue-400 border-blue-500/40'
+                  : 'bg-zinc-800 text-zinc-400 border-zinc-700'
+              }`}
+              title="Toggle AI Recognition Bounding Box"
+            >
+              {aiOverlayEnabled ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+              <span className="hidden sm:inline">{aiOverlayEnabled ? 'AI Layer: ON' : 'AI Layer: OFF'}</span>
+            </button>
+
             <button
               onClick={onClose}
-              className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+              className="p-2 rounded-xl bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        {/* Modal Viewport */}
-        <div className="flex-1 bg-slate-950 relative flex items-center justify-center overflow-hidden">
-          <CameraStream cam={cam} videoRef={videoRef} isPaused={isPaused} />
+        {/* Modal Viewport & Side Dossier */}
+        <div className="flex-1 bg-black relative flex flex-col lg:flex-row items-stretch overflow-hidden">
+          
+          {/* Main Video Viewport */}
+          <div className="flex-1 relative bg-black flex items-center justify-center overflow-hidden min-h-[300px]">
+            <CameraStream cam={cam} videoRef={videoRef} isPaused={isPaused} aiOverlayEnabled={aiOverlayEnabled} />
 
-          {/* Precision Tight Face/Plate Box Framing Actual Subject */}
-          <div
-            className={`absolute transition-all duration-300 rounded-md border-2 ${
-              suspectData.riskScore > 50 && (stage === 'match' || stage === 'identified')
-                ? 'border-red-500 bg-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.7)] ring-4 ring-red-500/30'
-                : 'border-emerald-500 bg-emerald-500/15'
-            }`}
-            style={{
-              top: `${suspectData.cropBox.y}%`,
-              left: `${suspectData.cropBox.x}%`,
-              width: `${suspectData.cropBox.w}%`,
-              height: `${suspectData.cropBox.h}%`,
-            }}
-          >
-            {/* Corner Corner Reticles */}
-            <span className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-red-400" />
-            <span className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-red-400" />
-            <span className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-red-400" />
-            <span className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-red-400" />
-
-            <div className="absolute -top-9 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-700 px-2.5 py-1 rounded text-[11px] font-bold text-white whitespace-nowrap shadow-xl flex items-center gap-1.5 z-30">
-              <Target className="w-3.5 h-3.5 text-red-400 animate-pulse" />
-              {stage === 'scan' && 'Scanning Stream...'}
-              {stage === 'lock' && 'Locking On Face...'}
-              {(stage === 'match' || stage === 'identified') && `🚨 MATCH: ${suspectData.name} (${suspectData.confidence}%)`}
+            {/* Scanning Radar HUD */}
+            <div className="absolute top-4 left-4 z-30 pointer-events-none">
+              <div className="bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-2 text-xs font-mono text-white">
+                <Target className="w-3.5 h-3.5 text-blue-400 animate-spin" />
+                <span>
+                  {stage === 'scan' && 'Searching Video Stream...'}
+                  {stage === 'lock' && 'Biometric Face Alignment in Progress...'}
+                  {(stage === 'match' || stage === 'identified') && `🚨 MATCH CONFIRMED: ${suspectData.name} (${suspectData.confidence}%)`}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Solid High-Contrast Side Dossier Panel */}
+          {/* Right Forensic Dossier Panel */}
           {stage === 'identified' && (
-            <div className="absolute right-6 top-6 bottom-6 w-[440px] bg-slate-900 border border-slate-700/90 rounded-xl p-6 shadow-2xl flex flex-col justify-between overflow-y-auto animate-fade-in z-40">
+            <div className="w-full lg:w-[420px] bg-zinc-900 border-t lg:border-t-0 lg:border-l border-zinc-800 p-5 flex flex-col justify-between overflow-y-auto z-40">
               <div className="space-y-4">
                 {/* Header */}
-                <div className="flex items-start justify-between pb-3 border-b border-slate-800">
+                <div className="flex items-start justify-between pb-3 border-b border-zinc-800">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-red-400 block mb-0.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-red-400 block mb-0.5 font-mono">
                       {suspectData.status}
                     </span>
                     <h4 className="text-xl font-extrabold text-white">{suspectData.name}</h4>
-                    <p className="text-xs text-slate-400 font-medium">Alias: &quot;{suspectData.alias}&quot;</p>
+                    <p className="text-xs text-zinc-400 font-medium">Alias: “{suspectData.alias}”</p>
                   </div>
                   {suspectData.riskScore > 0 && (
-                    <div className="text-right bg-red-950/40 border border-red-800/40 px-3 py-1.5 rounded-lg">
-                      <span className="text-2xl font-black text-red-400 block leading-none">{suspectData.riskScore}</span>
-                      <span className="text-[9px] text-slate-400 font-bold block mt-0.5">RISK SCORE</span>
+                    <div className="text-right bg-red-950/40 border border-red-800/40 px-3 py-1.5 rounded-xl">
+                      <span className="text-2xl font-black text-red-400 block leading-none font-mono">{suspectData.riskScore}</span>
+                      <span className="text-[9px] text-zinc-400 font-bold block mt-0.5 font-mono">RISK SCORE</span>
                     </div>
                   )}
                 </div>
 
                 {/* Target Visual Cue Badge */}
                 {suspectData.targetCue && (
-                  <div className="p-2.5 rounded-lg bg-red-950/30 border border-red-800/40 flex items-center gap-2 text-xs text-red-300 font-semibold">
+                  <div className="p-3 rounded-xl bg-red-950/30 border border-red-800/40 flex items-center gap-2.5 text-xs text-red-300 font-semibold">
                     <Target className="w-4 h-4 text-red-400 shrink-0" />
                     <span>Target Cue: {suspectData.targetCue}</span>
                   </div>
                 )}
 
-                {/* Structured Incident Summary & AI Rationale */}
-                <div className="space-y-3">
-                  <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                {/* Structured Incident Synopsis & AI Rationale */}
+                <div className="space-y-2.5">
+                  <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-800 space-y-1">
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5 font-mono">
                       <FileText className="w-3.5 h-3.5 text-blue-400" />
-                      Incident & Sight Synopsis
+                      Live Incident Synopsis
                     </span>
-                    <p className="text-xs text-slate-200 leading-relaxed font-medium">
+                    <p className="text-xs text-zinc-200 leading-relaxed font-medium">
                       {suspectData.incidentBriefing}
                     </p>
                   </div>
 
-                  <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-800 space-y-1">
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5 font-mono">
                       <Info className="w-3.5 h-3.5 text-emerald-400" />
                       AI Biometric Match Rationale
                     </span>
-                    <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                    <p className="text-xs text-zinc-300 leading-relaxed font-medium">
                       {suspectData.aiRationale}
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 grid grid-cols-2 gap-3 text-xs">
+                  <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800 grid grid-cols-2 gap-3 text-xs">
                     <div>
-                      <span className="text-[10px] font-bold text-slate-500 uppercase block mb-0.5">FIR Case File</span>
+                      <span className="text-[10px] font-bold text-zinc-500 uppercase block mb-0.5 font-mono">FIR Case File</span>
                       {(() => {
-                        const firNum = suspectData.fir || suspectData.case_number || 'FIR-2026-BL-9104';
+                        const firNum = suspectData.fir || 'FIR-2026-BL-9104';
                         return (
-                          <Link href={`/dashboard/fir/${firNum}`} className="font-bold text-blue-400 hover:underline flex items-center gap-1">
+                          <Link href={`/dashboard/fir/${encodeURIComponent(firNum)}`} className="font-bold text-blue-400 hover:underline flex items-center gap-1 font-mono">
                             {firNum} <ExternalLink className="w-3 h-3" />
                           </Link>
                         );
                       })()}
                     </div>
                     <div>
-                      <span className="text-[10px] font-bold text-slate-500 uppercase block mb-0.5">IPC Offense</span>
-                      <span className="font-bold text-red-400 truncate block">{suspectData.ipc}</span>
+                      <span className="text-[10px] font-bold text-zinc-500 uppercase block mb-0.5 font-mono">Legal Sections</span>
+                      <span className="font-bold text-red-400 truncate block font-mono text-[11px]">{suspectData.ipc}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="space-y-2 pt-4 border-t border-slate-800 mt-4">
+              <div className="space-y-2 pt-4 border-t border-zinc-800 mt-4">
                 {suspectData.riskScore > 50 && (
                   <button
                     onClick={handleDispatch}
                     disabled={dispatched}
-                    className={`w-full py-3 rounded-xl text-xs font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg ${
+                    className={`w-full py-3 rounded-xl text-xs font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg cursor-pointer ${
                       dispatched
                         ? 'bg-emerald-600 text-white'
                         : 'bg-red-600 hover:bg-red-500 text-white shadow-red-950/50'
@@ -707,7 +754,7 @@ function CameraInspectionModal({ cam, onClose, onDispatch }) {
                     {dispatched ? (
                       <>
                         <CheckCircle2 className="w-4.5 h-4.5" />
-                        Patrol Unit KSP-04 Dispatched
+                        Patrol Intercept Unit Dispatched
                       </>
                     ) : (
                       <>
@@ -720,13 +767,13 @@ function CameraInspectionModal({ cam, onClose, onDispatch }) {
                 <div className="grid grid-cols-2 gap-2">
                   <Link
                     href={`/dashboard/trail?suspect=${suspectData.suspectId}`}
-                    className="py-2.5 px-3 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold text-center transition-all"
+                    className="py-2.5 px-3 rounded-xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold text-center transition-all"
                   >
                     View Geo Trail
                   </Link>
                   <button
                     onClick={onClose}
-                    className="py-2.5 px-3 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-all"
+                    className="py-2.5 px-3 rounded-xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold transition-all cursor-pointer"
                   >
                     Close Inspection
                   </button>
@@ -741,55 +788,29 @@ function CameraInspectionModal({ cam, onClose, onDispatch }) {
 }
 
 // ─── Camera Card ─────────────────────────────────────────────────────────────
-function CameraCard({ cam, onInspect, onTriggerScan }) {
+function CameraCard({ cam, onInspect, onTriggerScan, aiOverlayEnabled }) {
+  const profile = DYNAMIC_DETECTION_PROFILES[cam.id];
+
   return (
-    <div className="bg-surface-1 border border-steel-600/30 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col group">
-      {/* Feed Viewport (16:9) */}
+    <div className="bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-xs hover:shadow-md hover:border-blue-400 dark:hover:border-blue-600 transition-all flex flex-col group">
+      {/* 16:9 Feed Viewport */}
       <div
         onClick={() => onInspect(cam)}
-        className="relative aspect-video bg-surface-0 overflow-hidden cursor-pointer"
+        className="relative aspect-video bg-black overflow-hidden cursor-pointer"
       >
         {cam.is_active ? (
           <>
-            <CameraStream cam={cam} />
-
-            {/* Top Bar Metadata */}
-            <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10">
-              <div className="flex items-center gap-2 bg-slate-950/80 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/10">
-                <span className="w-1.5 h-1.5 rounded-full bg-status-critical animate-pulse" />
-                <span className="text-[10px] font-bold text-white uppercase tracking-wider">LIVE</span>
-                <span className="text-[10px] text-white/70 border-l border-white/20 pl-2">{cam.id}</span>
-              </div>
-              <span className="text-[10px] font-medium text-white/80 bg-slate-950/80 backdrop-blur-md px-2 py-0.5 rounded border border-white/10">
-                {cam.fps || 30} FPS
-              </span>
-            </div>
-
-            {/* Detection Target Badge */}
-            {cam.detected_target && (
-              <div className="absolute bottom-3 left-3 z-10">
-                <div className={`px-2.5 py-1 rounded-md backdrop-blur-md border text-[11px] font-semibold flex items-center gap-1.5 shadow-sm ${
-                  cam.has_face_recog
-                    ? 'bg-status-critical text-white border-status-critical'
-                    : cam.has_anpr
-                    ? 'bg-emerald-600 text-white border-emerald-500'
-                    : 'bg-slate-900 text-white border-slate-700'
-                }`}>
-                  <Zap className="w-3 h-3" />
-                  {cam.detected_target}
-                </div>
-              </div>
-            )}
+            <CameraStream cam={cam} aiOverlayEnabled={aiOverlayEnabled} />
 
             {/* Hover Expand Icon */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-950/80 p-3 rounded-full text-white">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100 bg-black/80 backdrop-blur-md p-3 rounded-full text-white shadow-xl">
               <Maximize2 className="w-5 h-5" />
             </div>
           </>
         ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-text-secondary">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-zinc-500 font-mono">
             <WifiOff className="w-7 h-7" />
-            <span className="text-xs font-medium uppercase tracking-wider">Feed Offline</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Feed Offline</span>
           </div>
         )}
       </div>
@@ -797,43 +818,43 @@ function CameraCard({ cam, onInspect, onTriggerScan }) {
       {/* Card Info Footer */}
       <div className="p-4 flex-1 flex flex-col justify-between">
         <div>
-          <div className="flex items-start justify-between gap-2 mb-1">
-            <h4 className="text-sm font-bold text-paper-100 leading-snug group-hover:text-accent transition-colors">
+          <div className="flex items-start justify-between gap-2 mb-1.5">
+            <h4 className="text-sm font-bold text-zinc-900 dark:text-white leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
               {cam.name}
             </h4>
-            <span className={`px-2 py-0.5 rounded text-[10px] font-bold border uppercase shrink-0 ${
-              cam.has_face_recog
-                ? 'bg-amber-500/10 text-amber-600 border-amber-500/20'
-                : cam.has_anpr
-                ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
-                : 'bg-surface-2 text-text-secondary border-steel-600/30'
+            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase shrink-0 font-mono ${
+              cam.camera_type === 'face_recognition'
+                ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800'
+                : cam.camera_type === 'anpr'
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800'
+                : 'bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700'
             }`}>
               {cam.camera_type === 'face_recognition' ? 'Face AI' : cam.camera_type === 'anpr' ? 'ANPR' : 'CCTV'}
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-text-secondary mb-3">
-            <MapPin className="w-3.5 h-3.5 shrink-0" />
+          <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 mb-3">
+            <MapPin className="w-3.5 h-3.5 shrink-0 text-zinc-400" />
             <span className="truncate">{cam.location}</span>
           </div>
         </div>
 
-        <div className="pt-2 border-t border-steel-600/20 flex items-center justify-between gap-2">
+        <div className="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between gap-2">
           {cam.is_active ? (
             <button
-              onClick={() => onTriggerScan(cam)}
-              className="flex-1 py-1.5 px-3 rounded-lg bg-surface-2 hover:bg-steel-600/30 text-paper-100 text-xs font-semibold transition-all flex items-center justify-center gap-1.5 border border-steel-600/30"
+              onClick={() => onInspect(cam)}
+              className="flex-1 py-1.5 px-3 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 text-zinc-900 dark:text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
             >
-              <Zap className="w-3.5 h-3.5 text-accent" />
-              Verify Stream Target
+              <Target className="w-3.5 h-3.5 text-blue-500 group-hover:text-white" />
+              <span>Verify Target</span>
             </button>
           ) : (
-            <span className="text-xs text-text-secondary italic">Offline</span>
+            <span className="text-xs text-zinc-400 italic">Offline</span>
           )}
 
           <button
             onClick={() => onInspect(cam)}
-            className="p-1.5 rounded-lg text-text-secondary hover:text-paper-100 hover:bg-surface-2 transition-all"
+            className="p-1.5 rounded-xl bg-slate-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-white hover:bg-blue-600 transition-all cursor-pointer"
             title="Inspect Stream"
           >
             <Maximize2 className="w-4 h-4" />
@@ -849,8 +870,9 @@ export default function SurveillancePage() {
   const [filter, setFilter] = useState('all');
   const [activeCamModal, setActiveCamModal] = useState(null);
   const [detectionLog, setDetectionLog] = useState(INITIAL_EVENTS);
+  const [aiOverlayEnabled, setAiOverlayEnabled] = useState(true);
 
-  // ANPR Lookup State
+  // ANPR Quick Lookup State
   const [plateInput, setPlateInput] = useState('');
   const [plateResult, setPlateResult] = useState(null);
   const [plateLoading, setPlateLoading] = useState(false);
@@ -890,115 +912,41 @@ export default function SurveillancePage() {
   const activeCount = MOCK_CAMERAS.filter((c) => c.is_active).length;
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6 animate-fade-in text-[var(--text-primary)]">
+    <div className="w-full max-w-7xl mx-auto space-y-6 pb-20 animate-in fade-in text-zinc-900 dark:text-zinc-100 font-sans">
       
       {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200 dark:border-zinc-800">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">CCTV & ANPR Surveillance Command</h1>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-              {activeCount} Live Streams Operational
+            <h1 className="text-xl font-extrabold text-zinc-900 dark:text-white tracking-tight">CCTV & ANPR Surveillance Command</h1>
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+              {activeCount} Active Feeds Online
             </span>
           </div>
-          <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-            Real-time Karnataka Police CCTNS video feeds, vehicle ANPR recognition, and facial match analysis
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+            Real-time biometric facial recognition and automated license plate reader (ANPR) camera matrix
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* Global Controls: AI Overlay Toggle + Audio */}
+        <div className="flex items-center gap-2 flex-wrap">
           <button
-            onClick={() => setActiveCamModal(MOCK_CAMERAS[0])} // Opens KSRTC Majestic feed
-            className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90 text-xs font-semibold transition-all shadow-xs flex items-center gap-2"
+            onClick={() => setAiOverlayEnabled(!aiOverlayEnabled)}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border cursor-pointer shadow-2xs ${
+              aiOverlayEnabled
+                ? 'bg-blue-600 text-white border-blue-600 shadow-blue-500/20'
+                : 'bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border-zinc-300 dark:border-zinc-700'
+            }`}
           >
-            <Zap className="w-3.5 h-3.5" />
-            Run Target Analysis Demo
+            <Target className="w-3.5 h-3.5" />
+            <span>{aiOverlayEnabled ? 'AI Tracking: ACTIVE' : 'AI Tracking: OFF'}</span>
           </button>
         </div>
       </div>
 
-      {/* ANPR Lookup Search Bar */}
-      <div className="bg-[var(--surface-1)] border border-[var(--border)] rounded-xl p-4 shadow-xs space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Search className="w-4 h-4 text-accent" />
-            <h3 className="text-sm font-bold text-paper-100">ANPR License Plate Verification Desk</h3>
-          </div>
-          <span className="text-[11px] text-text-secondary">Instant database query against active FIR watchlist</span>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="relative flex-1">
-            <input
-              type="text"
-              placeholder="Enter license plate number (e.g. KA-03-HA-4410, KA-05-NB-1102, or KA-01-MJ-8821)"
-              value={plateInput}
-              onChange={(e) => setPlateInput(e.target.value.toUpperCase())}
-              onKeyDown={(e) => e.key === 'Enter' && handlePlateSearch()}
-              className="w-full bg-surface-0 border border-steel-600/40 rounded-lg px-4 py-2 text-xs font-mono text-paper-100 focus:outline-none focus:border-accent transition-all"
-            />
-          </div>
-          <button
-            onClick={handlePlateSearch}
-            disabled={plateLoading || !plateInput.trim()}
-            className="px-5 py-2 rounded-lg bg-accent text-white text-xs font-semibold disabled:opacity-50 transition-all flex items-center gap-1.5"
-          >
-            {plateLoading ? 'Searching...' : 'Check Watchlist'}
-          </button>
-          {plateResult && (
-            <button
-              onClick={() => { setPlateResult(null); setPlateInput(''); }}
-              className="p-2 text-text-secondary hover:text-paper-100"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-
-        {/* Search Result Card */}
-        {plateResult && (
-          <div className={`p-4 rounded-lg border text-xs ${
-            plateResult.alert
-              ? 'bg-status-critical/5 border-status-critical/30 text-paper-100'
-              : 'bg-emerald-500/5 border-emerald-500/30 text-paper-100'
-          }`}>
-            <div className="flex items-center justify-between pb-2 border-b border-steel-600/20">
-              <span className="font-bold">{plateResult._queried_plate}</span>
-              <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                plateResult.alert ? 'bg-status-critical text-white' : 'bg-emerald-600 text-white'
-              }`}>
-                {plateResult.alert ? 'Stolen / Flagged Vehicle' : 'Clear — No FIR Match'}
-              </span>
-            </div>
-            {plateResult.alert && (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-3">
-                <div>
-                  <span className="text-[10px] text-text-secondary block">Crime Severity</span>
-                  <span className="font-semibold text-status-critical uppercase">{plateResult.severity || 'HIGH'}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-text-secondary block">Crime Type</span>
-                  <span className="font-semibold">{plateResult.original_crime || 'Vehicle Theft'}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-text-secondary block">District</span>
-                  <span className="font-semibold">{plateResult.district || 'Bengaluru City'}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-text-secondary block">FIR Case File</span>
-                  <Link href={`/dashboard/fir/${plateResult.fir_case_number || plateResult.case_number || 'FIR-2026-MYS-0112'}`} className="font-semibold text-accent hover:underline">
-                    {plateResult.fir_case_number || plateResult.case_number || 'FIR-2026-MYS-0112'}
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="flex items-center justify-between pt-2">
-        <div className="flex items-center gap-2">
+      {/* Filter Tabs Strip */}
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80 text-xs font-semibold">
           {[
             { id: 'all', label: 'All Feeds' },
             { id: 'active', label: 'Online Only' },
@@ -1008,69 +956,137 @@ export default function SurveillancePage() {
             <button
               key={tab.id}
               onClick={() => setFilter(tab.id)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
                 filter === tab.id
-                  ? 'bg-accent text-white shadow-sm'
-                  : 'bg-surface-1 border border-steel-600/30 text-text-secondary hover:text-paper-100'
+                  ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-xs font-bold'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
               {tab.label}
             </button>
           ))}
         </div>
-        <span className="text-xs text-text-secondary font-medium">
+
+        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-mono">
           Showing {filteredCameras.length} of {MOCK_CAMERAS.length} total streams
         </span>
       </div>
 
-      {/* Camera Video Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {/* Camera Streams Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filteredCameras.map((cam) => (
           <CameraCard
             key={cam.id}
             cam={cam}
             onInspect={(c) => setActiveCamModal(c)}
             onTriggerScan={(c) => setActiveCamModal(c)}
+            aiOverlayEnabled={aiOverlayEnabled}
           />
         ))}
       </div>
 
-      {/* Audit Log / Event Table */}
-      <div className="bg-surface-1 border border-steel-600/30 rounded-xl overflow-hidden shadow-sm">
-        <div className="px-5 py-3.5 border-b border-steel-600/30 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-paper-100">Live Surveillance Audit Log</h3>
-          <span className="text-[11px] text-text-secondary">Auto-updating telemetry stream</span>
+      {/* ANPR Quick Plate Query Engine */}
+      <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white uppercase tracking-wider font-mono">
+              ANPR Hotlist Plate Search & Verification
+            </h3>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Query optical recognition archive across Karnataka toll plazas and city junctions
+            </p>
+          </div>
+          <span className="text-xs font-mono text-zinc-400">STATE ANPR NETWORK</span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={plateInput}
+              onChange={(e) => setPlateInput(e.target.value.toUpperCase())}
+              onKeyDown={(e) => e.key === 'Enter' && handlePlateSearch()}
+              placeholder="Enter Plate No (e.g., KA-01-MJ-8821, KA-05-NB-1102)..."
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-xs font-mono font-bold text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-blue-500"
+            />
+          </div>
+          <button
+            onClick={handlePlateSearch}
+            disabled={plateLoading || !plateInput.trim()}
+            className="px-5 py-2.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-blue-600 dark:hover:bg-blue-600 dark:hover:text-white text-xs font-bold transition-all disabled:opacity-50 cursor-pointer shadow-2xs"
+          >
+            {plateLoading ? 'Searching...' : 'Scan Hotlist'}
+          </button>
+        </div>
+
+        {plateResult && (
+          <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center font-bold">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="font-mono text-sm font-extrabold text-zinc-900 dark:text-white">
+                  {plateResult._queried_plate}
+                </span>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  Vehicle: {plateResult.vehicle_details || 'Bajaj Pulsar 220'} · Status: <strong className="text-red-500">{plateResult.status || 'HOTLIST MATCH'}</strong>
+                </p>
+              </div>
+            </div>
+            <Link
+              href={`/dashboard/trail?plate=${plateResult._queried_plate}`}
+              className="px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-500 text-xs font-bold transition-all shadow-2xs"
+            >
+              Track Geo Trail →
+            </Link>
+          </div>
+        )}
+      </div>
+
+      {/* Live Surveillance Audit Log */}
+      <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 shadow-xs space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-wider font-mono">
+            Live Surveillance Audit Log
+          </h3>
+          <span className="text-xs font-mono text-zinc-400">Auto-updating telemetry stream</span>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left">
+          <table className="w-full text-xs text-left border-collapse font-sans">
             <thead>
-              <tr className="border-b border-steel-600/30 text-text-secondary text-[11px] uppercase tracking-wider">
-                <th className="px-5 py-3 font-semibold">Timestamp</th>
-                <th className="px-4 py-3 font-semibold">Camera Sensor</th>
-                <th className="px-4 py-3 font-semibold">Type</th>
-                <th className="px-4 py-3 font-semibold">Severity</th>
-                <th className="px-5 py-3 font-semibold">Detection Summary</th>
+              <tr className="border-b border-zinc-200 dark:border-zinc-800 text-zinc-400 font-mono text-[10px] uppercase">
+                <th className="pb-3">Timestamp</th>
+                <th className="pb-3">Camera Sensor</th>
+                <th className="pb-3">Type</th>
+                <th className="pb-3">Severity</th>
+                <th className="pb-3">Detection Summary</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-steel-600/20">
-              {detectionLog.map((evt, idx) => (
-                <tr key={idx} className="hover:bg-surface-2/40 transition-colors">
-                  <td className="px-5 py-3 font-mono font-medium text-text-secondary">{evt.time}</td>
-                  <td className="px-4 py-3 font-medium text-paper-100">{evt.cam}</td>
-                  <td className="px-4 py-3">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-surface-2 border border-steel-600/30 text-text-secondary">
-                      {evt.type}
+            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+              {detectionLog.map((ev, idx) => (
+                <tr key={idx} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
+                  <td className="py-3 font-mono text-zinc-500">{ev.time}</td>
+                  <td className="py-3 font-mono font-bold text-zinc-900 dark:text-white">{ev.cam}</td>
+                  <td className="py-3">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                      {ev.type}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
-                    <span className={`font-semibold ${
-                      evt.severity === 'critical' ? 'text-status-critical' : evt.severity === 'warn' ? 'text-amber-600' : 'text-emerald-600'
+                  <td className="py-3">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
+                      ev.severity === 'critical'
+                        ? 'text-red-600 dark:text-red-400 font-extrabold'
+                        : ev.severity === 'warn'
+                        ? 'text-amber-600 dark:text-amber-400'
+                        : 'text-zinc-500'
                     }`}>
-                      {evt.severity.toUpperCase()}
+                      {ev.severity.toUpperCase()}
                     </span>
                   </td>
-                  <td className="px-5 py-3 text-paper-100/90">{evt.desc}</td>
+                  <td className="py-3 font-medium text-zinc-800 dark:text-zinc-200">{ev.desc}</td>
                 </tr>
               ))}
             </tbody>
@@ -1078,24 +1094,25 @@ export default function SurveillancePage() {
         </div>
       </div>
 
-      {/* Active Camera Inspection Modal */}
+      {/* Deep Inspection Modal */}
       {activeCamModal && (
         <CameraInspectionModal
           cam={activeCamModal}
           onClose={() => setActiveCamModal(null)}
-          onDispatch={(suspect) => {
-            const time = new Date().toTimeString().split(' ')[0];
-            setDetectionLog(prev => [{
-              time,
-              cam: activeCamModal.id,
-              type: 'DISPATCH',
-              severity: 'critical',
-              desc: `Sector Patrol Unit Dispatched for ${suspect.name} (${suspect.suspectId})`
-            }, ...prev]);
+          onDispatch={(target) => {
+            setDetectionLog((prev) => [
+              {
+                time: new Date().toLocaleTimeString('en-GB'),
+                cam: activeCamModal.id,
+                type: 'DISPATCH',
+                severity: 'critical',
+                desc: `🚨 Intercept Dispatched for ${target.name} at ${activeCamModal.location}`,
+              },
+              ...prev,
+            ]);
           }}
         />
       )}
-
     </div>
   );
 }
