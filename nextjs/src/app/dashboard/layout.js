@@ -84,11 +84,58 @@ function detectLocalIntent(query) {
 
   // ─── NAVIGATION INTENT DETECTION ───────────────────────────────────────────
   // Matches both formal ("navigate to crime map") and casual officer speech
-  // ("open crime map", "show crime map", "take me to surveillance", "check FIR", etc.)
+  // ("open crime map", "open case file of Anand Gowda", "show Ramesh Kumar", etc.)
 
-  const hasNavVerb = /\b(go\s*to|navigate\s*to|switch\s*to|open|show|take\s*me\s*to|bring\s*up|launch|pull\s*up|view|check|display|load|jump\s*to)\b/.test(q);
+  const hasNavVerb = /\b(go\s*to|navigate\s*to|switch\s*to|open|show|take\s*me\s*to|bring\s*up|launch|pull\s*up|view|check|display|load|jump\s*to|inspect|track|find)\b/.test(q);
 
   if (hasNavVerb || q.startsWith('ತೆರೆ') || q.startsWith('ಲೆ ಚಲೊ')) {
+
+    // Specific FIR docket number (e.g. KAR/BEN/2026/1002 or FIR-2026-BL-8842 or KAR/BEN/...)
+    const firNumMatch = q.match(/\b(kar\/[a-z0-9\/-]+|fir-[a-z0-9-]+)\b/i);
+    if (firNumMatch) {
+      const caseNum = firNumMatch[1].toUpperCase();
+      return nav(
+        `/dashboard/fir?search=${encodeURIComponent(caseNum)}`,
+        isHindi ? `सर, एफआईआर ${caseNum} खोल रहा हूं।` :
+        isKannada ? `ಸರ್, ಎಫ್ಐಆರ್ ${caseNum} ತೆರೆಯುತ್ತಿದ್ದೇನೆ.` :
+        `Opening FIR docket ${caseNum}, Sir.`,
+        null
+      );
+    }
+
+    // Specific Suspect or Case Dossier by Name (e.g. "open case file of Anand Gowda", "open Anand Gowda", "show Ramesh Kumar")
+    const suspectTargetMatch = q.match(/\b(?:case\s*file|suspect|accused|dossier|record|profile|history)\s*(?:of|for)?\s+([a-z\s]+)\b/i) ||
+      q.match(/\b(?:open|show|view|find|track|inspect|pull\s*up|bring\s*up|load)\s+(?:the\s+)?(?:case\s*file|suspect|dossier|profile)?\s*(?:of|for)?\s*([a-z\s]+)\b/i);
+
+    if (suspectTargetMatch && suspectTargetMatch[1]) {
+      const rawTarget = suspectTargetMatch[1].trim();
+      const nonNames = ['crime map', 'map', 'surveillance', 'cctv', 'camera', 'overview', 'dashboard', 'analytics', 'fir', 'cases', 'registry', 'hierarchy', 'statutes', 'news', 'panchanama', 'trail', 'chat', 'logs', 'units', 'ksp units'];
+      if (!nonNames.includes(rawTarget) && rawTarget.length > 2) {
+        const isCaseFile = /\b(case|file|fir)\b/i.test(q);
+        const cleanName = rawTarget.replace(/\b(the|suspect|accused|person|man|guy|file|case|fir|dossier)\b/gi, '').trim();
+        const capName = cleanName.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') || rawTarget;
+
+        if (capName.length > 2) {
+          if (isCaseFile) {
+            return nav(
+              `/dashboard/fir?search=${encodeURIComponent(capName)}`,
+              isHindi ? `सर, ${capName} की केस फाइल खोल रहा हूं।` :
+              isKannada ? `ಸರ್, ${capName} ಅವರ ಕೇಸ್ ಫೈಲ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.` :
+              `Opening ${capName}'s case file in FIR Registry, Sir.`,
+              null
+            );
+          } else {
+            return nav(
+              `/dashboard/suspect?search=${encodeURIComponent(capName)}`,
+              isHindi ? `सर, ${capName} का संदिग्ध प्रोफाइल खोल रहा हूं।` :
+              isKannada ? `ಸರ್, ${capName} ಅವರ ಶಂಕಿತ ವಿವರ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.` :
+              `Opening ${capName}'s suspect dossier in Suspect Roster, Sir.`,
+              null
+            );
+          }
+        }
+      }
+    }
 
     // Surveillance / CCTV / Camera
     if (/\b(surveillance|cctv|camera|feed|live\s*feed|camera\s*grid|watch)\b/.test(q)) {
@@ -310,12 +357,21 @@ export default function DashboardLayout({ children }) {
     try {
       window.speechSynthesis.cancel();
       const targetLang = lang || 'en-IN';
-      const cleanText = cleanTextForSpeech(text);
+      let cleanText = cleanTextForSpeech(text);
       if (!cleanText) return;
+
+      // Strict Anti-Yapping: Keep voice speech to max 1-2 punchy sentences
+      const sentences = cleanText.split(/(?<=[.!?])\s+/).filter(Boolean);
+      if (sentences.length > 2) {
+        cleanText = sentences.slice(0, 2).join(' ');
+      }
+      if (cleanText.length > 160) {
+        cleanText = cleanText.slice(0, 160).replace(/\s+\S*$/, '') + '.';
+      }
 
       const utt = new SpeechSynthesisUtterance(cleanText);
       utt.lang = targetLang;
-      utt.rate = 0.95;
+      utt.rate = 1.0;
       utt.pitch = 1.0;
 
       // Select best matching voice for clear pronunciation
@@ -358,12 +414,8 @@ export default function DashboardLayout({ children }) {
     // ── Local intent check ──
     const localResult = isFollowUp ? null : detectLocalIntent(queryText);
     if (localResult) {
-      if (localResult.type === 'navigate') {
-        if (typeof window !== 'undefined') {
-          window.location.href = localResult.path;
-        } else {
-          router.push(localResult.path);
-        }
+      if (localResult.type === 'navigate' && localResult.path) {
+        router.push(localResult.path);
       }
       const reply = localResult.reply;
       setResponse({ response_text: reply, follow_up_suggestions: [], confidence: 1.0 });
