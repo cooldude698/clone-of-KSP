@@ -325,6 +325,11 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
 
         return {
           answer: out,
+          spokenAnswer: isKannada
+            ? `ಸರ್, ಎಫ್ಐಆರ್ ${matchedCase.case_number} ವಿವರಗಳನ್ನು ಪರದೆಯ ಮೇಲೆ ಪ್ರದರ್ಶಿಸುತ್ತಿದ್ದೇನೆ.`
+            : isHindi
+            ? `सर, एफआईआर ${matchedCase.case_number} का विवरण स्क्रीन पर उपलब्ध है।`
+            : `Sir, displaying FIR docket ${matchedCase.case_number} on screen.`,
           case_cards: [matchedCase],
           suggestions: [
             `Open Case Docket ${matchedCase.case_number}`,
@@ -368,6 +373,11 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
     if (matchedPersonEntry?.name === 'Zakir Hussain' || (q.includes('zakir') && q.includes('hussain'))) {
       return {
         answer: `Sir, no criminal dossier or case file was found for **"Zakir Hussain"** in the Karnataka State Police CCTNS database.\n\n- **Database Status:** Unindexed / No Active Criminal History\n- **Surveillance Check:** No active ANPR or Watchlist flags recorded.\n\n*Recommendation:* Please verify the spelling, National Crime ID, or associated FIR number with the state records bureau.`,
+        spokenAnswer: isKannada
+          ? 'ಸರ್, ಜಾಕಿರ್ ಹುಸೇನ್ ಅವರ ಯಾವುದೇ ಕ್ರಿಮಿನಲ್ ದಾಖಲೆಗಳು ಲಭ್ಯವಿಲ್ಲ.'
+          : isHindi
+          ? 'सर, जाकिर हुसैन का कोई आपराधिक रिकॉर्ड CCTNS में नहीं मिला।'
+          : 'Sir, no criminal records or case files were found for Zakir Hussain in CCTNS.',
         suspects: [],
         suggestions: ['Search by FIR Number', 'Check Clearance Target Suspects', 'Open Overview Command Dashboard'],
         kpis: { search_status: 'NO_RECORD', database: 'KSP_CCTNS' }
@@ -407,6 +417,11 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
 
         return {
           answer: out,
+          spokenAnswer: isKannada
+            ? `ಸರ್, ${suspectProfile.name} ಅವರ ಶಂಕಿತ ವಿವರ ಮತ್ತು ${linkedFirs.length} ಪ್ರಕರಣಗಳನ್ನು ಪರದೆಯ ಮೇಲೆ ಪ್ರದರ್ಶಿಸುತ್ತಿದ್ದೇನೆ.`
+            : isHindi
+            ? `सर, ${suspectProfile.name} का डोजियर और ${linkedFirs.length} जुड़े मामले स्क्रीन पर उपलब्ध हैं।`
+            : `Sir, displaying intelligence dossier and ${linkedFirs.length} linked cases for ${suspectProfile.name} on screen.`,
           suspects: [suspectProfile],
           case_cards: linkedFirs.slice(0, 3),
           suggestions: [
@@ -442,6 +457,11 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
 
       return {
         answer: out,
+        spokenAnswer: isKannada
+          ? `ಸರ್, ${plate} ವಾಹನದ ಸಿಸಿಟಿವಿ ಕ್ಯಾಮೆರಾ ಟ್ರಯಲ್ ಮತ್ತು ವಿವರಗಳನ್ನು ಪರದೆಯ ಮೇಲೆ ಪ್ರದರ್ಶಿಸುತ್ತಿದ್ದೇನೆ.`
+          : isHindi
+          ? `सर, वाहन ${plate} का कैमरा ट्रैकिंग डेटा स्क्रीन पर उपलब्ध है।`
+          : `Sir, displaying ANPR surveillance trail and camera sightings for vehicle ${plate} on screen.`,
         suggestions: [
           'Open Live Surveillance Grid',
           'View Geo Trail on Map',
@@ -458,7 +478,7 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
       { name: 'Kalaburagi', aliases: ['kalaburagi', 'gulbarga', 'ಕಲಬುರಗಿ', 'ಗುಲ್ಬರ್ಗ', 'कलबुर्गी', 'गुलबर्गा'] },
       { name: 'Raichur', aliases: ['raichur', 'ರಾಯಚೂರು', 'रायचूर'] },
       { name: 'Chikkamagaluru', aliases: ['chikkamagaluru', 'chikmagalur', 'ಚಿಕ್ಕಮಗಳೂರು', 'चिकमगलूर'] },
-      { name: 'Tumakuru', aliases: ['tumakuru', 'tumkur', 'ತುಮಕೂರು', 'तुमकुरु'] },
+      { name: 'Tumakuru', aliases: ['tumakuru', 'tumkur', 'ತುಮಕೂರು', 'ತುಮಕೂರು'] },
       { name: 'Udupi', aliases: ['udupi', 'ಉಡುಪಿ', 'उडुपी'] },
       { name: 'Hassan', aliases: ['hassan', 'ಹಾಸನ', 'हासन'] },
       { name: 'Vijayapura', aliases: ['vijayapura', 'bijapur', 'ವಿಜಯಪುರ', 'ಬಿಜಾಪುರ', 'विजयपुरा', 'बीजापुर'] },
@@ -517,6 +537,11 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
 
       return {
         answer: out,
+        spokenAnswer: isKannada
+          ? `ಸರ್, ${matchedDistrict} ಜಿಲ್ಲೆಯ ${districtFirs.length} ಅಪರಾಧ ಪ್ರಕರಣಗಳ ಸಾರಾಂಶ ಪರದೆಯಲ್ಲಿದೆ.`
+          : isHindi
+          ? `सर, ${matchedDistrict} जिले के ${districtFirs.length} मामलों का सारांश स्क्रीन पर है।`
+          : `Sir, displaying crime analytics and case dockets for ${matchedDistrict} on screen.`,
         case_cards: districtFirs.slice(0, 4),
         suggestions: isKannada ? [
           `${matchedDistrict} ಅಪರಾಧ ನಕ್ಷೆ ತೆರೆಯಿರಿ`,
@@ -570,6 +595,11 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
 
       return {
         answer: out,
+        spokenAnswer: isKannada
+          ? `ಸರ್, ${matchedCategoryEntry.name} ಸಂಬಂಧಿತ ಪ್ರಕರಣಗಳ ವರದಿ ಪರದೆಯಲ್ಲಿದೆ.`
+          : isHindi
+          ? `सर, ${matchedCategoryEntry.name} के मामलों की रिपोर्ट स्क्रीन पर उपलब्ध है।`
+          : `Sir, displaying ${matchedCategoryEntry.name} case dockets on screen.`,
         case_cards: categoryFirs.slice(0, 3),
         suggestions: [
           `Open Crime Map for ${matchedCategoryEntry.name}`,
@@ -605,6 +635,11 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
 
       return {
         answer: out,
+        spokenAnswer: isKannada
+          ? 'ಸರ್, ರಾಜ್ಯಮಟ್ಟದ ಅಪರಾಧ ಅಂಕಿಅಂಶಗಳು ಮತ್ತು ಕ್ಲಿಯರೆನ್ಸ್ ವರದಿ ಪರದೆಯಲ್ಲಿದೆ.'
+          : isHindi
+          ? 'सर, राज्य स्तरीय अपराध आंकड़े और केस निपटान दर स्क्रीन पर उपलब्ध है।'
+          : 'Sir, displaying statewide crime statistics and clearance rates on screen.',
         suggestions: [
           'Open Analytics Dashboard',
           'View Crime Hotspot Map',
@@ -636,6 +671,11 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
 
       return {
         answer: out,
+        spokenAnswer: isKannada
+          ? 'ಸರ್, ಅಪರಾಧ ಪ್ರಕ್ರಿಯೆ ಮತ್ತು ಕಾರ್ಯಾಚರಣೆ ಮಾರ್ಗಸೂಚಿ ಪರದೆಯಲ್ಲಿದೆ.'
+          : isHindi
+          ? 'सर, वैधानिक प्रक्रिया और एसओपी विवरण स्क्रीन पर उपलब्ध है।'
+          : 'Sir, displaying standard operating procedure and legal statutes on screen.',
         suggestions: [
           'Open Panchanama Auto-Drafter',
           'Review Vehicle Theft SOP',
