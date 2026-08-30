@@ -197,11 +197,11 @@ const DrishtiOrb = ({
 
       {/* ── LIVE LISTENING & INTELLIGENCE RESPONSE HUD CARD (Tactical Glassmorphism) ── */}
       {!isDismissed && (liveTranscript || pendingTranscript || orbResponse) && (
-        <div className="w-[340px] sm:w-[440px] max-w-[94vw] rounded-2xl overflow-hidden mb-3 animate-fade-in relative z-20 shadow-[0_20px_50px_rgba(0,0,0,0.65),0_0_30px_rgba(59,130,246,0.18)] border border-slate-700/80 dark:border-slate-800 bg-slate-900/95 dark:bg-[#0B0F19]/95 backdrop-blur-2xl text-slate-100">
+        <div className="w-[380px] sm:w-[480px] md:w-[540px] max-w-[95vw] max-h-[calc(100vh-140px)] flex flex-col rounded-2xl overflow-hidden mb-2 animate-fade-in relative z-20 shadow-[0_20px_50px_rgba(0,0,0,0.65),0_0_30px_rgba(59,130,246,0.18)] border border-slate-700/80 dark:border-slate-800 bg-slate-900/95 dark:bg-[#0B0F19]/95 backdrop-blur-2xl text-slate-100">
           {/* Top ambient blue/cyan accent glow bar */}
-          <div className="h-[2.5px] w-full bg-gradient-to-r from-blue-600 via-cyan-400 to-indigo-600" />
+          <div className="h-[2.5px] w-full bg-gradient-to-r from-blue-600 via-cyan-400 to-indigo-600 shrink-0" />
 
-          <div className="p-4 relative z-10 text-slate-100">
+          <div className="p-4 relative z-10 text-slate-100 flex flex-col min-h-0 flex-1 overflow-hidden">
             {/* Live transcript while listening */}
             {liveTranscript && !pendingTranscript && (
               <div className="space-y-2.5">
@@ -329,7 +329,7 @@ const DrishtiOrb = ({
                 </div>
 
                 {/* Render Rich Intelligence Response */}
-                <div className="max-h-80 overflow-y-auto drishti-scrollbar pr-1">
+                <div className="max-h-[min(300px,calc(100vh-320px))] overflow-y-auto drishti-scrollbar pr-1">
                   <PoliceIntelligenceRenderer text={orbResponse} isDark={true} theme="dark" mode="bubble" />
                 </div>
 
