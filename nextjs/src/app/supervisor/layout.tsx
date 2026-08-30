@@ -95,7 +95,7 @@ export const SUPERVISOR_NAV_ITEMS = [
 
 function SupervisorHeader({ onOpenDrishti }: { onOpenDrishti: () => void }) {
   const { tick, lastUpdated, isPulseActive, avgResponseTimeSec, pendingSanctionsCount } = useSupervisorTelemetry();
-  const { language, setLanguage, supportedLanguages, currentLanguageObj, t } = useLanguage();
+  const { language, setLanguage, supportedLanguages, currentLanguageObj, t } = useLanguage() as any;
   const [isLangOpen, setIsLangOpen] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
 
@@ -359,7 +359,7 @@ export default function SupervisorLayout({ children }: { children: React.ReactNo
     liveTranscript,
     micPermission,
     audioLevel,
-  } = useDrishtiVoice({
+  } = (useDrishtiVoice as any)({
     enableClapWake: false,
     onSpeakStart: () => setOrbState('speaking'),
     onSpeakEnd: () => setOrbState('idle'),
@@ -412,6 +412,9 @@ export default function SupervisorLayout({ children }: { children: React.ReactNo
     setOrbState('idle');
   };
 
+  const OrbComponent = DrishtiOrb as any;
+  const PanelComponent = DrishtiPanel as any;
+
   return (
     <LanguageProvider>
       <SupervisorTelemetryProvider>
@@ -431,7 +434,7 @@ export default function SupervisorLayout({ children }: { children: React.ReactNo
             <>
               {isPanelOpen ? (
                 <div className="fixed top-[12px] right-[382px] z-[9996]">
-                  <DrishtiOrb
+                  <OrbComponent
                     state={orbState}
                     onClick={closePanel}
                     compact={true}
@@ -441,7 +444,7 @@ export default function SupervisorLayout({ children }: { children: React.ReactNo
                   />
                 </div>
               ) : (
-                <DrishtiOrb
+                <OrbComponent
                   state={orbState}
                   onClick={openPanel}
                   compact={false}
@@ -487,7 +490,7 @@ export default function SupervisorLayout({ children }: { children: React.ReactNo
                 />
               )}
 
-              <DrishtiPanel
+              <PanelComponent
                 isOpen={isPanelOpen}
                 onClose={closePanel}
                 orbState={orbState}
@@ -516,7 +519,7 @@ export default function SupervisorLayout({ children }: { children: React.ReactNo
                 onRequestMicPermission={requestMicPermission}
                 orbPinned={true}
                 onToggleOrbPin={() => {}}
-                onSpeakText={(text) => speak(cleanTextForSpeech(text), 'en-IN')}
+                onSpeakText={(text: string) => speak(cleanTextForSpeech(text), 'en-IN')}
                 isMuted={isMuted}
                 onToggleMute={() => setIsMuted((p) => !p)}
               />
