@@ -126,33 +126,26 @@ function SupervisorHeader({ onOpenDrishti }: { onOpenDrishti: () => void }) {
         />
       </div>
 
-      {/* Right Section: Live Telemetry Badges, Language, Notification, Drishti AI & Profile */}
-      <div className="flex items-center gap-3 sm:gap-4">
-        {/* Real-time Status Badges (Light Theme) */}
-        <div className="hidden lg:flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-gray-200/80 shadow-xs text-xs font-semibold text-gray-700">
-            <span
-              className={`w-2 h-2 rounded-full transition-all ${
-                isPulseActive ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'
-              }`}
-            />
-            <span className="text-[10px] text-gray-400 uppercase font-mono font-bold">PULSE:</span>
-            <span className="text-[11px] font-mono text-gray-900">#{tick} · 142 PATROLS</span>
-          </div>
-
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 shadow-xs text-xs font-semibold">
-            <Clock className="w-3.5 h-3.5 text-emerald-600" />
-            <span className="text-[10px] uppercase font-mono">112 ETA:</span>
-            <span className="text-[11px] font-mono font-bold">{timeFormatted}</span>
-          </div>
-
-          {pendingSanctionsCount > 0 && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-50 border border-rose-200 text-rose-700 shadow-xs text-xs font-semibold">
-              <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-              <span className="text-[10px] font-mono font-bold uppercase">{pendingSanctionsCount} SANCTIONS</span>
-            </div>
-          )}
+      {/* Right Section: Live Telemetry, Role Switcher, Language, Drishti AI & Profile */}
+      <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+        {/* Streamlined Live Fleet & ETA Capsule */}
+        <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-gray-200/80 shadow-xs text-xs font-semibold text-gray-700 whitespace-nowrap">
+          <span
+            className={`w-2 h-2 rounded-full transition-all shrink-0 ${
+              isPulseActive ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'
+            }`}
+          />
+          <span className="font-mono text-gray-900 font-bold">142 Patrols Active</span>
+          <span className="text-gray-300">·</span>
+          <span className="text-gray-500 font-mono text-[11px]">112 ETA: {timeFormatted}</span>
         </div>
+
+        {pendingSanctionsCount > 0 && (
+          <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0" />
+            <span className="font-mono text-[11px] font-bold uppercase">{pendingSanctionsCount} Sanctions</span>
+          </div>
+        )}
 
         {/* Quick Role Switcher */}
         <QuickRoleSwitcher />

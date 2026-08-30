@@ -87,7 +87,7 @@ const INITIAL_PATROL_UNITS: PatrolUnit[] = [
     lngSpeed: 0.00055,
     status: 'PATROLLING',
     fuel: 82,
-    speedKmH: 38,
+    speedKmH: 88,
     distanceKm: 14.2,
     lastPing: 'Live 1s ago',
     breadcrumb: [[12.915, 77.620], [12.916, 77.622], [12.9176, 77.6238]],
@@ -106,7 +106,7 @@ const INITIAL_PATROL_UNITS: PatrolUnit[] = [
     lngSpeed: 0.00060,
     status: 'DISPATCHED',
     fuel: 75,
-    speedKmH: 52,
+    speedKmH: 112,
     distanceKm: 22.8,
     assignedIncident: 'Pursuing Unregistered Commercial Vehicle on NH-50',
     lastPing: 'Live 1s ago',
@@ -126,7 +126,7 @@ const INITIAL_PATROL_UNITS: PatrolUnit[] = [
     lngSpeed: 0.00085, // cruising east on highway
     status: 'PATROLLING',
     fuel: 91,
-    speedKmH: 68,
+    speedKmH: 138,
     distanceKm: 41.5,
     lastPing: 'Live 1s ago',
     breadcrumb: [[16.206, 77.341], [16.207, 77.343], [16.2076, 77.3463]],
@@ -145,7 +145,7 @@ const INITIAL_PATROL_UNITS: PatrolUnit[] = [
     lngSpeed: -0.00045,
     status: 'PATROLLING',
     fuel: 86,
-    speedKmH: 26,
+    speedKmH: 66,
     distanceKm: 8.4,
     lastPing: 'Live 1s ago',
     breadcrumb: [[12.977, 77.643], [12.978, 77.642], [12.9784, 77.6408]],
@@ -164,7 +164,7 @@ const INITIAL_PATROL_UNITS: PatrolUnit[] = [
     lngSpeed: -0.00035,
     status: 'PATROLLING',
     fuel: 68,
-    speedKmH: 31,
+    speedKmH: 81,
     distanceKm: 11.2,
     lastPing: 'Live 1s ago',
     breadcrumb: [[13.318, 75.774], [13.317, 75.773], [13.3161, 75.7720]],
@@ -183,7 +183,7 @@ const INITIAL_PATROL_UNITS: PatrolUnit[] = [
     lngSpeed: -0.00040,
     status: 'DISPATCHED',
     fuel: 93,
-    speedKmH: 44,
+    speedKmH: 94,
     distanceKm: 19.6,
     assignedIncident: 'Industrial Perimeter Security & ANPR Cordon',
     lastPing: 'Live 1s ago',
@@ -331,15 +331,15 @@ export function SupervisorTelemetryProvider({ children }: { children: React.Reac
             if (unit.lng < 77.310) nextLngSpeed = Math.abs(unit.lngSpeed);
           }
 
-          const newLat = +(unit.lat + nextLatSpeed).toFixed(5);
-          const newLng = +(unit.lng + nextLngSpeed).toFixed(5);
+          const newLat = +(unit.lat + nextLatSpeed * 8).toFixed(5);
+          const newLng = +(unit.lng + nextLngSpeed * 8).toFixed(5);
 
           // Speed minor fluctuations
-          const speedVariance = Math.floor((Math.random() - 0.5) * 4);
-          const newSpeed = Math.max(20, Math.min(85, unit.speedKmH + speedVariance));
+          const speedVariance = Math.floor((Math.random() - 0.5) * 6);
+          const newSpeed = Math.max(50, Math.min(160, unit.speedKmH + speedVariance));
 
           // Distance odometer increment
-          const newDistance = +(unit.distanceKm + (newSpeed * (2 / 3600))).toFixed(2);
+          const newDistance = +(unit.distanceKm + (newSpeed * (1 / 3600))).toFixed(2);
 
           // Breadcrumb trail (keep last 6 points)
           const newBreadcrumb: [number, number][] = [...unit.breadcrumb.slice(-5), [newLat, newLng]];
@@ -352,12 +352,12 @@ export function SupervisorTelemetryProvider({ children }: { children: React.Reac
             lngSpeed: nextLngSpeed,
             speedKmH: newSpeed,
             distanceKm: newDistance,
-            lastPing: 'Moving (2s live)',
+            lastPing: 'Moving (1s live)',
             breadcrumb: newBreadcrumb,
           };
         })
       );
-    }, 2000); // Exactly 2 seconds
+    }, 1000); // Exactly 1 second
 
     return () => clearInterval(interval);
   }, []);
