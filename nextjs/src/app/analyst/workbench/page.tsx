@@ -265,45 +265,37 @@ export default function AnalystWorkbench() {
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6 text-slate-900 dark:text-white pb-16">
       
-      {/* ── TOP BANNER ── */}
-      <div className="p-6 rounded-3xl bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* ── TOP COMPACT HEADER BANNER ── */}
+      <div className="py-3 px-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-600 text-white uppercase tracking-wider">
-              CID / SCRB STATE INTELLIGENCE WORKBENCH
+          <h1 className="text-xl font-bold font-heading text-slate-900 tracking-tight flex items-center gap-2">
+            <span>Specialized Crime & Intelligence Workbench</span>
+            <span className="text-[10px] font-semibold text-teal-800 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200/70">
+              CCTNS v4.2
             </span>
-            <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
-              CCTNS v4.2 Cognitive Analytical Engine
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
-            Specialized Crime & Intelligence Workbench
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-3xl">
-            Multi-modal investigation tools engineered for Karnataka State Police crime analysts: Modus Operandi Linkage, 24×7 Chrono-Temporal Forecaster, Rossmo Geographic Profiling, Telemetry Fusion, Analysis of Competing Hypotheses (ACH), and Court-Admissible Dossier Generation.
+          <p className="text-xs text-slate-500 font-sans mt-0.5">
+            Multi-modal analytical suite: MO Linkage, Chrono Forecasting, Rossmo Profiling, Telemetry Fusion & Legal Dossiers.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="px-4 py-2 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-xs font-mono">
-            <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-              <span>Real-Time CCTNS Synced</span>
-            </div>
-            <span className="text-[10px] text-slate-500">5,35,815 Active Records</span>
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="px-3 py-1.5 rounded-xl bg-teal-50/70 border border-teal-200/80 text-xs flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
+            <span className="text-[11px] font-semibold text-teal-800">5.35L Records Synced</span>
           </div>
         </div>
       </div>
 
       {/* ── TOOL NAVIGATION TABS ── */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200 dark:border-slate-800">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b border-slate-200/80">
         {[
-          { id: 'mo_linker', label: 'MO Linkage & Cold Case Matcher', icon: Fingerprint, badge: 'Similarity Engine' },
-          { id: 'chrono_forecaster', label: '24×7 Chrono Matrix & Forecaster', icon: Clock, badge: 'Strike Prediction' },
-          { id: 'geo_profiling', label: 'Rossmo Geographic Profiler', icon: MapPin, badge: 'Anchor Base' },
-          { id: 'telemetry_fusion', label: 'ANPR + CDR + CCTV Fusion', icon: Radio, badge: 'Sensor Corroboration' },
-          { id: 'ach_matrix', label: 'ACH Hypothesis Matrix', icon: Scale, badge: 'Bias Elimination' },
-          { id: 'legal_dossier', label: 'Court Dossier & Bail Opp. Generator', icon: FileText, badge: 'BNS 2023 / BSA §63' }
+          { id: 'mo_linker', label: 'MO Linkage & Matcher', icon: Fingerprint, badge: 'Similarity' },
+          { id: 'chrono_forecaster', label: '24×7 Chrono Matrix', icon: Clock, badge: 'Forecast' },
+          { id: 'geo_profiling', label: 'Rossmo Geographic Profiler', icon: MapPin, badge: 'Geo Anchor' },
+          { id: 'telemetry_fusion', label: 'Telemetry Multi-Sensor Fusion', icon: Radio, badge: 'Corroboration' },
+          { id: 'ach_matrix', label: 'ACH Hypothesis Matrix', icon: Scale, badge: 'Evidence Bias' },
+          { id: 'legal_dossier', label: 'Court Dossier Generator', icon: FileText, badge: 'BNS/BSA' }
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -311,18 +303,18 @@ export default function AnalystWorkbench() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as WorkbenchTab)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 isActive
-                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-md scale-102'
-                  : 'bg-white dark:bg-[#18181B] text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'
+                  ? 'bg-[#0F5257] text-white shadow-xs font-bold'
+                  : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-slate-200/80'
               }`}
             >
-              <Icon className={`w-4 h-4 ${isActive ? 'text-blue-400 dark:text-blue-600' : 'text-slate-400'}`} />
+              <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-teal-300' : 'text-slate-400'}`} />
               <span>{tab.label}</span>
-              <span className={`text-[9px] px-2 py-0.5 rounded-full font-mono font-medium ${
+              <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-medium ${
                 isActive 
-                  ? 'bg-white/20 text-white dark:bg-black/10 dark:text-black' 
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                  ? 'bg-white/20 text-white' 
+                  : 'bg-slate-100 text-slate-500'
               }`}>
                 {tab.badge}
               </span>
