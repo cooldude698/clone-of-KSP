@@ -1,4 +1,4 @@
-import { Montserrat, Open_Sans } from "next/font/google";
+import { Montserrat, Open_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import ThemeProvider from "@/components/ThemeProvider";
@@ -16,6 +16,13 @@ const openSans = Open_Sans({
   variable: "--font-open-sans",
   display: "swap",
   weight: ["300", "400", "500", "600", "700", "800"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata = {
@@ -44,7 +51,7 @@ const themeScript = `
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${montserrat.variable} ${openSans.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${montserrat.variable} ${openSans.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=3" />

@@ -211,7 +211,7 @@ const DrishtiOrb = ({
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500"></span>
                     </span>
-                    <span className="text-[10px] text-cyan-400 uppercase tracking-widest font-bold font-mono">
+                    <span className="text-[11px] text-cyan-400 uppercase tracking-widest font-bold font-sans">
                       LISTENING TO VOICE…
                     </span>
                   </div>
@@ -223,7 +223,7 @@ const DrishtiOrb = ({
                     ✕
                   </button>
                 </div>
-                <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-800 text-xs text-cyan-100 font-mono leading-relaxed shadow-inner">
+                <div className="p-3.5 bg-slate-950/90 rounded-xl border border-cyan-500/30 text-sm text-cyan-100 font-sans font-medium leading-relaxed shadow-inner">
                   &quot;{liveTranscript}&quot;
                 </div>
               </div>
@@ -235,7 +235,7 @@ const DrishtiOrb = ({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <span className="text-xs">🎙️</span>
-                    <span className="text-[10px] text-cyan-400 uppercase tracking-wider font-bold font-mono">
+                    <span className="text-[11px] text-cyan-400 uppercase tracking-wider font-bold font-sans">
                       VOICE TRANSCRIPT VERIFICATION
                     </span>
                   </div>
@@ -248,7 +248,7 @@ const DrishtiOrb = ({
                   </button>
                 </div>
 
-                <div className="p-3 bg-slate-950/90 rounded-xl border border-blue-500/40 text-xs text-slate-100 font-medium leading-relaxed shadow-inner">
+                <div className="p-3.5 bg-slate-950/90 rounded-xl border border-blue-500/40 text-sm text-slate-100 font-sans font-medium leading-relaxed shadow-inner">
                   &quot;{pendingTranscript}&quot;
                 </div>
 
@@ -258,7 +258,7 @@ const DrishtiOrb = ({
                     className="flex-1 py-2 px-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-xl shadow-md shadow-blue-600/30 flex items-center justify-center gap-1.5 transition-all active:scale-98 cursor-pointer"
                   >
                     <span>Send Query</span>
-                    <span className="text-[10px] opacity-80 font-mono px-1 py-0.2 bg-black/30 rounded">↵</span>
+                    <span className="text-[10px] opacity-80 font-sans px-1 py-0.2 bg-black/30 rounded">↵</span>
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); onCancelTranscript?.(); }}
@@ -280,11 +280,11 @@ const DrishtiOrb = ({
                       🛡️
                     </div>
                     <div>
-                      <span className="font-mono text-[11px] font-bold tracking-wider text-white uppercase">
+                      <span className="font-sans text-xs font-bold tracking-wider text-white uppercase">
                         DRISHTI INTEL HUD
                       </span>
                     </div>
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[9px] font-mono text-emerald-400 font-semibold">
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[9px] font-sans text-emerald-400 font-semibold">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       LIVE
                     </span>
