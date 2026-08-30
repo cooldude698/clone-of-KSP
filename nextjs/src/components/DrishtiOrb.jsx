@@ -1,45 +1,11 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
-import { useTheme } from 'next-themes';
-import { AgentAudioVisualizerAura } from '@/components/agents-ui/agent-audio-visualizer-aura';
+import React, { useEffect, useState } from 'react';
+import { VoicePoweredOrb } from '@/components/ui/voice-powered-orb';
 import PoliceIntelligenceRenderer from '@/components/PoliceIntelligenceRenderer';
 
 const cn = (...classes) => classes.filter(Boolean).join(' ');
 
-// Exact color and colorShift specifications from user requirements
-const AURA_STATE_CONFIG = {
-  connecting: {
-    color: '#2bff00',
-    colorShift: 0.62,
-    state: 'connecting',
-  },
-  listening: {
-    color: '#0066ff',
-    colorShift: 0.83,
-    state: 'listening',
-  },
-  speaking: {
-    color: '#00ff09',
-    colorShift: 0.3,
-    state: 'speaking',
-  },
-  thinking: {
-    color: '#ff0026',
-    colorShift: 0.18,
-    state: 'thinking',
-  },
-  processing: {
-    color: '#ff0026',
-    colorShift: 0.18,
-    state: 'thinking',
-  },
-  idle: {
-    color: '#0066ff',
-    colorShift: 0.83,
-    state: 'listening',
-  },
-};
 
 const DrishtiOrb = ({
   state = 'idle',
@@ -76,7 +42,6 @@ const DrishtiOrb = ({
 }) => {
   const [isClient, setIsClient] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
-  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     setIsClient(true);
@@ -188,9 +153,8 @@ const DrishtiOrb = ({
     onClick?.(e);
   };
 
-  // Determine current Aura configuration based on effective state
+  // Determine current effective state for hue mapping
   const effectiveState = isListening ? 'listening' : state;
-  const config = AURA_STATE_CONFIG[effectiveState] || AURA_STATE_CONFIG.idle;
 
   if (!isClient) return null;
 
@@ -199,18 +163,18 @@ const DrishtiOrb = ({
     return (
       <div
         className={cn(
-          "relative flex items-center justify-center cursor-pointer select-none transition-transform hover:scale-105 active:scale-95",
+          "relative flex items-center justify-center cursor-pointer select-none transition-transform hover:scale-105 active:scale-95 w-14 h-14",
           className
         )}
         onClick={handleOrbClick}
       >
-        <AgentAudioVisualizerAura
-          size="sm"
-          color={config.color}
-          colorShift={config.colorShift}
-          state={config.state}
-          themeMode={resolvedTheme === 'light' ? 'light' : 'dark'}
-          className="w-14 h-14"
+        <VoicePoweredOrb
+          enableVoiceControl={isListening}
+          hue={effectiveState === 'thinking' || effectiveState === 'processing' ? 120 : 0}
+          voiceSensitivity={2.0}
+          maxRotationSpeed={1.5}
+          maxHoverIntensity={0.6}
+          className="w-full h-full rounded-full overflow-hidden"
         />
       </div>
     );
@@ -438,7 +402,7 @@ const DrishtiOrb = ({
         </div>
       )}
 
-      {/* ── AURA AUDIO VISUALIZER ── */}
+      {/* ── VOICE POWERED ORB (WebGL Shader) ── */}
       <div
         onClick={handleOrbClick}
         onMouseDown={onMouseDown}
@@ -450,13 +414,13 @@ const DrishtiOrb = ({
           className
         )}
       >
-        <AgentAudioVisualizerAura
-          size="lg"
-          color={config.color}
-          colorShift={config.colorShift}
-          state={config.state}
-          themeMode={resolvedTheme === 'light' ? 'light' : 'dark'}
-          className="w-full h-full"
+        <VoicePoweredOrb
+          enableVoiceControl={isListening}
+          hue={effectiveState === 'thinking' || effectiveState === 'processing' ? 120 : 0}
+          voiceSensitivity={2.0}
+          maxRotationSpeed={1.5}
+          maxHoverIntensity={0.8}
+          className="w-full h-full rounded-full overflow-hidden"
         />
       </div>
 
