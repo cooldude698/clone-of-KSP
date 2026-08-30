@@ -80,12 +80,23 @@ function AnalystHeader() {
         />
       </div>
 
-      {/* Right Controls: Language, Drishti AI Button, Bell, Avatar, Theme */}
-      <div className="flex items-center gap-3">
-        {/* Language selector pill */}
-        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300">
-          <Globe className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-          <span>EN</span>
+      {/* Right Controls: Quick Role Switcher, Telemetry Badges, Language, Drishti AI Button, Bell, Avatar */}
+      <div className="flex items-center gap-3 sm:gap-4">
+        {/* Quick Role Switcher */}
+        <QuickRoleSwitcher />
+
+        {/* Real-time Analyst Status Badges (Teal Palette) */}
+        <div className="hidden lg:flex items-center gap-2">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-700 shadow-xs text-xs font-semibold">
+            <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
+            <span className="text-[10px] uppercase font-mono font-bold">SCRB SYNC:</span>
+            <span className="text-[11px] font-mono font-bold">5.35L FIRS</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-50 border border-violet-200 text-violet-700 shadow-xs text-xs font-semibold">
+            <span className="text-[10px] uppercase font-mono font-bold">AI ACCURACY:</span>
+            <span className="text-[11px] font-mono font-bold">97.4%</span>
+          </div>
         </div>
 
         {/* Drishti AI pill button */}
