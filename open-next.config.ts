@@ -1,7 +1,25 @@
 import fs from 'fs';
 import path from 'path';
 
-// Hook into process exit to delete heavy unused functions from .open-next output directory
+// Helper to recursively delete .bin directories
+function removeBinDirs(dir: string) {
+  if (!fs.existsSync(dir)) return;
+  const files = fs.readdirSync(dir);
+  for (const file of files) {
+    const filePath = path.join(dir, file);
+    const stat = fs.statSync(filePath);
+    if (stat.isDirectory()) {
+      if (file === '.bin') {
+        fs.rmSync(filePath, { recursive: true, force: true });
+        console.log(`[Slate Hook] Deleted symlink directory: ${filePath}`);
+      } else {
+        removeBinDirs(filePath);
+      }
+    }
+  }
+}
+
+// Hook into process exit to delete symbolic links from .open-next node_modules directories
 process.on('exit', () => {
   try {
     const paths = [
@@ -10,22 +28,12 @@ process.on('exit', () => {
     ];
     for (const openNextDir of paths) {
       if (fs.existsSync(openNextDir)) {
-        const targets = [
-          'image-optimization-function',
-          'warmer-function',
-          'revalidation-function'
-        ];
-        for (const target of targets) {
-          const targetPath = path.join(openNextDir, target);
-          if (fs.existsSync(targetPath)) {
-            fs.rmSync(targetPath, { recursive: true, force: true });
-            console.log(`[Slate Hook] Purged ${target} successfully from ${openNextDir}`);
-          }
-        }
+        removeBinDirs(openNextDir);
+        console.log(`[Slate Hook] Cleaned up symlinks inside ${openNextDir}`);
       }
     }
   } catch (err) {
-    console.error('[Slate Hook] Failed to clean .open-next:', err);
+    console.error('[Slate Hook] Failed to clean symlinks:', err);
   }
 });
 
