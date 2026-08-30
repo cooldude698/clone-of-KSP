@@ -22,6 +22,7 @@ import {
   Sliders
 } from 'lucide-react';
 import DrishtiLogo from '@/components/DrishtiLogo';
+import QuickRoleSwitcher from '@/components/QuickRoleSwitcher';
 import { LanguageProvider, useLanguage } from '@/context/LanguageContext';
 import { AnalystTelemetryProvider } from '@/context/AnalystTelemetryContext';
 
@@ -72,20 +73,23 @@ function AnalystHeader() {
       </div>
 
       {/* Right Controls: Quick Role Switcher, Telemetry Badges, Language, Drishti AI Button, Bell, Avatar */}
-      <div className="flex items-center gap-3 sm:gap-4">
+      <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
         {/* Real-time Analyst Status Badges (Teal / Violet Palette) */}
-        <div className="hidden lg:flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-700 shadow-xs text-xs font-semibold">
+        <div className="hidden xl:flex items-center gap-2">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-700 shadow-xs text-xs font-semibold whitespace-nowrap">
             <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
             <span className="text-[10px] uppercase font-mono font-bold">SCRB SYNC:</span>
             <span className="text-[11px] font-mono font-bold">5.35L FIRS</span>
           </div>
 
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-50 border border-violet-200 text-violet-700 shadow-xs text-xs font-semibold">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-50 border border-violet-200 text-violet-700 shadow-xs text-xs font-semibold whitespace-nowrap">
             <span className="text-[10px] uppercase font-mono font-bold">AI ACCURACY:</span>
             <span className="text-[11px] font-mono font-bold">97.4%</span>
           </div>
         </div>
+
+        {/* Quick Role Switcher */}
+        <QuickRoleSwitcher />
 
         {/* Language Selector Dropdown */}
         <div className="relative" ref={langRef}>

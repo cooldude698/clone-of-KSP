@@ -8,7 +8,8 @@ import {
   ArrowUpDown, ChevronDown, MoreVertical, Wifi,
   Cpu, Car, Laptop, Home, ShieldAlert, Activity,
   Users, CheckCircle2, AlertCircle, ArrowUpRight, Sparkles, ChevronRight, X,
-  Fingerprint, Clock, Radio, Scale, SlidersHorizontal, GitBranch, Binary, Layers
+  Fingerprint, Clock, Radio, Scale, SlidersHorizontal, GitBranch, Binary, Layers,
+  TrendingUp, Target
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { fetchWithFallback } from '@/lib/fetch-with-fallback';
@@ -346,9 +347,10 @@ export default function AnalystIntelligenceHub() {
         </div>
 
         {/* RIGHT COLUMN: CASES ANALYZED THIS MONTH + STATE TARGET (4 COLS) */}
-        <div className="lg:col-span-4 flex flex-col justify-between">
-          <div className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs flex-1 flex flex-col justify-between">
-            <div className="flex items-center justify-between">
+        {/* RIGHT COLUMN: CASES ANALYZED THIS MONTH + STATE TARGET (4 COLS) */}
+        <div className="lg:col-span-4 rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs flex flex-col justify-between h-full space-y-4">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between text-slate-400">
               <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">
                 {timeFilter === 'Day'
                   ? 'Cases Analyzed Today'
@@ -358,44 +360,43 @@ export default function AnalystIntelligenceHub() {
                   ? 'Cases Analyzed This Year'
                   : 'Cases Analyzed This Month'}
               </span>
-              <button className="text-slate-400 hover:text-[#0F5257] transition-colors">
-                <MoreVertical className="w-4 h-4" />
-              </button>
+              <span className="flex items-center gap-1 text-[11px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
+                <TrendingUp className="w-3 h-3" />
+                +5.8% Velocity
+              </span>
             </div>
 
-            <div className="my-2">
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl sm:text-4xl font-mono font-extrabold tracking-tight text-[#14201F]">
-                  {timeFilter === 'Day'
-                    ? '98.1%'
-                    : timeFilter === 'Week'
-                    ? '95.4%'
-                    : timeFilter === 'Year'
-                    ? '89.7%'
-                    : '92.4%'}
-                </span>
-                <span className="text-xs font-mono font-medium text-slate-400">
-                  / {timeFilter === 'Day'
-                    ? '28 Case Files'
-                    : timeFilter === 'Week'
-                    ? '112 Case Files'
-                    : timeFilter === 'Year'
-                    ? '4,120 Case Files'
-                    : '340 Case Files'}
-                </span>
-              </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl sm:text-4xl font-mono font-extrabold tracking-tight text-[#14201F]">
+                {timeFilter === 'Day'
+                  ? '98.1%'
+                  : timeFilter === 'Week'
+                  ? '95.4%'
+                  : timeFilter === 'Year'
+                  ? '89.7%'
+                  : '92.4%'}
+              </span>
+              <span className="text-xs font-mono font-medium text-slate-400">
+                / {timeFilter === 'Day'
+                  ? '28 Case Files'
+                  : timeFilter === 'Week'
+                  ? '112 Case Files'
+                  : timeFilter === 'Year'
+                  ? '4,120 Case Files'
+                  : '340 Case Files'}
+              </span>
             </div>
 
             {/* Time Filter Pills */}
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-xs font-mono font-semibold text-slate-500">
+            <div className="flex items-center justify-between p-1 rounded-2xl bg-slate-100 border border-slate-200/80 text-xs font-semibold">
               {(['Day', 'Week', 'Month', 'Year'] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setTimeFilter(tab)}
-                  className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                  className={`flex-1 py-1.5 rounded-xl transition-all cursor-pointer text-center ${
                     timeFilter === tab
                       ? 'bg-[#0F5257] text-white shadow-xs font-bold'
-                      : 'hover:text-[#0F5257]'
+                      : 'text-slate-500 hover:text-[#0F5257]'
                   }`}
                 >
                   {tab}
@@ -404,8 +405,8 @@ export default function AnalystIntelligenceHub() {
             </div>
 
             {/* SMOOTH CURVED SVG SPLINE CHART (TEAL #0F5257 / VIOLET #6C4DE6) */}
-            <div className="relative mt-5 h-28 w-full">
-              <svg viewBox="0 0 300 100" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+            <div className="relative mt-2 h-36 w-full">
+              <svg viewBox="0 0 300 110" className="w-full h-full overflow-visible" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="analystChartGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#0F5257" stopOpacity="0.2" />
@@ -413,15 +414,19 @@ export default function AnalystIntelligenceHub() {
                   </linearGradient>
                 </defs>
 
+                {/* Baseline Grid lines */}
+                <line x1="0" y1="30" x2="300" y2="30" stroke="currentColor" strokeDasharray="3 3" className="text-slate-100" strokeWidth="1" />
+                <line x1="0" y1="70" x2="300" y2="70" stroke="currentColor" strokeDasharray="3 3" className="text-slate-100" strokeWidth="1" />
+
                 <path
                   d={
                     timeFilter === 'Day'
-                      ? 'M 0,80 C 40,75 70,60 100,48 C 130,35 160,55 190,30 C 220,15 240,25 260,18 C 280,15 290,22 300,18 L 300,100 L 0,100 Z'
+                      ? 'M 0,85 C 40,80 70,65 100,50 C 130,35 160,55 190,30 C 220,15 240,25 260,18 C 280,15 290,22 300,18 L 300,110 L 0,110 Z'
                       : timeFilter === 'Week'
-                      ? 'M 0,72 C 30,60 60,75 90,42 C 120,25 150,52 180,32 C 210,14 230,28 250,20 C 275,15 290,28 300,22 L 300,100 L 0,100 Z'
+                      ? 'M 0,78 C 30,65 60,80 90,45 C 120,28 150,55 180,35 C 210,16 230,30 250,22 C 275,16 290,30 300,24 L 300,110 L 0,110 Z'
                       : timeFilter === 'Year'
-                      ? 'M 0,85 C 40,72 80,60 120,48 C 160,38 200,28 240,18 C 260,14 275,12 300,10 L 300,100 L 0,100 Z'
-                      : 'M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45 L 300,100 L 0,100 Z'
+                      ? 'M 0,90 C 40,75 80,62 120,50 C 160,40 200,30 240,20 C 260,15 275,13 300,10 L 300,110 L 0,110 Z'
+                      : 'M 0,70 C 20,45 40,85 70,55 C 100,25 120,75 150,50 C 180,24 200,12 230,15 C 250,18 270,75 300,48 L 300,110 L 0,110 Z'
                   }
                   fill="url(#analystChartGrad)"
                   className="transition-all duration-500"
@@ -430,27 +435,76 @@ export default function AnalystIntelligenceHub() {
                 <path
                   d={
                     timeFilter === 'Day'
-                      ? 'M 0,80 C 40,75 70,60 100,48 C 130,35 160,55 190,30 C 220,15 240,25 260,18 C 280,15 290,22 300,18'
+                      ? 'M 0,85 C 40,80 70,65 100,50 C 130,35 160,55 190,30 C 220,15 240,25 260,18 C 280,15 290,22 300,18'
                       : timeFilter === 'Week'
-                      ? 'M 0,72 C 30,60 60,75 90,42 C 120,25 150,52 180,32 C 210,14 230,28 250,20 C 275,15 290,28 300,22'
+                      ? 'M 0,78 C 30,65 60,80 90,45 C 120,28 150,55 180,35 C 210,16 230,30 250,22 C 275,16 290,30 300,24'
                       : timeFilter === 'Year'
-                      ? 'M 0,85 C 40,72 80,60 120,48 C 160,38 200,28 240,18 C 260,14 275,12 300,10'
-                      : 'M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45'
+                      ? 'M 0,90 C 40,75 80,62 120,50 C 160,40 200,30 240,20 C 260,15 275,13 300,10'
+                      : 'M 0,70 C 20,45 40,85 70,55 C 100,25 120,75 150,50 C 180,24 200,12 230,15 C 250,18 270,75 300,48'
                   }
                   fill="none"
                   stroke="#0F5257"
-                  strokeWidth="2.5"
+                  strokeWidth="3"
                   strokeLinecap="round"
                   className="transition-all duration-500"
                 />
+
+                {/* Peak Point */}
+                <circle
+                  cx="300"
+                  cy={timeFilter === 'Year' ? 10 : timeFilter === 'Day' ? 18 : timeFilter === 'Week' ? 24 : 48}
+                  r="4"
+                  fill="#0F5257"
+                  className="animate-pulse"
+                />
               </svg>
+
+              {/* X-Axis Timeline Markers */}
+              <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-2 border-t border-slate-100">
+                <span>{timeFilter === 'Day' ? '06:00' : timeFilter === 'Week' ? 'Mon' : timeFilter === 'Year' ? 'Q1 2026' : 'Week 1'}</span>
+                <span>{timeFilter === 'Day' ? '12:00' : timeFilter === 'Week' ? 'Wed' : timeFilter === 'Year' ? 'Q2' : 'Week 2'}</span>
+                <span>{timeFilter === 'Day' ? '18:00' : timeFilter === 'Week' ? 'Fri' : timeFilter === 'Year' ? 'Q3' : 'Week 3'}</span>
+                <span className="font-bold text-[#0F5257]">{timeFilter === 'Day' ? 'Now' : timeFilter === 'Week' ? 'Sun' : timeFilter === 'Year' ? 'Q4 (Active)' : 'Week 4'}</span>
+              </div>
+            </div>
+
+            {/* 2-Column Analyst Velocity Stats */}
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-between">
+                <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
+                  <Clock className="w-3.5 h-3.5 text-[#0F5257]" />
+                  <span>Avg. Extraction</span>
+                </div>
+                <p className="text-base font-extrabold text-[#14201F] mt-1 font-mono">
+                  {timeFilter === 'Day' ? '1.2 sec' : timeFilter === 'Week' ? '1.4 sec' : timeFilter === 'Year' ? '1.9 sec' : '1.5 sec'}
+                </p>
+                <span className="text-[10px] text-teal-700 font-semibold font-mono">
+                  Neural Core Sync
+                </span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-between">
+                <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
+                  <Fingerprint className="w-3.5 h-3.5 text-[#6C4DE6]" />
+                  <span>Cluster Accuracy</span>
+                </div>
+                <p className="text-base font-extrabold text-[#14201F] mt-1 font-mono">
+                  {timeFilter === 'Day' ? '98.6%' : timeFilter === 'Week' ? '97.8%' : timeFilter === 'Year' ? '96.4%' : '97.4%'}
+                </p>
+                <span className="text-[10px] text-slate-500 font-semibold font-mono">
+                  Bayesian Validated
+                </span>
+              </div>
             </div>
           </div>
 
           {/* THE ONE DARK EXCEPTION: SUMMARY / TARGET CARD (DEEP TEAL ACCENT) */}
-          <div className="mt-4 p-4 rounded-xl bg-[#0F5257] text-white flex items-center justify-between shadow-sm border border-[#0F5257]">
+          <div className="p-4 rounded-xl bg-[#0F5257] text-white flex items-center justify-between shadow-sm border border-[#0F5257]">
             <div>
-              <p className="text-[10px] text-teal-200 font-mono font-medium">SCRB // PLAN 2026</p>
+              <div className="flex items-center gap-1.5">
+                <Target className="w-3.5 h-3.5 text-teal-300" />
+                <p className="text-[10px] text-teal-200 font-mono font-medium uppercase tracking-wider">SCRB // PLAN 2026</p>
+              </div>
               <p className="text-xs font-mono font-bold text-white mt-0.5 uppercase tracking-wide">Extraction Target</p>
             </div>
 
@@ -464,16 +518,25 @@ export default function AnalystIntelligenceHub() {
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
                 <path
-                  className="text-[#6C4DE6]"
-                  strokeDasharray="90, 100"
+                  className="text-teal-300"
+                  strokeDasharray={`${
+                    timeFilter === 'Day' ? 98 :
+                    timeFilter === 'Week' ? 95 :
+                    timeFilter === 'Year' ? 90 :
+                    92
+                  }, 100`}
                   strokeWidth="4"
                   strokeLinecap="round"
                   stroke="currentColor"
                   fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
               </svg>
               <span className="absolute text-[11px] font-bold text-white font-mono">
-                90%
+                {timeFilter === 'Day' ? '98%' :
+                 timeFilter === 'Week' ? '95%' :
+                 timeFilter === 'Year' ? '90%' :
+                 '92%'}
               </span>
             </div>
           </div>
