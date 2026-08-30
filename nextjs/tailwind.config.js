@@ -60,9 +60,19 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-google-sans)', '"Google Sans"', '"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        heading: ['var(--font-montserrat)', 'Montserrat', '"Google Sans"', 'sans-serif'],
-        mono: ['var(--font-google-sans)', '"Google Sans"', '"Plus Jakarta Sans"', '-apple-system', 'sans-serif'],
+        sans: ['var(--font-open-sans)', '"Open Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        display: ['var(--font-montserrat)', 'Montserrat', 'sans-serif'],
+        heading: ['var(--font-montserrat)', 'Montserrat', 'sans-serif'],
+        montserrat: ['var(--font-montserrat)', 'Montserrat', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'monospace', 'var(--font-open-sans)', 'sans-serif'],
+      },
+      borderRadius: {
+        '2xl': '1rem',
+        '3xl': '1.5rem',
+        '4xl': '2rem',
+        'organic': '1.75rem',
+        'organic-lg': '2.25rem',
+        'pill': '9999px',
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
