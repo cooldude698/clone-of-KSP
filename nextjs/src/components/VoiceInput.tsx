@@ -46,6 +46,11 @@ export default function VoiceInput({ onTranscription, onError, disabled = false 
     };
 
     recognition.onerror = (event: any) => {
+      if (event.error === 'no-speech' || event.error === 'aborted') {
+        setIsRecording(false);
+        setStatusText('Tap to speak');
+        return;
+      }
       console.error('Speech recognition error:', event.error);
       onError('Voice recognition error: ' + event.error);
       setIsRecording(false);

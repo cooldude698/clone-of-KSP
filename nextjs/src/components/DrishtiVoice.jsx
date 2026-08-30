@@ -122,19 +122,19 @@ const useDrishtiVoice = ({
     // Fix 1: auto-restart recognition if Chrome closes session on silence while user wants mic ON
     rec.onerror = (e) => {
       const err = e.error;
-      setError(err);
-      if (err !== 'no-speech') {
-        consecutiveErrorsRef.current += 1;
-      }
-      if (err === 'aborted') return;
-      if (err === 'no-speech') {
-        if (isPttPressedRef.current && !isRecognitionRunningRef.current) {
-          try { rec.start(); } catch (_) {}
-        } else if (!isPttPressedRef.current) {
-          setIsListening(false);
+      if (err === 'no-speech' || err === 'aborted') {
+        setError(null);
+        if (err === 'no-speech') {
+          if (isPttPressedRef.current && !isRecognitionRunningRef.current) {
+            try { rec.start(); } catch (_) {}
+          } else if (!isPttPressedRef.current) {
+            setIsListening(false);
+          }
         }
         return;
       }
+      setError(err);
+      consecutiveErrorsRef.current += 1;
       if (err === 'language-not-supported' || (err === 'network' && langRef.current?.startsWith('kn'))) {
         console.warn('[Drishti] kn-IN not supported by browser speech engine, falling back to en-IN preview');
         langRef.current = 'en-IN';
