@@ -3,7 +3,19 @@
     {
       "name": "drishti-ssr",
       "source": "nextjs",
-      "build_path": "."
+      "build_path": ".",
+      "ignore": [
+        "**/node_modules/**",
+        "**/.git/**",
+        "**/.cache/**",
+        "**/*.log",
+        "public/videos/**",
+        "**/crime-database/**",
+        "**/sample_firs/**",
+        "**/*.zip",
+        "**/.next/cache/**",
+        "**/.next/trace"
+      ]
     }
   ],
   "functions": {
