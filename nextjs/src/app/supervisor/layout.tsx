@@ -19,7 +19,6 @@ import {
   LogOut,
   Clock,
   Shield,
-  ArrowLeftRight,
   Sparkles,
   Search,
   Globe,
@@ -292,21 +291,6 @@ function SupervisorSidebar({ collapsed, setCollapsed }: { collapsed: boolean; se
         })}
       </nav>
 
-      {/* Portal Switch Link to Inspector */}
-      {!collapsed && (
-        <div className="px-3 py-2">
-          <Link
-            href="/dashboard"
-            className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl bg-gray-50 hover:bg-gray-100 border border-gray-100 text-xs font-semibold text-gray-600 transition-all group"
-          >
-            <span className="flex items-center gap-2">
-              <ArrowLeftRight className="w-3.5 h-3.5 text-blue-500" />
-              Inspector Portal
-            </span>
-            <span className="text-[10px] font-mono text-gray-400">Switch →</span>
-          </Link>
-        </div>
-      )}
 
       {/* User Profile Footer */}
       <div className={`p-4 border-t border-gray-100 ${collapsed ? 'flex flex-col items-center gap-2' : ''}`}>
