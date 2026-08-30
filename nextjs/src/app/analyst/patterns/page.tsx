@@ -172,11 +172,22 @@ export default function PatternIntelligencePage() {
           </p>
         </div>
 
-        {/* Dynamic 3s Pulse indicator */}
-        <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[var(--surface-0)] border border-[var(--border)] text-xs font-mono">
-          <span className="w-2.5 h-2.5 rounded-full bg-[var(--cyan-accent)] animate-spin" />
-          <span className="text-[var(--text-secondary)] font-bold uppercase">SCANNER:</span>
-          <span className="text-[var(--text-primary)] font-bold">5 Signatures Active</span>
+        {/* Dynamic Action Buttons */}
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href="/analyst/workbench?tool=mo_linker"
+            className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm"
+          >
+            <Fingerprint className="w-3.5 h-3.5" />
+            <span>Interactive MO Matcher</span>
+          </Link>
+          <Link
+            href="/analyst/workbench?tool=chrono_forecaster"
+            className="px-3.5 py-2 rounded-xl bg-[var(--surface-0)] border border-[var(--border)] hover:bg-[var(--surface-2)] text-[var(--text-primary)] font-bold text-xs flex items-center gap-1.5 transition-all"
+          >
+            <Clock className="w-3.5 h-3.5 text-amber-500" />
+            <span>24×7 Chrono Forecaster</span>
+          </Link>
         </div>
       </div>
 

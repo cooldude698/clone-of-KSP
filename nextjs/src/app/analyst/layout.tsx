@@ -42,6 +42,7 @@ import { AnalystTelemetryProvider, useAnalystTelemetry } from '@/context/Analyst
 
 const ANALYST_NAV_ITEMS = [
   { href: '/analyst', icon: LayoutDashboard, label: 'Overview', id: 'nav-overview' },
+  { href: '/analyst/workbench', icon: SlidersHorizontal, label: 'Intel Workbench', id: 'nav-workbench' },
   { href: '/analyst/heatmap', icon: Map, label: 'Crime Map', id: 'nav-map' },
   { href: '/analyst/network', icon: GitBranch, label: 'Network Graph', id: 'nav-network' },
   { href: '/analyst/chat', icon: MessageSquare, label: 'Co-Pilot Chat', id: 'nav-chat' },
