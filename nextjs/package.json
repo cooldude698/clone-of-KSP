@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node scripts/hijack.js",
+    "build": "next build && node scripts/search-node-modules.js && node scripts/hijack.js",
     "postbuild": "node -e \"const fs = require('fs'); fs.rmSync('.next/cache', { recursive: true, force: true }); console.log('Cleaned .next/cache completely');\"",
     "start": "next start",
     "lint": "next lint"
