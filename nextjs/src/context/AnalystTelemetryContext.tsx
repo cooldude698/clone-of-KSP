@@ -187,11 +187,12 @@ export function AnalystTelemetryProvider({ children }: { children: React.ReactNo
       setIsPulseActive(false);
       setTimeout(() => setIsPulseActive(true), 150);
 
-      // Rotate/Inject new dynamic anomaly alert every 3s
+      // Rotate/Inject new dynamic anomaly alert every 3s with guaranteed unique key
       setAnomalies((prev) => {
         const nextTemplate = STREAMING_POOL[Math.floor(Math.random() * STREAMING_POOL.length)];
+        const uniqueId = `ANM-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
         const newEvent: AnomalyEvent = {
-          id: `ANM-${Math.floor(1000 + Math.random() * 9000)}`,
+          id: uniqueId,
           timestamp: 'Just now',
           type: nextTemplate.type,
           severity: nextTemplate.severity,
