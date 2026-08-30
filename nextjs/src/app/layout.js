@@ -1,4 +1,4 @@
-import { Montserrat, Plus_Jakarta_Sans } from "next/font/google";
+import { Montserrat, Open_Sans } from "next/font/google";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import ThemeProvider from "@/components/ThemeProvider";
@@ -11,9 +11,9 @@ const montserrat = Montserrat({
   weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
-const googleSans = Plus_Jakarta_Sans({
+const openSans = Open_Sans({
   subsets: ["latin"],
-  variable: "--font-google-sans",
+  variable: "--font-open-sans",
   display: "swap",
   weight: ["300", "400", "500", "600", "700", "800"],
 });
@@ -44,14 +44,15 @@ const themeScript = `
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${montserrat.variable} ${googleSans.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${montserrat.variable} ${openSans.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=3" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3" />
         <link rel="shortcut icon" href="/favicon.svg?v=3" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&family=Noto+Sans+Kannada:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Noto+Sans+Kannada:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
         {/* Blocking script prevents FOUC — runs before CSS paint */}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
