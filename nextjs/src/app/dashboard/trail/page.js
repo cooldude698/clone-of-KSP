@@ -1130,9 +1130,11 @@ export default function GeoTrailPage() {
             </button>
           </form>
 
-          {/* Quick Target Preset Badges (Clean, Horizontal Scrollable Pills) */}
-          <div className="flex items-center gap-1.5 overflow-x-auto max-w-full md:max-w-xl pb-1 scrollbar-none">
-            <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 shrink-0">Quick Targets:</span>
+          {/* Quick Target Preset Badges (Clean Wrap, No Horizontal Scrollbar) */}
+          <div className="flex items-center flex-wrap gap-1.5 justify-start md:justify-end max-w-full md:max-w-xl">
+            <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider shrink-0 mr-1">
+              Targets:
+            </span>
             {[
               { plate: 'KA-01-MJ-8821', label: 'Vector Escape', color: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800' },
               { plate: 'KA-05-HB-3342', label: '5-Hop Clean', color: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800' },
@@ -1148,7 +1150,7 @@ export default function GeoTrailPage() {
                   setSearchQuery(item.plate);
                   loadTrailForPlate(item.plate);
                 }}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold border transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 hover:scale-105 shadow-2xs ${item.color}`}
+                className={`px-2 py-0.5 rounded-md text-[11px] font-mono font-bold border transition-all cursor-pointer flex items-center gap-1 hover:brightness-95 active:scale-95 shadow-2xs ${item.color}`}
               >
                 <span>{item.plate}</span>
                 <span className="text-[9px] opacity-75 font-sans font-normal">({item.label})</span>
