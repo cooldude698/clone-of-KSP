@@ -333,30 +333,16 @@ export default function DashboardPage() {
         </div>
 
         {/* RIGHT COLUMN: CASES RESOLVED GRAPH CARD (4 COLS) */}
-<<<<<<< HEAD
-        <div className="lg:col-span-4 rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs flex flex-col justify-between h-full">
-          <div>
-            <div className="flex items-center justify-between text-slate-400">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wide font-mono">
-=======
+        {/* RIGHT COLUMN: CASES RESOLVED GRAPH CARD (4 COLS) */}
         <div className="lg:col-span-4 rounded-3xl bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col justify-between h-full space-y-4">
           <div className="space-y-4">
             <div className="flex items-center justify-between text-slate-400">
               <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
->>>>>>> 087f0bff3817d2a331610787dc9e0e5782f51f1f
                 {timeFilter === 'Day' ? 'Cases Resolved Today' :
                  timeFilter === 'Week' ? 'Cases Resolved This Week' :
                  timeFilter === 'Year' ? 'Cases Resolved This Year' :
                  'Cases Resolved This Month'}
               </p>
-<<<<<<< HEAD
-              <button className="text-slate-400 hover:text-slate-900">
-                <MoreVertical className="w-4 h-4" />
-              </button>
-            </div>
-            
-            <p className="text-3xl font-black text-[#14141A] mt-1 tracking-tight">
-=======
               <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
                 <TrendingUp className="w-3 h-3" />
                 +4.2% KPI
@@ -364,16 +350,11 @@ export default function DashboardPage() {
             </div>
             
             <p className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
->>>>>>> 087f0bff3817d2a331610787dc9e0e5782f51f1f
               {timeFilter === 'Day' ? '92.0%' :
                timeFilter === 'Week' ? '88.2%' :
                timeFilter === 'Year' ? '81.4%' :
                '84.5%'}
-<<<<<<< HEAD
-              <span className="text-sm font-semibold text-slate-500 ml-1.5 font-mono">
-=======
               <span className="text-xs sm:text-sm font-medium text-slate-500 ml-1.5">
->>>>>>> 087f0bff3817d2a331610787dc9e0e5782f51f1f
                 / {timeFilter === 'Day' ? '12 Dossiers' :
                    timeFilter === 'Week' ? '48 Dossiers' :
                    timeFilter === 'Year' ? '1,840 Dossiers' :
@@ -389,13 +370,8 @@ export default function DashboardPage() {
                   onClick={() => setTimeFilter(tab)}
                   className={`flex-1 py-1.5 rounded-xl transition-all cursor-pointer text-center ${
                     timeFilter === tab 
-<<<<<<< HEAD
-                      ? 'bg-[#14141A] text-white font-bold shadow-xs' 
-                      : 'hover:text-slate-900'
-=======
                       ? 'bg-white dark:bg-zinc-900 text-slate-900 dark:text-white font-extrabold shadow-xs' 
                       : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
->>>>>>> 087f0bff3817d2a331610787dc9e0e5782f51f1f
                   }`}
                 >
                   {tab}
@@ -403,15 +379,6 @@ export default function DashboardPage() {
               ))}
             </div>
 
-<<<<<<< HEAD
-            {/* SMOOTH CURVED SVG BEZIER SPLINE CHART (COBALT #2E5FE0) */}
-            <div className="relative mt-5 h-28 w-full">
-              <svg viewBox="0 0 300 100" className="w-full h-full overflow-visible" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#2E5FE0" stopOpacity="0.18" />
-                    <stop offset="100%" stopColor="#2E5FE0" stopOpacity="0.0" />
-=======
             {/* SMOOTH CURVED SVG BEZIER SPLINE CHART */}
             <div className="relative mt-2 h-36 w-full">
               <svg viewBox="0 0 300 110" className="w-full h-full overflow-visible" preserveAspectRatio="none">
@@ -419,7 +386,6 @@ export default function DashboardPage() {
                   <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#2563eb" stopOpacity="0.2" />
                     <stop offset="100%" stopColor="#2563eb" stopOpacity="0.0" />
->>>>>>> 087f0bff3817d2a331610787dc9e0e5782f51f1f
                   </linearGradient>
                 </defs>
                 
@@ -452,13 +418,8 @@ export default function DashboardPage() {
                       : 'M 0,70 C 20,45 40,85 70,55 C 100,25 120,75 150,50 C 180,24 200,12 230,15 C 250,18 270,75 300,48'
                   }
                   fill="none"
-<<<<<<< HEAD
-                  stroke="#2E5FE0"
-                  strokeWidth="2.5"
-=======
                   stroke="#2563eb"
                   strokeWidth="3"
->>>>>>> 087f0bff3817d2a331610787dc9e0e5782f51f1f
                   strokeLinecap="round"
                   className="transition-all duration-500"
                 />
@@ -513,12 +474,6 @@ export default function DashboardPage() {
           </div>
 
           {/* BOTTOM TARGET CARD */}
-<<<<<<< HEAD
-          <div className="mt-4 p-4 rounded-xl bg-[#14141A] text-white flex items-center justify-between shadow-sm">
-            <div>
-              <p className="text-[10px] text-slate-400 font-mono font-medium">FIELD OPS // PLAN 2026</p>
-              <p className="text-xs font-black text-white mt-0.5 uppercase tracking-wide">Clearance Target</p>
-=======
           <div className="p-4 rounded-2xl bg-slate-900 text-white flex items-center justify-between shadow-xs border border-slate-800">
             <div>
               <div className="flex items-center gap-1.5">
@@ -526,7 +481,6 @@ export default function DashboardPage() {
                 <p className="text-[10px] text-slate-400 font-mono font-bold uppercase tracking-wider">Plan for 2026</p>
               </div>
               <p className="text-xs font-extrabold text-white mt-0.5">Annual Clearance Target</p>
->>>>>>> 087f0bff3817d2a331610787dc9e0e5782f51f1f
             </div>
 
             <div className="relative w-12 h-12 flex items-center justify-center">
@@ -547,16 +501,11 @@ export default function DashboardPage() {
                   fill="none"
                 />
               </svg>
-<<<<<<< HEAD
-              <span className="absolute text-[11px] font-black text-white font-mono">
-                75%
-=======
               <span className="absolute text-[10px] font-black font-mono text-white">
                 {timeFilter === 'Day' ? '92%' :
                  timeFilter === 'Week' ? '88%' :
                  timeFilter === 'Year' ? '81%' :
                  '75%'}
->>>>>>> 087f0bff3817d2a331610787dc9e0e5782f51f1f
               </span>
             </div>
           </div>
