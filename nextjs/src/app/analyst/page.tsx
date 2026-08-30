@@ -108,6 +108,22 @@ export default function AnalystIntelligenceHub() {
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6 text-slate-900 dark:text-white">
       
+      {/* ── KPI METRIC STRIP ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          { label: 'FIRs Analyzed', value: '5,35,815', sub: 'CCTNS Live Sync', color: 'text-blue-600 dark:text-blue-400' },
+          { label: 'Active MO Rings', value: '4 Rings', sub: 'Cross-district', color: 'text-rose-600 dark:text-rose-400' },
+          { label: 'Repeat Offenders', value: '8 Flagged', sub: 'Warrant Active', color: 'text-amber-600 dark:text-amber-400' },
+          { label: 'AI Confidence', value: '97.4%', sub: 'Bayesian Core', color: 'text-emerald-600 dark:text-emerald-400' },
+        ].map((kpi) => (
+          <div key={kpi.label} className="rounded-2xl bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 p-4 shadow-sm flex flex-col gap-1">
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{kpi.label}</span>
+            <span className={`text-2xl font-extrabold tracking-tight ${kpi.color}`}>{kpi.value}</span>
+            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">{kpi.sub}</span>
+          </div>
+        ))}
+      </div>
+
       {/* ── TOP SECTION: COMMAND DASHBOARD GRID ── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         
