@@ -1227,10 +1227,10 @@ export default function GeoTrailPage() {
           icon={Search}
           title={`No Sightings Found for Plate "${searchedPlate}"`}
           description="No automated camera hits or CCTV sightings detected in the ANPR matrix for this plate."
-          className="py-16 bg-steel-700/20 border border-steel-600/30 rounded-xl"
+          className="py-16 bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm"
         >
           <div className="mt-4 flex flex-col items-center gap-3">
-            <p className="text-xs font-mono text-paper-100/60">Try searching active sample watchlists:</p>
+            <p className="text-xs font-medium text-slate-500">Try searching active sample watchlists:</p>
             <div className="flex flex-wrap items-center justify-center gap-2">
               {['KA-05-HB-3342', 'KA-01-MJ-8821', 'KA-09-RT-7765', 'KA-19-MN-4456', 'KA-25-BG-3310'].map((plate) => (
                 <button
@@ -1239,7 +1239,7 @@ export default function GeoTrailPage() {
                     setSearchQuery(plate);
                     loadTrailForPlate(plate);
                   }}
-                  className="px-3 py-1.5 rounded-lg bg-steel-700 hover:bg-steel-600 border border-steel-600/60 text-xs font-mono text-phosphor-500 transition-all cursor-pointer shadow-sm"
+                  className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-slate-300 dark:border-zinc-700 text-xs font-mono font-bold text-blue-600 dark:text-blue-400 transition-all cursor-pointer shadow-xs"
                 >
                   {plate}
                 </button>
@@ -1251,19 +1251,19 @@ export default function GeoTrailPage() {
         /* ── MAIN DUAL-PANEL GRID ─────────────────────────────────────────── */
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[620px] items-stretch">
           {/* ── LEFT: LEAFLET MAP & SCRUBBER PANEL (7 COLS) ─────────────────── */}
-          <div className="lg:col-span-7 flex flex-col min-h-[480px] lg:min-h-[620px] relative space-y-3">
-            <Card className="flex-1 p-2 relative overflow-hidden flex flex-col border border-steel-600/50 bg-steel-700/30 min-h-[450px] rounded-xl shadow-md">
+          <div className="lg:col-span-7 flex flex-col min-h-[480px] lg:min-h-[620px] relative space-y-4">
+            <div className="flex-1 p-2.5 relative overflow-hidden flex flex-col border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#18181B] min-h-[450px] rounded-2xl shadow-sm">
               {loading && (
-                <div className="absolute inset-0 z-50 bg-void-000/80 backdrop-blur-sm flex flex-col items-center justify-center">
+                <div className="absolute inset-0 z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center">
                   <Spinner size="lg" />
-                  <p className="text-xs font-mono text-paper-100/70 mt-3 animate-pulse">
+                  <p className="text-xs font-bold text-slate-700 dark:text-slate-300 mt-3 animate-pulse">
                     Reconstructing ANPR Spatial Vector Grid...
                   </p>
                 </div>
               )}
 
               {/* Map Canvas */}
-              <div className="w-full h-full min-h-[440px] rounded-lg overflow-hidden relative">
+              <div className="w-full h-full min-h-[440px] rounded-xl overflow-hidden relative">
                 <TrailMapView
                   trailData={trailData}
                   visibleHopsCount={visibleHopsCount}
@@ -1276,30 +1276,30 @@ export default function GeoTrailPage() {
                 {/* Map Overlay Top HUD Badge */}
                 {metadata && (
                   <div className="absolute top-3 left-3 z-[500] flex flex-wrap items-center gap-2 pointer-events-none">
-                    <div className="bg-[#1E2733]/95 backdrop-blur-md border border-[#48596D] rounded-lg px-3 py-1.5 shadow-xl flex items-center gap-2">
-                      <span className="text-[10px] font-mono text-[#EFEAE4]/70 uppercase tracking-wider font-semibold">
+                    <div className="bg-slate-900/95 text-white backdrop-blur-md border border-slate-700 rounded-xl px-3 py-1.5 shadow-xl flex items-center gap-2">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                         TARGET:
                       </span>
-                      <span className="text-xs font-mono font-bold text-[#4A8B6F]">
+                      <span className="text-xs font-mono font-black text-emerald-400">
                         {searchedPlate}
                       </span>
                     </div>
 
-                    <div className="bg-[#1E2733]/95 backdrop-blur-md border border-[#48596D] rounded-lg px-3 py-1.5 shadow-xl flex items-center gap-3 font-mono text-xs">
+                    <div className="bg-slate-900/95 text-white backdrop-blur-md border border-slate-700 rounded-xl px-3 py-1.5 shadow-xl flex items-center gap-3 text-xs">
                       <div>
-                        <span className="text-[#EFEAE4]/70 text-[10px] font-mono uppercase tracking-wider">
+                        <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider">
                           DISTANCE:
                         </span>{' '}
-                        <span className="font-semibold text-[#EFEAE4] font-mono">
+                        <span className="font-bold text-slate-100">
                           {metadata.totalHops === 1 ? '0.0 km' : `${metadata.totalDistance} km`}
                         </span>
                       </div>
-                      <span className="text-[#48596D]">|</span>
+                      <span className="text-slate-700">|</span>
                       <div>
-                        <span className="text-[#EFEAE4]/70 text-[10px] font-mono uppercase tracking-wider">
+                        <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider">
                           DURATION:
                         </span>{' '}
-                        <span className="font-semibold text-[#EFEAE4] font-mono">
+                        <span className="font-bold text-slate-100">
                           {metadata.totalHops === 1 ? '0m' : `${metadata.duration}m`}
                         </span>
                       </div>
@@ -1307,31 +1307,31 @@ export default function GeoTrailPage() {
                   </div>
                 )}
               </div>
-            </Card>
+            </div>
 
             {/* REPLAY SCRUBBER PANEL (HIDDEN SAFELY ON 1-HOP TRAIL) */}
             {trailData.length > 1 && (
-              <Card className="p-3.5 border border-steel-600/50 bg-steel-700/40 space-y-2.5 shrink-0 rounded-xl shadow-md">
-                <div className="flex items-center justify-between font-mono text-xs text-paper-100/70">
+              <div className="p-4 border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#18181B] space-y-3 shrink-0 rounded-2xl shadow-sm">
+                <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="text-phosphor-500 font-bold uppercase tracking-wider text-[11px] font-sans flex items-center gap-1.5">
-                      <Activity className="w-3.5 h-3.5 text-phosphor-500" />
+                    <span className="text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                      <Activity className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                       REPLAY VECTOR SCRUBBER
                     </span>
                   </div>
 
                   <div className="flex items-center gap-3">
                     {/* Speed Multiplier Buttons */}
-                    <div className="flex items-center gap-1 bg-steel-600/30 p-0.5 rounded-lg border border-steel-600/40">
+                    <div className="flex items-center gap-1 bg-slate-100 dark:bg-zinc-800 p-1 rounded-xl border border-slate-200 dark:border-zinc-700">
                       {[1, 2, 4].map((spd) => (
                         <button
                           key={spd}
                           type="button"
                           onClick={() => setPlaybackSpeed(spd)}
-                          className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all ${
+                          className={`px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-bold transition-all cursor-pointer ${
                             playbackSpeed === spd
-                              ? 'bg-phosphor-500 text-void-000 font-bold'
-                              : 'text-paper-100/60 hover:text-paper-100'
+                              ? 'bg-blue-600 text-white shadow-2xs'
+                              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                           }`}
                         >
                           {spd}x
@@ -1339,7 +1339,7 @@ export default function GeoTrailPage() {
                       ))}
                     </div>
 
-                    <span className="text-[11px] text-phosphor-500 font-mono font-bold">
+                    <span className="text-xs text-blue-600 dark:text-blue-400 font-mono font-bold">
                       {ghostPosition ? `${ghostPosition.currentTimeStr} IST` : '14:22:10 IST'}
                     </span>
                   </div>
@@ -1353,20 +1353,19 @@ export default function GeoTrailPage() {
                       if (scrubberPercent >= 100) setScrubberPercent(0);
                       setIsPlaying(!isPlaying);
                     }}
-                    className="p-2 rounded-lg bg-steel-600 hover:bg-steel-600/80 text-paper-100 transition-all shrink-0 focus:outline-none focus:border-phosphor-500 active:scale-95 shadow cursor-pointer"
+                    className="p-2.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 transition-all shrink-0 active:scale-95 shadow-xs cursor-pointer"
                     title={isPlaying ? 'Pause Replay' : 'Play Replay'}
                   >
                     {isPlaying ? (
-                      <Pause className="w-4 h-4 text-phosphor-500" />
+                      <Pause className="w-4 h-4" />
                     ) : (
-                      <Play className="w-4 h-4 text-phosphor-500 fill-phosphor-500" />
+                      <Play className="w-4 h-4 fill-current" />
                     )}
                   </button>
 
                   <button
                     type="button"
                     onClick={() => {
-                      console.log('[GeoTrail Debug] BUTTON 3 CLICKED: Resetting scrubber to start, clearing highlighted hop, resetting visible hops');
                       setScrubberPercent(0);
                       setIsPlaying(false);
                       setHighlightedHop(null);
@@ -1374,10 +1373,10 @@ export default function GeoTrailPage() {
                         setVisibleHopsCount(1);
                       }
                     }}
-                    className="p-2 rounded-lg bg-steel-600/50 hover:bg-steel-600 text-paper-100/70 hover:text-paper-100 transition-all shrink-0 cursor-pointer"
+                    className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 transition-all shrink-0 cursor-pointer border border-slate-200 dark:border-zinc-700"
                     title="Reset Trail & Scrubber to Start"
                   >
-                    <RotateCcw className="w-3.5 h-3.5" />
+                    <RotateCcw className="w-4 h-4" />
                   </button>
 
                   {/* Scrubber Progress Slider */}
@@ -1389,68 +1388,64 @@ export default function GeoTrailPage() {
                       step="0.1"
                       value={scrubberPercent}
                       onChange={(e) => setScrubberPercent(parseFloat(e.target.value))}
-                      className="w-full h-2 rounded-lg bg-steel-600/50 appearance-none cursor-pointer accent-phosphor-500 focus:outline-none"
+                      className="w-full h-2 rounded-lg bg-slate-200 dark:bg-zinc-800 appearance-none cursor-pointer accent-blue-600 focus:outline-none"
                     />
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-[10px] font-mono text-paper-100/40 px-1">
+                <div className="flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 font-medium px-1">
                   <span>Start: {new Date(trailData[0].timestamp).toLocaleTimeString('en-IN')} IST</span>
-                  <span>Proportional Timestamp Interpolation</span>
+                  <span>Spatial Timestamp Interpolation</span>
                   <span>End: {new Date(trailData[trailData.length - 1].timestamp).toLocaleTimeString('en-IN')} IST</span>
                 </div>
-              </Card>
+              </div>
             )}
           </div>
 
-          {/* ── RIGHT: SIGHTINGS TIMELINE & INSIGHTS PANEL (5 COLS) ─────────── */}
-          <div className="lg:col-span-5 flex flex-col min-h-[480px] space-y-4">
-            <Card className="flex-1 flex flex-col p-4 border border-steel-600/50 bg-steel-700/30 justify-between space-y-4 rounded-xl shadow-md">
+          {/* ── RIGHT: SIGHTINGS TIMELINE & FORENSIC MILESTONES (5 COLS) ─────── */}
+          <div className="lg:col-span-5 flex flex-col min-h-[480px]">
+            <div className="flex-1 flex flex-col p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#18181B] rounded-2xl shadow-sm space-y-4">
               {/* Timeline Header & Export / Share Buttons */}
-              <div className="flex items-center justify-between pb-3 border-b border-steel-600/30">
+              <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-slate-800">
                 <div>
-                  <h3 className="text-sm font-bold text-paper-100 flex items-center gap-2 font-sans">
-                    <Clock className="w-4 h-4 text-phosphor-500" />
+                  <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                     Sighting Timeline & Insights
                   </h3>
                   {metadata && (
-                    <p className="text-[11px] font-mono text-paper-100/50 mt-0.5">
-                      {metadata.target} • {metadata.totalHops} {metadata.totalHops === 1 ? 'Sighting' : 'Hops Captured'}
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                      {metadata.target} · {metadata.totalHops} {metadata.totalHops === 1 ? 'Sighting' : 'Hops Captured'}
                     </p>
                   )}
                 </div>
 
-                <div className="flex items-center gap-1.5 relative">
+                <div className="flex items-center gap-2 relative">
                   {shareToast && (
-                    <span className="absolute -top-7 right-0 text-[10px] font-mono text-phosphor-500 bg-steel-700 border border-phosphor-500/50 px-2 py-0.5 rounded shadow-lg animate-fade-in flex items-center gap-1">
-                      <Check className="w-3 h-3 text-phosphor-500" /> Copied!
+                    <span className="absolute -top-8 right-0 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2.5 py-1 rounded-lg shadow-md animate-fade-in flex items-center gap-1">
+                      <Check className="w-3 h-3 text-emerald-500" /> Copied!
                     </span>
                   )}
-                  <Button
+                  <button
                     onClick={handleShareReport}
-                    variant="secondary"
-                    size="sm"
-                    className="font-mono text-xs flex items-center gap-1 rounded-lg"
+                    className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer border border-slate-200 dark:border-zinc-700 shadow-2xs"
                     title="Copy Summary Report to Clipboard"
                   >
-                    <Share2 className="w-3.5 h-3.5" />
+                    <Share2 className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
                     <span>Share</span>
-                  </Button>
+                  </button>
 
-                  <Button
+                  <button
                     onClick={handleExportReport}
-                    variant="secondary"
-                    size="sm"
-                    className="font-mono text-xs flex items-center gap-1 rounded-lg"
+                    className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer border border-slate-200 dark:border-zinc-700 shadow-2xs"
                   >
-                    <Download className="w-3.5 h-3.5" />
+                    <Download className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
                     <span>Export</span>
-                  </Button>
+                  </button>
                 </div>
               </div>
 
-              {/* Hop Timeline List */}
-              <div className="flex-1 overflow-y-auto space-y-3 pr-1 max-h-[380px]">
+              {/* Hop Timeline List with Connected Vertical Milestone Track */}
+              <div className="flex-1 overflow-y-auto space-y-3.5 pr-1 max-h-[420px] scrollbar-thin">
                 {trailData.map((hop, idx) => {
                   const prevHop = idx > 0 ? trailData[idx - 1] : null;
                   const { speedKmh, diffMinutes, anomaly } = analyzeHopInsights(hop, prevHop);
@@ -1459,31 +1454,39 @@ export default function GeoTrailPage() {
                   const isLowConf = hop.confidence < 90;
                   const isHighlighted = highlightedHop === hop.hop;
                   const isReplayActive = ghostPosition?.activeHop === hop.hop;
+                  const isOrigin = idx === 0;
+                  const isDestination = idx === trailData.length - 1;
 
                   return (
                     <div
                       key={hop.hop}
                       onClick={() => setHighlightedHop(hop.hop)}
-                      className={`p-3.5 rounded-lg border transition-all cursor-pointer ${
+                      className={`p-4 rounded-2xl border transition-all cursor-pointer ${
                         isHighlighted || isReplayActive
-                          ? 'bg-steel-700 border-phosphor-500 shadow-md ring-1 ring-phosphor-500/40'
-                          : 'bg-steel-700/50 border-steel-600/40 hover:border-steel-600'
+                          ? 'bg-blue-50/60 dark:bg-blue-950/30 border-blue-500 shadow-md ring-1 ring-blue-500/30'
+                          : 'bg-slate-50/60 dark:bg-zinc-900/40 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-white dark:hover:bg-zinc-800/60 shadow-2xs'
                       }`}
                     >
                       {/* Top Row: Hop Badge + Camera Type + Timestamp */}
-                      <div className="flex items-center justify-between mb-2 gap-2">
+                      <div className="flex items-center justify-between mb-2.5 gap-2">
                         <div className="flex items-center gap-2">
-                          <Badge variant={idx === 0 ? 'success' : idx === trailData.length - 1 ? 'critical' : 'info'}>
-                            Hop {hop.hop}
-                          </Badge>
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10.5px] font-bold uppercase tracking-wider ${
+                            isOrigin
+                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                              : isDestination
+                              ? 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
+                              : 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                          }`}>
+                            Hop {hop.hop} {isOrigin ? '· Origin' : isDestination ? '· Exit Point' : ''}
+                          </span>
 
-                          <span className="flex items-center gap-1 text-[11px] font-mono text-paper-100/60 bg-steel-600/20 px-2 py-0.5 rounded-md">
-                            <CamIcon className="w-3 h-3 text-phosphor-500" />
+                          <span className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-zinc-800 px-2 py-0.5 rounded-lg border border-slate-200 dark:border-zinc-700">
+                            <CamIcon className="w-3 h-3 text-blue-600 dark:text-blue-400" />
                             <span>{camDetails.label}</span>
                           </span>
                         </div>
 
-                        <span className="text-[11px] font-mono text-paper-100/50">
+                        <span className="text-xs font-mono font-bold text-slate-500 dark:text-slate-400">
                           {new Date(hop.timestamp).toLocaleTimeString('en-IN', {
                             hour: '2-digit',
                             minute: '2-digit',
@@ -1493,43 +1496,44 @@ export default function GeoTrailPage() {
                       </div>
 
                       {/* Camera Location Name */}
-                      <h4 className="text-xs font-semibold text-paper-100 line-clamp-1">
+                      <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white line-clamp-1">
                         {hop.camera_name}
                       </h4>
 
-                      {/* Speed Anomaly Badge or Speed Detail */}
+                      {/* Speed Anomaly Alert or Velocity Metric */}
                       {anomaly ? (
-                        <div className="mt-2 p-2 rounded-lg bg-steel-700/80 border border-steel-600/50 space-y-1">
+                        <div className="mt-2.5 p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 space-y-1">
                           <div className="flex items-center gap-1.5">
-                            <AlertTriangle
-                              className={`w-3.5 h-3.5 ${
-                                anomaly.variant === 'critical' ? 'text-critical-500' : 'text-warn-500'
-                              }`}
-                            />
-                            <Badge variant={anomaly.variant}>{anomaly.label}</Badge>
+                            <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                            <span className="text-xs font-bold text-amber-800 dark:text-amber-300">{anomaly.label}</span>
                           </div>
-                          <p className="text-[10px] font-mono text-paper-100/60 leading-snug">
+                          <p className="text-[11px] text-amber-700 dark:text-amber-400 leading-snug">
                             {anomaly.detail}
                           </p>
                         </div>
                       ) : (
                         speedKmh && (
-                          <div className="mt-1.5 flex items-center gap-1 text-[11px] font-mono text-paper-100/50">
-                            <Zap className="w-3 h-3 text-phosphor-500/70" />
-                            <span>Implied Speed: {speedKmh} km/h ({diffMinutes}m elapsed)</span>
+                          <div className="mt-2 flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
+                            <Zap className="w-3.5 h-3.5 text-amber-500" />
+                            <span className="font-semibold text-slate-800 dark:text-slate-200">Implied Speed: {speedKmh} km/h</span>
+                            <span className="text-slate-400">({diffMinutes}m transit)</span>
                           </div>
                         )
                       )}
 
                       {/* Bottom Row: Confidence & Distance */}
-                      <div className="mt-3 pt-2 border-t border-steel-600/30 flex items-center justify-between text-[11px] font-mono">
-                        <div className="flex items-center gap-1.5">
-                          <Activity className="w-3.5 h-3.5 text-phosphor-500" />
-                          <Badge variant={isLowConf ? 'warning' : 'success'}>
-                            {hop.confidence}% Match {isLowConf ? '(Low Confidence)' : ''}
-                          </Badge>
+                      <div className="mt-3 pt-2.5 border-t border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 py-0.5 rounded-lg font-bold text-[11px] flex items-center gap-1 ${
+                            isLowConf
+                              ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                              : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                          }`}>
+                            <Activity className="w-3 h-3" />
+                            <span>{hop.confidence}% Match</span>
+                          </span>
                         </div>
-                        <span className="text-paper-100/50">
+                        <span className="text-slate-500 dark:text-slate-400 font-medium text-[11px]">
                           {hop.distance_from_crime_km} km from origin
                         </span>
                       </div>
@@ -1539,34 +1543,36 @@ export default function GeoTrailPage() {
 
                 {/* Projected Path Card on Timeline */}
                 {projectedPath && (
-                  <div className="p-3.5 rounded-lg border border-dashed border-warn-500/40 bg-warn-500/5 space-y-2">
+                  <div className="p-4 rounded-2xl border-2 border-dashed border-amber-400/60 bg-amber-50/50 dark:bg-amber-950/20 space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
-                        <TrendingUp className="w-3.5 h-3.5 text-warn-500" />
-                        <Badge variant="warning">PROJECTED HEADING</Badge>
+                        <TrendingUp className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                        <span className="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider">
+                          PROJECTED ESCAPE HEADING
+                        </span>
                       </div>
-                      <span className="text-[11px] font-mono text-warn-500">
+                      <span className="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">
                         ~{projectedPath.projectedTime} IST
                       </span>
                     </div>
-                    <p className="text-xs font-semibold text-paper-100/90">
-                      Estimated Escape Corridor (Unconfirmed)
+                    <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                      Estimated Continuation Corridor
                     </p>
-                    <p className="text-[11px] font-mono text-paper-100/60 leading-snug">
-                      Extrapolated continuation vector derived from velocity & heading of final 2 sightings.
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
+                      Extrapolated vector derived from velocity and escape heading from final 2 ANPR sightings.
                     </p>
                   </div>
                 )}
               </div>
 
-              {/* SPEED SPARKLINE CHART (SAFE ON 1-HOP CASE) */}
-              <div className="pt-3 border-t border-steel-600/30 space-y-1.5">
-                <div className="flex items-center justify-between text-[10px] font-mono text-paper-100/60">
-                  <span className="flex items-center gap-1 uppercase tracking-wider font-semibold">
-                    <Zap className="w-3 h-3 text-phosphor-500" />
+              {/* SPEED SPARKLINE CHART */}
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-[11px]">
+                    <Zap className="w-3.5 h-3.5 text-amber-500" />
                     Inter-Hop Velocity Profile
                   </span>
-                  <span>
+                  <span className="font-bold text-slate-500 dark:text-slate-400 text-xs">
                     {speedSparklinePoints.length > 0
                       ? `Max: ${Math.max(...speedSparklinePoints.map((p) => p.speed))} km/h`
                       : 'Single Sighting'}
@@ -1574,13 +1580,13 @@ export default function GeoTrailPage() {
                 </div>
 
                 {speedSparklinePoints.length > 0 ? (
-                  <div className="h-10 w-full bg-steel-700/60 border border-steel-600/40 rounded-lg p-1.5 flex items-end justify-between relative overflow-hidden">
+                  <div className="h-12 w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-slate-800 rounded-xl p-2 flex items-end justify-between relative overflow-hidden shadow-inner">
                     <svg className="w-full h-full overflow-visible" viewBox="0 0 100 30" preserveAspectRatio="none">
-                      <line x1="0" y1="15" x2="100" y2="15" stroke="#48596D" strokeWidth="0.5" strokeDasharray="2,2" opacity="0.5" />
+                      <line x1="0" y1="15" x2="100" y2="15" stroke="#94A3B8" strokeWidth="0.5" strokeDasharray="2,2" opacity="0.4" />
                       <polyline
                         fill="none"
-                        stroke="#4A8B6F"
-                        strokeWidth="2"
+                        stroke="#2563EB"
+                        strokeWidth="2.5"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         points={speedSparklinePoints
@@ -1596,24 +1602,24 @@ export default function GeoTrailPage() {
                         const x = (idx / Math.max(1, speedSparklinePoints.length - 1)) * 100;
                         const maxSpd = Math.max(100, ...speedSparklinePoints.map((p) => p.speed));
                         const y = 28 - (pt.speed / maxSpd) * 24;
-                        const color = pt.isAnomaly ? '#D97706' : pt.speed > 85 ? '#B91C1C' : '#4A8B6F';
+                        const color = pt.isAnomaly ? '#D97706' : pt.speed > 85 ? '#DC2626' : '#2563EB';
 
                         return (
                           <circle
                             key={idx}
                             cx={x}
                             cy={y}
-                            r="3"
+                            r="3.5"
                             fill={color}
-                            stroke="#1E2733"
-                            strokeWidth="1"
+                            stroke="#FFFFFF"
+                            strokeWidth="1.5"
                           />
                         );
                       })}
                     </svg>
                   </div>
                 ) : (
-                  <div className="h-9 w-full bg-steel-700/40 border border-steel-600/30 rounded-lg flex items-center justify-center text-[10px] font-mono text-paper-100/50">
+                  <div className="h-10 w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center text-xs text-slate-400 font-medium">
                     Single Hop Sighting — Inter-Hop Velocity Profile Unavailable
                   </div>
                 )}
@@ -1621,13 +1627,13 @@ export default function GeoTrailPage() {
 
               {/* RELATED VEHICLES CO-OCCURRENCE PANEL */}
               {metadata?.relatedVehicles && metadata.relatedVehicles.length > 0 && (
-                <div className="pt-3 border-t border-steel-600/30 space-y-2">
-                  <div className="flex items-center justify-between text-[10px] font-mono text-paper-100/60">
-                    <span className="uppercase tracking-wider font-semibold flex items-center gap-1">
-                      <Car className="w-3 h-3 text-phosphor-500" />
-                      Related Vehicles (Co-Occurrences Near Route)
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                      <Car className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                      Related Vehicles (Co-Occurrences)
                     </span>
-                    <span>{metadata.relatedVehicles.length} Spotted</span>
+                    <span className="text-[11px] font-bold text-slate-400">{metadata.relatedVehicles.length} Spotted</span>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
@@ -1636,15 +1642,14 @@ export default function GeoTrailPage() {
                         key={rel.plate}
                         type="button"
                         onClick={() => {
-                          console.log('[GeoTrail Debug] Related vehicle chip clicked:', rel.plate);
                           setSearchQuery(rel.plate);
                           loadTrailForPlate(rel.plate);
                         }}
-                        className="px-2.5 py-1.5 rounded-lg bg-steel-700 hover:bg-steel-600 border border-steel-600/60 text-xs font-mono text-phosphor-500 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm group"
+                        className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-slate-200 dark:border-zinc-700 text-xs font-mono font-bold text-blue-600 dark:text-blue-400 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs group"
                         title={`Spotted at ${rel.camera} at ${rel.time} (${rel.delta})`}
                       >
-                        <span className="font-bold group-hover:underline">{rel.plate}</span>
-                        <span className="text-[10px] text-paper-100/40">({rel.delta})</span>
+                        <span className="group-hover:underline">{rel.plate}</span>
+                        <span className="text-[10px] text-slate-400 font-sans font-normal">({rel.delta})</span>
                       </button>
                     ))}
                   </div>
@@ -1653,17 +1658,17 @@ export default function GeoTrailPage() {
 
               {/* Bottom Target Meta Footer */}
               {metadata && (
-                <div className="pt-3 border-t border-steel-600/30 flex items-center justify-between text-[11px] font-mono text-paper-100/60">
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
                   <div className="flex items-center gap-1.5">
-                    <Eye className="w-3.5 h-3.5 text-phosphor-500" />
+                    <Eye className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                     <span>Case: {metadata.crimeLinked || 'FIR-2026-BL-0492'}</span>
                   </div>
-                  <span className="text-phosphor-500 uppercase font-semibold">
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400 uppercase">
                     Status: {metadata.status}
                   </span>
                 </div>
               )}
-            </Card>
+            </div>
           </div>
         </div>
       )}
