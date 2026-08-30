@@ -2,7 +2,6 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import axios from 'axios';
 import FormData from 'form-data';
-import { EdgeTTS } from '@seepine/edge-tts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
