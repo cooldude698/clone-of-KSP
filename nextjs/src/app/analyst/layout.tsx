@@ -11,20 +11,29 @@ import {
   FileSpreadsheet,
   ShieldAlert,
   Bot,
-  Layers,
   ChevronLeft,
   ChevronRight,
-  Radio,
-  Activity,
-  ArrowRightLeft,
   LogOut,
   Bell,
-  Cpu,
-  RefreshCw,
   Search,
+  Fingerprint,
+  Radio,
   SlidersHorizontal,
-  Flame,
-  Fingerprint
+  Shield,
+  Clock,
+  Globe,
+  LayoutDashboard,
+  MessageSquare,
+  FileText,
+  Building2,
+  Scale,
+  User,
+  Map,
+  Camera,
+  BarChart2,
+  History,
+  Navigation,
+  Newspaper
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -33,60 +42,19 @@ import { LanguageProvider, useLanguage } from '@/context/LanguageContext';
 import { AnalystTelemetryProvider, useAnalystTelemetry } from '@/context/AnalystTelemetryContext';
 
 const ANALYST_NAV_ITEMS = [
-  {
-    href: '/analyst',
-    icon: BarChart3,
-    label: 'Intelligence Hub',
-    badge: 'LIVE 3s',
-    desc: 'KPIs, trend forecasts & real-time anomaly stream',
-  },
-  {
-    href: '/analyst/heatmap',
-    icon: MapPin,
-    label: 'Predictive Heatmap',
-    badge: 'AI SPATIAL',
-    desc: 'Time-sliced density & 7-day projection zones',
-  },
-  {
-    href: '/analyst/patterns',
-    icon: Fingerprint,
-    label: 'Pattern & MO Intel',
-    badge: 'CLUSTERING',
-    desc: 'Modus Operandi correlation & repeat offenders',
-  },
-  {
-    href: '/analyst/network',
-    icon: GitBranch,
-    label: 'Syndicate Nexus',
-    badge: 'MULTI-HOP',
-    desc: 'Criminal ring link analysis & kingpin graph',
-  },
-  {
-    href: '/analyst/reports',
-    icon: FileSpreadsheet,
-    label: 'Report Generator',
-    badge: 'EXPORT',
-    desc: 'Weekly digests, PDF briefs & comparative tables',
-  },
-  {
-    href: '/analyst/watchlist',
-    icon: ShieldAlert,
-    label: 'Intelligence Watchlist',
-    badge: 'TRIGGERS',
-    desc: 'High-threat targets, volatile zones & ANPR pings',
-  },
-  {
-    href: '/analyst/chat',
-    icon: Bot,
-    label: 'Analyst Co-Pilot',
-    badge: 'AI CORE',
-    desc: 'Specialized deep statistical querying agent',
-  },
+  { href: '/analyst', icon: LayoutDashboard, label: 'Overview', id: 'nav-overview' },
+  { href: '/analyst/chat', icon: MessageSquare, label: 'Co-Pilot Chat', id: 'nav-chat' },
+  { href: '/analyst/reports', icon: FileText, label: 'FIR Registry', id: 'nav-fir' },
+  { href: '/analyst/patterns', icon: Fingerprint, label: 'Pattern & MO Intel', id: 'nav-patterns' },
+  { href: '/analyst/watchlist', icon: User, label: 'Suspect Roster', id: 'nav-suspect' },
+  { href: '/analyst/heatmap', icon: Map, label: 'Crime Map', id: 'nav-map' },
+  { href: '/analyst/network', icon: GitBranch, label: 'Network Graph', id: 'nav-network' },
+  { href: '/analyst/watchlist', icon: Camera, label: 'Surveillance', id: 'nav-surveillance' },
+  { href: '/analyst', icon: BarChart2, label: 'Analytics', id: 'nav-analytics' },
 ];
 
 function AnalystHeader() {
   const router = useRouter();
-  const { tick, lastUpdated, isPulseActive, confidenceScore, latestAnomaly } = useAnalystTelemetry();
   const [officerName, setOfficerName] = useState('Dr. Priya Rao');
 
   useEffect(() => {
@@ -97,48 +65,55 @@ function AnalystHeader() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 backdrop-blur-md bg-[var(--surface-0)]/90 border-b border-[var(--border)] px-4 sm:px-6 py-2.5 flex items-center justify-between transition-colors duration-200">
+    <header className="sticky top-0 z-40 bg-white dark:bg-[#18181B] border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-2.5 flex items-center justify-between transition-colors">
       {/* Left: Clean Brand Logo */}
       <div className="flex items-center gap-3">
         <DrishtiLogo variant="compact" size="md" href="/analyst" />
       </div>
 
-      {/* Center: Real-time 3s Pulse & Dynamic Live Telemetry */}
-      <div className="hidden md:flex items-center gap-3 text-xs font-mono">
-        <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-[var(--surface-1)] border border-[var(--border)] shadow-inner">
-          <span
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              isPulseActive ? 'bg-[var(--cyan-accent)] scale-110 shadow-sm shadow-[var(--cyan-accent)]' : 'bg-gray-400 scale-90'
-            }`}
-          />
-          <span className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-wider">
-            3s TELEMETRY:
-          </span>
-          <span className="text-[11px] font-semibold text-[var(--text-primary)]" suppressHydrationWarning>
-            #{tick} · {confidenceScore}% CONFIDENCE
-          </span>
-        </div>
-
-        {/* Streaming Anomaly Feed Pill */}
-        <div className="hidden xl:flex items-center gap-2 px-3 py-1 rounded-md bg-[var(--surface-1)] border border-[var(--border)] max-w-sm overflow-hidden text-ellipsis whitespace-nowrap">
-          <span className="w-1.5 h-1.5 rounded-full bg-[var(--status-critical)] animate-ping" />
-          <span className="text-[10px] font-bold text-[var(--status-critical)] uppercase tracking-wide">
-            LIVE:
-          </span>
-          <span className="text-[10px] text-[var(--text-secondary)] truncate" suppressHydrationWarning>
-            {latestAnomaly.title} ({latestAnomaly.location})
-          </span>
-        </div>
+      {/* Center: Search Bar */}
+      <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 text-xs w-80 text-slate-500 hover:border-slate-400 dark:hover:border-slate-600 transition-all">
+        <Search className="w-4 h-4 text-slate-400 shrink-0" />
+        <input
+          type="text"
+          placeholder="Search cases, suspects, FIRs..."
+          className="bg-transparent border-none outline-none w-full text-xs text-slate-900 dark:text-white placeholder:text-slate-400"
+          readOnly
+        />
       </div>
 
-      {/* Right: Timestamp & Theme Toggle */}
+      {/* Right Controls: Language, Drishti AI Button, Bell, Avatar, Theme */}
       <div className="flex items-center gap-3">
-        {/* Time Stamp */}
-        <div className="hidden sm:block px-2.5 py-1 rounded bg-[var(--surface-1)] border border-[var(--border)] text-[10px] font-mono text-[var(--text-secondary)]" suppressHydrationWarning>
-          {lastUpdated || '18:00:00 IST'}
+        {/* Language selector pill */}
+        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300">
+          <Globe className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+          <span>EN</span>
         </div>
 
-        {/* Theme Toggle */}
+        {/* Drishti AI pill button */}
+        <Link
+          href="/analyst/chat"
+          className="px-3.5 py-1.5 rounded-full bg-slate-900 text-white dark:bg-white dark:text-black text-xs font-bold flex items-center gap-1.5 hover:scale-105 transition-all shadow-xs"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-amber-400 dark:text-amber-500" />
+          <span>Drishti AI</span>
+        </Link>
+
+        {/* Notification Bell */}
+        <button
+          className="relative p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors"
+          title="Notifications"
+        >
+          <Bell className="w-4 h-4" />
+          <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900" />
+        </button>
+
+        {/* User profile avatar circle */}
+        <div className="w-8 h-8 rounded-full bg-slate-900 text-white dark:bg-white dark:text-black flex items-center justify-center font-bold text-xs shadow-xs">
+          PR
+        </div>
+
+        {/* Theme toggle */}
         <ThemeToggle />
       </div>
     </header>
@@ -159,20 +134,15 @@ function AnalystSidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean;
 
   return (
     <aside
-      className={`fixed top-[53px] bottom-0 left-0 z-30 bg-[var(--surface-0)] border-r border-[var(--border)] transition-all duration-300 flex flex-col justify-between ${
-        isCollapsed ? 'w-16' : 'w-64'
+      className={`fixed top-[53px] bottom-0 left-0 z-30 bg-white dark:bg-[#18181B] border-r border-slate-200 dark:border-slate-800 transition-all duration-300 flex flex-col justify-between ${
+        isCollapsed ? 'w-16' : 'w-60'
       }`}
     >
       <div className="p-3 flex flex-col gap-1 overflow-y-auto flex-1 custom-scrollbar">
         <div className="flex items-center justify-between px-2 py-1.5 mb-1">
-          {!isCollapsed && (
-            <span className="text-[10px] font-mono text-[var(--text-secondary)] uppercase tracking-[0.15em] font-bold">
-              Analyst Workspaces
-            </span>
-          )}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1 rounded bg-[var(--surface-1)] hover:bg-[var(--surface-2)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border)] transition-all ml-auto cursor-pointer"
+            className="p-1 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 border border-slate-200 dark:border-slate-700 transition-all ml-auto cursor-pointer"
             title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
           >
             {isCollapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
@@ -180,28 +150,28 @@ function AnalystSidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean;
         </div>
 
         <nav className="flex flex-col gap-1">
-          {ANALYST_NAV_ITEMS.map((item) => {
+          {ANALYST_NAV_ITEMS.map((item, idx) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href;
+            const isActive = idx === 0 ? pathname === '/analyst' : pathname.startsWith(item.href) && item.href !== '/analyst';
 
             return (
               <Link
-                key={item.href}
+                key={item.label + idx}
                 href={item.href}
-                className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 whitespace-nowrap ${
+                className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
                   isActive
-                    ? 'bg-[var(--accent)] text-white font-bold shadow-md shadow-[var(--accent-glow)]'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-1)] border border-transparent'
+                    ? 'bg-slate-900 text-white dark:bg-white dark:text-black font-bold shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                 }`}
                 title={isCollapsed ? item.label : undefined}
               >
                 <Icon
-                  className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${
-                    isActive ? 'text-white' : 'text-[var(--cyan-accent)]'
+                  className={`w-4 h-4 shrink-0 ${
+                    isActive ? 'text-white dark:text-black' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white'
                   }`}
                 />
                 {!isCollapsed && (
-                  <span className="truncate tracking-normal">{item.label}</span>
+                  <span className="truncate">{item.label}</span>
                 )}
               </Link>
             );
@@ -210,15 +180,15 @@ function AnalystSidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean;
       </div>
 
       {/* Sidebar Footer: User Profile & Sign Out (Matching Inspector Style) */}
-      <div className={`p-4 border-t border-[var(--border)] bg-[var(--surface-0)] ${isCollapsed ? 'flex flex-col items-center gap-2' : ''}`}>
+      <div className={`p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#18181B] ${isCollapsed ? 'flex flex-col items-center gap-2' : ''}`}>
         {!isCollapsed && (
-          <div className="flex items-center gap-3 p-2.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] mb-2 shadow-sm">
-            <div className="w-9 h-9 rounded-full bg-[var(--accent)] text-white flex items-center justify-center font-bold text-xs font-mono shadow-sm">
+          <div className="flex items-center gap-3 p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 mb-2">
+            <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white flex items-center justify-center font-bold text-xs">
               PR
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold text-[var(--text-primary)] truncate">{officerName}</p>
-              <p className="text-[10px] text-[var(--text-secondary)] font-mono font-medium truncate">Chief Crime Analyst</p>
+              <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{officerName}</p>
+              <p className="text-[10px] text-slate-500 font-medium truncate">Chief Crime Analyst</p>
             </div>
           </div>
         )}
@@ -228,7 +198,7 @@ function AnalystSidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean;
             localStorage.clear();
             router.push('/');
           }}
-          className={`flex items-center gap-2 w-full px-3 py-2 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-1)] transition-all text-xs font-semibold cursor-pointer ${
+          className={`flex items-center gap-2 w-full px-3 py-2 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-all text-xs font-semibold cursor-pointer ${
             isCollapsed ? 'justify-center' : ''
           }`}
           title={isCollapsed ? 'Sign Out' : undefined}
@@ -247,7 +217,7 @@ export default function AnalystLayout({ children }: { children: React.ReactNode 
   return (
     <LanguageProvider>
       <AnalystTelemetryProvider>
-        <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col font-sans transition-colors duration-200">
+        <div className="min-h-screen bg-[#FAF9F5] dark:bg-[#0B0F17] text-slate-900 dark:text-white flex flex-col font-sans transition-colors duration-200">
           <AnalystHeader />
 
           <div className="flex flex-1 pt-0">
@@ -255,7 +225,7 @@ export default function AnalystLayout({ children }: { children: React.ReactNode 
 
             <main
               className={`flex-1 transition-all duration-300 p-4 sm:p-6 lg:p-8 min-h-[calc(100vh-53px)] ${
-                isCollapsed ? 'ml-16' : 'ml-64'
+                isCollapsed ? 'ml-16' : 'ml-60'
               }`}
             >
               <div className="max-w-7xl mx-auto">{children}</div>
