@@ -1,8 +1,8 @@
 /* ═══════════════════════════════════════════════════════
    DRISHTI — Tactical AI Co-Pilot Design System
-   Fonts: Montserrat (Headlines) · Google Sans / Plus Jakarta Sans (Body) · JetBrains Mono (Data) · Noto Sans Kannada · Playfair Display (Newspaper)
+   Fonts: Montserrat (Headlines & Metrics) · Open Sans (Body & UI) · JetBrains Mono (Data) · Noto Sans Kannada
    ═══════════════════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+Kannada:wght@400;500;600;700&family=Playfair+Display:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+Kannada:wght@400;500;600;700&family=Playfair+Display:wght@400;700;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -10,21 +10,22 @@
 
 /* ─── LIGHT & DARK THEME TOKENS ────────── */
 :root {
-  /* Default Crisp Light Surface & UI Tokens */
-  --background:        #F8FAFC;
-  --foreground:        #0F172A;
+  /* Warm Luxury & Tactical Canvas */
+  --background:        #F8F6F0;
+  --foreground:        #1A202C;
   --surface-0:         #FFFFFF;
-  --surface-1:         #F1F5F9;
-  --surface-2:         #E2E8F0;
-  --border:            #E2E8F0;
-  --border-subtle:     #CBD5E1;
-  --text-primary:      #0F172A;
-  --text-secondary:    #475569;
-  --text-muted:        #64748B;
-  --muted-foreground:  #64748B;
-  --accent:            #1D6FBF;
+  --surface-1:         #F3EFE6;
+  --surface-2:         #E9E3D6;
+  --surface-warm:      #FAF6EE;
+  --border:            #E5DFD3;
+  --border-subtle:     #D8D0C2;
+  --text-primary:      #111827;
+  --text-secondary:    #4B5563;
+  --text-muted:        #6B7280;
+  --muted-foreground:  #6B7280;
+  --accent:            #1E3A8A;
   --accent-light:      #2563EB;
-  --accent-glow:       rgba(37, 99, 235, 0.15);
+  --accent-glow:       rgba(30, 58, 138, 0.15);
   --cyan-accent:       #0284C7;
   --cyan-glow:         rgba(2, 132, 199, 0.15);
   --status-critical:   #DC2626;
@@ -34,58 +35,58 @@
   /* ── Legacy aliases ── */
   --color-void-000:       #FFFFFF;
   --color-steel-700:      #FFFFFF;
-  --color-steel-600:      #E2E8F0;
-  --color-phosphor-500:   #1D6FBF;
+  --color-steel-600:      #E5DFD3;
+  --color-phosphor-500:   #1E3A8A;
   --color-warn-500:       #D97706;
   --color-critical-500:   #DC2626;
   --color-stamp-red-500:  #DC2626;
   --color-success-500:    #059669;
-  --color-paper-100:      #0F172A;
+  --color-paper-100:      #111827;
 
-  --scroll-track: #F1F5F9;
-  --scroll-thumb: #CBD5E1;
+  --scroll-track: #F3EFE6;
+  --scroll-thumb: #D8D0C2;
 
-  --radius-sm:   6px;
-  --radius-md:   10px;
-  --radius-lg:   14px;
+  --radius-sm:   8px;
+  --radius-md:   14px;
+  --radius-lg:   20px;
+  --radius-organic: 26px;
 }
 
 .dark {
-  --background:        #09090B;
+  --background:        #0B0F17;
   --foreground:        #F8FAFC;
-  --surface-0:         #09090B;
-  --surface-1:         #18181B;
-  --surface-2:         #27272A;
-  --border:            #27272A;
-  --border-subtle:     #1F1F23;
+  --surface-0:         #111726;
+  --surface-1:         #192237;
+  --surface-2:         #232F4D;
+  --surface-warm:      #141D30;
+  --border:            #263352;
+  --border-subtle:     #1E2A44;
   --text-primary:      #F8FAFC;
   --text-secondary:    #94A3B8;
   --text-muted:        #64748B;
   --muted-foreground:  #94A3B8;
-  --accent:            #F8FAFC;
-  --accent-light:      #3B82F6;
-  --accent-glow:       rgba(59, 130, 246, 0.2);
+  --accent:            #3B82F6;
+  --accent-light:      #60A5FA;
+  --accent-glow:       rgba(59, 130, 246, 0.25);
   --cyan-accent:       #38BDF8;
-  --cyan-glow:         rgba(56, 189, 248, 0.2);
+  --cyan-glow:         rgba(56, 189, 248, 0.25);
   --status-critical:   #EF4444;
   --status-warning:    #F59E0B;
   --status-success:    #10B981;
 
-  --color-void-000:       #09090B;
-  --color-steel-700:      #18181B;
-  --color-steel-600:      #27272A;
-  --color-phosphor-500:   #F8FAFC;
+  --color-void-000:       #0B0F17;
+  --color-steel-700:      #111726;
+  --color-steel-600:      #263352;
+  --color-phosphor-500:   #3B82F6;
   --color-warn-500:       var(--status-warning);
   --color-critical-500:   var(--status-critical);
   --color-stamp-red-500:  var(--status-critical);
   --color-success-500:    var(--status-success);
   --color-paper-100:      #F8FAFC;
 
-  --scroll-track: #09090B;
-  --scroll-thumb: #27272A;
+  --scroll-track: #0B0F17;
+  --scroll-thumb: #263352;
 }
-
-
 
 * {
   box-sizing: border-box;
@@ -94,10 +95,10 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   STRICT DUAL-FONT REWIRING (MONTSERRAT & GOOGLE SANS ONLY)
+   STRICT DUAL-FONT REWIRING (MONTSERRAT & OPEN SANS ONLY)
    ═══════════════════════════════════════════════════════ */
 
-/* 1. Universal Body, Text, Controls, Forms, Navigation & Badges (Google Sans) */
+/* 1. Universal Body, Text, Controls, Forms, Navigation & Badges (Open Sans) */
 *,
 *::before,
 *::after,
@@ -128,10 +129,10 @@ footer,
 .badge,
 .btn-primary,
 .btn-secondary {
-  font-family: var(--font-google-sans), 'Google Sans', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: var(--font-open-sans), 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
-/* 2. All Headlines, Section Titles, Brand Logo & Card Headers (Montserrat ONLY) */
+/* 2. All Headlines, Section Titles, KPI Figures, Brand Logo & Card Headers (Montserrat ONLY) */
 h1,
 h2,
 h3,
@@ -147,13 +148,31 @@ h6 *,
 .font-headline,
 .font-heading,
 .font-title,
+.font-montserrat,
+.font-display,
 .heading-text,
 .case-stamp,
 .brand-title,
 .card-header,
-.modal-header {
-  font-family: var(--font-montserrat), 'Montserrat', 'Google Sans', sans-serif !important;
+.modal-header,
+.kpi-number,
+.stat-metric {
+  font-family: var(--font-montserrat), 'Montserrat', sans-serif !important;
   letter-spacing: -0.015em;
+}
+
+/* Organic Asymmetrical Curve Helpers */
+.organic-card-1 {
+  border-radius: 28px 12px 28px 24px;
+}
+.organic-card-2 {
+  border-radius: 24px 28px 16px 28px;
+}
+.organic-card-3 {
+  border-radius: 20px 24px 28px 16px;
+}
+.organic-pill {
+  border-radius: 9999px;
 }
 
 /* Code & Data Monospace exemption */
