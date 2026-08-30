@@ -17,10 +17,13 @@ export default function VoiceDebugStatus({
   useEffect(() => setMounted(true), []);
 
   if (!mounted) return null;
-  // If no issues and not listening and not asking for prompt, don't clutter the UI
-  // But wait, the prompt says "judges see mic permission status, listening state, and any errors". 
-  // Let's always show it if the user just interacted or if there is an error.
-  if ((micPermission === 'granted' || micPermission === 'prompt') && !isListening && !error && consecutiveErrors < 2) return null;
+
+  // Filter out normal silence/timeout events
+  const isHarmlessError = !error || error === 'no-speech' || error === 'aborted';
+  const realError = isHarmlessError ? null : error;
+
+  // If no real issues and not listening and not asking for prompt, don't clutter the UI
+  if ((micPermission === 'granted' || micPermission === 'prompt') && !isListening && !realError && consecutiveErrors < 2) return null;
 
   let stateLabel = 'Ready';
   let stateColor = 'text-success-500';
@@ -31,8 +34,8 @@ export default function VoiceDebugStatus({
     stateLabel = 'Text Input Fallback Mode';
     stateColor = 'text-warning-500';
     Icon = MessageSquare;
-  } else if (error) {
-    stateLabel = `Error: ${error}`;
+  } else if (realError) {
+    stateLabel = `Error: ${realError}`;
     stateColor = 'text-critical-500';
     Icon = AlertTriangle;
   } else if (micPermission === 'denied') {
@@ -64,16 +67,16 @@ export default function VoiceDebugStatus({
         )}
       </div>
 
-      {error && consecutiveErrors < 2 && (
+      {realError && consecutiveErrors < 2 && (
         <div className="bg-critical-500/10 border border-critical-500/30 rounded-lg p-3 backdrop-blur-sm shadow-lg pointer-events-auto max-w-xs flex flex-col gap-2 animate-fade-in">
           <p className="text-xs text-paper-100 font-mono">
-            Voice system encountered an error.
+            Voice system encountered an error: {realError}
           </p>
           <div className="flex gap-2">
             {onTryAgain && (
               <button 
                 onClick={onTryAgain}
-                className="px-3 py-1.5 bg-steel-700 hover:bg-steel-600 rounded text-xs text-paper-100 transition-colors flex items-center gap-1"
+                className="px-3 py-1.5 bg-steel-700 hover:bg-steel-600 rounded text-xs text-paper-100 transition-colors flex items-center gap-1 cursor-pointer"
               >
                 <RefreshCw className="w-3 h-3" /> Try Again
               </button>
@@ -81,7 +84,7 @@ export default function VoiceDebugStatus({
             {onUseText && (
               <button 
                 onClick={onUseText}
-                className="px-3 py-1.5 bg-phosphor-500/20 hover:bg-phosphor-500/30 text-phosphor-500 rounded text-xs transition-colors flex items-center gap-1"
+                className="px-3 py-1.5 bg-phosphor-500/20 hover:bg-phosphor-500/30 text-phosphor-500 rounded text-xs transition-colors flex items-center gap-1 cursor-pointer"
               >
                 <MessageSquare className="w-3 h-3" /> Use Text
               </button>
