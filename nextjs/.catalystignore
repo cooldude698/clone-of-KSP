@@ -1,8 +1,8 @@
 node_modules
+.next
+.open-next
 .git
 .cache
 *.log
-.next/cache
-.cache
 *.zip
 *.map

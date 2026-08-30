@@ -3,7 +3,8 @@ node_modules
 .cache
 *.log
 nextjs/node_modules
-nextjs/.next/cache
+nextjs/.next
+nextjs/.open-next
 nextjs/.cache
 crime-database
 sample_firs
