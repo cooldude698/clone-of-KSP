@@ -27,17 +27,17 @@ const DrishtiPanel = dynamic(() => import('@/components/DrishtiPanel'), { ssr: f
 
 const NAV_ITEMS = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Overview', translationKey: 'nav.dashboard', id: 'nav-overview' },
-  { href: '/dashboard/chat', icon: MessageSquare, label: 'Co-Pilot Chat', translationKey: 'nav.chat', id: 'nav-chat' },
-  { href: '/dashboard/fir', icon: FileText, label: 'FIR Registry', translationKey: 'nav.fir', id: 'nav-fir' },
-  { href: '/dashboard/hierarchy', icon: Building2, label: 'KSP Units & HR', translationKey: 'nav.hierarchy', id: 'nav-hierarchy' },
-  { href: '/dashboard/statutes', icon: Scale, label: 'Acts & Sections', translationKey: 'nav.statutes', id: 'nav-statutes' },
-  { href: '/dashboard/suspect', icon: User, label: 'Suspect Roster', translationKey: 'nav.suspect', id: 'nav-suspect' },
   { href: '/dashboard/map', icon: Map, label: 'Crime Map', translationKey: 'nav.hotspots', id: 'nav-map' },
   { href: '/dashboard/network', icon: GitBranch, label: 'Network Graph', translationKey: 'nav.network', id: 'nav-network' },
+  { href: '/dashboard/chat', icon: MessageSquare, label: 'Co-Pilot Chat', translationKey: 'nav.chat', id: 'nav-chat' },
+  { href: '/dashboard/fir', icon: FileText, label: 'FIR Registry', translationKey: 'nav.fir', id: 'nav-fir' },
+  { href: '/dashboard/suspect', icon: User, label: 'Suspect Roster', translationKey: 'nav.suspect', id: 'nav-suspect' },
   { href: '/dashboard/surveillance', icon: Camera, label: 'Surveillance', translationKey: 'nav.surveillance', id: 'nav-surveillance' },
   { href: '/dashboard/analytics', icon: BarChart2, label: 'Analytics', translationKey: 'nav.analytics', id: 'nav-analytics' },
-  { href: '/dashboard/logs', icon: History, label: 'AI Logs', translationKey: 'nav.logs', id: 'nav-logs' },
   { href: '/dashboard/trail', icon: Navigation, label: 'Geo Trail', translationKey: 'nav.trail', id: 'nav-trail' },
+  { href: '/dashboard/hierarchy', icon: Building2, label: 'KSP Units & HR', translationKey: 'nav.hierarchy', id: 'nav-hierarchy' },
+  { href: '/dashboard/statutes', icon: Scale, label: 'Acts & Sections', translationKey: 'nav.statutes', id: 'nav-statutes' },
+  { href: '/dashboard/logs', icon: History, label: 'AI Logs', translationKey: 'nav.logs', id: 'nav-logs' },
   { href: '/dashboard/news', icon: Newspaper, label: 'Live News', translationKey: 'nav.news', id: 'nav-news' },
 ];
 
@@ -84,13 +84,165 @@ function detectLocalIntent(query) {
 
   // ─── NAVIGATION INTENT DETECTION ───────────────────────────────────────────
   // Matches both formal ("navigate to crime map") and casual officer speech
-  // ("open crime map", "open case file of Anand Gowda", "show Ramesh Kumar", etc.)
+  // ("open crime map", "open network graph", "open Vikram Malhotra's investigation chronicle", etc.)
 
   const hasNavVerb = /\b(go\s*to|navigate\s*to|switch\s*to|open|show|take\s*me\s*to|bring\s*up|launch|pull\s*up|view|check|display|load|jump\s*to|inspect|track|find)\b/.test(q);
 
   if (hasNavVerb || q.startsWith('ತೆರೆ') || q.startsWith('ಲೆ ಚಲೊ')) {
 
-    // Specific FIR docket number (e.g. KAR/BEN/2026/1002 or FIR-2026-BL-8842 or KAR/BEN/...)
+    // 1. Specific Investigation Chronicle / Intercept Dossier intent
+    if (/\b(chronicle|investigation\s*chronicle|intercept\s*dossier|dossier\s*newspaper)\b/i.test(q)) {
+      if (q.includes('vikram') || q.includes('malhotra')) {
+        return nav(
+          '/dashboard/suspect/vikram-malhotra?chronicle=true',
+          isHindi ? 'सर, विक्रम मल्होत्रा का इन्वेस्टिगेशन क्रॉनिकल और डोजियर खोल रहा हूं।' :
+          isKannada ? 'ಸರ್, ವಿಕ್ರಮ್ ಮಲ್ಹೋತ್ರಾ ಅವರ ತನಿಖಾ ಕ್ರಾನಿಕಲ್ ಮತ್ತು ಡಾಕ್ಯುಮೆಂಟ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+          "Opening Vikram Malhotra's investigation chronicle and suspect dossier, Sir.",
+          null
+        );
+      }
+      if (q.includes('anand') || q.includes('gowda')) {
+        return nav(
+          '/dashboard/suspect/anand-gowda?chronicle=true',
+          isHindi ? 'सर, आनंद गौड़ा का इन्वेस्टिगेशन क्रॉनिकल खोल रहा हूं।' :
+          isKannada ? 'ಸರ್, ಆನಂದ್ ಗೌಡ ಅವರ ತನಿಖಾ ಕ್ರಾನಿಕಲ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+          "Opening Anand Gowda's investigation chronicle, Sir.",
+          null
+        );
+      }
+      if (q.includes('ramesh') || q.includes('kumar')) {
+        return nav(
+          '/dashboard/suspect/ramesh-kumar?chronicle=true',
+          isHindi ? 'सर, रमेश कुमार का इन्वेस्टिगेशन क्रॉनिकल खोल रहा हूं।' :
+          isKannada ? 'ಸರ್, ರಮೇಶ್ ಕುಮಾರ್ ಅವರ ತನಿಖಾ ಕ್ರಾನಿಕಲ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+          "Opening Ramesh Kumar's investigation chronicle, Sir.",
+          null
+        );
+      }
+      // FIR case match
+      const caseMatch = q.match(/\b(kar\/[a-z0-9\/-]+|fir-[a-z0-9-]+)\b/i);
+      if (caseMatch) {
+        return nav(
+          `/dashboard/fir/${encodeURIComponent(caseMatch[1].toUpperCase())}?chronicle=true`,
+          `Opening investigation chronicle for case ${caseMatch[1].toUpperCase()}, Sir.`,
+          null
+        );
+      }
+    }
+
+    // 2. Network Graph / Criminal Nexus (Explicit High Priority Match)
+    if (/\b(network\s*graph|criminal\s*network|syndicate\s*graph|syndicate\s*network|nexus|gang\s*graph|connections|graph|link\s*analysis|network)\b/.test(q)) {
+      return nav('/dashboard/network', 
+        isHindi ? 'सर, नेटवर्क ग्राफ खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ನೆಟ್‌ವರ್ಕ್ ಗ್ರಾಫ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Criminal Network Graph, Sir.', null);
+    }
+
+    // 3. Crime Map / Hotspot Map
+    if (/\b(crime\s*map|hotspot|heat\s*map|map|geography|district\s*map|heatmap)\b/.test(q)) {
+      return nav('/dashboard/map', 
+        isHindi ? 'सर, अपराध मानचित्र खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಅಪರಾಧ ನಕ್ಷೆ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Crime Hotspot Map, Sir.', null);
+    }
+
+    // 4. Surveillance / CCTV / Camera
+    if (/\b(surveillance|cctv|camera|feed|live\s*feed|camera\s*grid|anpr\s*grid)\b/.test(q)) {
+      return nav('/dashboard/surveillance', 
+        isHindi ? 'सर, निगरानी और सीसीटीवी ग्रिड खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಕಣ್ಗಾವಲು ಮತ್ತು ಸಿಸಿಟಿವಿ ಗ್ರಿಡ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Surveillance & CCTV grid, Sir.', null);
+    }
+
+    // 5. FIR / Case Registry
+    if (/\b(fir\s*registry|fir\s*list|case\s*registry|all\s*firs|case\s*dockets|fir|cases|registry)\b/.test(q) && !/\b(suspect|accused|person|man|who\s*is)\b/.test(q)) {
+      return nav('/dashboard/fir', 
+        isHindi ? 'सर, एफआईआर रजिस्ट्री खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಎಫ್ಐಆರ್ ರಿಜಿಸ್ಟ್ರಿ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening FIR Registry, Sir.', null);
+    }
+
+    // 6. Suspect / Accused Roster
+    if (/\b(suspect\s*roster|suspect\s*list|all\s*suspects|offender\s*roster|watchlist|suspects|accused\s*list)\b/.test(q) && !/\b(of|for|named|is)\b/.test(q)) {
+      return nav('/dashboard/suspect', 
+        isHindi ? 'सर, संदिग्ध सूची खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಅನುಮಾನಿತರ ಪಟ್ಟಿ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Suspect Roster, Sir.', null);
+    }
+
+    // 7. Analytics / Statistics
+    if (/\b(analytics|statistics|stats|analysis|charts|reports|trends)\b/.test(q)) {
+      return nav('/dashboard/analytics', 
+        isHindi ? 'सर, एनालिटिक्स डैशबोर्ड खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಅನಾಲಿಟಿಕ್ಸ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Analytics Dashboard, Sir.', null);
+    }
+
+    // 8. Co-Pilot Chat
+    if (/\b(chat|co.?pilot|copilot|assistant|ai\s*chat|conversation|intelligence\s*chat)\b/.test(q)) {
+      return nav('/dashboard/chat', 
+        isHindi ? 'सर, को-पायलट चैट खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಕೋ-ಪೈಲಟ್ ಚಾಟ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Co-Pilot Intelligence Chat, Sir.', null);
+    }
+
+    // 9. Logs / AI Context Log / History
+    if (/\b(log|logs|history|context\s*log|ai\s*log|session|past\s*query|query\s*history)\b/.test(q)) {
+      return nav('/dashboard/logs', 
+        isHindi ? 'सर, एआई लॉग खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಎಐ ಲಾಗ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening AI Context Logs, Sir.', null);
+    }
+
+    // 10. KSP Units / HR / Hierarchy
+    if (/\b(hierarchy|unit|hr|police\s*station|station|personnel|officers|ksp\s*unit)\b/.test(q)) {
+      return nav('/dashboard/hierarchy', 
+        isHindi ? 'सर, केएसपी यूनिट और पदानुक्रम खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಕೆಎಸ್ಪಿ ಘಟಕ ಮತ್ತು ಕ್ರಮಾನುಗತ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening KSP Units & HR, Sir.', null);
+    }
+
+    // 11. Acts & Statutes / Legal
+    if (/\b(act|statute|legal|law|ipc|bns|section|legal\s*reference|acts)\b/.test(q)) {
+      return nav('/dashboard/statutes', 
+        isHindi ? 'सर, अधिनियम और धाराएं खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಕಾಯಿದೆ ಮತ್ತು ಸೆಕ್ಷನ್‌ಗಳನ್ನು ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Acts & Legal Sections, Sir.', null);
+    }
+
+    // 12. Live News
+    if (/\b(news|headlines|live\s*news|latest\s*news|media|press)\b/.test(q)) {
+      return nav('/dashboard/news', 
+        isHindi ? 'सर, लाइव न्यूज़ खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಲೈವ್ ನ್ಯೂಸ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Live News Feed, Sir.', null);
+    }
+
+    // 13. Panchanama
+    if (/\b(panchanama|panchanama\s*draft|spot\s*report|seizure\s*memo)\b/.test(q)) {
+      return nav('/dashboard/fir/panchanama', 
+        isHindi ? 'सर, पंचनामा ड्राफ्टर खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಪಂಚನಾಮ ಡ್ರಾಫ್ಟರ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Panchanama Auto-Drafter, Sir.', null);
+    }
+
+    // 14. Geo Trail
+    if (/\b(trail|geo\s*trail|gps|movement|tracking\s*trail|route)\b/.test(q)) {
+      return nav('/dashboard/trail',
+        isHindi ? 'सर, जियो ट्रेल खोल रहा हूं।' :
+        isKannada ? 'ಸರ್, ಜಿಯೋ ಟ್ರೇಲ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Geo Trail, Sir.', null);
+    }
+
+    // 15. Overview / Home / Dashboard
+    if (/\b(overview|home|dashboard|main\s*screen|command\s*center)\b/.test(q)) {
+      return nav('/dashboard', 
+        isHindi ? 'सर, ओवरव्यू डैशबोर्ड खोल रहा हूं।' : 
+        isKannada ? 'ಸರ್, ಮುಖ್ಯ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Going to Overview, Sir.', null);
+    }
+
+    // 16. Specific FIR docket number (e.g. KAR/BEN/2026/1002 or FIR-2026-BL-8842)
     const firNumMatch = q.match(/\b(kar\/[a-z0-9\/-]+|fir-[a-z0-9-]+)\b/i);
     if (firNumMatch) {
       const caseNum = firNumMatch[1].toUpperCase();
@@ -103,19 +255,25 @@ function detectLocalIntent(query) {
       );
     }
 
-    // Specific Suspect or Case Dossier by Name (e.g. "open case file of Anand Gowda", "open Anand Gowda", "show Ramesh Kumar")
-    const suspectTargetMatch = q.match(/\b(?:case\s*file|suspect|accused|dossier|record|profile|history)\s*(?:of|for)?\s+([a-z\s]+)\b/i) ||
+    // 17. Specific Named Suspect or Case Dossier by Name (e.g. "open case file of Anand Gowda", "open Vikram Malhotra", "show Ramesh Kumar")
+    const suspectTargetMatch = q.match(/\b(?:case\s*file|suspect|accused|dossier|record|profile|history|chronicle)\s*(?:of|for)?\s+([a-z\s]+)\b/i) ||
       q.match(/\b(?:open|show|view|find|track|inspect|pull\s*up|bring\s*up|load)\s+(?:the\s+)?(?:case\s*file|suspect|dossier|profile)?\s*(?:of|for)?\s*([a-z\s]+)\b/i);
 
     if (suspectTargetMatch && suspectTargetMatch[1]) {
       const rawTarget = suspectTargetMatch[1].trim();
-      const nonNames = ['crime map', 'map', 'surveillance', 'cctv', 'camera', 'overview', 'dashboard', 'analytics', 'fir', 'cases', 'registry', 'hierarchy', 'statutes', 'news', 'panchanama', 'trail', 'chat', 'logs', 'units', 'ksp units'];
+      const nonNames = [
+        'crime map', 'map', 'surveillance', 'cctv', 'camera', 'overview', 'dashboard',
+        'analytics', 'fir', 'cases', 'registry', 'hierarchy', 'statutes', 'news',
+        'panchanama', 'trail', 'chat', 'logs', 'units', 'ksp units', 'network',
+        'network graph', 'nexus', 'graph', 'syndicate', 'gang', 'patrol', 'hotspots', 'heatmap'
+      ];
       if (!nonNames.includes(rawTarget) && rawTarget.length > 2) {
         const isCaseFile = /\b(case|file|fir)\b/i.test(q);
-        const cleanName = rawTarget.replace(/\b(the|suspect|accused|person|man|guy|file|case|fir|dossier)\b/gi, '').trim();
+        const cleanName = rawTarget.replace(/\b(the|suspect|accused|person|man|guy|file|case|fir|dossier|chronicle)\b/gi, '').trim();
         const capName = cleanName.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') || rawTarget;
 
         if (capName.length > 2) {
+          const targetSlug = nameToSlug(capName);
           if (isCaseFile) {
             return nav(
               `/dashboard/fir?search=${encodeURIComponent(capName)}`,
@@ -126,7 +284,7 @@ function detectLocalIntent(query) {
             );
           } else {
             return nav(
-              `/dashboard/suspect?search=${encodeURIComponent(capName)}`,
+              `/dashboard/suspect/${targetSlug}`,
               isHindi ? `सर, ${capName} का संदिग्ध प्रोफाइल खोल रहा हूं।` :
               isKannada ? `ಸರ್, ${capName} ಅವರ ಶಂಕಿತ ವಿವರ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.` :
               `Opening ${capName}'s suspect dossier in Suspect Roster, Sir.`,
@@ -135,118 +293,6 @@ function detectLocalIntent(query) {
           }
         }
       }
-    }
-
-    // Surveillance / CCTV / Camera
-    if (/\b(surveillance|cctv|camera|feed|live\s*feed|camera\s*grid|watch)\b/.test(q)) {
-      return nav('/dashboard/surveillance', 
-        isHindi ? 'सर, निगरानी और सीसीटीवी ग्रिड खोल रहा हूं।' : 
-        isKannada ? 'ಸರ್, ಕಣ್ಗಾವಲು ಮತ್ತು ಸಿಸಿಟಿವಿ ಗ್ರಿಡ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
-        'Opening Surveillance & CCTV grid, Sir.', null);
-    }
-
-    // Crime Map / Hotspot Map
-    if (/\b(crime\s*map|hotspot|heat\s*map|map|geography|location|district\s*map)\b/.test(q)) {
-      return nav('/dashboard/map', 
-        isHindi ? 'सर, अपराध मानचित्र खोल रहा हूं।' : 
-        isKannada ? 'ಸರ್, ಅಪರಾಧ ನಕ್ಷೆ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
-        'Opening Crime Hotspot Map, Sir.', null);
-    }
-
-    // FIR / Case Registry
-    if (/\b(fir|case\s*file|case\s*list|registry|first\s*information|cases|complaints)\b/.test(q)) {
-      return nav('/dashboard/fir', 
-        isHindi ? 'सर, एफआईआर रजिस्ट्री खोल रहा हूं।' : 
-        isKannada ? 'ಸರ್, ಎಫ್ಐಆರ್ ರಿಜಿಸ್ಟ್ರಿ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
-        'Opening FIR Registry, Sir.', null);
-    }
-
-    // Suspect / Accused Roster
-    if (/\b(suspect|accused|criminal|wanted|roster|offender|watchlist)\b/.test(q)) {
-      return nav('/dashboard/suspect', 
-        isHindi ? 'सर, संदिग्ध सूची खोल रहा हूं।' : 
-        isKannada ? 'ಸರ್, ಅನುಮಾನಿತರ ಪಟ್ಟಿ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
-        'Opening Suspect Roster, Sir.', null);
-    }
-
-    // Network Graph / Criminal Nexus
-    if (/\b(network|nexus|gang|syndicate|connections|graph|link\s*analysis|criminal\s*network)\b/.test(q)) {
-      return nav('/dashboard/network', 
-        isHindi ? 'सर, नेटवर्क ग्राफ खोल रहा हूं।' : 
-        isKannada ? 'ಸರ್, ನೆಟ್‌ವರ್ಕ್ ಗ್ರಾಫ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
-        'Opening Criminal Network Graph, Sir.', null);
-    }
-
-    // Analytics / Statistics
-    if (/\b(analytics|statistics|stats|analysis|data|charts|reports|trends)\b/.test(q)) {
-      return nav('/dashboard/analytics', 
-        isHindi ? 'सर, एनालिटिक्स डैशबोर्ड खोल रहा हूं।' : 
-        isKannada ? 'ಸರ್, ಅನಾಲಿಟಿಕ್ಸ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
-        'Opening Analytics Dashboard, Sir.', null);
-    }
-
-    // Co-Pilot Chat
-    if (/\b(chat|co.?pilot|copilot|assistant|ai\s*chat|conversation|intelligence\s*chat)\b/.test(q)) {
-      return nav('/dashboard/chat', 
-        isHindi ? 'सर, को-पायलट चैट खोल रहा हूं।' : 
-        isKannada ? 'ಸರ್, ಕೋ-ಪೈಲಟ್ ಚಾಟ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
-        'Opening Co-Pilot Intelligence Chat, Sir.', null);
-    }
-
-    // Logs / AI Context Log / History
-    if (/\b(log|logs|history|context\s*log|ai\s*log|session|past\s*query|query\s*history)\b/.test(q)) {
-      return nav('/dashboard/logs', 
-        isHindi ? 'सर, एआई लॉग खोल रहा हूं।' : 
-        isKannada ? 'ಸರ್, ಎಐ ಲಾಗ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
-        'Opening AI Context Logs, Sir.', null);
-    }
-
-    // KSP Units / HR / Hierarchy
-    if (/\b(hierarchy|unit|hr|police\s*station|station|personnel|officers|ksp\s*unit)\b/.test(q)) {
-      return nav('/dashboard/hierarchy', 
-        isHindi ? 'सर, केएसपी यूनिट और पदानुक्रम खोल रहा हूं।' : 
-        isKannada ? 'ಸರ್, ಕೆಎಸ್ಪಿ ಘಟಕ ಮತ್ತು ಕ್ರಮಾನುಗತ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
-        'Opening KSP Units & HR, Sir.', null);
-    }
-
-    // Acts & Statutes / Legal
-    if (/\b(act|statute|legal|law|ipc|bns|section|legal\s*reference|acts)\b/.test(q)) {
-      return nav('/dashboard/statutes', 
-        isHindi ? 'सर, अधिनियम और धाराएं खोल रहा हूं।' : 
-        isKannada ? 'ಸರ್, ಕಾಯಿದೆ ಮತ್ತು ಸೆಕ್ಷನ್‌ಗಳನ್ನು ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
-        'Opening Acts & Legal Sections, Sir.', null);
-    }
-
-    // Live News
-    if (/\b(news|headlines|live\s*news|latest\s*news|media|press)\b/.test(q)) {
-      return nav('/dashboard/news', 
-        isHindi ? 'सर, लाइव न्यूज़ खोल रहा हूं।' : 
-        isKannada ? 'ಸರ್, ಲೈವ್ ನ್ಯೂಸ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
-        'Opening Live News Feed, Sir.', null);
-    }
-
-    // Panchanama
-    if (/\b(panchanama|panchanama\s*draft|spot\s*report|seizure\s*memo)\b/.test(q)) {
-      return nav('/dashboard/fir/panchanama', 
-        isHindi ? 'सर, पंचनामा ड्राफ्टर खोल रहा हूं।' : 
-        isKannada ? 'ಸರ್, ಪಂಚನಾಮ ಡ್ರಾಫ್ಟರ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
-        'Opening Panchanama Auto-Drafter, Sir.', null);
-    }
-
-    // Geo Trail
-    if (/\b(trail|geo\s*trail|gps|movement|tracking\s*trail|route)\b/.test(q)) {
-      return nav('/dashboard/trail',
-        isHindi ? 'सर, जियो ट्रेल खोल रहा हूं।' :
-        isKannada ? 'ಸರ್, ಜಿಯೋ ಟ್ರೇಲ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
-        'Opening Geo Trail, Sir.', null);
-    }
-
-    // Overview / Home / Dashboard
-    if (/\b(overview|home|dashboard|main\s*screen|command\s*center)\b/.test(q)) {
-      return nav('/dashboard', 
-        isHindi ? 'सर, ओवरव्यू डैशबोर्ड खोल रहा हूं।' : 
-        isKannada ? 'ಸರ್, ಮುಖ್ಯ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
-        'Going to Overview, Sir.', null);
     }
   }
 
