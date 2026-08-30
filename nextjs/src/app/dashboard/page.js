@@ -334,27 +334,27 @@ export default function DashboardPage() {
 
         {/* RIGHT COLUMN: CASES RESOLVED GRAPH CARD (4 COLS) */}
         {/* RIGHT COLUMN: CASES RESOLVED GRAPH CARD (4 COLS) */}
-        <div className="lg:col-span-4 rounded-3xl bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col justify-between h-full space-y-4">
+        <div className="lg:col-span-4 rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs flex flex-col justify-between h-full space-y-4">
           <div className="space-y-4">
             <div className="flex items-center justify-between text-slate-400">
-              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wide font-mono">
                 {timeFilter === 'Day' ? 'Cases Resolved Today' :
                  timeFilter === 'Week' ? 'Cases Resolved This Week' :
                  timeFilter === 'Year' ? 'Cases Resolved This Year' :
                  'Cases Resolved This Month'}
               </p>
-              <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+              <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                 <TrendingUp className="w-3 h-3" />
                 +4.2% KPI
               </span>
             </div>
             
-            <p className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+            <p className="text-3xl sm:text-4xl font-black text-[#14141A] tracking-tight">
               {timeFilter === 'Day' ? '92.0%' :
                timeFilter === 'Week' ? '88.2%' :
                timeFilter === 'Year' ? '81.4%' :
                '84.5%'}
-              <span className="text-xs sm:text-sm font-medium text-slate-500 ml-1.5">
+              <span className="text-xs sm:text-sm font-semibold text-slate-500 ml-1.5 font-mono">
                 / {timeFilter === 'Day' ? '12 Dossiers' :
                    timeFilter === 'Week' ? '48 Dossiers' :
                    timeFilter === 'Year' ? '1,840 Dossiers' :
@@ -363,15 +363,15 @@ export default function DashboardPage() {
             </p>
 
             {/* Time Filter Pills */}
-            <div className="flex items-center justify-between p-1 rounded-2xl bg-slate-100 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/60 text-xs font-semibold">
+            <div className="flex items-center justify-between p-1 rounded-2xl bg-slate-100 border border-slate-200/80 text-xs font-semibold">
               {['Day', 'Week', 'Month', 'Year'].map(tab => (
                 <button
                   key={tab}
                   onClick={() => setTimeFilter(tab)}
                   className={`flex-1 py-1.5 rounded-xl transition-all cursor-pointer text-center ${
                     timeFilter === tab 
-                      ? 'bg-white dark:bg-zinc-900 text-slate-900 dark:text-white font-extrabold shadow-xs' 
-                      : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-[#14141A] text-white font-bold shadow-xs' 
+                      : 'text-slate-500 hover:text-slate-900'
                   }`}
                 >
                   {tab}
@@ -379,19 +379,19 @@ export default function DashboardPage() {
               ))}
             </div>
 
-            {/* SMOOTH CURVED SVG BEZIER SPLINE CHART */}
+            {/* SMOOTH CURVED SVG BEZIER SPLINE CHART (COBALT #2E5FE0) */}
             <div className="relative mt-2 h-36 w-full">
               <svg viewBox="0 0 300 110" className="w-full h-full overflow-visible" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#2563eb" stopOpacity="0.2" />
-                    <stop offset="100%" stopColor="#2563eb" stopOpacity="0.0" />
+                    <stop offset="0%" stopColor="#2E5FE0" stopOpacity="0.18" />
+                    <stop offset="100%" stopColor="#2E5FE0" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
                 
                 {/* Baseline Grid lines */}
-                <line x1="0" y1="30" x2="300" y2="30" stroke="currentColor" strokeDasharray="3 3" className="text-slate-100 dark:text-slate-800/80" strokeWidth="1" />
-                <line x1="0" y1="70" x2="300" y2="70" stroke="currentColor" strokeDasharray="3 3" className="text-slate-100 dark:text-slate-800/80" strokeWidth="1" />
+                <line x1="0" y1="30" x2="300" y2="30" stroke="currentColor" strokeDasharray="3 3" className="text-slate-100" strokeWidth="1" />
+                <line x1="0" y1="70" x2="300" y2="70" stroke="currentColor" strokeDasharray="3 3" className="text-slate-100" strokeWidth="1" />
 
                 <path
                   d={
@@ -418,7 +418,7 @@ export default function DashboardPage() {
                       : 'M 0,70 C 20,45 40,85 70,55 C 100,25 120,75 150,50 C 180,24 200,12 230,15 C 250,18 270,75 300,48'
                   }
                   fill="none"
-                  stroke="#2563eb"
+                  stroke="#2E5FE0"
                   strokeWidth="3"
                   strokeLinecap="round"
                   className="transition-all duration-500"
@@ -429,44 +429,44 @@ export default function DashboardPage() {
                   cx="300"
                   cy={timeFilter === 'Year' ? 10 : timeFilter === 'Day' ? 18 : timeFilter === 'Week' ? 24 : 48}
                   r="4"
-                  fill="#2563eb"
+                  fill="#2E5FE0"
                   className="animate-pulse"
                 />
               </svg>
 
               {/* X-Axis Timeline Markers */}
-              <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-2 border-t border-slate-100">
                 <span>{timeFilter === 'Day' ? '06:00' : timeFilter === 'Week' ? 'Mon' : timeFilter === 'Year' ? 'Q1 2026' : 'Week 1'}</span>
                 <span>{timeFilter === 'Day' ? '12:00' : timeFilter === 'Week' ? 'Wed' : timeFilter === 'Year' ? 'Q2' : 'Week 2'}</span>
                 <span>{timeFilter === 'Day' ? '18:00' : timeFilter === 'Week' ? 'Fri' : timeFilter === 'Year' ? 'Q3' : 'Week 3'}</span>
-                <span className="font-bold text-blue-600 dark:text-blue-400">{timeFilter === 'Day' ? 'Now' : timeFilter === 'Week' ? 'Sun' : timeFilter === 'Year' ? 'Q4 (Active)' : 'Week 4'}</span>
+                <span className="font-bold text-[#2E5FE0]">{timeFilter === 'Day' ? 'Now' : timeFilter === 'Week' ? 'Sun' : timeFilter === 'Year' ? 'Q4 (Active)' : 'Week 4'}</span>
               </div>
             </div>
 
             {/* 2-Column Resolution Velocity Stats */}
             <div className="grid grid-cols-2 gap-3 pt-1">
-              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 flex flex-col justify-between">
-                <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 font-mono">
-                  <Clock className="w-3.5 h-3.5 text-blue-500" />
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-between">
+                <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
+                  <Clock className="w-3.5 h-3.5 text-[#2E5FE0]" />
                   <span>Avg. Resolution</span>
                 </div>
-                <p className="text-base font-extrabold text-slate-900 dark:text-white mt-1 font-mono">
+                <p className="text-base font-extrabold text-[#14141A] mt-1 font-mono">
                   {timeFilter === 'Day' ? '3.8 hrs' : timeFilter === 'Week' ? '4.2 hrs' : timeFilter === 'Year' ? '5.1 days' : '4.6 hrs'}
                 </p>
-                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold font-mono">
+                <span className="text-[10px] text-emerald-600 font-semibold font-mono">
                   ↓ 18% faster
                 </span>
               </div>
 
-              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 flex flex-col justify-between">
-                <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 font-mono">
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-between">
+                <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
                   <Shield className="w-3.5 h-3.5 text-emerald-500" />
                   <span>Chargesheet Rate</span>
                 </div>
-                <p className="text-base font-extrabold text-slate-900 dark:text-white mt-1 font-mono">
+                <p className="text-base font-extrabold text-[#14141A] mt-1 font-mono">
                   {timeFilter === 'Day' ? '96.2%' : timeFilter === 'Week' ? '91.8%' : timeFilter === 'Year' ? '89.6%' : '90.4%'}
                 </p>
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold font-mono">
+                <span className="text-[10px] text-slate-500 font-semibold font-mono">
                   Benchmark Met
                 </span>
               </div>
@@ -474,13 +474,13 @@ export default function DashboardPage() {
           </div>
 
           {/* BOTTOM TARGET CARD */}
-          <div className="p-4 rounded-2xl bg-slate-900 text-white flex items-center justify-between shadow-xs border border-slate-800">
+          <div className="p-4 rounded-xl bg-[#14141A] text-white flex items-center justify-between shadow-xs border border-[#14141A]">
             <div>
               <div className="flex items-center gap-1.5">
                 <Target className="w-3.5 h-3.5 text-blue-400" />
-                <p className="text-[10px] text-slate-400 font-mono font-bold uppercase tracking-wider">Plan for 2026</p>
+                <p className="text-[10px] text-slate-400 font-mono font-medium uppercase tracking-wider">FIELD OPS // PLAN 2026</p>
               </div>
-              <p className="text-xs font-extrabold text-white mt-0.5">Annual Clearance Target</p>
+              <p className="text-xs font-black text-white mt-0.5 uppercase tracking-wide">Clearance Target</p>
             </div>
 
             <div className="relative w-12 h-12 flex items-center justify-center">
@@ -494,11 +494,17 @@ export default function DashboardPage() {
                 />
                 <path
                   className="text-[#2E5FE0]"
-                  strokeDasharray="75, 100"
+                  strokeDasharray={`${
+                    timeFilter === 'Day' ? 92 :
+                    timeFilter === 'Week' ? 88 :
+                    timeFilter === 'Year' ? 81 :
+                    75
+                  }, 100`}
                   strokeWidth="4"
                   strokeLinecap="round"
                   stroke="currentColor"
                   fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
               </svg>
               <span className="absolute text-[10px] font-black font-mono text-white">
