@@ -1,13 +1,21 @@
 {
-  "command": "node server.js",
+  "command": "npm run start",
+  "buildPath": "./",
   "stack": "node20",
-  "build_path": ".",
   "env_variables": {
     "NODE_ENV": "production",
     "NEXT_PUBLIC_API_BASE_URL": "/api",
     "ANALYTICS_API_URL": "/api",
-    "OVERPASS_API_URL": "https://overpass-api.de/api/interpreter",
-    "NEXT_PUBLIC_VIDEO_BASE_URL": "/videos"
+    "CATALYST_ORG_ID": "60073715607",
+    "QUICKML_RAG_ENDPOINT_URL": "https://api.catalyst.zoho.in/quickml/v1/project/49149000000019001/rag/answer",
+    "QUICKML_TTS_ENDPOINT_URL": "https://api.catalyst.zoho.in/quickml/api/v1/models/zia/tts/synthesize",
+    "QUICKML_TRANSLATE_ENDPOINT_URL": "https://api.catalyst.zoho.in/quickml/api/v1/models/zia/translate",
+    "QUICKML_STT_ENDPOINT_URL": "https://api.catalyst.zoho.in/quickml/api/v1/models/zia/audio/transcribe",
+    "ZIA_OCR_ENDPOINT_URL": "https://api.catalyst.zoho.in/quickml/api/v1/models/zia/vision/ocr",
+    "ZIA_AUTOML_ENDPOINT_URL": "https://api.catalyst.zoho.in/quickml/api/v1/models/zia/automl/crime_severity/predict"
   },
-  "memory": 2048
+  "memory": 512,
+  "scripts": {
+    "predeploy": "npm run build:appsail && npm run postbuild"
+  }
 }
