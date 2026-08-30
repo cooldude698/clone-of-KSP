@@ -272,6 +272,24 @@ export default function NetworkPage() {
     } catch (_) {}
   }, []);
 
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab') || params.get('view');
+        if (tab === 'routes' || tab === 'predictive_routes' || tab === 'map') {
+          setViewMode('map');
+        } else if (tab === 'matrix' || tab === 'nexus_matrix') {
+          setViewMode('matrix');
+        } else if (tab === 'syndicates' || tab === 'cards' || tab === 'grid') {
+          setViewMode('grid');
+        } else if (tab === 'wall' || tab === 'hierarchy') {
+          setViewMode('hierarchy');
+        }
+      }
+    } catch (_) {}
+  }, []);
+
   const handleAddCustomPin = (e) => {
     e.preventDefault();
     if (!newPinNote.text.trim()) return;

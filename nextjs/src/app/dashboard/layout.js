@@ -41,6 +41,10 @@ const NAV_ITEMS = [
   { href: '/dashboard/news', icon: Newspaper, label: 'Live News', translationKey: 'nav.news', id: 'nav-news' },
 ];
 
+function nameToSlug(name) {
+  return (name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
 function extractRequestedName(queryText) {
   let cleaned = queryText
     .replace(/\b(can you|please|hey|hi|drishti|could you|would you)\b/gi, '')
@@ -130,7 +134,18 @@ function detectLocalIntent(query) {
       }
     }
 
-    // 2. Network Graph / Criminal Nexus (Explicit High Priority Match)
+    // 2. Predictive Routes / Syndicate Routes (Explicit Sub-Tab Navigation)
+    if (/\b(predictive\s*route|predictive\s*routes|escape\s*route|crime\s*corridor|syndicate\s*routes|routes)\b/i.test(q)) {
+      return nav(
+        '/dashboard/network?tab=routes',
+        isHindi ? 'सर, नेटवर्क ग्राफ़ पर प्रेडिक्टिव रूट्स खोल रहा हूं।' :
+        isKannada ? 'ಸರ್, ನೆಟ್‌ವರ್ಕ್ ಗ್ರಾಫ್‌ನಲ್ಲಿ ಪ್ರಿಡಿಕ್ಟಿವ್ ರೂಟ್‌ಗಳನ್ನು ತೆರೆಯುತ್ತಿದ್ದೇನೆ.' :
+        'Opening Predictive Crime Routes on Network Graph, Sir.',
+        null
+      );
+    }
+
+    // 3. Network Graph / Criminal Nexus (Explicit High Priority Match)
     if (/\b(network\s*graph|criminal\s*network|syndicate\s*graph|syndicate\s*network|nexus|gang\s*graph|connections|graph|link\s*analysis|network)\b/.test(q)) {
       return nav('/dashboard/network', 
         isHindi ? 'सर, नेटवर्क ग्राफ खोल रहा हूं।' : 
@@ -138,7 +153,7 @@ function detectLocalIntent(query) {
         'Opening Criminal Network Graph, Sir.', null);
     }
 
-    // 3. Crime Map / Hotspot Map
+    // 4. Crime Map / Hotspot Map
     if (/\b(crime\s*map|hotspot|heat\s*map|map|geography|district\s*map|heatmap)\b/.test(q)) {
       return nav('/dashboard/map', 
         isHindi ? 'सर, अपराध मानचित्र खोल रहा हूं।' : 
