@@ -138,15 +138,67 @@ const SUSPECT_MUGSHOTS = {
     confidence: '98.9%',
     last_seen: 'Near Wadhwa, Bengaluru Urban East',
     vehicle: 'Royal Enfield Classic (KA-03-NJ-1199)',
+  },
+  'basha-khan': {
+    mugshot: '/mugshots/basha-khan.jpg',
+    surveillance_still: '/mugshots/basha-khan.jpg',
+    alias: 'Basha Bhai',
+    cctns_id: 'SUS-4412',
+    primary_crime: 'Highway Cargo Hijacking & Interception',
+    anpr_camera: 'CAM-BLR-0012 (Tumakuru Highway Toll)',
+    confidence: '94.6%',
+    last_seen: 'Nelamangala Toll Post, Bengaluru Rural',
+    vehicle: 'Tata 407 (KA-06-B-8811)',
+  },
+  'deepak-shetty': {
+    mugshot: '/mugshots/deepak-shetty.jpg',
+    surveillance_still: '/mugshots/deepak-shetty.jpg',
+    alias: 'D-Shetty',
+    cctns_id: 'SUS-5120',
+    primary_crime: 'Financial Extortion & Land Encroachment',
+    anpr_camera: 'CAM-MNG-0004 (Mangaluru Port Road)',
+    confidence: '91.8%',
+    last_seen: 'Hampankatta, Mangaluru City',
+    vehicle: 'Toyota Fortuner (KA-19-M-9900)',
+  },
+  'ravi-shankar': {
+    mugshot: '/mugshots/ravi-shankar.jpg',
+    surveillance_still: '/mugshots/ravi-shankar.jpg',
+    alias: 'Ravi Anna',
+    cctns_id: 'SUS-3091',
+    primary_crime: 'Illegal Sand Mining & River Transport',
+    anpr_camera: 'CAM-SHI-0019 (Shivamogga Bypass)',
+    confidence: '93.4%',
+    last_seen: 'Bhadravathi Bypass, Shivamogga',
+    vehicle: 'Mahindra Bolero (KA-14-E-2234)',
+  },
+  'saanvi-dara': {
+    mugshot: '/mugshots/mahika-ramachandran.jpg',
+    surveillance_still: '/mugshots/mahika-ramachandran.jpg',
+    alias: 'Saanvi Madam',
+    cctns_id: 'SUS-8102',
+    primary_crime: 'Senior Citizen Extortion & Coercion',
+    anpr_camera: 'CAM-UDU-0003 (Udupi Temple Square)',
+    confidence: '90.2%',
+    last_seen: 'Das Marg, Udupi Rural',
+    vehicle: 'Honda Activa (KA-20-EA-1102)',
   }
 };
 
 const FALLBACK_PORTRAITS_MALE = [
+  '/mugshots/vikram-malhotra.jpg',
+  '/mugshots/imran-khan.jpg',
   '/mugshots/ramesh-kumar.jpg',
+  '/mugshots/suresh-naidu.jpg',
+  '/mugshots/anand-gowda.jpg',
   '/mugshots/anand-shinde.jpg',
-  '/mugshots/farid-mirza.jpg',
+  '/mugshots/basha-khan.jpg',
   '/mugshots/chetan-shetty.jpg',
-  '/mugshots/vikram-malhotra.jpg'
+  '/mugshots/deepak-shetty.jpg',
+  '/mugshots/farid-mirza.jpg',
+  '/mugshots/ravi-shankar.jpg',
+  '/mugshots/vikram-reddy.jpg',
+  '/mugshots/vikram-singh.jpg'
 ];
 
 const FALLBACK_PORTRAITS_FEMALE = [
@@ -155,10 +207,11 @@ const FALLBACK_PORTRAITS_FEMALE = [
 ];
 
 function isFemaleName(name = '') {
-  const n = name.toLowerCase();
+  const n = String(name || '').toLowerCase();
   return (
     n.includes('bhavani') ||
     n.includes('mahika') ||
+    n.includes('saanvi') ||
     n.includes('anita') ||
     n.includes('priya') ||
     n.includes('sunita') ||
@@ -167,7 +220,6 @@ function isFemaleName(name = '') {
     n.includes('pooja') ||
     n.includes('devi') ||
     n.includes('kumari') ||
-    n.includes('sharma, meera') ||
     n.includes('meera') ||
     n.includes('ananya')
   );
@@ -188,23 +240,27 @@ export function getSuspectMedia(suspect) {
     };
   }
 
-  // 1. Direct key match by name or slug
-  const rawName = suspect.name || suspect.accused_name || '';
+  // 1. Extract name properly whether suspect is a string or an object
+  const rawName = typeof suspect === 'string'
+    ? suspect
+    : (suspect.name || suspect.accused_name || suspect.suspect_name || suspect.target || '');
   const slug = rawName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-  const idKey = (suspect.suspect_id || suspect.id || '').toLowerCase();
+  const idKey = typeof suspect === 'object' ? (suspect.suspect_id || suspect.id || '').toLowerCase() : '';
 
-  if (SUSPECT_MUGSHOTS[slug]) return SUSPECT_MUGSHOTS[slug];
-  if (SUSPECT_MUGSHOTS[idKey]) return SUSPECT_MUGSHOTS[idKey];
+  if (slug && SUSPECT_MUGSHOTS[slug]) return SUSPECT_MUGSHOTS[slug];
+  if (idKey && SUSPECT_MUGSHOTS[idKey]) return SUSPECT_MUGSHOTS[idKey];
 
   // Try partial name match
-  for (const [key, media] of Object.entries(SUSPECT_MUGSHOTS)) {
-    if (slug.includes(key) || key.includes(slug)) {
-      return media;
+  if (slug) {
+    for (const [key, media] of Object.entries(SUSPECT_MUGSHOTS)) {
+      if (slug.includes(key) || key.includes(slug)) {
+        return media;
+      }
     }
   }
 
   // 2. If custom mugshot provided in object that starts with / or http
-  if (suspect.mugshot_url || suspect.mugshot) {
+  if (typeof suspect === 'object' && (suspect.mugshot_url || suspect.mugshot)) {
     const customPic = suspect.mugshot_url || suspect.mugshot;
     if (!customPic.includes('undefined')) {
       return {
@@ -227,7 +283,7 @@ export function getSuspectMedia(suspect) {
     hash = (hash << 5) - hash + slug.charCodeAt(i);
     hash |= 0;
   }
-  const isFemale = isFemaleName(rawName) || suspect.gender?.toLowerCase() === 'female';
+  const isFemale = isFemaleName(rawName) || (typeof suspect === 'object' && suspect.gender?.toLowerCase() === 'female');
   const pool = isFemale ? FALLBACK_PORTRAITS_FEMALE : FALLBACK_PORTRAITS_MALE;
   const index = Math.abs(hash) % pool.length;
   const chosenPic = pool[index];
@@ -235,12 +291,12 @@ export function getSuspectMedia(suspect) {
   return {
     mugshot: chosenPic,
     surveillance_still: chosenPic,
-    alias: suspect.alias || `${rawName.split(' ')[0]} Operative`,
-    cctns_id: suspect.suspect_id || `SUS-${Math.abs(hash % 9000 + 1000)}`,
-    primary_crime: suspect.primary_crime || suspect.crime_type || 'Repeat Penal Offense',
+    alias: (typeof suspect === 'object' && suspect.alias) ? suspect.alias : `${rawName.split(' ')[0] || 'Suspect'} Operative`,
+    cctns_id: (typeof suspect === 'object' && suspect.suspect_id) ? suspect.suspect_id : `SUS-${Math.abs(hash % 9000 + 1000)}`,
+    primary_crime: (typeof suspect === 'object' && (suspect.primary_crime || suspect.crime_type)) || 'Repeat Penal Offense',
     anpr_camera: 'CAM-BLR-INTERCEPT-01',
     confidence: `${(88 + (Math.abs(hash) % 10)).toFixed(1)}%`,
-    last_seen: suspect.last_known_location || suspect.district_name || 'Bengaluru Urban Jurisdiction',
-    vehicle: suspect.vehicle || 'Vehicle under ANPR scan',
+    last_seen: (typeof suspect === 'object' && (suspect.last_known_location || suspect.district_name)) || 'Bengaluru Urban Jurisdiction',
+    vehicle: (typeof suspect === 'object' && suspect.vehicle) || 'Vehicle under ANPR scan',
   };
 }

@@ -74,6 +74,26 @@ function getCrimeCardMeta(crimeType = '', firId = '') {
   };
 }
 
+function formatFirDisplayNumber(fir, caseId) {
+  if (!fir) return caseId || 'FIR #1001/2026';
+  const cNum = fir.case_number || caseId || '';
+  if (cNum.startsWith('KAR/')) {
+    const parts = cNum.split('/');
+    const year = parts[2] || '2026';
+    const num = parts[3] || '1001';
+    return `FIR #${num}/${year}`;
+  }
+  if (cNum.startsWith('FIR-')) {
+    return cNum;
+  }
+  if (fir.crime_no && String(fir.crime_no).length > 8) {
+    const str = String(fir.crime_no);
+    const lastDigits = str.slice(-4);
+    return `FIR #${lastDigits}/2026`;
+  }
+  return cNum || 'FIR #1001/2026';
+}
+
 export default function FirRegistryPage() {
   const [firs, setFirs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -330,23 +350,26 @@ export default function FirRegistryPage() {
           {filtered.map(fir => {
             const caseId = fir.case_number || fir.id || 'FIR-2026-UNKNOWN';
             const encodedId = encodeURIComponent(caseId);
-            const status = fir.status || fir.case_status || 'open';
+            const status = (fir.status || fir.case_status || 'open').toLowerCase();
             const meta = getCrimeCardMeta(fir.crime_type, caseId);
+            const CategoryIcon = meta.icon;
             const accusedName = fir.accused_name || fir.suspect_name;
             const suspectMedia = accusedName ? getSuspectMedia(accusedName) : null;
             const rawDescription = fir.description || 'FIR complaint registered under relevant legal sections.';
             const briefSummary = rawDescription.split('\n')[0].replace(/FIR registered at .* for /i, '');
+            const displayFirNo = formatFirDisplayNumber(fir, caseId);
 
             return (
               <div
                 key={caseId}
-                className="group rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all duration-150 flex flex-col justify-between"
+                className="group rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 p-5 hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-md transition-all duration-200 flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="flex items-center gap-3">
+                  {/* Top Bar: Mugshot / Icon + Case Number + Status Badge */}
+                  <div className="flex items-start justify-between gap-2.5 mb-3.5">
+                    <div className="flex items-center gap-3 min-w-0">
                       {suspectMedia && accusedName ? (
-                        <div className="relative w-11 h-11 rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 shrink-0">
+                        <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 shrink-0 shadow-2xs">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={suspectMedia.mugshot}
@@ -356,14 +379,14 @@ export default function FirRegistryPage() {
                           />
                         </div>
                       ) : (
-                        <div className="w-11 h-11 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700 font-mono text-[11px] font-bold">
-                          {meta.ipc.split(' ')[0] || 'FIR'}
+                        <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-900/60 shadow-2xs">
+                          <CategoryIcon className="w-5 h-5" />
                         </div>
                       )}
 
                       <div className="min-w-0">
-                        <span className="font-mono text-xs font-black text-zinc-950 dark:text-white block truncate max-w-[150px]">
-                          {fir.crime_no || caseId}
+                        <span className="font-mono text-xs sm:text-sm font-black text-zinc-950 dark:text-white block truncate">
+                          {displayFirNo}
                         </span>
                         <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
                           {fir.police_station || fir.location_name || 'KSP Command'}
@@ -371,26 +394,48 @@ export default function FirRegistryPage() {
                       </div>
                     </div>
 
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                      status === 'open' ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400' :
-                      status === 'closed' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400' :
-                      'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400'
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap shrink-0 border ${
+                      status === 'open' ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800' :
+                      status === 'closed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800' :
+                      'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800'
                     }`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${
-                        status === 'open' ? 'bg-rose-500' : status === 'closed' ? 'bg-emerald-500' : 'bg-amber-500'
+                        status === 'open' ? 'bg-rose-500 animate-pulse' : status === 'closed' ? 'bg-emerald-500' : 'bg-amber-500'
                       }`} />
-                      {status.replace('_', ' ')}
+                      {status === 'under_investigation' ? 'Under Inv.' : status.replace('_', ' ')}
                     </span>
                   </div>
 
-                  <h3 className="text-base font-extrabold text-zinc-900 dark:text-zinc-50 mb-1 leading-snug">
-                    {fir.crime_type || 'General Offence'}
-                  </h3>
+                  {/* Crime Category Pill & Title */}
+                  <div className="mb-2">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${meta.iconBg} ${meta.iconText} border ${meta.iconBorder}`}>
+                        <CategoryIcon className="w-3 h-3" />
+                        <span>{meta.badge}</span>
+                      </span>
+                      <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500">
+                        {meta.ipc}
+                      </span>
+                    </div>
 
+                    <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-zinc-50 leading-snug">
+                      {fir.crime_type || 'General Offence'}
+                    </h3>
+                  </div>
+
+                  {/* Accused Name with Alias if available */}
                   {accusedName && (
-                    <p className="text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-2">
-                      Accused: <span className="text-zinc-950 dark:text-white font-extrabold">{accusedName}</span>
-                    </p>
+                    <div className="mb-2.5 flex items-center gap-1.5 flex-wrap">
+                      <span className="text-xs text-zinc-500 dark:text-zinc-400">Accused:</span>
+                      <span className="text-xs font-black text-zinc-950 dark:text-white">
+                        {accusedName}
+                      </span>
+                      {suspectMedia?.alias && suspectMedia.alias !== 'Unknown Operative' && (
+                        <span className="text-[10px] font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-1.5 py-0.5 rounded border border-blue-200 dark:border-blue-900/60">
+                          {suspectMedia.alias}
+                        </span>
+                      )}
+                    </div>
                   )}
 
                   <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2 leading-relaxed mb-4">
@@ -399,16 +444,17 @@ export default function FirRegistryPage() {
                 </div>
 
                 <div className="pt-3.5 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400 font-mono">
+                  <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400">
                     <MapPin className="w-3.5 h-3.5 shrink-0 text-zinc-400" />
-                    <span className="truncate max-w-[140px]">{fir.location_name || fir.district_name || 'Karnataka'}</span>
+                    <span className="truncate max-w-[130px] font-medium">{fir.location_name || fir.district_name || 'Karnataka'}</span>
                   </div>
 
                   <Link
                     href={`/dashboard/fir/${encodedId}`}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-zinc-950 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-blue-600 hover:text-white dark:bg-zinc-800 dark:hover:bg-blue-600 text-xs font-bold text-zinc-900 dark:text-white transition-all shadow-2xs"
                   >
-                    View Case <ArrowRight className="w-3.5 h-3.5" />
+                    <span>View Case</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               </div>
