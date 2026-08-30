@@ -13,14 +13,17 @@ import {
   AlertTriangle,
   ChevronRight,
   TrendingUp,
-  TrendingDown,
   Building2,
   Users,
   Zap,
   ArrowUpRight,
   Sparkles,
   MapPin,
-  Gauge
+  Gauge,
+  Shield,
+  Search,
+  MoreVertical,
+  Camera
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSupervisorTelemetry } from '@/context/SupervisorTelemetryContext';
@@ -40,6 +43,7 @@ export default function SupervisorOperationsCommandHub() {
     approveSanction,
   } = useSupervisorTelemetry();
 
+  const [timeFilter, setTimeFilter] = useState('Month');
   const [approvedNotification, setApprovedNotification] = useState('');
 
   const handleQuickApprove = (id: string, name: string) => {
@@ -53,326 +57,419 @@ export default function SupervisorOperationsCommandHub() {
   const timeFormatted = `${minutes}m ${seconds < 10 ? '0' : ''}${seconds}s`;
 
   return (
-    <div className="flex flex-col gap-6 pb-12">
-      {/* ── TOP BANNER ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] shadow-sm">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)] tracking-tight">
-            State Operations & Fleet Command
-          </h1>
-          <p className="text-xs sm:text-sm text-[var(--text-secondary)] font-mono mt-1">
-            Supervisory command oversight, live 2s moving patrol fleet dispatch, inter-district audit & statutory sanction queue.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--surface-0)] border border-[var(--border)] text-xs font-mono self-start sm:self-center shadow-inner">
-          <span className="w-2 h-2 rounded-full bg-[var(--status-success)] animate-pulse" />
-          <span className="text-[var(--text-secondary)] font-bold uppercase text-[10px]">2s DYNAMIC GPS:</span>
-          <span className="text-[11px] text-[var(--text-primary)] font-bold" suppressHydrationWarning>Moving Cycle #{tick}</span>
-        </div>
-      </div>
-
-      {/* ── TOAST NOTIFICATION ── */}
-      {approvedNotification && (
-        <div className="p-3.5 rounded-xl bg-[var(--status-success)]/10 border border-[var(--status-success)]/30 text-[var(--status-success)] font-mono text-xs flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
-          <span>{approvedNotification}</span>
-        </div>
-      )}
-
-      {/* ── 4 KEY EXECUTIVE KPI CARDS ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1: Active Patrol Units */}
-        <motion.div
-          whileHover={{ y: -2 }}
-          className="p-5 rounded-xl bg-[var(--surface-0)] border border-[var(--border)] shadow-sm flex flex-col justify-between"
-        >
+    <div className="w-full max-w-7xl mx-auto space-y-6 text-slate-900">
+      {/* ── TOP SECTION: COMMAND DASHBOARD GRID ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        {/* LEFT COLUMN: ACTIVE DUTY & TACTICAL INTEL (8 COLS) */}
+        <div className="lg:col-span-8 flex flex-col justify-between space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono font-bold text-[var(--text-secondary)] uppercase tracking-wider">
-              Patrol Fleets On Beat
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-[var(--cyan-accent)]/10 text-[var(--cyan-accent)] flex items-center justify-center">
-              <Navigation className="w-4 h-4" />
+            <div>
+              <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+                Operations Command
+              </h1>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Karnataka State Police · Sector 4 Supervisory Command & Fleet Matrix
+              </p>
             </div>
-          </div>
-          <div className="mt-3">
-            <span className="text-3xl font-extrabold font-mono text-[var(--text-primary)]" suppressHydrationWarning>
-              {activePatrolCount} Units
-            </span>
-            <div className="flex items-center gap-1 text-[11px] font-mono text-[var(--status-success)] mt-1 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-[var(--status-success)] animate-pulse" />
-              <span>2s Continuous Vector Sync</span>
-            </div>
-          </div>
-        </motion.div>
 
-        {/* Card 2: 112 Emergency ETA */}
-        <motion.div
-          whileHover={{ y: -2 }}
-          className="p-5 rounded-xl bg-[var(--surface-0)] border border-[var(--border)] shadow-sm flex flex-col justify-between"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono font-bold text-[var(--text-secondary)] uppercase tracking-wider">
-              Avg 112 Response Time
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-[var(--status-success)]/10 text-[var(--status-success)] flex items-center justify-center">
-              <Clock className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="mt-3">
-            <span className="text-3xl font-extrabold font-mono text-[var(--status-success)]" suppressHydrationWarning>
-              {timeFormatted}
-            </span>
-            <div className="flex items-center gap-1 text-[11px] font-mono text-[var(--status-success)] mt-1 font-semibold">
-              <TrendingDown className="w-3.5 h-3.5" />
-              <span>-42s improvement WoW</span>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Card 3: Pending Statutory Sanctions */}
-        <motion.div
-          whileHover={{ y: -2 }}
-          className="p-5 rounded-xl bg-[var(--surface-0)] border border-[var(--border)] shadow-sm flex flex-col justify-between"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono font-bold text-[var(--text-secondary)] uppercase tracking-wider">
-              Pending SP Sanctions
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-[var(--status-critical)]/10 text-[var(--status-critical)] flex items-center justify-center">
-              <FileCheck className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="mt-3">
-            <span className="text-3xl font-extrabold font-mono text-[var(--status-critical)]" suppressHydrationWarning>
-              {pendingSanctionsCount} Warrants
-            </span>
-            <div className="flex items-center gap-1 text-[11px] font-mono text-[var(--status-warning)] mt-1 font-semibold">
-              <AlertTriangle className="w-3.5 h-3.5" />
-              <span>2 critical Goonda Act requests</span>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Card 4: Statewide Clearance Rate */}
-        <motion.div
-          whileHover={{ y: -2 }}
-          className="p-5 rounded-xl bg-[var(--surface-0)] border border-[var(--border)] shadow-sm flex flex-col justify-between"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono font-bold text-[var(--text-secondary)] uppercase tracking-wider">
-              Disposal & Clearance
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-[var(--accent)]/10 text-[var(--accent)] flex items-center justify-center">
-              <Activity className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="mt-3">
-            <span className="text-3xl font-extrabold font-mono text-[var(--text-primary)]" suppressHydrationWarning>
-              {statewideClearanceRate}%
-            </span>
-            <div className="flex items-center gap-1 text-[11px] font-mono text-[var(--status-success)] mt-1 font-semibold">
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>Exceeds Target (80.0%)</span>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* ── MIDDLE SECTION: LIVE 2S FLEET MONITOR & PENDING SANCTIONS QUEUE ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left 2 Cols: Live Patrol Units Moving Stream */}
-        <div className="lg:col-span-2 p-5 rounded-2xl bg-[var(--surface-0)] border border-[var(--border)] shadow-sm flex flex-col gap-4">
-          <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
             <div className="flex items-center gap-2">
-              <Navigation className="w-4 h-4 text-[var(--cyan-accent)] animate-pulse" />
-              <h2 className="text-sm font-bold font-mono uppercase tracking-wider text-[var(--text-primary)]">
-                Live 2s Patrol Fleet Coordinates & Heading
-              </h2>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] font-bold text-emerald-600">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                Live GPS Vector #{tick}
+              </span>
+            </div>
+          </div>
+
+          {/* Toast */}
+          {approvedNotification && (
+            <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>{approvedNotification}</span>
+            </div>
+          )}
+
+          {/* 4-CARD BALANCED INTELLIGENCE GRID (EXACT INSPECTOR STYLE) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+            {/* CARD 1: ACTIVE PATROL FLEETS */}
+            <div className="rounded-[28px] bg-white border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-11 h-11 rounded-full bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shadow-xs">
+                    <Navigation className="w-5 h-5" />
+                  </div>
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-200">
+                    4 Sectors Active
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-xs text-slate-500 font-medium">
+                    Patrol Fleets On Beat
+                  </p>
+                  <h3 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug">
+                    {activePatrolCount} Units Operational
+                  </h3>
+                  <div className="flex items-center gap-2 pt-2">
+                    <span className="text-[10px] font-mono font-bold text-emerald-600">
+                      100% Satellite Connected · 2s Refresh
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-extrabold text-slate-900">Beat Coverage</span>
+                  <span className="block text-[10px] text-slate-500 font-medium">PCR & Cheetah Active</span>
+                </div>
+                <Link
+                  href="/supervisor/dispatch"
+                  className="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
+                >
+                  Fleet Map
+                </Link>
+              </div>
+            </div>
+
+            {/* CARD 2: STATEWIDE 112 RESPONSE TIME */}
+            <div className="rounded-[28px] bg-white border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-11 h-11 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shadow-xs">
+                    <Clock className="w-5 h-5" />
+                  </div>
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">
+                    SLA Compliant
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-xs text-slate-500 font-medium">
+                    112 Average Response ETA
+                  </p>
+                  <h3 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug">
+                    {timeFormatted} Latency
+                  </h3>
+                  <p className="text-[11px] text-slate-500 line-clamp-2 pt-1">
+                    Sector 4 urban beat benchmark &lt;10m; dispatch to on-scene verified.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-extrabold text-slate-900">Dispatch Queue</span>
+                  <span className="block text-[10px] text-slate-500 font-medium">Auto-Routed</span>
+                </div>
+                <Link
+                  href="/supervisor/dispatch"
+                  className="px-4 py-2 rounded-full bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-all shadow-xs flex items-center gap-1"
+                >
+                  Deploy Patrol
+                </Link>
+              </div>
+            </div>
+
+            {/* CARD 3: PENDING STATUTORY SANCTIONS */}
+            <div className="rounded-[28px] bg-white border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-11 h-11 rounded-full bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center shadow-xs">
+                    <FileCheck className="w-5 h-5" />
+                  </div>
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-rose-50 text-rose-600 border border-rose-200">
+                    Action Required
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-xs text-slate-500 font-medium">
+                    SP Statutory Clearance Desk
+                  </p>
+                  <h3 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug">
+                    {pendingSanctionsCount} Warrants Pending
+                  </h3>
+                  <div className="flex flex-wrap items-center gap-1.5 pt-2 pb-1">
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-semibold text-slate-700">
+                      Goonda Act
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-semibold text-slate-700 font-mono">
+                      Sec 110 BNSS
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-extrabold text-slate-900">Statutory Orders</span>
+                  <span className="block text-[10px] text-slate-500 font-medium">Awaiting Sign-off</span>
+                </div>
+                <Link
+                  href="/supervisor/approvals"
+                  className="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
+                >
+                  Review Warrants
+                </Link>
+              </div>
+            </div>
+
+            {/* CARD 4: DISPOSAL VELOCITY */}
+            <div className="rounded-[28px] bg-white border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-11 h-11 rounded-full bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center shadow-xs">
+                    <Gauge className="w-5 h-5" />
+                  </div>
+                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-purple-50 text-purple-600 border border-purple-200">
+                    {statewideClearanceRate}% Rate
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-xs text-slate-500 font-medium">
+                    Division Clearance & Disposal
+                  </p>
+                  <h3 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug">
+                    148 Cases Closed (MoM)
+                  </h3>
+                  <div className="flex flex-wrap items-center gap-1.5 pt-2 pb-1">
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-semibold text-slate-700">
+                      4 PS Synced
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-[10px] font-semibold text-emerald-700">
+                      +4.2% Velocity
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-extrabold text-slate-900">Officer Metrics</span>
+                  <span className="block text-[10px] text-slate-500 font-medium">4 Inspectors</span>
+                </div>
+                <Link
+                  href="/supervisor/performance"
+                  className="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
+                >
+                  Scorecards
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN: CASES RESOLVED GRAPH CARD (4 COLS) */}
+        <div className="lg:col-span-4 rounded-3xl bg-white border border-slate-200 p-6 shadow-sm flex flex-col justify-between h-full">
+          <div>
+            <div className="flex items-center justify-between text-slate-400">
+              <p className="text-xs font-medium text-slate-500">
+                {timeFilter === 'Day' ? 'Division Disposals Today' :
+                 timeFilter === 'Week' ? 'Division Disposals This Week' :
+                 timeFilter === 'Year' ? 'Division Disposals This Year' :
+                 'Division Disposals This Month'}
+              </p>
+              <button className="text-slate-400 hover:text-slate-900">
+                <MoreVertical className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-3xl font-extrabold text-slate-900 mt-1 tracking-tight">
+              {timeFilter === 'Day' ? '92.0%' :
+               timeFilter === 'Week' ? '88.2%' :
+               timeFilter === 'Year' ? '81.4%' :
+               '84.5%'}
+              <span className="text-sm font-normal text-slate-500 ml-1.5">
+                / {timeFilter === 'Day' ? '12 Dossiers' :
+                   timeFilter === 'Week' ? '48 Dossiers' :
+                   timeFilter === 'Year' ? '1,840 Dossiers' :
+                   '152 Dossiers'}
+              </span>
+            </p>
+
+            {/* Time Filter Pills */}
+            <div className="flex items-center justify-between text-xs font-bold text-slate-500 mt-4 px-2">
+              {['Day', 'Week', 'Month', 'Year'].map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setTimeFilter(tab)}
+                  className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                    timeFilter === tab
+                      ? 'bg-slate-900 text-white font-bold shadow-xs'
+                      : 'hover:text-slate-900'
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+
+            {/* SMOOTH CURVED SVG SPLINE CHART */}
+            <div className="relative mt-5 h-28 w-full">
+              <svg viewBox="0 0 300 100" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="supChartGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#1d6fbf" stopOpacity="0.15" />
+                    <stop offset="100%" stopColor="#1d6fbf" stopOpacity="0.0" />
+                  </linearGradient>
+                </defs>
+
+                <path
+                  d="M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45 L 300,100 L 0,100 Z"
+                  fill="url(#supChartGrad)"
+                  className="transition-all duration-500"
+                />
+
+                <path
+                  d="M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45"
+                  fill="none"
+                  stroke="#1d6fbf"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  className="transition-all duration-500"
+                />
+              </svg>
+            </div>
+          </div>
+
+          {/* THE ONE DARK EXCEPTION: SUMMARY / TARGET CARD */}
+          <div className="mt-4 p-4 rounded-2xl bg-slate-900 text-white flex items-center justify-between shadow-sm">
+            <div>
+              <p className="text-[10px] text-slate-400 font-medium">Sector 4 Plan for 2026</p>
+              <p className="text-xs font-bold text-white mt-0.5">Division Clearance Target</p>
+            </div>
+
+            <div className="relative w-12 h-12 flex items-center justify-center">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                <path
+                  className="text-slate-700"
+                  strokeWidth="4"
+                  stroke="currentColor"
+                  fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                <path
+                  className="text-blue-500"
+                  strokeDasharray="85, 100"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  stroke="currentColor"
+                  fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+              </svg>
+              <span className="absolute text-[10px] font-black text-white">85%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── BOTTOM SECTION: STATION WORKLOAD MATRIX & PATROL FEED ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Police Station Workload Table (7 cols) */}
+        <div className="lg:col-span-7 rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-base font-bold text-slate-900">
+                Division Police Station Workload Matrix
+              </h3>
+              <p className="text-xs text-slate-500">
+                Disposal velocities, charge sheet turnaround times and station backlogs
+              </p>
             </div>
             <Link
-              href="/supervisor/dispatch"
-              className="text-xs font-mono text-[var(--accent)] hover:underline flex items-center gap-1"
+              href="/supervisor/performance"
+              className="text-xs font-bold text-blue-600 hover:underline"
             >
-              Open Full 2s Map Tracker <ArrowUpRight className="w-3 h-3" />
+              View Roster →
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {patrolUnits.map((unit) => (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-slate-100 text-slate-400 font-semibold">
+                  <th className="pb-3">Station / District</th>
+                  <th className="pb-3">Disposal Rate</th>
+                  <th className="pb-3">Charge Sheet SLA</th>
+                  <th className="pb-3">Avg Response</th>
+                  <th className="pb-3">Risk Level</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {districtAudits.map((d) => (
+                  <tr key={d.district} className="hover:bg-slate-50 transition-colors">
+                    <td className="py-3 font-bold text-slate-900">{d.district}</td>
+                    <td className="py-3 font-bold text-emerald-600">{d.disposalRate}%</td>
+                    <td className="py-3 text-slate-600">{d.chargeSheetCompliance}% within 60d</td>
+                    <td className="py-3 text-slate-600">{d.avgResponseMin} mins</td>
+                    <td className="py-3">
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-semibold ${
+                          d.underreportingRisk === 'LOW'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : d.underreportingRisk === 'MODERATE'
+                            ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                            : 'bg-rose-50 text-rose-700 border border-rose-200'
+                        }`}
+                      >
+                        {d.underreportingRisk}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Live Moving Patrol Units List (5 cols) */}
+        <div className="lg:col-span-5 rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <Navigation className="w-4 h-4 text-blue-600" />
+                Live Moving Patrol Fleets
+              </h3>
+              <p className="text-xs text-slate-500">2-second vector positioning</p>
+            </div>
+            <Link
+              href="/supervisor/dispatch"
+              className="text-xs font-bold text-blue-600 hover:underline"
+            >
+              Full Map →
+            </Link>
+          </div>
+
+          <div className="flex flex-col gap-2.5 mt-1">
+            {patrolUnits.slice(0, 4).map((unit) => (
               <div
                 key={unit.id}
-                className="p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] flex flex-col gap-2 font-mono text-xs hover:border-[var(--cyan-accent)]/40 transition-colors"
+                className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col gap-1.5"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-[var(--text-primary)] text-sm">{unit.callsign}</span>
-                  <span
-                    className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${
-                      unit.status === 'DISPATCHED'
-                        ? 'bg-[var(--status-critical)]/10 text-[var(--status-critical)] border border-[var(--status-critical)]/30 animate-pulse'
-                        : 'bg-[var(--status-success)]/10 text-[var(--status-success)] border border-[var(--status-success)]/30'
-                    }`}
-                  >
-                    {unit.status}
+                  <span className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    {unit.callsign}
+                  </span>
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                    {unit.type}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between text-[11px] text-[var(--text-secondary)]">
-                  <span>{unit.type} · {unit.officer}</span>
-                  <span className="text-[var(--cyan-accent)] font-semibold" suppressHydrationWarning>{unit.speedKmH} km/h</span>
-                </div>
+                <p className="text-[11px] text-slate-600">
+                  {unit.officer} · {unit.precinct}
+                </p>
 
-                {/* Moving Coordinates & Heading Vector */}
-                <div className="text-[10px] text-[var(--text-secondary)] flex items-center justify-between pt-1 border-t border-[var(--border)]/60" suppressHydrationWarning>
-                  <span className="text-[var(--cyan-accent)] font-semibold">
-                    {unit.lat.toFixed(4)}° N, {unit.lng.toFixed(4)}° E
-                  </span>
-                  <span className="text-gray-400 font-mono">
-                    {unit.distanceKm} km · {unit.heading}°
-                  </span>
+                <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1 border-t border-slate-200/60 font-mono">
+                  <span>Speed: <strong className="text-slate-900">{unit.speedKmH} km/h</strong></span>
+                  <span>Fuel: <strong className="text-emerald-600">{unit.fuel}%</strong></span>
+                  <span className="text-blue-600 font-bold">{unit.status}</span>
                 </div>
               </div>
             ))}
           </div>
-
-          {/* Real-Time Radio Activity Ticker */}
-          <div className="p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] flex flex-col gap-1.5 font-mono text-xs">
-            <span className="text-[10px] font-bold text-[var(--accent)] uppercase flex items-center gap-1">
-              <Radio className="w-3.5 h-3.5 text-[var(--status-success)] animate-pulse" /> Live 112 Radio Dispatch Log
-            </span>
-            <div className="flex items-center justify-between text-[11px] text-[var(--text-primary)]">
-              <span>
-                <strong className="text-[var(--cyan-accent)]">{recentRadioCalls[tick % recentRadioCalls.length].callsign}:</strong>{' '}
-                {recentRadioCalls[tick % recentRadioCalls.length].message}
-              </span>
-              <span className="text-[10px] text-[var(--text-secondary)] shrink-0 ml-2">
-                {recentRadioCalls[tick % recentRadioCalls.length].time}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Right 1 Col: Urgent Sanction Authorization Board */}
-        <div className="p-5 rounded-2xl bg-[var(--surface-0)] border border-[var(--border)] shadow-sm flex flex-col gap-4">
-          <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
-            <div className="flex items-center gap-2">
-              <FileCheck className="w-4 h-4 text-[var(--status-critical)]" />
-              <h2 className="text-sm font-bold font-mono uppercase tracking-wider text-[var(--text-primary)]">
-                SP Sanction Queue
-              </h2>
-            </div>
-            <Link
-              href="/supervisor/approvals"
-              className="text-xs font-mono text-[var(--accent)] hover:underline flex items-center gap-1"
-            >
-              View All ({pendingSanctionsCount}) <ChevronRight className="w-3 h-3" />
-            </Link>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            {sanctions.slice(0, 3).map((sanc) => {
-              const isPending = sanc.status === 'PENDING_SANCTION';
-              return (
-                <div
-                  key={sanc.id}
-                  className={`p-3 rounded-xl border flex flex-col gap-2 font-mono text-xs transition-all ${
-                    isPending
-                      ? 'bg-[var(--surface-1)] border-[var(--border)]'
-                      : 'bg-[var(--status-success)]/5 border-[var(--status-success)]/30 opacity-75'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase bg-[var(--status-critical)]/10 text-[var(--status-critical)]">
-                      {sanc.urgency}
-                    </span>
-                    <span className="text-[10px] text-[var(--text-secondary)]">{sanc.timestamp}</span>
-                  </div>
-
-                  <div>
-                    <h3 className="font-bold text-[var(--text-primary)] text-xs">{sanc.requestType}</h3>
-                    <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">
-                      Target: <strong className="text-[var(--text-primary)]">{sanc.suspectName}</strong> ({sanc.policeStation})
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]">
-                    <span className="text-[9px] text-[var(--text-secondary)]">{sanc.firNumber}</span>
-                    {isPending ? (
-                      <button
-                        onClick={() => handleQuickApprove(sanc.id, sanc.suspectName)}
-                        className="px-2.5 py-1 rounded bg-[var(--accent)] hover:opacity-90 text-white font-bold text-[10px] uppercase shadow-sm cursor-pointer"
-                      >
-                        Approve Sanction
-                      </button>
-                    ) : (
-                      <span className="text-[10px] text-[var(--status-success)] font-bold flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" /> Approved
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* ── BOTTOM SECTION: DISTRICT AUDIT BENCHMARKS ── */}
-      <div className="p-5 rounded-2xl bg-[var(--surface-0)] border border-[var(--border)] shadow-sm flex flex-col gap-4">
-        <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
-          <div className="flex items-center gap-2">
-            <Building2 className="w-4 h-4 text-[var(--accent)]" />
-            <h2 className="text-sm font-bold font-mono uppercase tracking-wider text-[var(--text-primary)]">
-              Statewide District Compliance & Accountability Matrix
-            </h2>
-          </div>
-          <Link
-            href="/supervisor/audit"
-            className="text-xs font-mono text-[var(--accent)] hover:underline flex items-center gap-1"
-          >
-            Audit Report <ArrowUpRight className="w-3 h-3" />
-          </Link>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left font-mono text-xs">
-            <thead>
-              <tr className="border-b border-[var(--border)] text-[var(--text-secondary)] text-[10px] uppercase">
-                <th className="pb-2">District</th>
-                <th className="pb-2">Disposal Rate</th>
-                <th className="pb-2">Charge Sheet (&lt;60d)</th>
-                <th className="pb-2">Avg 112 Response</th>
-                <th className="pb-2">On-Duty Staff</th>
-                <th className="pb-2">Pending Clearances</th>
-                <th className="pb-2">Underreporting</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--border)]">
-              {districtAudits.map((dist) => (
-                <tr key={dist.district} className="hover:bg-[var(--surface-1)] transition-colors">
-                  <td className="py-2.5 font-bold text-[var(--text-primary)]">{dist.district}</td>
-                  <td className="py-2.5 font-semibold text-[var(--text-primary)]">{dist.disposalRate}%</td>
-                  <td className="py-2.5 text-[var(--text-secondary)]">{dist.chargeSheetCompliance}%</td>
-                  <td className="py-2.5 text-[var(--status-success)] font-semibold">{dist.avgResponseMin} mins</td>
-                  <td className="py-2.5 text-[var(--text-secondary)]">{dist.activeStaffOnDuty} officers</td>
-                  <td className="py-2.5 text-[var(--status-warning)] font-bold">{dist.pendingClearances} cases</td>
-                  <td className="py-2.5">
-                    <span
-                      className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
-                        dist.underreportingRisk === 'HIGH'
-                          ? 'bg-[var(--status-critical)]/10 text-[var(--status-critical)]'
-                          : dist.underreportingRisk === 'MODERATE'
-                          ? 'bg-[var(--status-warning)]/10 text-[var(--status-warning)]'
-                          : 'bg-[var(--status-success)]/10 text-[var(--status-success)]'
-                      }`}
-                    >
-                      {dist.underreportingRisk}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>

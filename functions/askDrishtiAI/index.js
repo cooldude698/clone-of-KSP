@@ -77,6 +77,23 @@ const TOOL_CONFIGS = {
     fallback: { nodes: [
       { id: 'accused_Ramesh_Kumar', label: 'Ramesh Kumar', total_firs: 4, risk_score: 85, crime_types: ['vehicle_theft', 'robbery'] }
     ], edges: [], source: 'mock' }
+  },
+  fetch_officer_performance: {
+    method: 'GET', endpoint: '/supervisor/performance/',
+    fallback: { officers: [
+      { officer_id: 'KSP-4092', name: 'Insp. V. Sharma', station: 'Ashoknagar PS', clearance_rate: 88, avg_response_min: 14, active_cases: 12, sla_compliance: 96 },
+      { officer_id: 'KSP-3180', name: 'Insp. Rajesh Rao', station: 'Cubbon Park PS', clearance_rate: 79, avg_response_min: 18, active_cases: 19, sla_compliance: 84 },
+      { officer_id: 'KSP-2845', name: 'Insp. Priya Patel', station: 'Ulsoor PS', clearance_rate: 92, avg_response_min: 11, active_cases: 8, sla_compliance: 98 },
+      { officer_id: 'KSP-5120', name: 'Insp. Anand Deshmukh', station: 'Indiranagar PS', clearance_rate: 71, avg_response_min: 24, active_cases: 23, sla_compliance: 76 }
+    ], jurisdiction: 'Bengaluru Central & East Division', total_inspectors: 4, source: 'mock' }
+  },
+  fetch_pending_approvals: {
+    method: 'GET', endpoint: '/supervisor/approvals/',
+    fallback: { pending_approvals: [
+      { approval_id: 'APP-2026-081', fir_number: 'KAR/BEN/2024/1840', officer_name: 'Insp. V. Sharma', request_type: 'FIR Final Closure', priority: 'HIGH', days_pending: 2 },
+      { approval_id: 'APP-2026-084', fir_number: 'KAR/BEN/2024/1726', officer_name: 'Insp. Anand Deshmukh', request_type: 'CCB Organized Crime Escalation', priority: 'CRITICAL', days_pending: 1 },
+      { approval_id: 'APP-2026-089', fir_number: 'KAR/BEN/2024/0747', officer_name: 'Insp. Rajesh Rao', request_type: 'ANPR Deep Scan Request', priority: 'MEDIUM', days_pending: 3 }
+    ], total_pending: 3, source: 'mock' }
   }
 };
 
@@ -420,7 +437,7 @@ async function _removedExternalAI() {
  */
 const DEFAULT_GEMINI_KEY = 'AIzaSyCZKZBcVvz5sVokO8ei__6plJBeqO2JWpU';
 
-async function callGeminiWithTools(question, knowledgeContext = '') {
+async function callGeminiWithTools(question, knowledgeContext = '', portal = 'inspector') {
   // Collect all configured Gemini API keys (supports up to GEMINI_API_KEY_10)
   const keys = [];
   const primaryKey = process.env.GEMINI_API_KEY || DEFAULT_GEMINI_KEY;
@@ -551,6 +568,36 @@ async function callGeminiWithTools(question, knowledgeContext = '') {
       }
     }
   ];
+
+  // Strictly additive: Append supervisor tools only when portal === "supervisor"
+  if (portal === 'supervisor') {
+    functionDeclarations.push(
+      {
+        name: 'fetch_officer_performance',
+        description: 'Fetch case clearance rates, response times, and active caseloads for inspectors under supervisor jurisdiction.',
+        parameters: {
+          type: 'OBJECT',
+          properties: {
+            jurisdiction: { type: 'STRING', description: 'Optional jurisdiction or division name' },
+            station_id:   { type: 'STRING', description: 'Optional police station filter' },
+            officer_id:   { type: 'STRING', description: 'Optional officer badge ID' }
+          }
+        }
+      },
+      {
+        name: 'fetch_pending_approvals',
+        description: 'Fetch FIR closure sign-offs, case escalations, and resource requests awaiting supervisor approval.',
+        parameters: {
+          type: 'OBJECT',
+          properties: {
+            jurisdiction: { type: 'STRING', description: 'Optional jurisdiction or division name' },
+            request_type: { type: 'STRING', description: 'Optional filter by request type (closure, escalation, resource)' },
+            priority:     { type: 'STRING', description: 'Optional filter by priority (CRITICAL, HIGH, MEDIUM)' }
+          }
+        }
+      }
+    );
+  }
 
   const systemText = 'You are DRISHTI (ದೃಷ್ಟಿ), Karnataka State Police\'s living AI Crime-Intelligence Officer and strategic co-pilot. Answer the officer\'s exact question directly and factually in the first 1-2 sentences. Then autonomously provide ONE sharp, reasonable tactical opinion, strategic recommendation, or next investigative action (e.g. suggesting ANPR watchlists, patrol increases, or checking related associates). Speak authoritatively as a senior IPS officer without generic fluff.';
 

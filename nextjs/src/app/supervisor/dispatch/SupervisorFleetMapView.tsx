@@ -188,7 +188,7 @@ export default function SupervisorFleetMapView({
   return (
     <div
       ref={containerRef}
-      className="w-full h-[520px] rounded-2xl overflow-hidden border border-[var(--border)] shadow-sm relative z-0"
+      className="w-full h-[520px] rounded-2xl overflow-hidden border border-[#1e293b] shadow-sm relative z-0"
     />
   );
 }

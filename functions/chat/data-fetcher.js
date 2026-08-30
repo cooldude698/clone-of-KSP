@@ -96,6 +96,34 @@ const toolConfigs = {
       edges: [],
       source: "mock"
     }
+  },
+  fetch_officer_performance: {
+    method: 'GET',
+    endpoint: '/supervisor/performance/',
+    fallback: {
+      officers: [
+        { officer_id: "KSP-4092", name: "Insp. V. Sharma", station: "Ashoknagar PS", clearance_rate: 88, avg_response_min: 14, active_cases: 12, sla_compliance: 96 },
+        { officer_id: "KSP-3180", name: "Insp. Rajesh Rao", station: "Cubbon Park PS", clearance_rate: 79, avg_response_min: 18, active_cases: 19, sla_compliance: 84 },
+        { officer_id: "KSP-2845", name: "Insp. Priya Patel", station: "Ulsoor PS", clearance_rate: 92, avg_response_min: 11, active_cases: 8, sla_compliance: 98 },
+        { officer_id: "KSP-5120", name: "Insp. Anand Deshmukh", station: "Indiranagar PS", clearance_rate: 71, avg_response_min: 24, active_cases: 23, sla_compliance: 76 }
+      ],
+      jurisdiction: "Bengaluru Central & East Division",
+      total_inspectors: 4,
+      source: "mock"
+    }
+  },
+  fetch_pending_approvals: {
+    method: 'GET',
+    endpoint: '/supervisor/approvals/',
+    fallback: {
+      pending_approvals: [
+        { approval_id: "APP-2026-081", fir_number: "KAR/BEN/2024/1840", officer_name: "Insp. V. Sharma", request_type: "FIR Final Closure", priority: "HIGH", days_pending: 2 },
+        { approval_id: "APP-2026-084", fir_number: "KAR/BEN/2024/1726", officer_name: "Insp. Anand Deshmukh", request_type: "CCB Organized Crime Escalation", priority: "CRITICAL", days_pending: 1 },
+        { approval_id: "APP-2026-089", fir_number: "KAR/BEN/2024/0747", officer_name: "Insp. Rajesh Rao", request_type: "ANPR Deep Scan Request", priority: "MEDIUM", days_pending: 3 }
+      ],
+      total_pending: 3,
+      source: "mock"
+    }
   }
 };
 

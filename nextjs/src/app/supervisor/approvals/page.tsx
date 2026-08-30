@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import {
-  FileCheck,
+  ClipboardCheck,
   ShieldAlert,
   CheckCircle2,
   XCircle,
@@ -13,7 +13,9 @@ import {
   Building,
   UserCheck,
   Search,
-  Filter
+  Filter,
+  Eye,
+  HelpCircle
 } from 'lucide-react';
 import { useSupervisorTelemetry, SanctionRequest } from '@/context/SupervisorTelemetryContext';
 
@@ -39,32 +41,32 @@ export default function SupervisorApprovalsPage() {
     setTimeout(() => setActionSuccess(''), 5000);
   };
 
+  const handleReject = (sanc: SanctionRequest) => {
+    setActionSuccess(`Rejected sanction request for ${sanc.firNumber}. Sent back to ${sanc.investigatingOfficer}.`);
+    setTimeout(() => setActionSuccess(''), 5000);
+  };
+
+  const handleRequestEvidence = (sanc: SanctionRequest) => {
+    setActionSuccess(`Requested additional call data records (CDR) & FSL evidence from ${sanc.investigatingOfficer}.`);
+    setTimeout(() => setActionSuccess(''), 5000);
+  };
+
   return (
-    <div className="flex flex-col gap-6 pb-12">
+    <div className="w-full max-w-7xl mx-auto space-y-6 text-slate-900">
       {/* ── HEADER ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[var(--accent)] text-white uppercase tracking-wider">
-              STATUTORY AUTHORIZATIONS
-            </span>
-            <span className="text-xs font-mono text-[var(--text-secondary)]">
-              Superintendent of Police Clearance Desk
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)] tracking-tight">
-            Sanctions, Goonda Warrants & Statutory Orders
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+            Sanctions & Warrants Clearance Queue
           </h1>
-          <p className="text-xs sm:text-sm text-[var(--text-secondary)] font-mono">
-            Mandatory executive sign-offs for preventive detentions, inter-state custody remands, and bank asset freezes.
+          <p className="text-xs text-slate-500 mt-0.5">
+            Karnataka State Police · Superintendent of Police Statutory Approvals & Goonda Warrants
           </p>
         </div>
 
-        {/* Dynamic 3s Pulse */}
-        <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[var(--surface-0)] border border-[var(--border)] text-xs font-mono">
-          <span className="w-2.5 h-2.5 rounded-full bg-[var(--status-critical)] animate-pulse" />
-          <span className="text-[var(--text-secondary)] font-bold uppercase">QUEUE:</span>
-          <span className="text-[var(--text-primary)] font-bold" suppressHydrationWarning>
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-[11px] font-bold text-rose-600">
+            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
             {sanctions.filter((s) => s.status === 'PENDING_SANCTION').length} Awaiting Signature
           </span>
         </div>
@@ -72,22 +74,22 @@ export default function SupervisorApprovalsPage() {
 
       {/* ── ACTION NOTIFICATION ── */}
       {actionSuccess && (
-        <div className="p-3.5 rounded-xl bg-[var(--status-success)]/10 border border-[var(--status-success)]/30 text-[var(--status-success)] font-mono text-xs flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
+        <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>{actionSuccess}</span>
         </div>
       )}
 
       {/* ── SEARCH & FILTER ── */}
-      <div className="flex flex-col sm:flex-row gap-3 font-mono text-xs">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search by suspect name, FIR number, or police station..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[var(--surface-0)] border border-[var(--border)] text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent)]"
+            className="w-full pl-10 pr-4 py-2.5 rounded-full bg-white border border-gray-200/80 text-xs text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/5 shadow-xs"
           />
         </div>
 
@@ -95,176 +97,155 @@ export default function SupervisorApprovalsPage() {
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="px-3 py-2.5 rounded-xl bg-[var(--surface-0)] border border-[var(--border)] text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent)]"
+            className="px-4 py-2.5 rounded-full bg-white border border-gray-200/80 text-xs font-semibold text-gray-700 focus:outline-none shadow-xs"
           >
             <option value="ALL">All Requests ({sanctions.length})</option>
-            <option value="PENDING_SANCTION">Pending Only</option>
-            <option value="APPROVED">Approved Orders</option>
+            <option value="PENDING_SANCTION">Pending Signature</option>
+            <option value="APPROVED">Approved</option>
           </select>
         </div>
       </div>
 
-      {/* ── MAIN SPLIT QUEUE & DETAIL VIEW ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Sanctions List */}
-        <div className="lg:col-span-1 p-4 rounded-2xl bg-[var(--surface-0)] border border-[var(--border)] shadow-sm flex flex-col gap-3">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--text-primary)] border-b border-[var(--border)] pb-2">
-            Authorization Requisitions
-          </span>
+      {/* ── MAIN 2-COLUMN APPROVAL CONSOLE (LIGHT THEME) ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column: Docket List (7 cols) */}
+        <div className="lg:col-span-7 flex flex-col gap-3">
+          {filteredSanctions.map((sanc) => {
+            const isSelected = selectedSanction?.id === sanc.id;
 
-          <div className="flex flex-col gap-2.5">
-            {filteredSanctions.map((sanc) => {
-              const isSelected = selectedSanction?.id === sanc.id;
-              const isPending = sanc.status === 'PENDING_SANCTION';
-
-              return (
-                <button
-                  key={sanc.id}
-                  onClick={() => setSelectedSanction(sanc)}
-                  className={`p-3.5 rounded-xl text-left border transition-all flex flex-col gap-1.5 cursor-pointer font-mono text-xs ${
-                    isSelected
-                      ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-md shadow-[var(--accent-glow)]'
-                      : 'bg-[var(--surface-1)] text-[var(--text-primary)] border-[var(--border)] hover:border-[var(--cyan-accent)]/50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
+            return (
+              <div
+                key={sanc.id}
+                onClick={() => setSelectedSanction(sanc)}
+                className={`p-5 rounded-[28px] border transition-all cursor-pointer flex flex-col gap-3 ${
+                  isSelected
+                    ? 'bg-blue-50/60 border-blue-300 shadow-sm'
+                    : 'bg-white border-slate-200 hover:border-slate-300 shadow-xs'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
                     <span
-                      className={`text-[8px] px-1.5 py-0.5 rounded font-bold uppercase ${
-                        isSelected
-                          ? 'bg-white/20 text-white'
-                          : sanc.urgency === 'CRITICAL'
-                          ? 'bg-[var(--status-critical)]/10 text-[var(--status-critical)]'
-                          : 'bg-[var(--surface-2)] text-[var(--text-secondary)]'
+                      className={`text-[9px] px-2.5 py-0.5 rounded-full font-semibold uppercase ${
+                        sanc.urgency === 'CRITICAL'
+                          ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                          : 'bg-amber-50 text-amber-700 border border-amber-200'
                       }`}
                     >
                       {sanc.urgency}
                     </span>
-                    <span className="text-[9px] opacity-80">{sanc.timestamp}</span>
+                    <span className="text-xs font-bold text-blue-600 font-mono">{sanc.firNumber}</span>
                   </div>
 
-                  <h3 className="font-bold text-xs leading-snug">{sanc.requestType}</h3>
-                  <p className={`text-[11px] truncate ${isSelected ? 'text-white/80' : 'text-[var(--text-secondary)]'}`}>
-                    Target: <strong>{sanc.suspectName}</strong>
+                  <span className="text-xs text-slate-400 font-mono">{sanc.timestamp}</span>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-bold text-slate-900">{sanc.requestType}</h4>
+                  <p className="text-xs text-slate-600 mt-0.5">
+                    Suspect: <strong className="text-slate-900">{sanc.suspectName}</strong> · Station: {sanc.policeStation}
                   </p>
+                  <p className="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                    {sanc.summary}
+                  </p>
+                </div>
 
-                  <div className="flex items-center justify-between pt-1 border-t border-white/10 text-[9px]">
-                    <span className="opacity-80">{sanc.firNumber}</span>
-                    <span
-                      className={`font-bold uppercase ${
-                        isPending ? 'text-[var(--status-warning)]' : 'text-[var(--status-success)]'
-                      } ${isSelected ? 'text-white' : ''}`}
-                    >
-                      {isPending ? 'Pending SP Signature' : '✓ Sanctioned'}
+                <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                  <span className="text-slate-500">IO: {sanc.investigatingOfficer}</span>
+                  {sanc.status === 'PENDING_SANCTION' ? (
+                    <span className="text-rose-600 font-bold flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5" />
+                      Awaiting Sign-off
                     </span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+                  ) : (
+                    <span className="text-emerald-600 font-bold flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Sanction Granted
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Right: Detailed Dossier Preview & Digital Authorization Seal */}
-        <div className="lg:col-span-2 p-6 rounded-2xl bg-[var(--surface-0)] border border-[var(--border)] shadow-sm flex flex-col justify-between">
+        {/* Right Column: Case Review & SP Executive Sign-Off Console (5 cols) */}
+        <div className="lg:col-span-5 rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm flex flex-col gap-4 text-xs">
           {selectedSanction ? (
-            <div className="flex flex-col gap-5 font-mono text-xs">
-              {/* Official Sanction Header */}
-              <div className="flex items-center justify-between border-b border-[var(--border)] pb-4">
-                <div>
-                  <span className="text-[10px] font-bold text-[var(--text-secondary)] uppercase block">
-                    SANCTION APPLICATION DOSSIER · REF: {selectedSanction.id}
-                  </span>
-                  <h2 className="text-base sm:text-lg font-extrabold text-[var(--text-primary)] mt-0.5">
-                    {selectedSanction.requestType}
-                  </h2>
-                </div>
-
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-                    selectedSanction.status === 'PENDING_SANCTION'
-                      ? 'bg-[var(--status-warning)]/10 text-[var(--status-warning)] border border-[var(--status-warning)]/30 animate-pulse'
-                      : 'bg-[var(--status-success)]/10 text-[var(--status-success)] border border-[var(--status-success)]/30'
-                  }`}
-                >
-                  {selectedSanction.status === 'PENDING_SANCTION' ? 'Awaiting SP Clearance' : 'Authorized'}
+            <>
+              <div className="border-b border-slate-100 pb-3">
+                <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">
+                  SP STATUTORY REVIEW
                 </span>
+                <h3 className="text-base font-bold text-slate-900 mt-0.5">
+                  Docket #{selectedSanction.id}
+                </h3>
               </div>
 
-              {/* Case Metadata Matrix */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                <div className="p-3 rounded-lg bg-[var(--surface-1)] border border-[var(--border)]">
-                  <span className="text-[9px] text-[var(--text-secondary)] uppercase block">FIR Case</span>
-                  <span className="text-xs font-bold text-[var(--text-primary)]">{selectedSanction.firNumber}</span>
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">Statutory Power:</span>
+                  <span className="text-slate-900 font-bold">{selectedSanction.requestType}</span>
                 </div>
-                <div className="p-3 rounded-lg bg-[var(--surface-1)] border border-[var(--border)]">
-                  <span className="text-[9px] text-[var(--text-secondary)] uppercase block">Target Offender</span>
-                  <span className="text-xs font-bold text-[var(--status-critical)]">{selectedSanction.suspectName}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">Target Suspect:</span>
+                  <span className="text-rose-600 font-bold">{selectedSanction.suspectName}</span>
                 </div>
-                <div className="p-3 rounded-lg bg-[var(--surface-1)] border border-[var(--border)]">
-                  <span className="text-[9px] text-[var(--text-secondary)] uppercase block">Station / District</span>
-                  <span className="text-xs font-semibold text-[var(--text-primary)]">{selectedSanction.district}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">Originating PS:</span>
+                  <span className="text-slate-800">{selectedSanction.policeStation}</span>
                 </div>
-                <div className="p-3 rounded-lg bg-[var(--surface-1)] border border-[var(--border)]">
-                  <span className="text-[9px] text-[var(--text-secondary)] uppercase block">Investigating Officer</span>
-                  <span className="text-xs font-semibold text-[var(--text-primary)]">{selectedSanction.investigatingOfficer}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">Investigating Officer:</span>
+                  <span className="text-slate-800">{selectedSanction.investigatingOfficer}</span>
                 </div>
               </div>
 
-              {/* Legal Rationale & Summary */}
-              <div className="p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] flex flex-col gap-2">
-                <span className="text-[10px] font-bold text-[var(--accent)] uppercase flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5" /> Investigating Officer Sworn Ground & Affidavit
-                </span>
-                <p className="text-xs text-[var(--text-primary)] leading-relaxed bg-[var(--surface-0)] p-3 rounded-lg border border-[var(--border)]">
+              <div>
+                <span className="font-bold text-slate-700 block mb-1">Evidentiary Ground & Summary:</span>
+                <p className="text-[11px] text-slate-600 bg-slate-50 p-3 rounded-2xl border border-slate-100 leading-relaxed">
                   {selectedSanction.summary}
                 </p>
               </div>
 
-              {/* Statutory Framework & Compliance Alert */}
-              <div className="p-3 rounded-lg bg-[var(--cyan-accent)]/10 border border-[var(--cyan-accent)]/30 flex items-start gap-2">
-                <ShieldAlert className="w-4 h-4 text-[var(--cyan-accent)] shrink-0 mt-0.5" />
-                <div>
-                  <span className="text-[10px] font-bold text-[var(--cyan-accent)] uppercase block">
-                    Statutory Authority Verified
-                  </span>
-                  <span className="text-[11px] text-[var(--text-primary)]">
-                    Meets legal evidentiary burden under Section 3(1) of Karnataka Act 12 of 1985 / BNSS 2023. SP signature executes immediate judicial warrant notice.
-                  </span>
-                </div>
-              </div>
+              {selectedSanction.status === 'PENDING_SANCTION' ? (
+                <div className="flex flex-col gap-2 pt-2 border-t border-slate-100">
+                  <button
+                    onClick={() => handleApprove(selectedSanction)}
+                    className="w-full py-2.5 rounded-full bg-slate-900 hover:scale-105 text-white font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Authorize & Grant SP Clearance</span>
+                  </button>
 
-              {/* SP Action Signature Execution */}
-              <div className="pt-4 border-t border-[var(--border)] flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="text-[10px] text-[var(--text-secondary)]">
-                  Authorized Signatory: <strong>Dr. Rajesh Kumar, IPS (SP Command)</strong>
-                </div>
-
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  {selectedSanction.status === 'PENDING_SANCTION' ? (
+                  <div className="grid grid-cols-2 gap-2">
                     <button
-                      onClick={() => handleApprove(selectedSanction)}
-                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[var(--accent)] hover:opacity-90 text-white font-bold text-xs uppercase shadow-md shadow-[var(--accent-glow)] flex items-center justify-center gap-2 cursor-pointer transition-all"
+                      onClick={() => handleRequestEvidence(selectedSanction)}
+                      className="py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-[11px] transition-colors flex items-center justify-center gap-1.5"
                     >
-                      <UserCheck className="w-4 h-4" />
-                      Grant Statutory Approval
+                      <HelpCircle className="w-3.5 h-3.5 text-blue-500" />
+                      <span>Request Evidence</span>
                     </button>
-                  ) : (
-                    <div className="px-4 py-2 rounded-xl bg-[var(--status-success)]/10 border border-[var(--status-success)]/30 text-[var(--status-success)] font-bold text-xs flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4" /> Digitally Signed & Sealed
-                    </div>
-                  )}
+                    <button
+                      onClick={() => handleReject(selectedSanction)}
+                      className="py-2 rounded-full bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-semibold text-[11px] transition-colors flex items-center justify-center gap-1.5"
+                    >
+                      <XCircle className="w-3.5 h-3.5 text-rose-600" />
+                      <span>Reject Docket</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </div>
+              ) : (
+                <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-center">
+                  ✓ Formally cleared and signed under SP executive seal.
+                </div>
+              )}
+            </>
           ) : (
-            <p className="text-xs text-[var(--text-secondary)] font-mono">
-              Select an authorization request from the queue to view dossier.
-            </p>
+            <div className="py-12 text-center text-slate-400 font-mono text-xs">
+              Select a warrant from the queue to review evidentiary grounds and grant statutory sign-offs.
+            </div>
           )}
-
-          <div className="pt-4 border-t border-[var(--border)] flex items-center justify-between text-[10px] font-mono text-[var(--text-secondary)] mt-4">
-            <span>KSP Judicial Compliance Desk</span>
-            <span>Digital Cryptographic Seal: KSP-AUTH-2026-OK</span>
-          </div>
         </div>
       </div>
     </div>
