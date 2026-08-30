@@ -9,9 +9,9 @@
     "nextjs"
   ],
   "scripts": {
-    "build": "next build",
-    "start": "next start",
-    "dev": "next dev"
+    "build": "npm --prefix nextjs run build",
+    "start": "npm --prefix nextjs run start",
+    "dev": "npm --prefix nextjs run dev"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
