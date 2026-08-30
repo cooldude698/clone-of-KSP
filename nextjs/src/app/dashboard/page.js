@@ -63,6 +63,28 @@ export default function DashboardPage() {
 
   const [role, setRole] = useState('Inspector');
   const [officerName, setOfficerName] = useState('V. Sharma');
+  const [assignedAlerts, setAssignedAlerts] = useState([]);
+
+  const checkAssignedCases = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = localStorage.getItem('drishti_assigned_cases');
+      if (raw) {
+        const list = JSON.parse(raw);
+        const forOfficer = list.filter(c => 
+          !c.acknowledged && (
+            !c.assigned_officer || 
+            c.assigned_officer.toLowerCase().includes('sharma') || 
+            c.assigned_officer.toLowerCase().includes('v.') ||
+            c.assigned_officer.toLowerCase().includes(officerName.toLowerCase())
+          )
+        );
+        setAssignedAlerts(forOfficer);
+      }
+    } catch (e) {
+      console.warn('Could not read assigned cases', e);
+    }
+  }, [officerName]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -74,16 +96,84 @@ export default function DashboardPage() {
     }
   }, []);
 
+  useEffect(() => {
+    checkAssignedCases();
+    window.addEventListener('drishti_case_assigned', checkAssignedCases);
+    window.addEventListener('storage', checkAssignedCases);
+    return () => {
+      window.removeEventListener('drishti_case_assigned', checkAssignedCases);
+      window.removeEventListener('storage', checkAssignedCases);
+    };
+  }, [checkAssignedCases]);
+
+  const handleAcknowledgeCase = (firNumber) => {
+    try {
+      const raw = localStorage.getItem('drishti_assigned_cases');
+      if (raw) {
+        const list = JSON.parse(raw);
+        const updated = list.map(c => c.fir_number === firNumber ? { ...c, acknowledged: true } : c);
+        localStorage.setItem('drishti_assigned_cases', JSON.stringify(updated));
+      }
+    } catch (e) {}
+    setAssignedAlerts(prev => prev.filter(c => c.fir_number !== firNumber));
+  };
+
+  const handleReviewAssignedCase = (caseObj) => {
+    const firForModal = {
+      case_number: caseObj.fir_number,
+      crime_type: caseObj.crime_type,
+      crime_title: caseObj.crime_type,
+      police_station: caseObj.station,
+      description: caseObj.description,
+      date_filed: caseObj.assigned_at || new Date().toISOString(),
+      status: 'under_investigation',
+      case_status: 'under_investigation',
+      priority: caseObj.priority,
+      is_assigned_by_supervisor: true,
+      investigation_office: `Insp. ${officerName} (Assigned by Supervisor)`
+    };
+    setSelectedFIR(firForModal);
+    handleAcknowledgeCase(caseObj.fir_number);
+  };
+
   const loadData = useCallback(async () => {
     const res = await fetchWithFallback('/api/firs', DEMO_FIRS, { timeoutMs: 2000 });
-    const rows = res?.data?.firs || res?.data || DEMO_FIRS.firs;
+    let rows = res?.data?.firs || res?.data || DEMO_FIRS.firs;
+
+    // Merge persistent assigned cases
+    try {
+      const rawAssigned = localStorage.getItem('drishti_assigned_cases');
+      if (rawAssigned) {
+        const assignedList = JSON.parse(rawAssigned);
+        const converted = assignedList.map(c => ({
+          case_number: c.fir_number,
+          crime_type: c.crime_type,
+          crime_title: c.crime_type,
+          police_station: c.station,
+          status: 'under_investigation',
+          case_status: 'under_investigation',
+          priority: c.priority,
+          severity: c.priority === 'CRITICAL' ? 'critical' : 'high',
+          description: c.description,
+          date_filed: new Date().toISOString(),
+          is_assigned_by_supervisor: true,
+          assigned_officer: c.assigned_officer,
+          investigation_office: c.assigned_officer || `Insp. ${officerName}`
+        }));
+        
+        const existingIds = new Set(rows.map(r => r.case_number));
+        const toAdd = converted.filter(c => !existingIds.has(c.case_number));
+        rows = [...toAdd, ...rows];
+      }
+    } catch (e) {}
+
     saveFIRsToStore(rows);
     setFirs(rows);
 
     const hotRes = await fetchWithFallback('/api/hotspots', DEMO_HOTSPOTS, { timeoutMs: 2000 });
     setHotspots(hotRes?.data?.hotspots || DEMO_HOTSPOTS.hotspots);
     setLoading(false);
-  }, []);
+  }, [officerName]);
 
   useEffect(() => {
     loadData();
@@ -110,6 +200,52 @@ export default function DashboardPage() {
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6 text-[#14141A]">
       
+      {/* ── NEW CASE ASSIGNMENT NOTIFICATION BANNER ── */}
+      {assignedAlerts.length > 0 && (
+        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50 via-indigo-50/80 to-blue-50/50 border-2 border-blue-300 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold shrink-0 shadow-md ring-4 ring-blue-100">
+              <ShieldAlert className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-extrabold uppercase bg-blue-600 text-white px-2.5 py-0.5 rounded-full font-heading tracking-wider shadow-2xs">
+                  ⚡ NEW CASE ASSIGNED BY SUPERVISOR
+                </span>
+                <span className="text-xs font-mono font-bold text-blue-900 bg-white px-2 py-0.5 rounded-md border border-blue-200 shadow-2xs">
+                  {assignedAlerts[0].fir_number}
+                </span>
+                <span className="text-[11px] text-blue-700 font-semibold">
+                  Assigned to Insp. {officerName}
+                </span>
+              </div>
+              <h4 className="text-sm sm:text-base font-bold text-slate-900 mt-1 font-heading">
+                {assignedAlerts[0].crime_type}
+              </h4>
+              <p className="text-xs text-slate-600 mt-0.5 line-clamp-2">
+                {assignedAlerts[0].description} · Station: <strong className="text-slate-800">{assignedAlerts[0].station}</strong>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0 self-end md:self-auto">
+            <button
+              onClick={() => handleReviewAssignedCase(assignedAlerts[0])}
+              className="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer hover:scale-105"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>Review Case Dossier</span>
+            </button>
+            <button
+              onClick={() => handleAcknowledgeCase(assignedAlerts[0].fir_number)}
+              className="px-3.5 py-2 rounded-full bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-300 transition-all cursor-pointer"
+            >
+              Acknowledge
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ── TOP SECTION: COMMAND DASHBOARD GRID ── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         
@@ -577,9 +713,16 @@ export default function DashboardPage() {
                     <CrimeIcon className="w-4 h-4" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-bold text-slate-900 dark:text-white truncate">
-                      {title}
-                    </p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                        {title}
+                      </p>
+                      {fir.is_assigned_by_supervisor && (
+                        <span className="text-[9px] font-extrabold uppercase bg-blue-600 text-white px-2 py-0.5 rounded-full inline-flex items-center gap-1 font-heading shadow-2xs">
+                          <Sparkles className="w-2.5 h-2.5" /> Assigned to You
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-slate-500 truncate">
                       {fir.police_station || fir.location_name || 'Silk Board PS'} · IO: {fir.investigation_office || 'ACP Special Squad'}
                     </p>

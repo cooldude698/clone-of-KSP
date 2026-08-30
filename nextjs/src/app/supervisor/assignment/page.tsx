@@ -100,9 +100,33 @@ export default function SupervisorCaseAssignmentPage() {
   const [toastMessage, setToastMessage] = useState('');
 
   const handleAssign = (firNumber: string, officerName: string) => {
+    const caseToAssign = cases.find((c) => c.fir_number === firNumber) || selectedCase;
     setCases((prev) => prev.filter((c) => c.fir_number !== firNumber));
     setToastMessage(`Assigned ${firNumber} to ${officerName}. CCTNS docket updated.`);
     setSelectedCase(cases.find((c) => c.fir_number !== firNumber) || null);
+
+    // Save to localStorage for instant cross-portal reactivity
+    try {
+      const assignedObj = {
+        fir_number: firNumber,
+        crime_type: caseToAssign?.crime_type || 'Organized Vehicle Theft & Jammer Syndicate',
+        station: caseToAssign?.station || 'Ashoknagar PS',
+        priority: caseToAssign?.priority || 'HIGH',
+        description: caseToAssign?.description || '433MHz frequency jammer recovered near Richmond Circle. 2 Pulsar bikes stolen in tandem.',
+        assigned_officer: officerName,
+        assigned_at: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        assigned_timestamp: Date.now(),
+        acknowledged: false,
+      };
+
+      const existing = JSON.parse(localStorage.getItem('drishti_assigned_cases') || '[]');
+      const updated = [assignedObj, ...existing.filter((x: any) => x.fir_number !== firNumber)];
+      localStorage.setItem('drishti_assigned_cases', JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('drishti_case_assigned', { detail: assignedObj }));
+    } catch (e) {
+      console.warn('Could not persist assigned case to localStorage', e);
+    }
+
     setTimeout(() => setToastMessage(''), 5000);
   };
 

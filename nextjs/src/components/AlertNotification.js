@@ -45,30 +45,47 @@ export default function AlertNotification() {
         }
       } catch (err) {
         // Fallback mock alerts if endpoint is offline
-        if (alerts.length === 0) {
-          const mockAlerts = [
-            {
-              id: 'a1',
+        let mockAlerts = [
+          {
+            id: 'a1',
+            severity: 'critical',
+            plate_number: 'KA-01-MJ-8821',
+            camera_name: 'Silk Board Inbound Junction (CAM-04)',
+            fir_case_number: 'KAR/BLR/2026/04921',
+            timestamp: 'Just now',
+            crime_type: 'Stolen Pulsar 220 Transit'
+          },
+          {
+            id: 'a2',
+            severity: 'high',
+            plate_number: 'KA-05-NB-1102',
+            camera_name: 'MG Road Metro Signal Approach',
+            fir_case_number: 'KAR/BLR/2026/01184',
+            timestamp: '8m ago',
+            crime_type: 'Cloned ANPR Sighting'
+          },
+        ];
+
+        // Merge any assigned cases from Supervisor
+        try {
+          const rawAssigned = localStorage.getItem('drishti_assigned_cases');
+          if (rawAssigned) {
+            const assignedList = JSON.parse(rawAssigned);
+            const assignedAlertItems = assignedList.map(c => ({
+              id: 'assign-' + c.fir_number,
               severity: 'critical',
-              plate_number: 'KA-01-MJ-8821',
-              camera_name: 'Silk Board Inbound Junction (CAM-04)',
-              fir_case_number: 'KAR/BLR/2026/04921',
-              timestamp: 'Just now',
-              crime_type: 'Stolen Pulsar 220 Transit'
-            },
-            {
-              id: 'a2',
-              severity: 'high',
-              plate_number: 'KA-05-NB-1102',
-              camera_name: 'MG Road Metro Signal Approach',
-              fir_case_number: 'KAR/BLR/2026/01184',
-              timestamp: '8m ago',
-              crime_type: 'Cloned ANPR Sighting'
-            },
-          ];
-          setAlerts(mockAlerts);
-          prevCountRef.current = mockAlerts.length;
-        }
+              plate_number: c.fir_number,
+              camera_name: `Assigned to ${c.assigned_officer || 'Insp. V. Sharma'} (${c.station})`,
+              fir_case_number: c.fir_number,
+              timestamp: c.assigned_at || 'Just now',
+              crime_type: `Supervisor Assignment: ${c.crime_type}`
+            }));
+            mockAlerts = [...assignedAlertItems, ...mockAlerts];
+          }
+        } catch (e) {}
+
+        setAlerts(mockAlerts);
+        prevCountRef.current = mockAlerts.length;
       }
     };
 
