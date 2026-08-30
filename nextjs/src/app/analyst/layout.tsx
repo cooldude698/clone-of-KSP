@@ -74,17 +74,17 @@ function AnalystHeader() {
 
       {/* Right Controls: Quick Role Switcher, Telemetry Badges, Language, Drishti AI Button, Bell, Avatar */}
       <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-        {/* Real-time Analyst Status Badges (Teal / Violet Palette) */}
+        {/* Real-time Analyst Status Badges (Teal / Indigo Palette) */}
         <div className="hidden xl:flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-700 shadow-xs text-xs font-semibold whitespace-nowrap">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 shadow-xs text-xs font-semibold whitespace-nowrap">
             <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
-            <span className="text-[10px] uppercase font-mono font-bold">SCRB SYNC:</span>
-            <span className="text-[11px] font-mono font-bold">5.35L FIRS</span>
+            <span className="text-[11px] text-teal-700 font-medium">SCRB Sync:</span>
+            <span className="text-xs font-bold font-heading text-teal-900">5.35L FIRs</span>
           </div>
 
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-50 border border-violet-200 text-violet-700 shadow-xs text-xs font-semibold whitespace-nowrap">
-            <span className="text-[10px] uppercase font-mono font-bold">AI ACCURACY:</span>
-            <span className="text-[11px] font-mono font-bold">97.4%</span>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-200/80 text-indigo-800 shadow-xs text-xs font-semibold whitespace-nowrap">
+            <span className="text-[11px] text-indigo-600 font-medium">Accuracy:</span>
+            <span className="text-xs font-bold font-heading text-indigo-900">97.4%</span>
           </div>
         </div>
 

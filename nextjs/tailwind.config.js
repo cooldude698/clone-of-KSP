@@ -60,11 +60,12 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-open-sans)', '"Open Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        sans: ['"Google Sans"', '"Plus Jakarta Sans"', 'var(--font-open-sans)', '"Open Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         display: ['var(--font-montserrat)', 'Montserrat', 'sans-serif'],
         heading: ['var(--font-montserrat)', 'Montserrat', 'sans-serif'],
         montserrat: ['var(--font-montserrat)', 'Montserrat', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'monospace', 'var(--font-open-sans)', 'sans-serif'],
+        body: ['"Google Sans"', '"Plus Jakarta Sans"', 'var(--font-open-sans)', '"Open Sans"', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'monospace', 'sans-serif'],
       },
       borderRadius: {
         '2xl': '1rem',
