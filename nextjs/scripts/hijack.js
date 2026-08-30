@@ -7,14 +7,25 @@ const binDirs = [
   path.resolve(__dirname, '../../node_modules/.bin')
 ];
 
-console.log('[Hijack] Creating custom zcatalyst-nextjs binaries...');
+console.log('[Hijack] Cleaning old zcatalyst-nextjs binaries...');
+binDirs.forEach((binDir) => {
+  const oldFile = path.join(binDir, 'zcatalyst-nextjs');
+  try {
+    if (fs.existsSync(oldFile)) {
+      fs.unlinkSync(oldFile);
+      console.log(`[Hijack] Cleaned old zcatalyst-nextjs binary from: ${oldFile}`);
+    }
+  } catch (e) {}
+});
+
+console.log('[Hijack] Creating custom open-next binaries...');
 
 const scriptContent = `#!/usr/bin/env node
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-console.log('[Hijack Wrapper] Running real zcatalyst-nextjs...');
+console.log('[Hijack Wrapper] Running real open-next build...');
 
 // 1. Remove all hijacked binaries to prevent recursion
 const selfPath = __filename;
@@ -23,9 +34,9 @@ try {
 } catch (e) {}
 
 const pathsToDelete = [
-  path.join(__dirname, 'zcatalyst-nextjs'),
-  path.resolve(__dirname, '../../nextjs/node_modules/.bin/zcatalyst-nextjs'),
-  path.resolve(__dirname, '../../../node_modules/.bin/zcatalyst-nextjs')
+  path.join(__dirname, 'open-next'),
+  path.resolve(__dirname, '../../nextjs/node_modules/.bin/open-next'),
+  path.resolve(__dirname, '../../../node_modules/.bin/open-next')
 ];
 pathsToDelete.forEach((p) => {
   try {
@@ -33,11 +44,12 @@ pathsToDelete.forEach((p) => {
   } catch (e) {}
 });
 
-// 2. Execute the real zcatalyst-nextjs (this will now fetch from Zoho's registry or use global fallback)
+// 2. Execute the real open-next (pass along all arguments)
+const args = process.argv.slice(2).join(' ');
 try {
-  execSync('npx zcatalyst-nextjs', { stdio: 'inherit' });
+  execSync('npx open-next ' + args, { stdio: 'inherit' });
 } catch (err) {
-  console.error('[Hijack Wrapper] Real zcatalyst-nextjs failed:', err);
+  console.error('[Hijack Wrapper] Real open-next failed:', err);
   process.exit(1);
 }
 
@@ -47,7 +59,7 @@ if (!fs.existsSync(patchScript)) {
   patchScript = path.resolve(__dirname, '../../nextjs/scripts/patch-opennext-configs.js');
 }
 
-console.log('[Hijack Wrapper] Real build complete. Running patch script at:', patchScript);
+console.log('[Hijack Wrapper] Real open-next build complete. Running patch script at:', patchScript);
 try {
   execSync('node ' + patchScript, { stdio: 'inherit' });
 } catch (err) {
@@ -60,14 +72,14 @@ process.exit(0);
 `;
 
 binDirs.forEach((binDir) => {
-  const binFile = path.join(binDir, 'zcatalyst-nextjs');
+  const binFile = path.join(binDir, 'open-next');
   try {
     if (!fs.existsSync(binDir)) {
       fs.mkdirSync(binDir, { recursive: true });
     }
     fs.writeFileSync(binFile, scriptContent, 'utf8');
     fs.chmodSync(binFile, '755');
-    console.log(`[Hijack] Custom binary created at: ${binFile}`);
+    console.log(`[Hijack] Custom open-next binary created at: ${binFile}`);
   } catch (err) {
     console.warn(`[Hijack] Failed to write binary to ${binFile}:`, err.message);
   }
