@@ -8,10 +8,17 @@ import {
   FileText, MapPin, Phone, Clock, Activity, Eye,
   TrendingUp, Zap, Network, CheckCircle, XCircle, AlertCircle,
   Mail, Bell, RefreshCw, Sparkles, CheckCircle2, Send, Car,
-  ShieldAlert, Camera, Fingerprint, Radio, Gavel, FileCheck, Copy, Check
+  ShieldAlert, Camera, Fingerprint, Radio, Gavel, FileCheck, Copy, Check,
+  Newspaper, X
 } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { DEMO_REPEAT_OFFENDERS, DEMO_FIRS, DEMO_TRAIL } from '@/lib/demo-data';
 import { getSuspectMedia } from '@/lib/suspect-media';
+
+const InvestigatorWall = dynamic(() => import('@/components/InvestigatorWall'), {
+  ssr: false,
+  loading: () => <div className="p-8 text-center font-bold text-sm">Loading Investigation Chronicle...</div>
+});
 
 // Slug → display name: "ramesh-kumar" → "Ramesh Kumar"
 function slugToName(slug) {
@@ -128,6 +135,16 @@ export default function SuspectProfilePage() {
 
   const [pushSent, setPushSent] = useState(false);
   const [pushLoading, setPushLoading] = useState(false);
+
+  const [isChronicleOpen, setIsChronicleOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && window.location.search.includes('chronicle=true')) {
+        setIsChronicleOpen(true);
+      }
+    } catch (_) {}
+  }, []);
 
   const [activeToast, setActiveToast] = useState(null);
 
@@ -362,9 +379,17 @@ export default function SuspectProfilePage() {
             </div>
 
             <button
+              onClick={() => setIsChronicleOpen(true)}
+              className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-amber-300 dark:bg-amber-400 dark:text-slate-950 hover:bg-slate-800 font-serif text-xs font-bold shadow-2xs transition-all flex items-center gap-2 cursor-pointer border border-amber-500/30"
+            >
+              <Newspaper className="w-4 h-4 text-amber-400 dark:text-slate-950" />
+              <span>Open Investigation Chronicle 🗞️</span>
+            </button>
+
+            <button
               onClick={handleQuickMlScoring}
               disabled={isScoring}
-              className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 text-xs font-bold shadow-2xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              className="px-3.5 py-2.5 rounded-xl bg-slate-100 text-slate-800 dark:bg-zinc-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-zinc-700 text-xs font-bold shadow-2xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 border border-slate-300 dark:border-zinc-700"
             >
               <Sparkles className="w-3.5 h-3.5" />
               {isScoring ? 'Scoring...' : 'Re-Score via QuickML'}
@@ -660,6 +685,74 @@ export default function SuspectProfilePage() {
           <button onClick={() => setActiveToast(null)} className="text-slate-400 hover:text-white p-1 text-xs">
             ✕
           </button>
+        </div>
+      )}
+
+      {/* ── INVESTIGATION CHRONICLE MODAL OVERLAY ── */}
+      {isChronicleOpen && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex flex-col z-[99999] overflow-y-auto animate-newspaper-spin">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-300 shrink-0 bg-[#FAF7F2]/95 sticky top-0 z-30 backdrop-blur-md shadow-sm">
+            <div className="flex items-center gap-2.5 text-slate-900">
+              <ShieldAlert className="w-5 h-5 text-red-600" />
+              <h3 className="text-base font-black font-serif tracking-wider uppercase">
+                Investigation Chronicle — {suspect.name} ({officialId})
+              </h3>
+            </div>
+            <button
+              onClick={() => setIsChronicleOpen(false)}
+              className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-red-600 text-white font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
+            >
+              <X className="w-4 h-4" />
+              <span>Close Chronicle</span>
+            </button>
+          </div>
+
+          <div className="flex-1 p-4 sm:p-6 md:p-8 lg:p-10 max-w-[1300px] w-full mx-auto">
+            <InvestigatorWall
+              fir={{
+                case_number: suspect.associated_firs?.[0] || 'KAR/BEN/2026/1002',
+                crime_type: 'Vehicle Theft & Financial Syndicate',
+                date_filed: '2026-07-22',
+                location_name: suspect.last_known_location || 'ITPB Tech Park / Silk Board Corridor',
+                case_status: isAbsconding ? 'investigating' : isCustody ? 'chargesheeted' : 'open',
+                description: `${suspect.name} (${alias || 'Alias'}) is an active target tracked on CCTNS intelligence grid for organized syndicate offenses across Karnataka. ${suspect.primary_modus_operandi}`,
+                police_station: `${suspect.district_name || 'Bengaluru Urban'} Central PS`,
+                district_name: suspect.district_name || 'Bengaluru Urban'
+              }}
+              accused={[
+                {
+                  full_name: suspect.name,
+                  alias: alias || 'Primary Target',
+                  age: suspect.age || 38,
+                  gender: suspect.gender || 'Male',
+                  address: suspect.last_known_location || 'ITPB Main Road, Whitefield',
+                  district_name: suspect.district_name || 'Bengaluru Urban',
+                  occupation: 'Syndicate Operative / Logistics',
+                  prior_convictions: 3,
+                  modus_operandi: suspect.primary_modus_operandi || 'High-value nocturnal property theft and digital imposter operations.',
+                  risk_score: currentRiskScore
+                }
+              ]}
+              victims={[
+                {
+                  full_name: 'Complainant (State of Karnataka / CCTNS Citizen)',
+                  age: 42,
+                  gender: 'Male',
+                  occupation: 'Corporate Director / Citizen',
+                  district_name: suspect.district_name || 'Bengaluru Urban',
+                  vulnerability_score: 65
+                }
+              ]}
+              related_firs={(suspect.associated_firs || ['KAR/BEN/2026/1002', 'KAR/BEN/2024/0747']).map(num => ({
+                case_number: num,
+                crime_type: 'Vehicle Theft',
+                date_filed: '2026-07-20',
+                link_reason: 'Shared MO and accomplice network match in CCTNS datastore.'
+              }))}
+              case_summary={`Official CCTNS Special Dossier for ${suspect.name}. Threat score assessed at ${currentRiskScore}%. Real-time ANPR surveillance and intercept alerts active across all district corridors.`}
+              isLoading={false}
+            />
+          </div>
         </div>
       )}
     </div>

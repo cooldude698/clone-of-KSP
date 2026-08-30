@@ -1182,6 +1182,14 @@ export default function FIRDetailView({ caseNumber, fir, suspects, trailData, tr
   const [activeTab, setActiveTab] = useState('details');
   const [chronicleOpen, setChronicleOpen] = useState(false);
 
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && window.location.search.includes('chronicle=true')) {
+        setChronicleOpen(true);
+      }
+    } catch (_) {}
+  }, []);
+
   const status = fir.status || fir.case_status || 'open';
   const detail = getCaseDetail(caseNumber, fir);
 
