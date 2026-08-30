@@ -13,7 +13,7 @@ export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: CORS });
 }
 
-// --- Zoho Catalyst QuickML RAG Call ------------------------------------------
+// --- Zoho Catalyst QuickML RAG Call (100% Zoho Ecosystem) -------------------
 async function callQuickML(question, sessionHistory = []) {
   const ragUrl = process.env.QUICKML_RAG_ENDPOINT_URL;
   const token = process.env.QUICKML_OAUTH_TOKEN;
@@ -37,7 +37,7 @@ async function callQuickML(question, sessionHistory = []) {
   throw new Error('QuickML RAG returned empty answer');
 }
 
-// --- Main Handler ------------------------------------------------------------
+// --- Main Handler (Zero External APIs) ---------------------------------------
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -47,14 +47,20 @@ export async function POST(req) {
 
     if (!question?.trim()) {
       return NextResponse.json(
-        { answer: 'No question received, Sir. How can I assist your investigation?', language: lang, source: 'system' },
+        { 
+          answer: 'No question received, Sir. How can I assist your investigation?',
+          spokenAnswer: 'How can I assist your command shift today, Sir?',
+          language: lang,
+          source: 'system' 
+        },
         { status: 200, headers: CORS }
       );
     }
 
     let workingQuestion = question.trim();
     let finalAnswer = '';
-    let source = 'drishti_intelligence_engine';
+    let finalSpokenAnswer = '';
+    let source = 'drishti_autonomous_engine';
     let resultPayload = null;
 
     // Auto-detect script (Kannada or Hindi)
@@ -68,25 +74,27 @@ export async function POST(req) {
       content: h.content || '',
     }));
 
-    // 1. Try Zoho Catalyst QuickML RAG
+    // 1. Try Zoho Catalyst QuickML RAG (Official Zoho Ecosystem)
     try {
       finalAnswer = await callQuickML(workingQuestion, formattedHistory);
+      finalSpokenAnswer = finalAnswer.slice(0, 250);
       source = 'catalyst_quickml';
     } catch (quickMlErr) {
-      // 2. Primary Engine: Autonomous DRISHTI Multi-Strategy Intelligence Engine
+      // 2. DRISHTI Autonomous In-Memory Police Reasoning Engine (Zero External APIs)
       resultPayload = await executeDrishtiIntelligenceQuery(workingQuestion, targetLang, activeHistory);
       finalAnswer = resultPayload.answer;
+      finalSpokenAnswer = resultPayload.spokenAnswer || resultPayload.answer;
       source = 'drishti_autonomous_engine';
     }
 
-    // Ensure structured intelligence metadata is present
+    // Ensure structured intelligence metadata is present if needed
     if (!resultPayload) {
       try {
         resultPayload = await executeDrishtiIntelligenceQuery(workingQuestion, targetLang, activeHistory);
       } catch (_) {}
     }
 
-    const suggestions = resultPayload?.suggestions || [
+    const suggestions = resultPayload?.suggestions?.length > 0 ? resultPayload.suggestions : [
       'Show Clearance & Target Suspects',
       'ANPR camera hits near Silk Board',
       'NDPS Drug Seizure SOP & Panchanama',
@@ -96,7 +104,7 @@ export async function POST(req) {
     return NextResponse.json(
       {
         answer: finalAnswer,
-        spokenAnswer: finalAnswer,
+        spokenAnswer: finalSpokenAnswer || finalAnswer,
         language: targetLang,
         source,
         suspects: resultPayload?.suspects || [],
@@ -117,7 +125,7 @@ export async function POST(req) {
     return NextResponse.json(
       {
         answer: result.answer,
-        spokenAnswer: result.answer,
+        spokenAnswer: result.spokenAnswer || result.answer,
         language: 'en',
         source: 'drishti_autonomous_engine',
         suspects: result.suspects || [],
