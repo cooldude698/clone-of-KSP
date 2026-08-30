@@ -1109,118 +1109,114 @@ export default function GeoTrailPage() {
           </p>
         </div>
 
-        {/* Search Input Form with Helper Quick Links */}
-        <div className="flex flex-col gap-1.5 w-full md:w-auto">
+        {/* Search Input Form & Quick Target Selector */}
+        <div className="flex flex-col gap-2.5 w-full md:w-auto items-start md:items-end">
           <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 w-full md:w-96">
             <div className="relative flex-1">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search Plate (e.g. KA-19-MN-4456, KA-25-BG-3310)..."
-                className="w-full px-3.5 py-2 pl-9 rounded-xl bg-steel-700 border border-steel-600/50 text-xs font-mono text-paper-100 placeholder:text-paper-100/40 focus:outline-none focus:border-phosphor-500 transition-all shadow-md"
+                placeholder="Search Vehicle Plate (e.g. KA-01-MJ-8821)..."
+                className="w-full px-3.5 py-2 pl-9 rounded-xl bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 text-xs font-mono text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-blue-500 transition-all shadow-xs"
               />
-              <Search className="w-4 h-4 text-paper-100/40 absolute left-3 top-2.5" />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
             </div>
-            <Button type="submit" variant="primary" size="sm" className="font-mono text-xs shrink-0 rounded-xl">
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer shrink-0"
+            >
               Search
-            </Button>
+            </button>
           </form>
 
-          {/* Search Helper Quick Links (10 Scenarios) */}
-          <div className="flex items-center flex-wrap gap-1 text-[10px] font-mono text-paper-100/50 px-0.5 max-w-xl">
-            <span className="text-paper-100/40 font-semibold">Try:</span>
+          {/* Quick Target Preset Badges (Clean, Horizontal Scrollable Pills) */}
+          <div className="flex items-center gap-1.5 overflow-x-auto max-w-full md:max-w-xl pb-1 scrollbar-none">
+            <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 shrink-0">Quick Targets:</span>
             {[
-              { plate: 'KA-05-HB-3342', label: 'Clean 5-Hop' },
-              { plate: 'KA-01-MJ-8821', label: 'Vector' },
-              { plate: 'KA-09-RT-7765', label: 'Gap Anomaly' },
-              { plate: 'KA-03-KL-1190', label: '8-Hop Long' },
-              { plate: 'KA-19-MN-4456', label: '1-Hop Edge' },
-              { plate: 'KA-02-VS-9981', label: '2-Wheeler' },
-              { plate: 'KA-25-BG-3310', label: 'Statewide' },
-              { plate: 'KA-14-JP-6602', label: '3 Co-Occur' },
-              { plate: 'KA-33-EC-8847', label: 'All-ANPR' },
-              { plate: 'KA-07-DD-0021', label: 'Not Found' },
-            ].map((item, idx) => (
-              <span key={item.plate} className="inline-flex items-center gap-1">
-                {idx > 0 && <span className="text-paper-100/20">•</span>}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchQuery(item.plate);
-                    loadTrailForPlate(item.plate);
-                  }}
-                  className="hover:text-phosphor-500 hover:underline transition-colors focus:outline-none cursor-pointer"
-                >
-                  {item.plate} ({item.label})
-                </button>
-              </span>
+              { plate: 'KA-01-MJ-8821', label: 'Vector Escape', color: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800' },
+              { plate: 'KA-05-HB-3342', label: '5-Hop Clean', color: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800' },
+              { plate: 'KA-09-RT-7765', label: 'Gap Anomaly', color: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800' },
+              { plate: 'KA-03-KL-1190', label: '8-Hop Long', color: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800' },
+              { plate: 'KA-25-BG-3310', label: 'Statewide', color: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800' },
+              { plate: 'KA-14-JP-6602', label: '3 Co-Occur', color: 'bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/40 dark:text-cyan-300 dark:border-cyan-800' },
+            ].map((item) => (
+              <button
+                key={item.plate}
+                type="button"
+                onClick={() => {
+                  setSearchQuery(item.plate);
+                  loadTrailForPlate(item.plate);
+                }}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold border transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 hover:scale-105 shadow-2xs ${item.color}`}
+              >
+                <span>{item.plate}</span>
+                <span className="text-[9px] opacity-75 font-sans font-normal">({item.label})</span>
+              </button>
             ))}
           </div>
         </div>
       </div>
 
-      {/* SUSPECT SUMMARY CARD */}
+      {/* SUSPECT SUMMARY CARD (4-KPI METRIC STRIP) */}
       {metadata && !notFound && (
-        <Card className="p-4 border border-steel-600/50 bg-steel-700/40 rounded-xl shadow-md">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 divide-x divide-steel-600/30">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-steel-700 border border-steel-600/60 text-phosphor-500 shrink-0">
-                <Car className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="text-[10px] font-mono text-paper-100/50 uppercase tracking-wider block">
-                  VEHICLE SPEC
-                </span>
-                <span className="text-xs font-mono font-bold text-paper-100 block truncate">
-                  {metadata.vehicleType || 'Sedan / Commercial'}
-                </span>
-              </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="p-3.5 rounded-2xl bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-800 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+              <Car className="w-5 h-5" />
             </div>
-
-            <div className="flex items-center gap-3 pl-4">
-              <div className="p-2.5 rounded-lg bg-steel-700 border border-steel-600/60 text-phosphor-500 shrink-0">
-                <Layers className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="text-[10px] font-mono text-paper-100/50 uppercase tracking-wider block">
-                  TOTAL HOPS
-                </span>
-                <span className="text-xs font-mono font-bold text-paper-100 block">
-                  {metadata.totalHops} {metadata.totalHops === 1 ? 'Sighting' : 'Hops Captured'}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 pl-4">
-              <div className="p-2.5 rounded-lg bg-steel-700 border border-steel-600/60 text-phosphor-500 shrink-0">
-                <Activity className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="text-[10px] font-mono text-paper-100/50 uppercase tracking-wider block">
-                  AVG MATCH %
-                </span>
-                <span className="text-xs font-mono font-bold text-phosphor-500 block">
-                  {averageMatchPercent}% Confidence
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 pl-4">
-              <div className="p-2.5 rounded-lg bg-steel-700 border border-steel-600/60 text-phosphor-500 shrink-0">
-                <Clock className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="text-[10px] font-mono text-paper-100/50 uppercase tracking-wider block">
-                  DURATION
-                </span>
-                <span className="text-xs font-mono font-bold text-paper-100 block">
-                  {metadata.totalHops === 1 ? '0m (Single Point)' : `${metadata.duration} mins (${metadata.totalDistance} km)`}
-                </span>
-              </div>
+            <div className="min-w-0">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+                VEHICLE SPEC
+              </span>
+              <span className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 block truncate">
+                {metadata.vehicleType || 'Sedan / Commercial'}
+              </span>
             </div>
           </div>
-        </Card>
+
+          <div className="p-3.5 rounded-2xl bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-800 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+              <Layers className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+                TOTAL HOPS
+              </span>
+              <span className="text-xs sm:text-sm font-extrabold text-slate-800 dark:text-slate-100 block">
+                {metadata.totalHops} {metadata.totalHops === 1 ? 'Sighting' : 'Hops Captured'}
+              </span>
+            </div>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <Activity className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+                AVG MATCH %
+              </span>
+              <span className="text-xs sm:text-sm font-extrabold text-emerald-600 dark:text-emerald-400 block">
+                {averageMatchPercent}% Confidence
+              </span>
+            </div>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-800 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+              <Clock className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+                DURATION & DIST
+              </span>
+              <span className="text-xs sm:text-sm font-extrabold text-slate-800 dark:text-slate-100 block truncate">
+                {metadata.totalHops === 1 ? '0m (Single Point)' : `${metadata.duration}m (${metadata.totalDistance} km)`}
+              </span>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ── NOT FOUND STATE ────────────────────────────────────────────────── */}
