@@ -195,38 +195,35 @@ const DrishtiOrb = ({
       }}
     >
 
-      {/* ── LIVE LISTENING & INTELLIGENCE RESPONSE HUD CARD (Beige Luxury Theme) ── */}
+      {/* ── LIVE LISTENING & INTELLIGENCE RESPONSE HUD CARD (Tactical Glassmorphism) ── */}
       {!isDismissed && (liveTranscript || pendingTranscript || orbResponse) && (
-        <div className="w-[340px] sm:w-[430px] max-w-[94vw] rounded-2xl overflow-hidden mb-3 animate-fade-in relative z-20 shadow-[0_25px_60px_rgba(40,30,20,0.35),0_0_35px_rgba(217,119,6,0.15)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.85),0_0_35px_rgba(217,119,6,0.18)] border border-[#DFD6C7] dark:border-[#3D362D]">
-          {/* Top ambient amber accent line */}
-          <div className="h-[2.5px] w-full bg-gradient-to-r from-amber-600 via-amber-400 to-yellow-600" />
+        <div className="w-[340px] sm:w-[440px] max-w-[94vw] rounded-2xl overflow-hidden mb-3 animate-fade-in relative z-20 shadow-[0_20px_50px_rgba(0,0,0,0.65),0_0_30px_rgba(59,130,246,0.18)] border border-slate-700/80 dark:border-slate-800 bg-slate-900/95 dark:bg-[#0B0F19]/95 backdrop-blur-2xl text-slate-100">
+          {/* Top ambient blue/cyan accent glow bar */}
+          <div className="h-[2.5px] w-full bg-gradient-to-r from-blue-600 via-cyan-400 to-indigo-600" />
 
-          <div
-            style={{
-              background: 'rgba(253, 251, 247, 0.97)',
-              backdropFilter: 'blur(30px)',
-            }}
-            className="p-4 relative z-10 text-[#28211A] dark:!bg-[#181512]/98 dark:!text-[#FAF6F0]"
-          >
+          <div className="p-4 relative z-10 text-slate-100">
             {/* Live transcript while listening */}
             {liveTranscript && !pendingTranscript && (
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-                    <span className="text-[10px] text-amber-800 dark:text-amber-300 uppercase tracking-widest font-bold font-mono">
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500"></span>
+                    </span>
+                    <span className="text-[10px] text-cyan-400 uppercase tracking-widest font-bold font-mono">
                       LISTENING TO VOICE…
                     </span>
                   </div>
                   <button
                     onClick={handleDismissBubble}
-                    className="text-[#7A6E60] hover:text-[#28211A] dark:text-[#A89C8D] dark:hover:text-white hover:bg-amber-500/15 p-1 rounded-lg transition-all text-xs cursor-pointer"
+                    className="text-slate-400 hover:text-white hover:bg-slate-800/80 p-1 rounded-lg transition-all text-xs cursor-pointer"
                     title="Dismiss"
                   >
                     ✕
                   </button>
                 </div>
-                <div className="p-3 bg-[#F2ECE1] dark:bg-[#221E1A] rounded-xl border border-[#DFD6C7] dark:border-[#352F28] text-xs text-amber-950 dark:text-amber-100 font-mono leading-relaxed">
+                <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-800 text-xs text-cyan-100 font-mono leading-relaxed shadow-inner">
                   &quot;{liveTranscript}&quot;
                 </div>
               </div>
@@ -238,34 +235,34 @@ const DrishtiOrb = ({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <span className="text-xs">🎙️</span>
-                    <span className="text-[10px] text-amber-850 dark:text-amber-300 uppercase tracking-wider font-bold font-mono">
+                    <span className="text-[10px] text-cyan-400 uppercase tracking-wider font-bold font-mono">
                       VOICE TRANSCRIPT VERIFICATION
                     </span>
                   </div>
                   <button
                     onClick={handleDismissBubble}
-                    className="text-[#7A6E60] hover:text-[#28211A] dark:text-[#A89C8D] dark:hover:text-white hover:bg-amber-500/15 p-1 rounded-lg transition-all text-xs cursor-pointer"
+                    className="text-slate-400 hover:text-white hover:bg-slate-800/80 p-1 rounded-lg transition-all text-xs cursor-pointer"
                     title="Dismiss"
                   >
                     ✕
                   </button>
                 </div>
 
-                <div className="p-3 bg-[#FAF7F2] dark:bg-[#201C18] rounded-xl border border-amber-500/30 text-xs text-[#28211A] dark:text-[#FAF6F0] font-medium leading-relaxed shadow-inner">
+                <div className="p-3 bg-slate-950/90 rounded-xl border border-blue-500/40 text-xs text-slate-100 font-medium leading-relaxed shadow-inner">
                   &quot;{pendingTranscript}&quot;
                 </div>
 
                 <div className="flex items-center gap-2 pt-1">
                   <button
                     onClick={(e) => { e.stopPropagation(); onConfirmSend?.(); }}
-                    className="flex-1 py-2 px-3 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white text-xs font-semibold rounded-xl shadow-md shadow-amber-600/25 flex items-center justify-center gap-1.5 transition-all active:scale-98 cursor-pointer"
+                    className="flex-1 py-2 px-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-xl shadow-md shadow-blue-600/30 flex items-center justify-center gap-1.5 transition-all active:scale-98 cursor-pointer"
                   >
                     <span>Send Query</span>
-                    <span className="text-[10px] opacity-80 font-mono px-1 py-0.2 bg-black/20 rounded">↵</span>
+                    <span className="text-[10px] opacity-80 font-mono px-1 py-0.2 bg-black/30 rounded">↵</span>
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); onCancelTranscript?.(); }}
-                    className="py-2 px-3.5 bg-[#E5DED2] dark:bg-[#2E2822] hover:bg-[#DCD4C5] text-[#5A4E40] dark:text-[#C5B8A5] hover:text-[#28211A] dark:hover:text-white text-xs font-medium rounded-xl transition-all cursor-pointer"
+                    className="py-2 px-3.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium rounded-xl transition-all cursor-pointer border border-slate-700"
                   >
                     Cancel
                   </button>
@@ -277,18 +274,18 @@ const DrishtiOrb = ({
             {!liveTranscript && !pendingTranscript && orbResponse && (
               <div className="space-y-3">
                 {/* Header bar */}
-                <div className="flex items-center justify-between pb-2 border-b border-[#E8DFD0] dark:border-[#2D2721]">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-800">
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-[10px] shrink-0 text-amber-800 dark:text-amber-200">
+                    <div className="w-5 h-5 rounded-lg bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-[10px] shrink-0 text-blue-400 shadow-xs">
                       🛡️
                     </div>
                     <div>
-                      <span className="font-mono text-[11px] font-bold tracking-wider text-[#28211A] dark:text-[#FAF6F0] uppercase">
+                      <span className="font-mono text-[11px] font-bold tracking-wider text-white uppercase">
                         DRISHTI INTEL HUD
                       </span>
                     </div>
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/25 text-[9px] font-mono text-amber-800 dark:text-amber-300 font-semibold">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[9px] font-mono text-emerald-400 font-semibold">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       LIVE
                     </span>
                   </div>
@@ -297,16 +294,16 @@ const DrishtiOrb = ({
                     {isSpeaking ? (
                       <button
                         onClick={(e) => { e.stopPropagation(); onStopSpeaking?.(); }}
-                        className="text-red-700 dark:text-red-300 hover:text-red-900 dark:hover:text-white hover:bg-red-500/25 bg-red-500/15 border border-red-500/40 px-2.5 py-1 rounded-lg cursor-pointer transition-all text-xs flex items-center gap-1.5 font-mono font-bold animate-pulse shadow-xs"
+                        className="text-red-300 hover:text-white hover:bg-red-500/30 bg-red-500/20 border border-red-500/50 px-2.5 py-1 rounded-lg cursor-pointer transition-all text-xs flex items-center gap-1.5 font-mono font-bold animate-pulse shadow-xs"
                         title="Stop audio speech immediately"
                       >
-                        <span className="w-2 h-2 rounded-full bg-red-600" />
+                        <span className="w-2 h-2 rounded-full bg-red-500" />
                         <span>Stop Audio</span>
                       </button>
                     ) : onReadAloud ? (
                       <button
                         onClick={(e) => { e.stopPropagation(); onReadAloud(); }}
-                        className="text-[#5A4E40] dark:text-[#C5B8A5] hover:text-amber-900 dark:hover:text-amber-100 hover:bg-amber-500/15 bg-[#EFE9DE] dark:bg-[#25201B] border border-[#DDD4C5] dark:border-[#352F28] px-2 py-1 rounded-lg cursor-pointer transition-all text-xs flex items-center gap-1 font-mono"
+                        className="text-slate-300 hover:text-white hover:bg-blue-500/20 bg-slate-800/90 border border-slate-700 px-2 py-1 rounded-lg cursor-pointer transition-all text-xs flex items-center gap-1 font-mono"
                         title="Read Aloud"
                       >
                         🔊 Listen
@@ -315,7 +312,7 @@ const DrishtiOrb = ({
                     {onOpenPanel && (
                       <button
                         onClick={(e) => { e.stopPropagation(); onOpenPanel(); }}
-                        className="text-[#5A4E40] dark:text-[#C5B8A5] hover:text-amber-900 dark:hover:text-amber-100 hover:bg-amber-500/15 bg-[#EFE9DE] dark:bg-[#25201B] border border-[#DDD4C5] dark:border-[#352F28] px-2 py-1 rounded-lg cursor-pointer transition-all text-xs font-mono"
+                        className="text-slate-300 hover:text-white hover:bg-blue-500/20 bg-slate-800/90 border border-slate-700 px-2 py-1 rounded-lg cursor-pointer transition-all text-xs font-mono"
                         title="Open Full Copilot Workspace"
                       >
                         ↗ Panel
@@ -323,7 +320,7 @@ const DrishtiOrb = ({
                     )}
                     <button
                       onClick={handleDismissBubble}
-                      className="text-[#7A6E60] hover:text-[#28211A] dark:text-[#A89C8D] dark:hover:text-white hover:bg-amber-500/15 p-1 rounded-lg cursor-pointer transition-all text-xs ml-0.5"
+                      className="text-slate-400 hover:text-white hover:bg-slate-800 p-1 rounded-lg cursor-pointer transition-all text-xs ml-0.5"
                       title="Dismiss"
                     >
                       ✕
@@ -331,20 +328,20 @@ const DrishtiOrb = ({
                   </div>
                 </div>
 
-                {/* Render Rich Intelligence Response in Beige Luxury Theme */}
+                {/* Render Rich Intelligence Response */}
                 <div className="max-h-80 overflow-y-auto drishti-scrollbar pr-1">
-                  <PoliceIntelligenceRenderer text={orbResponse} isDark={true} theme="beige" mode="bubble" />
+                  <PoliceIntelligenceRenderer text={orbResponse} isDark={true} theme="dark" mode="bubble" />
                 </div>
 
                 {/* Interactive Recommended Queries (Clean 2-Column Grid) */}
                 {suggestions && suggestions.length > 0 && (
-                  <div className="pt-2.5 border-t border-[#E8DFD0] dark:border-[#2D2721] space-y-2">
-                    <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-[#7A6E60] dark:text-[#A89C8D] font-bold">
+                  <div className="pt-2.5 border-t border-slate-800 space-y-2">
+                    <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold">
                       <span className="flex items-center gap-1.5">
-                        <span className="text-amber-600 dark:text-amber-400">⚡</span>
+                        <span className="text-cyan-400">⚡</span>
                         <span>Recommended Next Inquiries</span>
                       </span>
-                      <span className="text-[9px] font-medium text-amber-800/70 dark:text-amber-300/70">Click to ask</span>
+                      <span className="text-[9px] font-medium text-cyan-400/80">Click to ask</span>
                     </div>
 
                     <div className="grid grid-cols-2 gap-1.5">
@@ -363,16 +360,16 @@ const DrishtiOrb = ({
                               e.stopPropagation();
                               onSelectSuggestion?.(sug);
                             }}
-                            className="group relative flex items-center gap-2 p-2 rounded-xl text-left bg-[#F4EDE2] hover:bg-[#ECE3D4] dark:bg-[#201C17] dark:hover:bg-[#2A241E] border border-[#DDD3C0] hover:border-amber-500/50 dark:border-[#383126] dark:hover:border-amber-500/40 transition-all cursor-pointer shadow-2xs active:scale-[0.98] overflow-hidden"
+                            className="group relative flex items-center gap-2 p-2 rounded-xl text-left bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 hover:border-cyan-500/50 transition-all cursor-pointer shadow-2xs active:scale-[0.98] overflow-hidden"
                             title={sug}
                           >
-                            <span className="w-5 h-5 rounded-lg bg-amber-500/15 border border-amber-500/25 flex items-center justify-center text-[10px] shrink-0 text-amber-800 dark:text-amber-200">
+                            <span className="w-5 h-5 rounded-lg bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-[10px] shrink-0 text-cyan-300">
                               {icon}
                             </span>
-                            <span className="text-[11px] font-semibold text-[#2C231A] dark:text-[#FAF6F0] line-clamp-1 leading-tight flex-1">
+                            <span className="text-[11px] font-semibold text-slate-200 group-hover:text-white line-clamp-1 leading-tight flex-1">
                               {sug}
                             </span>
-                            <span className="text-[10px] text-amber-700 dark:text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                            <span className="text-[10px] text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                               →
                             </span>
                           </button>
@@ -383,7 +380,7 @@ const DrishtiOrb = ({
                 )}
 
                 {/* Tactical Footer */}
-                <div className="pt-2 border-t border-[#E8DFD0] dark:border-[#2D2721] flex items-center justify-between text-[10px] text-[#7A6E60] dark:text-[#A89C8D] font-mono">
+                <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-[10px] text-slate-400 font-mono">
                   <span>KSP CCTNS v4.2 • Grid Synced</span>
                   <button
                     onClick={() => {
@@ -391,7 +388,7 @@ const DrishtiOrb = ({
                         navigator.clipboard.writeText(orbResponse);
                       }
                     }}
-                    className="hover:text-amber-800 dark:hover:text-amber-200 cursor-pointer flex items-center gap-1 transition-colors font-medium"
+                    className="hover:text-cyan-400 cursor-pointer flex items-center gap-1 transition-colors font-medium text-slate-300"
                   >
                     📋 Copy Brief
                   </button>
@@ -424,8 +421,8 @@ const DrishtiOrb = ({
         />
       </div>
 
-      {/* ── FLOATING CONTROLS PILL ── */}
-      <div className="flex items-center gap-2 bg-[#EDE4D5]/98 dark:bg-[#231F1A]/95 backdrop-blur-xl border border-[#D8C9B4] dark:border-[#42392E] px-3 py-1.5 rounded-full shadow-[0_10px_35px_rgba(140,115,85,0.22)] animate-fade-in mt-1">
+      {/* ── FLOATING CONTROLS PILL (Tactical Sleek) ── */}
+      <div className="flex items-center gap-2 bg-slate-900/90 dark:bg-[#0B0F19]/90 backdrop-blur-xl border border-slate-700/80 px-3 py-1.5 rounded-full shadow-[0_10px_35px_rgba(0,0,0,0.5)] animate-fade-in mt-1 text-slate-200">
         {/* PTT HOLD TO TALK BUTTON */}
         <button
           onMouseDown={(e) => { e.preventDefault(); onPttStart?.(); }}
@@ -435,8 +432,8 @@ const DrishtiOrb = ({
           onTouchEnd={(e) => { e.preventDefault(); onPttEnd?.(); }}
           className={`px-3.5 py-1.5 rounded-full text-[10px] uppercase font-bold tracking-wider select-none transition-all duration-200 flex items-center gap-1.5 h-7 cursor-pointer
             ${isListening
-              ? 'bg-blue-600 text-white shadow-md scale-105'
-              : 'bg-[#DFD2BF] dark:bg-[#342D24] hover:bg-[#D4C3AC] dark:hover:bg-[#433B30] text-[#3B2F23] dark:text-[#EFE6D8] border border-[#CBB9A0] dark:border-[#4D4235]'}`}
+              ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40 scale-105'
+              : 'bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700'}`}
         >
           {isListening && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
           {isListening ? 'Listening…' : 'Hold to Talk'}
@@ -448,7 +445,7 @@ const DrishtiOrb = ({
           className={`p-1.5 rounded-full transition-all cursor-pointer ${
             showTypingInput
               ? 'bg-blue-600 text-white'
-              : 'text-[#665440] hover:text-[#251D14] dark:text-[#D1C2AF] dark:hover:text-white hover:bg-[#DFD2BF] dark:hover:bg-[#342D24]'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800'
           }`}
           title="Type query"
         >
@@ -460,8 +457,8 @@ const DrishtiOrb = ({
           onClick={(e) => { e.stopPropagation(); onToggleMute?.(); }}
           className={`p-1.5 rounded-full transition-all cursor-pointer ${
             isMuted
-              ? 'bg-rose-500/20 text-rose-500'
-              : 'text-[#665440] hover:text-[#251D14] dark:text-[#D1C2AF] dark:hover:text-white hover:bg-[#DFD2BF] dark:hover:bg-[#342D24]'
+              ? 'bg-rose-500/20 text-rose-400'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800'
           }`}
           title={isMuted ? 'Unmute voice' : 'Mute voice'}
         >
@@ -477,7 +474,7 @@ const DrishtiOrb = ({
             e.stopPropagation();
             onTypingSubmit?.(typingText);
           }}
-          className="mt-2 w-72 flex items-center gap-1.5 bg-[#EDE4D5] dark:bg-[#231F1A] border border-[#D8C9B4] dark:border-[#42392E] rounded-full px-3 py-1.5 shadow-[0_10px_35px_rgba(140,115,85,0.22)] animate-fade-in"
+          className="mt-2 w-72 flex items-center gap-1.5 bg-slate-900/95 dark:bg-[#0B0F19]/95 border border-slate-700/80 rounded-full px-3 py-1.5 shadow-2xl backdrop-blur-xl animate-fade-in"
           onClick={(e) => e.stopPropagation()}
         >
           <input
@@ -486,11 +483,11 @@ const DrishtiOrb = ({
             onChange={(e) => onTypingChange?.(e.target.value)}
             placeholder="Ask Drishti AI..."
             autoFocus
-            className="flex-1 text-xs bg-transparent text-[#251D14] dark:text-white focus:outline-none placeholder:text-[#8C7A68]"
+            className="flex-1 text-xs bg-transparent text-white focus:outline-none placeholder:text-slate-500"
           />
           <button
             type="submit"
-            className="w-6 h-6 rounded-full bg-[#3B2F23] dark:bg-[#DFD2BF] text-[#EDE4D5] dark:text-[#231F1A] flex items-center justify-center text-xs font-bold hover:opacity-80"
+            className="w-6 h-6 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-xs font-bold transition-all shadow-xs"
           >
             ↑
           </button>
