@@ -119,7 +119,7 @@ export default function AnalystIntelligenceHub() {
                 Overview
               </h1>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Karnataka State Police · Sector 4 Tactical Command & Analytics
+                Karnataka State Police · SCRB State Crime Intelligence Command
               </p>
             </div>
 
