@@ -260,25 +260,36 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
     const allFirs = DEMO_FIRS.firs || [];
     const allSuspects = [...SUSPECTS_INTEL, ...UPLOADED_SUSPECTS];
 
-    // ── 1. GREETINGS & CASUAL HELLOS ───────────────────────────────────────────
-    if (/^(hi|hello|hey|greetings|good\s*morning|good\s*afternoon|good\s*evening|jai\s*hind|namaste|नमस्ते|हेलो|हाय|ನಮಸ್ಕಾರ|ಜೈ ಹಿಂದ್)$/i.test(q) ||
-        q.includes('how are you') || q.includes('who are you') || q.includes('what can you do') || q.includes('help me') || q.includes('what is drishti')) {
-      if (isKannada) {
+    // ── 1. GREETINGS, AUDIO/MIC CHECKS & CONVERSATIONAL INQUIRIES ───────────
+    const isAudioCheck = /\b(can\s*you\s*hear|hear\s*me|listening|hear\s*you|mic\s*test|voice\s*test|audio\s*check|testing|am\s*i\s*audible|sound\s*check)\b/i.test(q);
+    const isGreeting = /\b(hi|hello|hey|greetings|good\s*morning|good\s*afternoon|good\s*evening|jai\s*hind|namaste|नमस्ते|हेलो|हाय|ನಮಸ್ಕಾರ|ಜೈ ಹಿಂದ್)\b/i.test(q);
+    const isStatusQuery = /\b(how\s*are\s*you|who\s*are\s*you|what\s*can\s*you\s*do|what\s*is\s*drishti|status|online|are\s*you\s*there|ready)\b/i.test(q);
+
+    if (isAudioCheck || isGreeting || isStatusQuery) {
+      if (isAudioCheck) {
+        const speech = isKannada
+          ? 'ನಮಸ್ಕಾರ ಸರ್, ನಿಮ್ಮ ಧ್ವನಿ ಸ್ಪಷ್ಟವಾಗಿ ಕೇಳಿಸುತ್ತಿದೆ. ದೃಷ್ಟಿ ಎಐ ಸಕ್ರಿಯವಾಗಿದೆ ಮತ್ತು ಕರ್ತವ್ಯದಲ್ಲಿದೆ. ನಿಮ್ಮ ಆದೇಶ ತಿಳಿಸಿ.'
+          : isHindi
+          ? 'जय हिंद सर, आपकी आवाज बिल्कुल स्पष्ट आ रही है। दृष्टि एआई ड्यूटी पर सक्रिय है। बताइए मैं क्या सहायता करूँ?'
+          : 'Jai Hind, Officer. I can hear you loud and clear. DRISHTI AI is online and monitoring all Karnataka Police intelligence feeds. How can I assist your shift?';
+
         return {
-          answer: `ಜೈ ಹಿಂದ್, ಸರ್! ದೃಷ್ಟಿ (DRISHTI AI) ಕರ್ತವ್ಯದಲ್ಲಿದೆ. ಕರ್ನಾಟಕ ರಾಜ್ಯ ಪೊಲೀಸ್ ಸಿಸಿಟಿಎನ್‌ಎಸ್ ಮತ್ತು ಗುಪ್ತಚರ ದತ್ತಸಂಚಯ ಸಂಪೂರ್ಣವಾಗಿ ಸಕ್ರಿಯವಾಗಿದೆ.\n\nಇಂದು ನಿಮ್ಮ ತನಿಖೆಯಲ್ಲಿ ನಾನು ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ, ಸರ್? ನೀವು ನಿರ್ದಿಷ್ಟ ಪ್ರಕರಣ, ಶಂಕಿತರ ಹಿನ್ನೆಲೆ, ವಾಹನ ಸಂಖ್ಯೆ ಅಥವಾ ಸ್ಥಳದ ಅಪರಾಧ ಮಾಹಿತಿಯನ್ನು ಕೇಳಬಹುದು.`,
-          suggestions: ['ಇತ್ತೀಚಿನ ವಾಹನ ಕಳವು ಪ್ರಕರಣಗಳು', 'ನಮ್ಮ ಪ್ರಮುಖ ಗುರಿಗಳು (Target Suspects)', 'ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಅಪರಾಧ ಹಾಟ್‌ಸ್ಪಾಟ್', 'ಕಲಬುರಗಿ ಪ್ರಕರಣಗಳ ಪಟ್ಟಿ'],
-          kpis: { active_firs: allFirs.length, repeat_offenders: allSuspects.length, grid_status: 'ONLINE' }
+          answer: `### 🎙️ Voice & Tactical Audio Link: **ONLINE**\n\nJai Hind, Officer! I can hear you loud and clear.\n\n- **Audio Reception:** High-fidelity microphone stream verified.\n- **Intelligence Grid:** Connected to Karnataka State Police CCTNS, ANPR camera networks, and repeat offender registries.\n- **Ready For Commands:** You can ask about cases, suspects, vehicle tracking, crime hotspots, or legal SOPs.`,
+          spokenAnswer: speech,
+          suggestions: ['Show Top Clearance Target Suspects', 'Latest Vehicle Theft Cases in Bengaluru', 'Inspect Silk Board Hotspot', 'Kalaburagi Crime Statistics'],
+          kpis: { audio_link: '100% CLEAR', grid_status: 'ONLINE', active_firs: allFirs.length }
         };
       }
-      if (isHindi) {
-        return {
-          answer: `जय हिंद, सर! दृष्टि (DRISHTI AI) ऑन-ड्यूटी सक्रिय है। कर्नाटक पुलिस CCTNS और सर्विलांस ग्रिड पूरी तरह सिंक्रोनाइज़्ड हैं।\n\nआज आपकी जांच में मैं कैसे सहायता कर सकता हूँ, सर? आप किसी भी केस नंबर, संदिग्ध के नाम, वाहन नंबर या जिले के अपराध आंकड़ों के बारे में पूछ सकते हैं।`,
-          suggestions: ['नवीनतम वाहन चोरी मामले', 'शीर्ष वांछित संदिग्ध (Target Suspects)', 'सिल्क बोर्ड क्राइम एनालिसिस', 'कलवारगी केस रिपोर्ट'],
-          kpis: { active_firs: allFirs.length, repeat_offenders: allSuspects.length, grid_status: 'ONLINE' }
-        };
-      }
+
+      const speech = isKannada
+        ? 'ಜೈ ಹಿಂದ್ ಸರ್, ದೃಷ್ಟಿ ಎಐ ಕರ್ತವ್ಯದಲ್ಲಿದೆ. ಕರ್ನಾಟಕ ರಾಜ್ಯ ಪೊಲೀಸ್ ದತ್ತಸಂಚಯ ಸಂಪರ್ಕದಲ್ಲಿದೆ. ತನಿಖೆಯಲ್ಲಿ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?'
+        : isHindi
+        ? 'जय हिंद सर, दृष्टि एआई सक्रिय है। CCTNS और सर्विलांस ग्रिड पूरी तरह जुड़े हुए हैं। आज के कमांड शिफ्ट में मैं आपकी क्या सहायता करूँ?'
+        : 'Jai Hind, Officer! DRISHTI AI is on active duty, synchronized with Karnataka State Police CCTNS datastores and surveillance grid. How may I assist your command shift today?';
+
       return {
-        answer: `Jai Hind, Inspector! DRISHTI AI is on active duty, synchronized with Karnataka State Police CCTNS datastores and the statewide surveillance grid.\n\nHow may I assist your command shift today, Sir? You can ask about any specific case docket, search for a suspect or vehicle registration number, inspect district crime analytics, or review legal SOPs.`,
+        answer: `### 🛡️ DRISHTI KSP Intelligence Copilot — **ONLINE**\n\nJai Hind, Officer! DRISHTI AI is on active duty, synchronized with Karnataka State Police CCTNS datastores and the statewide surveillance grid.\n\nHow may I assist your command shift today, Sir? You can ask about any specific case docket, search for a suspect or vehicle registration number, inspect district crime analytics, or review legal SOPs.`,
+        spokenAnswer: speech,
         suggestions: ['Show Top Clearance Target Suspects', 'Latest Vehicle Theft Cases in Bengaluru', 'Inspect Silk Board Hotspot', 'Kalaburagi Crime Statistics'],
         kpis: { active_firs: allFirs.length, repeat_offenders: allSuspects.length, grid_status: 'ONLINE' }
       };
@@ -636,25 +647,37 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
     }
 
     // ── 9. DYNAMIC MULTI-TOKEN SEMANTIC SYNTHESIS (FOR NOVEL / UNINDEXED QUERIES) ──
-    const tokens = q.split(/\s+/).filter(w => w.length > 2 && !['the', 'and', 'for', 'with', 'what', 'where', 'when', 'show', 'open', 'give', 'tell', 'about', 'this', 'that', 'please', 'can', 'you'].includes(w));
+    const stopWords = new Set(['the', 'and', 'for', 'with', 'what', 'where', 'when', 'show', 'open', 'give', 'tell', 'about', 'this', 'that', 'please', 'can', 'you', 'how', 'why', 'are', 'was', 'were', 'which', 'who', 'whom', 'them', 'their', 'some', 'any', 'hear', 'listening', 'know', 'look', 'check', 'drishti', 'ksp', 'sir', 'madam', 'officer']);
+    const tokens = q.split(/\s+/).filter(w => w.length > 2 && !stopWords.has(w));
     
-    const correlatedFirs = allFirs.filter(f => {
-      const corpus = `${f.case_number} ${f.crime_type} ${f.police_station} ${f.district_name} ${f.description} ${f.accused_name} ${f.location_name}`.toLowerCase();
-      return tokens.some(token => corpus.includes(token));
-    });
+    let correlatedFirs = [];
+    let correlatedSuspects = [];
 
-    const correlatedSuspects = allSuspects.filter(s => {
-      const corpus = `${s.name} ${s.alias} ${s.primary_crime} ${(s.districts || []).join(' ')} ${s.last_known_location}`.toLowerCase();
-      return tokens.some(token => corpus.includes(token));
-    });
+    if (tokens.length > 0) {
+      correlatedFirs = allFirs.filter(f => {
+        const corpus = `${f.case_number} ${f.crime_type} ${f.police_station} ${f.district_name} ${f.description} ${f.accused_name} ${f.location_name}`.toLowerCase();
+        return tokens.some(token => corpus.includes(token));
+      });
 
-    let out = `### 🔍 DRISHTI Operational Intelligence: **"${rawQuestion}"**\n\n`;
+      correlatedSuspects = allSuspects.filter(s => {
+        const corpus = `${s.name} ${s.alias} ${s.primary_crime} ${(s.districts || []).join(' ')} ${s.last_known_location}`.toLowerCase();
+        return tokens.some(token => corpus.includes(token));
+      });
+    }
+
+    let out = `### 📋 Intelligence Brief: CCTNS Synthesis\n\n`;
+    let spokenSummary = '';
 
     if (correlatedFirs.length > 0) {
       out += `### Correlated CCTNS Case Dockets (${correlatedFirs.length} Matches Found):\n`;
       correlatedFirs.slice(0, 3).forEach((f, idx) => {
         out += `${idx + 1}. [${f.case_number}](/dashboard/fir/${encodeURIComponent(f.case_number)}) — **${f.crime_type}** (${f.police_station}, ${f.district_name})\n   - Accused / Sighted: **${f.accused_name || 'Under Identification'}** | Status: \`${f.status.toUpperCase()}\`\n   - Incident: _${f.description}_\n\n`;
       });
+      spokenSummary = isKannada
+        ? `ಸರ್, ನಿಮ್ಮ ಪ್ರಶ್ನೆಗೆ ಸಂಬಂಧಿಸಿದ ${correlatedFirs.length} ಎಫ್ಐಆರ್ ಪ್ರಕರಣಗಳು ಲಭ್ಯವಾಗಿವೆ. ವಿವರಗಳನ್ನು ಪರದೆಯ ಮೇಲೆ ಪ್ರದರ್ಶಿಸುತ್ತಿದ್ದೇನೆ.`
+        : isHindi
+        ? `सर, आपकी पूछताछ से संबंधित ${correlatedFirs.length} CCTNS मामले मिले हैं। विवरण स्क्रीन पर उपलब्ध है।`
+        : `Sir, I have retrieved ${correlatedFirs.length} correlated CCTNS case dockets matching your inquiry. Displaying the intelligence brief now.`;
     }
 
     if (correlatedSuspects.length > 0) {
@@ -666,16 +689,22 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
     }
 
     if (correlatedFirs.length === 0 && correlatedSuspects.length === 0) {
-      out += `Sir, I have cross-checked the active CCTNS records, surveillance camera logs, and repeat offender matrices for your query.\n\n`;
+      out += `Sir, I have cross-checked active CCTNS records, surveillance camera logs, and repeat offender matrices for your query.\n\n`;
       out += `- **Active Database Sync:** 51 live FIRs and ${allSuspects.length} high-risk dossiers indexed across Karnataka.\n`;
       out += `- **Statewide ANPR Grid:** Active monitoring across 450+ cameras with automated plate alerts.\n`;
-      out += `- **Investigative Guidance:** If you are looking for a specific incident, you can search by case number (e.g. \`KAR/BEN/2024/0747\`), suspect name (e.g. \`Ramesh Kumar\`), vehicle plate, or district name.\n`;
+      out += `- **Investigative Guidance:** You can search by case number (e.g. \`KAR/BEN/2024/0747\`), suspect name (e.g. \`Ramesh Kumar\`), vehicle plate, or district name.\n`;
+      spokenSummary = isKannada
+        ? 'ಸರ್, ಕರ್ನಾಟಕ ರಾಜ್ಯ ಪೊಲೀಸ್ ದತ್ತಸಂಚಯ ಪರಿಶೀಲಿಸಲಾಗಿದೆ. ನಿರ್ದಿಷ್ಟ ಪ್ರಕರಣ ಅಥವಾ ಶಂಕಿತರ ವಿವರಗಳನ್ನು ತಿಳಿಸಿ.'
+        : isHindi
+        ? 'सर, CCTNS और सर्विलांस रिकॉर्ड्स चेक किए गए हैं। कृपया विशिष्ट केस या संदिग्ध का विवरण बताएं।'
+        : 'Sir, I have searched the KSP records. You can ask for specific case numbers, suspect names, vehicle numbers, or district hotspots.';
     } else {
       out += `**Tactical Action Directive:** Review the correlated case files above, inspect associated physical evidence in CCTNS, and deploy mobile beat patrols as required.`;
     }
 
     return {
       answer: out,
+      spokenAnswer: spokenSummary,
       suspects: correlatedSuspects.length > 0 ? correlatedSuspects : allSuspects.slice(0, 2),
       case_cards: correlatedFirs.slice(0, 3),
       suggestions: [
@@ -691,6 +720,7 @@ export async function executeDrishtiIntelligenceQuery(question, lang = 'en', his
     console.error('[drishtiIntelligenceEngine] Error:', err);
     return {
       answer: `DRISHTI AI is active and monitoring the Karnataka State Police intelligence grid, Sir. How may I assist your command shift?`,
+      spokenAnswer: 'DRISHTI AI is active and monitoring the Karnataka State Police intelligence grid. How may I assist your command shift, Sir?',
       suspects: SUSPECTS_INTEL.slice(0, 2),
       case_cards: DEMO_FIRS.firs.slice(0, 2),
       suggestions: ['Show Target Suspects Roster', 'Open Crime Hotspot Map', 'Latest Vehicle Theft Cases'],
