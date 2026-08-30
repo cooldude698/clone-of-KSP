@@ -107,20 +107,20 @@ export default function AnalystIntelligenceHub() {
   }, [filteredFIRs, visibleCount]);
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6 text-slate-900">
+    <div className="w-full max-w-7xl mx-auto space-y-6 text-[#14201F]">
       
-      {/* ── KPI METRIC STRIP (ANALYST DOMAIN TELEMETRY) ── */}
+      {/* ── KPI METRIC STRIP (ANALYST FORENSIC READOUT TELEMETRY) ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'FIRs Analyzed', value: '5,35,815', sub: 'CCTNS Live Ingestion', color: 'text-teal-600' },
-          { label: 'Active MO Rings', value: '4 Rings', sub: 'Cross-District Clusters', color: 'text-violet-600' },
-          { label: 'Repeat Offenders', value: '8 Flagged', sub: 'High Recidivism Risk', color: 'text-amber-600' },
-          { label: 'AI Confidence', value: '97.4%', sub: 'Bayesian Neural Core', color: 'text-cyan-600' },
+          { label: 'FIRs Analyzed', value: '5,35,815', sub: 'CCTNS Live Ingestion', color: 'text-[#0F5257]' },
+          { label: 'Active MO Rings', value: '4 Rings', sub: 'Cross-District Clusters', color: 'text-[#6C4DE6]' },
+          { label: 'Repeat Offenders', value: '8 Flagged', sub: 'Recidivism Correlated', color: 'text-[#D6553B]' },
+          { label: 'AI Confidence', value: '97.4%', sub: 'Bayesian Neural Core', color: 'text-[#1F8A70]' },
         ].map((kpi) => (
-          <div key={kpi.label} className="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm flex flex-col gap-1 hover:border-teal-200 transition-colors">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{kpi.label}</span>
-            <span className={`text-2xl font-extrabold tracking-tight ${kpi.color}`}>{kpi.value}</span>
-            <span className="text-[10px] text-slate-400 font-medium">{kpi.sub}</span>
+          <div key={kpi.label} className="rounded-2xl bg-white border border-slate-200/90 p-4 shadow-2xs flex flex-col gap-1 hover:border-[#0F5257]/40 transition-colors">
+            <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider">{kpi.label}</span>
+            <span className={`text-2xl font-mono font-extrabold tracking-tight ${kpi.color}`}>{kpi.value}</span>
+            <span className="text-[10px] text-slate-400 font-mono font-medium">{kpi.sub}</span>
           </div>
         ))}
       </div>
@@ -132,34 +132,49 @@ export default function AnalystIntelligenceHub() {
         <div className="lg:col-span-8 flex flex-col justify-between space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-                Intelligence Overview
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-sm bg-[#0F5257]/10 text-[#0F5257] border border-[#0F5257]/20">
+                  INTELLIGENCE DESK // EVIDENCE BOARD
+                </span>
+              </div>
+              <h1 className="text-2xl font-mono font-extrabold text-[#14201F] tracking-tight mt-1">
+                Pattern & Syndicate Intelligence
               </h1>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Karnataka State Police · SCRB State Crime Intelligence & Pattern Recognition Division
+              <p className="text-xs text-slate-500 mt-0.5 font-sans">
+                Karnataka State Police · Central Crime Intelligence & Forensic Cross-Correlation
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-[11px] font-bold text-teal-700">
-                <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
-                Live SCRB Ingestion
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0F5257]/10 border border-[#0F5257]/20 text-[11px] font-mono font-bold text-[#0F5257]">
+                <span className="w-2 h-2 rounded-full bg-[#1F8A70] animate-pulse" />
+                SCRB SYNC // 5.35L
               </span>
             </div>
           </div>
 
-          {/* 4-CARD BALANCED INTELLIGENCE GRID (ANALYST TEAL/CYAN/VIOLET PALETTE) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+          {/* 4-CARD EVIDENCE BOARD GRID WITH DOTTED VIOLET CORRELATION OVERLAY */}
+          <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+            
+            {/* SIGNATURE ELEMENT 1: Dotted Violet Correlation Linkage Lines */}
+            <svg className="hidden sm:block absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible" xmlns="http://www.w3.org/2000/svg">
+              <line x1="48%" y1="28%" x2="52%" y2="28%" stroke="#6C4DE6" strokeWidth="2" strokeDasharray="3 4" strokeOpacity="0.6" />
+              <line x1="25%" y1="48%" x2="25%" y2="52%" stroke="#6C4DE6" strokeWidth="2" strokeDasharray="3 4" strokeOpacity="0.4" />
+              <line x1="75%" y1="48%" x2="75%" y2="52%" stroke="#6C4DE6" strokeWidth="2" strokeDasharray="3 4" strokeOpacity="0.4" />
+            </svg>
             
             {/* CARD 1: MO PATTERN CLUSTERS */}
-            <div className="rounded-[28px] bg-white border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+            <div className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between group relative overflow-hidden">
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-11 h-11 rounded-full bg-teal-50 text-teal-700 border border-teal-100 flex items-center justify-center shadow-xs">
-                    <Fingerprint className="w-5 h-5" />
+                <div className="flex items-center justify-between mb-3.5">
+                  {/* SIGNATURE ELEMENT 2: Forensic Confidence Readout Badge */}
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#0F5257]/10 border border-[#0F5257]/20 text-[#0F5257] font-mono text-[10px] font-extrabold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#0F5257] animate-ping" />
+                    <span>97.4% CONF</span>
                   </div>
-                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-teal-50 text-teal-700 border border-teal-200">
-                    4 Active Clusters
+
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-sm bg-teal-50 text-[#0F5257] border border-teal-200">
+                    4 ACTIVE RINGS
                   </span>
                 </div>
 
@@ -167,25 +182,25 @@ export default function AnalystIntelligenceHub() {
                   <p className="text-xs text-slate-500 font-medium">
                     MO Pattern Cluster
                   </p>
-                  <h3 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug">
+                  <h3 className="text-base font-bold text-[#14201F] tracking-tight leading-snug">
                     433MHz Jammer & Key Bypass Ring
                   </h3>
-                  <div className="flex items-center gap-2 pt-2">
-                    <span className="text-[10px] font-mono font-bold text-teal-600">
+                  <div className="flex items-center gap-2 pt-1.5">
+                    <span className="text-[10px] font-mono font-bold text-[#0F5257]">
                       Central Bengaluru & Hosur Axis · 14 Linked FIRs
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between">
+              <div className="pt-3.5 mt-3 border-t border-slate-100 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-extrabold text-slate-900">Cluster Signature</span>
-                  <span className="block text-[10px] text-slate-500 font-medium">Electronic Jamming</span>
+                  <span className="text-xs font-bold text-[#14201F]">Cluster Signature</span>
+                  <span className="block text-[10px] text-slate-500 font-mono">Electronic Jamming</span>
                 </div>
                 <Link
                   href="/analyst/patterns"
-                  className="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
+                  className="px-4 py-1.5 rounded-full bg-[#0F5257] text-white text-xs font-bold hover:bg-[#0b3c40] transition-all shadow-xs flex items-center gap-1"
                 >
                   Inspect MO
                 </Link>
@@ -193,14 +208,17 @@ export default function AnalystIntelligenceHub() {
             </div>
 
             {/* CARD 2: CROSS-DISTRICT REPEAT-OFFENDER LINKAGE */}
-            <div className="rounded-[28px] bg-white border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+            <div className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between group relative overflow-hidden">
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-11 h-11 rounded-full bg-violet-50 text-violet-700 border border-violet-100 flex items-center justify-center shadow-xs">
-                    <GitBranch className="w-5 h-5" />
+                <div className="flex items-center justify-between mb-3.5">
+                  {/* SIGNATURE ELEMENT 2: Forensic Confidence Readout Badge */}
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#6C4DE6]/10 border border-[#6C4DE6]/25 text-[#6C4DE6] font-mono text-[10px] font-extrabold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#6C4DE6]" />
+                    <span>94.8% CORR</span>
                   </div>
-                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-violet-50 text-violet-700 border border-violet-200">
-                    Syndicate Nexus
+
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-sm bg-violet-50 text-[#6C4DE6] border border-violet-200">
+                    SYNDICATE NEXUS
                   </span>
                 </div>
 
@@ -208,23 +226,23 @@ export default function AnalystIntelligenceHub() {
                   <p className="text-xs text-slate-500 font-medium">
                     Cross-District Offender Linkage
                   </p>
-                  <h3 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug">
+                  <h3 className="text-base font-bold text-[#14201F] tracking-tight leading-snug">
                     Multi-District Chopshop Nexus
                   </h3>
-                  <p className="text-[11px] text-slate-500 line-clamp-2 pt-1">
+                  <p className="text-[11px] text-slate-600 line-clamp-2 pt-1 font-sans">
                     Bullet Ramesh ↔ Deepak Shetty cross-matching (94.8% confidence correlation).
                   </p>
                 </div>
               </div>
 
-              <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between">
+              <div className="pt-3.5 mt-3 border-t border-slate-100 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-extrabold text-slate-900">Link Analysis</span>
-                  <span className="block text-[10px] text-slate-500 font-medium">3 Inter-PS Nodes</span>
+                  <span className="text-xs font-bold text-[#14201F]">Link Analysis</span>
+                  <span className="block text-[10px] text-slate-500 font-mono">3 Inter-PS Nodes</span>
                 </div>
                 <Link
                   href="/analyst/network"
-                  className="px-4 py-2 rounded-full bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1"
+                  className="px-4 py-1.5 rounded-full bg-[#6C4DE6] hover:bg-[#583cc4] text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1"
                 >
                   Inspect Syndicate
                 </Link>
@@ -232,14 +250,17 @@ export default function AnalystIntelligenceHub() {
             </div>
 
             {/* CARD 3: PREDICTIVE RECIDIVISM MODEL */}
-            <div className="rounded-[28px] bg-white border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+            <div className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between group relative overflow-hidden">
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-11 h-11 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-100 flex items-center justify-center shadow-xs">
-                    <Sparkles className="w-5 h-5" />
+                <div className="flex items-center justify-between mb-3.5">
+                  {/* SIGNATURE ELEMENT 2: Forensic Confidence Readout Badge */}
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#1F8A70]/10 border border-[#1F8A70]/25 text-[#1F8A70] font-mono text-[10px] font-extrabold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#1F8A70]" />
+                    <span>89.2% PROB</span>
                   </div>
-                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-200">
-                    94.2% AI Score
+
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-sm bg-cyan-50 text-[#0F5257] border border-cyan-200">
+                    BAYESIAN 94.2%
                   </span>
                 </div>
 
@@ -247,28 +268,28 @@ export default function AnalystIntelligenceHub() {
                   <p className="text-xs text-slate-500 font-medium">
                     Predictive Recidivism Forecast
                   </p>
-                  <h3 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug">
+                  <h3 className="text-base font-bold text-[#14201F] tracking-tight leading-snug">
                     Spatial-Temporal Crime Forecast
                   </h3>
-                  <div className="flex flex-wrap items-center gap-1.5 pt-2 pb-1">
-                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-semibold text-slate-700">
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
+                    <span className="px-2 py-0.5 rounded-sm bg-slate-100 text-[10px] font-mono font-semibold text-slate-700">
                       Peak 22:00–04:00
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-semibold text-slate-700 font-mono">
+                    <span className="px-2 py-0.5 rounded-sm bg-slate-100 text-[10px] font-mono font-bold text-[#0F5257]">
                       Sector 4 Corridors
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between">
+              <div className="pt-3.5 mt-3 border-t border-slate-100 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-extrabold text-slate-900">Bayesian AI Core</span>
-                  <span className="block text-[10px] text-slate-500 font-medium">Risk Map Vector</span>
+                  <span className="text-xs font-bold text-[#14201F]">Bayesian AI Core</span>
+                  <span className="block text-[10px] text-slate-500 font-mono">Risk Map Vector</span>
                 </div>
                 <Link
                   href="/analyst/heatmap"
-                  className="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
+                  className="px-4 py-1.5 rounded-full bg-[#0F5257] text-white text-xs font-bold hover:bg-[#0b3c40] transition-all shadow-xs flex items-center gap-1"
                 >
                   View Heatmap
                 </Link>
@@ -276,14 +297,17 @@ export default function AnalystIntelligenceHub() {
             </div>
 
             {/* CARD 4: FORENSIC ANOMALY QUEUE */}
-            <div className="rounded-[28px] bg-white border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+            <div className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between group relative overflow-hidden">
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-11 h-11 rounded-full bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center shadow-xs">
-                    <ShieldAlert className="w-5 h-5" />
+                <div className="flex items-center justify-between mb-3.5">
+                  {/* SIGNATURE ELEMENT 2: Forensic Confidence Readout Badge */}
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#D6553B]/10 border border-[#D6553B]/25 text-[#D6553B] font-mono text-[10px] font-extrabold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#D6553B]" />
+                    <span>99.1% MATCH</span>
                   </div>
-                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
-                    Action Required
+
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-sm bg-rose-50 text-[#D6553B] border border-rose-200">
+                    ACTION QUEUE
                   </span>
                 </div>
 
@@ -291,28 +315,28 @@ export default function AnalystIntelligenceHub() {
                   <p className="text-xs text-slate-500 font-medium">
                     Automated Forensic Anomaly Queue
                   </p>
-                  <h3 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug">
+                  <h3 className="text-base font-bold text-[#14201F] tracking-tight leading-snug">
                     Unusual Plates & FSL Flags
                   </h3>
-                  <div className="flex items-center gap-2 pt-2">
-                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-semibold text-slate-700">
+                  <div className="flex items-center gap-2 pt-1.5">
+                    <span className="px-2 py-0.5 rounded-sm bg-slate-100 text-[10px] font-mono font-semibold text-slate-700">
                       3 Cloned Plates
                     </span>
-                    <span className="text-[10px] font-mono font-bold text-rose-600">
+                    <span className="text-[10px] font-mono font-bold text-[#D6553B]">
                       2 Ballistics Delays
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between">
+              <div className="pt-3.5 mt-3 border-t border-slate-100 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-extrabold text-slate-900">Forensic Scan</span>
-                  <span className="block text-[10px] text-slate-500 font-medium">FSL Automated</span>
+                  <span className="text-xs font-bold text-[#14201F]">Forensic Scan</span>
+                  <span className="block text-[10px] text-slate-500 font-mono">FSL Automated</span>
                 </div>
                 <Link
                   href="/analyst/workbench"
-                  className="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
+                  className="px-4 py-1.5 rounded-full bg-[#0F5257] text-white text-xs font-bold hover:bg-[#0b3c40] transition-all shadow-xs flex items-center gap-1"
                 >
                   Review Queue
                 </Link>
@@ -323,9 +347,9 @@ export default function AnalystIntelligenceHub() {
 
         {/* RIGHT COLUMN: CASES ANALYZED THIS MONTH + STATE TARGET (4 COLS) */}
         <div className="lg:col-span-4 flex flex-col justify-between">
-          <div className="rounded-[28px] bg-white border border-slate-200 p-6 shadow-sm flex-1 flex flex-col justify-between">
+          <div className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs flex-1 flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-500">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">
                 {timeFilter === 'Day'
                   ? 'Cases Analyzed Today'
                   : timeFilter === 'Week'
@@ -334,14 +358,14 @@ export default function AnalystIntelligenceHub() {
                   ? 'Cases Analyzed This Year'
                   : 'Cases Analyzed This Month'}
               </span>
-              <button className="text-slate-400 hover:text-slate-600 transition-colors">
+              <button className="text-slate-400 hover:text-[#0F5257] transition-colors">
                 <MoreVertical className="w-4 h-4" />
               </button>
             </div>
 
             <div className="my-2">
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
+                <span className="text-3xl sm:text-4xl font-mono font-extrabold tracking-tight text-[#14201F]">
                   {timeFilter === 'Day'
                     ? '98.1%'
                     : timeFilter === 'Week'
@@ -350,7 +374,7 @@ export default function AnalystIntelligenceHub() {
                     ? '89.7%'
                     : '92.4%'}
                 </span>
-                <span className="text-xs font-medium text-slate-400">
+                <span className="text-xs font-mono font-medium text-slate-400">
                   / {timeFilter === 'Day'
                     ? '28 Case Files'
                     : timeFilter === 'Week'
@@ -363,15 +387,15 @@ export default function AnalystIntelligenceHub() {
             </div>
 
             {/* Time Filter Pills */}
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-xs font-semibold text-slate-500">
+            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-xs font-mono font-semibold text-slate-500">
               {(['Day', 'Week', 'Month', 'Year'] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setTimeFilter(tab)}
                   className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
                     timeFilter === tab
-                      ? 'bg-slate-900 text-white shadow-xs font-bold'
-                      : 'hover:text-slate-900'
+                      ? 'bg-[#0F5257] text-white shadow-xs font-bold'
+                      : 'hover:text-[#0F5257]'
                   }`}
                 >
                   {tab}
@@ -379,13 +403,13 @@ export default function AnalystIntelligenceHub() {
               ))}
             </div>
 
-            {/* SMOOTH CURVED SVG SPLINE CHART (TEAL #0d9488) */}
+            {/* SMOOTH CURVED SVG SPLINE CHART (TEAL #0F5257 / VIOLET #6C4DE6) */}
             <div className="relative mt-5 h-28 w-full">
               <svg viewBox="0 0 300 100" className="w-full h-full overflow-visible" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="analystChartGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#0d9488" stopOpacity="0.2" />
-                    <stop offset="100%" stopColor="#0d9488" stopOpacity="0.0" />
+                    <stop offset="0%" stopColor="#0F5257" stopOpacity="0.2" />
+                    <stop offset="100%" stopColor="#0F5257" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
 
@@ -414,7 +438,7 @@ export default function AnalystIntelligenceHub() {
                       : 'M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45'
                   }
                   fill="none"
-                  stroke="#0d9488"
+                  stroke="#0F5257"
                   strokeWidth="2.5"
                   strokeLinecap="round"
                   className="transition-all duration-500"
@@ -423,33 +447,34 @@ export default function AnalystIntelligenceHub() {
             </div>
           </div>
 
-          {/* THE ONE DARK EXCEPTION: SUMMARY / TARGET CARD (TEAL ACCENT) */}
-          <div className="mt-4 p-4 rounded-2xl bg-slate-900 text-white flex items-center justify-between shadow-sm">
+          {/* THE ONE DARK EXCEPTION: SUMMARY / TARGET CARD (DEEP TEAL ACCENT) */}
+          <div className="mt-4 p-4 rounded-xl bg-[#0F5257] text-white flex items-center justify-between shadow-sm border border-[#0F5257]">
             <div>
-              <p className="text-[10px] text-slate-400 font-medium">State Intelligence Plan 2026</p>
-              <p className="text-xs font-bold text-white mt-0.5">Analyst Extraction Target</p>
+              <p className="text-[10px] text-teal-200 font-mono font-medium">SCRB // PLAN 2026</p>
+              <p className="text-xs font-mono font-bold text-white mt-0.5 uppercase tracking-wide">Extraction Target</p>
             </div>
 
             <div className="relative w-12 h-12 flex items-center justify-center">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
                 <path
-                  className="text-slate-700"
+                  className="text-[#093538]"
                   strokeWidth="4"
                   stroke="currentColor"
                   fill="none"
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
                 <path
-                  className="text-teal-400"
+                  className="text-[#6C4DE6]"
                   strokeDasharray="90, 100"
                   strokeWidth="4"
                   strokeLinecap="round"
                   stroke="currentColor"
                   fill="none"
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
               </svg>
-              <span className="absolute text-[10px] font-black text-white">90%</span>
+              <span className="absolute text-[11px] font-bold text-white font-mono">
+                90%
+              </span>
             </div>
           </div>
         </div>

@@ -107,7 +107,7 @@ export default function DashboardPage() {
   }, [filteredFIRs, visibleCount]);
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6 text-slate-900 dark:text-white">
+    <div className="w-full max-w-7xl mx-auto space-y-6 text-[#14141A]">
       
       {/* ── TOP SECTION: COMMAND DASHBOARD GRID ── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
@@ -116,17 +116,22 @@ export default function DashboardPage() {
         <div className="lg:col-span-8 flex flex-col justify-between space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">
-                {t('nav.dashboard', 'Dashboard')}
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[10px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-sm bg-[#C7362F]/10 text-[#C7362F] border border-[#C7362F]/30">
+                  FIELD OPS // CONSOLE
+                </span>
+              </div>
+              <h1 className="text-2xl font-black text-[#14141A] tracking-tight uppercase mt-1">
+                {t('nav.dashboard', 'Tactical Dispatch & Case Console')}
               </h1>
-              <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-                Karnataka State Police · Sector 4 Tactical Command & Analytics
+              <p className="text-xs text-slate-500 mt-0.5">
+                Karnataka State Police · Central Sector Dispatch & Live Tactical Radar
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] font-bold text-[#1E8A5F]">
+                <span className="w-2 h-2 rounded-full bg-[#1E8A5F] animate-pulse" />
                 Live CCTNS Sync
               </span>
             </div>
@@ -137,41 +142,45 @@ export default function DashboardPage() {
             
             {/* CARD 1: CRIME NETWORK / SYNDICATE */}
             <div
-              className="rounded-[28px] bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
+              className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden"
             >
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-11 h-11 rounded-full bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-white border border-blue-100 dark:border-slate-700 flex items-center justify-center shadow-xs">
+                <div className="flex items-center justify-between mb-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-rose-50 text-[#C7362F] border border-rose-100 flex items-center justify-center shadow-xs">
                     <ShieldAlert className="w-5 h-5" />
                   </div>
-                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50">
-                    High Risk Alert
-                  </span>
+                  
+                  {/* SIGNATURE ELEMENT: Physical Field Report Case Stamp */}
+                  <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm border border-[#C7362F]/50 bg-[#C7362F]/10 text-[#C7362F] font-mono text-[9px] font-black uppercase tracking-wider -rotate-1 shadow-2xs">
+                    FIR #04921 // URGENT
+                  </div>
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    Imminent Target Corridor
-                  </p>
-                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#C7362F]">
+                      Imminent Target Corridor
+                    </span>
+                  </div>
+                  <h3 className="text-base font-black text-[#14141A] tracking-tight leading-snug">
                     Silk Board TTMC – Hosur Corridor
                   </h3>
-                  <div className="flex items-center gap-2 pt-2">
-                    <span className="text-[10px] font-mono font-bold text-rose-600 dark:text-rose-400">
+                  <div className="flex items-center gap-2 pt-1">
+                    <span className="text-[10px] font-mono font-bold text-[#C7362F]">
                       Predicted Window: 28 Jul 2026 – 30 Jul 2026
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+              <div className="pt-3.5 mt-3 border-t border-slate-100 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-extrabold text-slate-900 dark:text-white">Gang Syndicate</span>
-                  <span className="block text-[10px] text-slate-500 font-medium">GANG-NORTH Active</span>
+                  <span className="text-xs font-black text-[#14141A]">Gang Syndicate</span>
+                  <span className="block text-[10px] text-slate-500 font-mono font-semibold">GANG-NORTH Active</span>
                 </div>
                 <Link
                   href="/dashboard/network"
-                  className="px-4 py-2 rounded-full bg-slate-900 text-white dark:bg-white dark:text-black text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
+                  className="px-4 py-1.5 rounded-full bg-[#14141A] text-white text-xs font-bold hover:bg-[#C7362F] transition-all shadow-xs flex items-center gap-1"
                 >
                   View Network
                 </Link>
@@ -180,39 +189,43 @@ export default function DashboardPage() {
 
             {/* CARD 2: HOTSPOT INTELLIGENCE */}
             <div
-              className="rounded-[28px] bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
+              className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden"
             >
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-11 h-11 rounded-full bg-amber-50 dark:bg-slate-800 text-amber-600 dark:text-white border border-amber-100 dark:border-slate-700 flex items-center justify-center shadow-xs">
+                <div className="flex items-center justify-between mb-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 text-[#D08A1E] border border-amber-100 flex items-center justify-center shadow-xs">
                     <MapPin className="w-5 h-5" />
                   </div>
-                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50">
-                    6 Active Hotspots
-                  </span>
+                  
+                  {/* SIGNATURE ELEMENT: Physical Field Report Case Stamp */}
+                  <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm border border-[#D08A1E]/50 bg-[#D08A1E]/10 text-[#D08A1E] font-mono text-[9px] font-black uppercase tracking-wider -rotate-1 shadow-2xs">
+                    GRID #BGL-06 // ACTIVE
+                  </div>
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    Primary Crime Vector & MO
-                  </p>
-                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#D08A1E]">
+                      Primary Crime Vector & MO
+                    </span>
+                  </div>
+                  <h3 className="text-base font-black text-[#14141A] tracking-tight leading-snug">
                     Vehicle Theft & Commercial Hijack
                   </h3>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 pt-1">
+                  <p className="text-[11px] text-slate-500 line-clamp-2 pt-1 font-medium">
                     Peak window 22:00–03:00 hrs targeting Pulsar & TVS Apache transit.
                   </p>
                 </div>
               </div>
 
-              <div className="pt-4 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+              <div className="pt-3.5 mt-3 border-t border-slate-100 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-extrabold text-slate-900 dark:text-white">Hotspot Grid</span>
-                  <span className="block text-[10px] text-slate-500 font-medium">GIS Patrol Active</span>
+                  <span className="text-xs font-black text-[#14141A]">Hotspot Grid</span>
+                  <span className="block text-[10px] text-slate-500 font-mono font-semibold">GIS Patrol Active</span>
                 </div>
                 <Link
                   href="/dashboard/map"
-                  className="px-4 py-2 rounded-full bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-all shadow-xs flex items-center gap-1"
+                  className="px-4 py-1.5 rounded-full bg-[#2E5FE0] text-white text-xs font-bold hover:bg-blue-700 transition-all shadow-xs flex items-center gap-1"
                 >
                   Deploy Patrol
                 </Link>
@@ -221,44 +234,46 @@ export default function DashboardPage() {
 
             {/* CARD 3: SUSPECT WATCHLIST ALERT */}
             <div
-              className="rounded-[28px] bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
+              className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden"
             >
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-11 h-11 rounded-full bg-purple-50 dark:bg-slate-800 text-purple-600 dark:text-white border border-purple-100 dark:border-slate-700 flex items-center justify-center shadow-xs">
+                <div className="flex items-center justify-between mb-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center shadow-xs">
                     <Users className="w-5 h-5" />
                   </div>
-                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-900/50">
-                    Watchlist Hit
-                  </span>
+                  
+                  {/* SIGNATURE ELEMENT: Physical Field Report Case Stamp */}
+                  <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm border border-[#C7362F]/50 bg-[#C7362F]/10 text-[#C7362F] font-mono text-[9px] font-black uppercase tracking-wider -rotate-1 shadow-2xs">
+                    WARRANT #SUS-7701
+                  </div>
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  <p className="text-xs text-slate-500 font-medium">
                     ANPR Hit 14m ago · Indiranagar
                   </p>
-                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug">
+                  <h3 className="text-base font-black text-[#14141A] tracking-tight leading-snug">
                     Vicky “The Snake” (Repeat)
                   </h3>
                   <div className="flex flex-wrap items-center gap-1.5 pt-2 pb-1">
-                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300">
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-semibold text-slate-700">
                       Non-Bailable Warrant
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300 font-mono">
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-bold text-slate-700 font-mono">
                       SUS-7701
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+              <div className="pt-3.5 mt-3 border-t border-slate-100 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-extrabold text-slate-900 dark:text-white">Active Warrant</span>
-                  <span className="block text-[10px] text-slate-500 font-medium">Patrol Alerted</span>
+                  <span className="text-xs font-black text-[#14141A]">Active Warrant</span>
+                  <span className="block text-[10px] text-slate-500 font-mono font-semibold">Patrol Alerted</span>
                 </div>
                 <Link
                   href="/dashboard/suspect"
-                  className="px-4 py-2 rounded-full bg-slate-900 text-white dark:bg-white dark:text-black text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
+                  className="px-4 py-1.5 rounded-full bg-[#14141A] text-white text-xs font-bold hover:bg-[#C7362F] transition-all shadow-xs flex items-center gap-1"
                 >
                   Track Suspect
                 </Link>
@@ -267,44 +282,46 @@ export default function DashboardPage() {
 
             {/* CARD 4: ANPR SENSOR TELEMETRY */}
             <div
-              className="rounded-[28px] bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
+              className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden"
             >
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-11 h-11 rounded-full bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-white border border-emerald-100 dark:border-slate-700 flex items-center justify-center shadow-xs">
+                <div className="flex items-center justify-between mb-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#1E8A5F] border border-emerald-100 flex items-center justify-center shadow-xs">
                     <Camera className="w-5 h-5" />
                   </div>
-                  <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50">
-                    99.4% Grid Uptime
-                  </span>
+                  
+                  {/* SIGNATURE ELEMENT: Physical Field Report Case Stamp */}
+                  <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm border border-[#1E8A5F]/50 bg-[#1E8A5F]/10 text-[#1E8A5F] font-mono text-[9px] font-black uppercase tracking-wider -rotate-1 shadow-2xs">
+                    SENSOR #12.5K // LIVE
+                  </div>
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  <p className="text-xs text-slate-500 font-medium">
                     Surveillance Network · Bengaluru City
                   </p>
-                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug">
+                  <h3 className="text-base font-black text-[#14141A] tracking-tight leading-snug">
                     12,500+ ANPR Nodes Active
                   </h3>
                   <div className="flex flex-wrap items-center gap-1.5 pt-2 pb-1">
-                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300">
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-semibold text-slate-700">
                       14 PCR Units
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300">
-                      Optical Sync Live
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-[#1E8A5F] text-[10px] font-bold font-mono">
+                      Optical Sync 99.4%
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+              <div className="pt-3.5 mt-3 border-t border-slate-100 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-extrabold text-slate-900 dark:text-white">Sensor Grid</span>
-                  <span className="block text-[10px] text-slate-500 font-medium">Real-Time Streams</span>
+                  <span className="text-xs font-black text-[#14141A]">Sensor Grid</span>
+                  <span className="block text-[10px] text-slate-500 font-mono font-semibold">Real-Time Streams</span>
                 </div>
                 <Link
                   href="/dashboard/surveillance"
-                  className="px-4 py-2 rounded-full bg-slate-900 text-white dark:bg-white dark:text-black text-xs font-bold hover:scale-105 transition-all shadow-xs flex items-center gap-1"
+                  className="px-4 py-1.5 rounded-full bg-[#14141A] text-white text-xs font-bold hover:bg-[#2E5FE0] transition-all shadow-xs flex items-center gap-1"
                 >
                   View Feed
                 </Link>
@@ -315,26 +332,26 @@ export default function DashboardPage() {
         </div>
 
         {/* RIGHT COLUMN: CASES RESOLVED GRAPH CARD (4 COLS) */}
-        <div className="lg:col-span-4 rounded-3xl bg-white dark:bg-[#18181B] border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col justify-between h-full">
+        <div className="lg:col-span-4 rounded-2xl bg-white border border-slate-200/90 p-5 shadow-2xs flex flex-col justify-between h-full">
           <div>
             <div className="flex items-center justify-between text-slate-400">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wide font-mono">
                 {timeFilter === 'Day' ? 'Cases Resolved Today' :
                  timeFilter === 'Week' ? 'Cases Resolved This Week' :
                  timeFilter === 'Year' ? 'Cases Resolved This Year' :
                  'Cases Resolved This Month'}
               </p>
-              <button className="text-slate-400 hover:text-slate-900 dark:hover:text-white">
+              <button className="text-slate-400 hover:text-slate-900">
                 <MoreVertical className="w-4 h-4" />
               </button>
             </div>
             
-            <p className="text-3xl font-extrabold text-slate-900 dark:text-white mt-1 tracking-tight">
+            <p className="text-3xl font-black text-[#14141A] mt-1 tracking-tight">
               {timeFilter === 'Day' ? '92.0%' :
                timeFilter === 'Week' ? '88.2%' :
                timeFilter === 'Year' ? '81.4%' :
                '84.5%'}
-              <span className="text-sm font-normal text-slate-500 ml-1.5">
+              <span className="text-sm font-semibold text-slate-500 ml-1.5 font-mono">
                 / {timeFilter === 'Day' ? '12 Dossiers' :
                    timeFilter === 'Week' ? '48 Dossiers' :
                    timeFilter === 'Year' ? '1,840 Dossiers' :
@@ -350,8 +367,8 @@ export default function DashboardPage() {
                   onClick={() => setTimeFilter(tab)}
                   className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
                     timeFilter === tab 
-                      ? 'bg-slate-900 text-white dark:bg-white dark:text-black font-bold shadow-xs' 
-                      : 'hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-[#14141A] text-white font-bold shadow-xs' 
+                      : 'hover:text-slate-900'
                   }`}
                 >
                   {tab}
@@ -359,13 +376,13 @@ export default function DashboardPage() {
               ))}
             </div>
 
-            {/* SMOOTH CURVED SVG BEZIER SPLINE CHART */}
+            {/* SMOOTH CURVED SVG BEZIER SPLINE CHART (COBALT #2E5FE0) */}
             <div className="relative mt-5 h-28 w-full">
               <svg viewBox="0 0 300 100" className="w-full h-full overflow-visible" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#1d6fbf" stopOpacity="0.15" />
-                    <stop offset="100%" stopColor="#1d6fbf" stopOpacity="0.0" />
+                    <stop offset="0%" stopColor="#2E5FE0" stopOpacity="0.18" />
+                    <stop offset="100%" stopColor="#2E5FE0" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
                 
@@ -394,7 +411,7 @@ export default function DashboardPage() {
                       : 'M 0,65 C 20,40 40,80 70,50 C 100,20 120,70 150,45 C 180,20 200,10 230,12 C 250,15 270,70 300,45'
                   }
                   fill="none"
-                  stroke="#1d6fbf"
+                  stroke="#2E5FE0"
                   strokeWidth="2.5"
                   strokeLinecap="round"
                   className="transition-all duration-500"
@@ -404,41 +421,32 @@ export default function DashboardPage() {
           </div>
 
           {/* BOTTOM TARGET CARD */}
-          <div className="mt-4 p-4 rounded-2xl bg-slate-900 text-white flex items-center justify-between shadow-sm">
+          <div className="mt-4 p-4 rounded-xl bg-[#14141A] text-white flex items-center justify-between shadow-sm">
             <div>
-              <p className="text-[10px] text-slate-400 font-medium">Plan for 2026</p>
-              <p className="text-xs font-bold text-white mt-0.5">Clearance Target</p>
+              <p className="text-[10px] text-slate-400 font-mono font-medium">FIELD OPS // PLAN 2026</p>
+              <p className="text-xs font-black text-white mt-0.5 uppercase tracking-wide">Clearance Target</p>
             </div>
 
             <div className="relative w-12 h-12 flex items-center justify-center">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
                 <path
-                  className="text-slate-700"
+                  className="text-slate-800"
                   strokeWidth="4"
                   stroke="currentColor"
                   fill="none"
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
                 <path
-                  className="text-blue-500"
-                  strokeDasharray={`${
-                    timeFilter === 'Day' ? 92 :
-                    timeFilter === 'Week' ? 88 :
-                    timeFilter === 'Year' ? 81 :
-                    75
-                  }, 100`}
+                  className="text-[#2E5FE0]"
+                  strokeDasharray="75, 100"
                   strokeWidth="4"
                   strokeLinecap="round"
                   stroke="currentColor"
                   fill="none"
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
               </svg>
-              <span className="absolute text-[10px] font-black text-white">
-                {timeFilter === 'Day' ? '92%' :
-                 timeFilter === 'Week' ? '88%' :
-                 timeFilter === 'Year' ? '81%' :
-                 '75%'}
+              <span className="absolute text-[11px] font-black text-white font-mono">
+                75%
               </span>
             </div>
           </div>

@@ -267,8 +267,8 @@ function SupervisorSidebar({ collapsed, setCollapsed }: { collapsed: boolean; se
                 collapsed ? 'w-12 h-12 justify-center mx-auto' : 'gap-3.5 px-4 py-3'
               } ${
                 active
-                  ? 'bg-black text-white shadow-sm'
-                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                  ? 'bg-[#1B2A4A] text-white shadow-sm font-bold'
+                  : 'text-gray-600 hover:text-[#1B2A4A] hover:bg-[#F7F5F1]'
               }`}
               title={collapsed ? item.label : undefined}
             >
@@ -415,10 +415,10 @@ export default function SupervisorLayout({ children }: { children: React.ReactNo
   return (
     <LanguageProvider>
       <SupervisorTelemetryProvider>
-        <div className="flex h-screen bg-[#F4F5F8] overflow-hidden">
+        <div className="flex h-screen bg-[#F7F5F1] text-[#1C1F26] overflow-hidden bg-[radial-gradient(#1B2A4A12_1px,transparent_1px)] [background-size:20px_20px]">
           <SupervisorSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
 
-          <div className="flex-1 flex flex-col overflow-hidden min-w-0 bg-[#F4F5F8]">
+          <div className="flex-1 flex flex-col overflow-hidden min-w-0 bg-transparent">
             <SupervisorHeader onOpenDrishti={openPanel} />
 
             <main ref={mainContentRef} className="flex-1 overflow-auto px-4 sm:px-8 pb-8">

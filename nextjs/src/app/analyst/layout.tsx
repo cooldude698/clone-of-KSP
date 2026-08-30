@@ -204,13 +204,13 @@ function AnalystSidebar({ collapsed, setCollapsed }: { collapsed: boolean; setCo
               href={item.href}
               className={`group flex items-center gap-3.5 px-4 py-3 text-xs font-semibold transition-all relative ${
                 active
-                  ? 'bg-slate-900 text-white rounded-2xl font-bold shadow-sm'
-                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-2xl'
+                  ? 'bg-[#0F5257] text-white rounded-2xl font-bold shadow-sm'
+                  : 'text-gray-600 hover:text-[#0F5257] hover:bg-[#F5F7F7] rounded-2xl'
               } ${collapsed ? 'justify-center px-0' : ''}`}
             >
               <Icon
                 className={`w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-105 ${
-                  active ? 'text-teal-400' : 'text-gray-400 group-hover:text-gray-900'
+                  active ? 'text-teal-300' : 'text-gray-400 group-hover:text-[#0F5257]'
                 }`}
               />
               {!collapsed && <span className="tracking-normal truncate">{item.label}</span>}
@@ -267,7 +267,7 @@ export default function AnalystLayout({ children }: { children: React.ReactNode 
   return (
     <LanguageProvider>
       <AnalystTelemetryProvider>
-        <div className="flex h-screen bg-[#F4F5F8] overflow-hidden text-slate-900 font-sans">
+        <div className="flex h-screen bg-[#F5F7F7] overflow-hidden text-[#14201F] font-sans">
           {/* Main Sidebar */}
           <AnalystSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
 
