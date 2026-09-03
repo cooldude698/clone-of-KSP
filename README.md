@@ -651,7 +651,7 @@ interface DrishtiResponse {
 
 ---
 
-## 📄 License
+## 📄 License :
 
 Built for the **Karnataka State Police Datathon 2026** (Hack2Skill).  
 Distributed under the **MIT License**.
